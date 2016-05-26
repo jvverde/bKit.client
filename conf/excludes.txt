@@ -15,6 +15,7 @@ Temp/
 cache/
 cache2/
 Cache/
+System Volume Information
 
 
 

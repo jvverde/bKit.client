@@ -11,6 +11,8 @@ use Config::Simple;
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;
 
+my $server = shift or do {print "Usage:\n\t$0 server-address"; exit};
+
 sub saveData{
   my ($file,$data) = @_;
   open my $fhv, ">$file" or (warn "Cannot save info to $file" and return undef);
@@ -66,7 +68,7 @@ my $name = $sysInfo->{nodeName};
 my $domain = $sysInfo->{domainName}; 
 
 my $cfg = new Config::Simple(syntax=>'http');
-$cfg->param('url',"rsync://user\@10.1.2.6:8733/${domain}.${name}.${uuid}");
+$cfg->param('url',"rsync://user\@${server}:8733/${domain}.${name}.${uuid}");
 $cfg->param('pass','us3r');
 $cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";
 
@@ -75,7 +77,7 @@ $path =~ s/[\\]/\//g; #dos->unix
 $path =~ s/^([a-z]):/\/cygdrive\/$1/i;
 
 my $init = qq|${rsync} -rltvvhR --inplace --stats |
-  .qq| ${path}/./ rsync://admin\@10.1.2.6:8733/bkit.me/win/${domain}/${name}/${uuid}|
+  .qq| ${path}/./ rsync://admin\@${server}:8733/bkit.me/win/${domain}/${name}/${uuid}|
   .qq| 2>${logDir}\\err.txt >${logDir}\\logs.txt|
 ;
 

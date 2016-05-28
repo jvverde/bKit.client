@@ -8,6 +8,7 @@ Documents and Settings/*/Recent
 Documents and Settings/*/Local Settings/Temp
 System32/LogFiles/
 Windows/Logs/
+Windows/Prefetch/
 iobw.tst
 RECYCLER/
 Temp/

@@ -6,6 +6,9 @@ Users/*/AppData/Local/Temp
 Documents and Settings/*/Cookies
 Documents and Settings/*/Recent
 Documents and Settings/*/Local Settings/Temp
+AppData/Local/IconCache.db
+Local Settings/Application Data/IconCache.db
+Windows/ShellIconCache
 System32/LogFiles/
 Windows/Logs/
 Windows/Prefetch/

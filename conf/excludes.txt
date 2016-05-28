@@ -12,6 +12,7 @@ Windows/Prefetch/
 iobw.tst
 RECYCLER/
 Temp/
+tmp
 *.tmp
 *.dmp
 cache/

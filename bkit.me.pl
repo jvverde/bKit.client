@@ -85,7 +85,7 @@ my $lastVssKey = pop @{[sort keys %$cvss]};
 my $cur = $cvss->{$lastVssKey}->{volume};
 #my $VolumeSerialNumber = (Win32::DriveInfo::VolumeInfo ( $drive ))[1] || "DRIVE_$drive";
 
-my $fmt = qq|"\%o \%i \%f \%l \%b"|;
+my $fmt = q|"%o %i %f %l %b"|;
 if (defined $cur){
   my ($shcN) = $cur =~ /(HarddiskVolumeShadowCopy\d+)/;
   open my $handler, "|-"

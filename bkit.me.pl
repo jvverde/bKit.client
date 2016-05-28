@@ -85,14 +85,14 @@ my $lastVssKey = pop @{[sort keys %$cvss]};
 my $cur = $cvss->{$lastVssKey}->{volume};
 #my $VolumeSerialNumber = (Win32::DriveInfo::VolumeInfo ( $drive ))[1] || "DRIVE_$drive";
 
-my $fmt = q|"%o %i %f %l %b"|;
+my $fmt = q|"%t %o %i %f %l %b"|;
 if (defined $cur){
   my ($shcN) = $cur =~ /(HarddiskVolumeShadowCopy\d+)/;
   open my $handler, "|-"
     ,qq|${rsync} -rlitzvvhR --chmod=ugo=rwX --inplace --delete-after --force --delete-excluded --stats --fuzzy|
 	.qq| --skip-compress=gz/zip/z/rpm/deb/iso/bz2/t[gb]z/7z/mp[34]/mov/avi/ogg/jpg/jpeg|
 	.qq| --exclude-from=$cd\\conf\\excludes.txt|
-	.qq| --log-file-format=${fmt} --log-file=${bkit}\\logs\\rsync.log|
+	.qq| --out-format=${fmt}|
     .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path} ${url}/{$drive}/current/|
     .qq| 2>${bkit}\\logs\\err.txt >${bkit}\\logs\\logs.txt|;
   print $handler "${pass}\n\n";

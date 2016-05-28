@@ -7,6 +7,7 @@ Documents and Settings/*/Cookies
 Documents and Settings/*/Recent
 Documents and Settings/*/Local Settings/Temp
 System32/LogFiles/
+Windows/Logs/
 iobw.tst
 RECYCLER/
 Temp/

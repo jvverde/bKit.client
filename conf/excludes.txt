@@ -18,8 +18,8 @@ iobw.tst
 RECYCLER/
 Temp/
 tmp
-*.tmp
 *.dmp
+*.tmp
 cache/
 cache2/
 Cache/

@@ -1,0 +1,65 @@
+{
+   "Win32_OperatingSystem" : {
+      "SystemDirectory" : "C:\\Windows\\system32",
+      "Locale" : "0816",
+      "ProductType" : 1,
+      "SerialNumber" : "00178-70000-00011-AA011",
+      "OperatingSystemSKU" : 48,
+      "CSName" : "MEATFEUP",
+      "Version" : "6.2.9200",
+      "OSArchitecture" : "64-bit",
+      "SystemDevice" : "\\Device\\HarddiskVolume2",
+      "Caption" : "Microsoft Windows 8 Pro",
+      "Name" : "Microsoft Windows 8 Pro|C:\\Windows|\\Device\\Harddisk0\\Partition2",
+      "ServicePackMajorVersion" : 0,
+      "BootDevice" : "\\Device\\HarddiskVolume6",
+      "CountryCode" : "351",
+      "BuildNumber" : "9200",
+      "WindowsDirectory" : "C:\\Windows",
+      "SystemDrive" : "C:",
+      "ServicePackMinorVersion" : 0,
+      "OSType" : 18,
+      "CodeSet" : "1252",
+      "BuildType" : "Multiprocessor Free",
+      "OSProductSuite" : 256,
+      "OSLanguage" : 2057
+   },
+   "Win32_BIOS" : {
+      "SMBIOSPresent" : 1,
+      "SMBIOSBIOSVersion" : "V1.30",
+      "SystemBiosMinorVersion" : null,
+      "PrimaryBIOS" : 1,
+      "Version" : "TOSCPL - 6040000",
+      "SoftwareElementState" : 3,
+      "SMBIOSMinorVersion" : 5,
+      "Manufacturer" : "TOSHIBA",
+      "Name" : "Ver 1.00PARTTBLD",
+      "SMBIOSMajorVersion" : 2,
+      "SystemBiosMajorVersion" : null,
+      "BIOSVersion" : [
+         "TOSCPL - 6040000",
+         "Ver 1.00PARTTBLD"
+      ],
+      "SerialNumber" : "79430650K",
+      "BuildNumber" : null
+   },
+   "Win32_ComputerSystem" : {
+      "Domain" : "WORKGROUP",
+      "Name" : "MEATFEUP",
+      "SystemSKUNumber" : null,
+      "DNSHostName" : "meatfeup",
+      "Manufacturer" : "TOSHIBA",
+      "DomainRole" : 0,
+      "Model" : "Satellite L550",
+      "Workgroup" : "WORKGROUP"
+   },
+   "Win32_ComputerSystemProduct" : {
+      "Vendor" : "TOSHIBA",
+      "SKUNumber" : null,
+      "IdentifyingNumber" : "79430650K",
+      "Version" : "PSLN8E-01001UEP",
+      "UUID" : "BE12F655-8A5F-DE11-86E9-00235AF75147",
+      "Name" : "Satellite L550"
+   }
+}
+

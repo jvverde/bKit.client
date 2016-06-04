@@ -1,5 +1,7 @@
 <template>
   <li class="backup" @click.stop="toggle">
+    <icon name="minus-square-o" scale=".8" v-if="open"></icon>
+    <icon name="plus-square-o" scale=".8" v-else></icon>
     <icon name="clone" scale=".8"></icon>
     {{location.backup}}
     <directory v-if="open"

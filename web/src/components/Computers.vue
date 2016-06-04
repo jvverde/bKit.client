@@ -7,6 +7,8 @@
     <ul class="tree">
       <li v-for="computer in computers" class="computer" 
         @click.stop="toggle_roots($index)" >
+        <icon name="minus-square-o" scale=".8" v-if="computer.open"></icon>
+        <icon name="plus-square-o" scale=".8" v-else></icon>
         <icon name="tv" scale=".8" label="Backup computer"></icon>
         {{computer.name}}
         <root v-if="computer.open"

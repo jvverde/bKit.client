@@ -1,12 +1,12 @@
 <template>
-  <div class="backup" @click="toggle">
+  <li class="backup" @click="toggle">
     <slot>Backup:{{location.backup}}</slot>
     <directory v-if="open" 
       :entries="entries"
       path="/"
       :location="location">
     </directory>
-  </div>
+  </li>
 </template>
 
 <script>
@@ -44,9 +44,7 @@
   }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   .directory{
-    border: 1px solid red;
   }
 </style>

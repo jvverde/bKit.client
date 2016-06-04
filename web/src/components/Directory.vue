@@ -2,19 +2,19 @@
   <div class="directory">
     <ul class="directories">
       <li v-for="folder in folders" @click.stop="toggle($index)">
+        <icon name="folder-o" scale=".8" v-if="folder.open === false"></icon>
+        <icon name="folder-open-o" scale=".8" v-else></icon>
         {{folder.name}}
-        <b v-if="folder.entries.folders && folder.entries.folders.length > 0">
-          ({{folder.entries.folders.length}})
-        </b>
-        <directory v-if="folder.open" 
+        <directory v-if="folder.open" keep-alive
           :entries="folder.entries"
-          :path="path + folder.name"
+          :path="path + encodeURIComponent(folder.name)"
           :location="location">
         </directory>
       </li>
     </ul>
-    <ul class="files tree">
+    <ul class="files">
       <li v-for="file in files">
+        <icon name="file-o" scale=".8"></icon>
         {{file}}
       </li>      
     </ul>
@@ -43,6 +43,7 @@
       return obj.folders instanceof Array
     }
   }
+  import Icon from 'vue-awesome/src/components/Icon'
   export default {
     name: 'directory',
     data () {
@@ -56,7 +57,10 @@
       path: requiredString,
       entries: requiredEntries
     },
-    ready () {
+    components: {
+      Icon
+    },
+    created () {
       this.files = this.entries.files
       var url = 'http://10.1.2.219:8082/folder' +
         '/' + this.location.computer +
@@ -68,8 +72,9 @@
       })
       var self = this
       this.folders.forEach(function (folder) {
-        console.log(url + folder.name + '/')
-        self.$http.jsonp(url + folder.name + '/').then(
+        var u = url + encodeURIComponent(folder.name) + '/'
+        console.log(u)
+        self.$http.jsonp(u).then(
           function (response) {
             folder.entries = response.data
           },
@@ -82,13 +87,15 @@
     methods: {
       toggle (index) {
         this.folders[index].open = !this.folders[index].open
+      },
+      hasChildren (index) {
+        return this.folders[index].entries.folders &&
+          this.folders[index].entries.folders.length > 0
       }
     }
   }
 </script>
 
 <style scoped>
-  .directory{
 
-  }
 </style>

@@ -1,7 +1,8 @@
 <template>
-  <li class="backup" @click="toggle">
-    <slot>Backup:{{location.backup}}</slot>
-    <directory v-if="open" 
+  <li class="backup" @click.stop="toggle">
+    <icon name="clone" scale=".8"></icon>
+    {{location.backup}}
+    <directory v-if="open"
       :entries="entries"
       path="/"
       :location="location">
@@ -11,6 +12,8 @@
 
 <script>
   import Directory from './Directory'
+  import Icon from 'vue-awesome/src/components/Icon'
+
   export default {
     data () {
       return {
@@ -19,7 +22,8 @@
       }
     },
     components: {
-      Directory
+      Directory,
+      Icon
     },
     props: ['location'],
     ready () {

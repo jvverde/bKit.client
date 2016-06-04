@@ -2,8 +2,13 @@
   <div class="directory">
     <ul class="directories">
       <li v-for="folder in folders" @click.stop="toggle($index)">
-        <icon name="folder-o" scale=".8" v-if="folder.open === false"></icon>
-        <icon name="folder-open-o" scale=".8" v-else></icon>
+        <span v-if="hasChildren($index)">
+          <icon name="minus-square-o" scale=".8" v-if="folder.open"></icon>
+          <icon name="plus-square-o" scale=".8" v-else></icon>
+        </span>
+        <icon name="refresh" spin="true" scale=".8" v-if="isWaiting($index)"></icon>
+        <icon name="folder-open-o" scale=".8" v-if="folder.open"></icon>
+        <icon name="folder-o" scale=".8" v-else></icon>
         {{folder.name}}
         <directory v-if="folder.open" keep-alive
           :entries="folder.entries"
@@ -73,7 +78,6 @@
       var self = this
       this.folders.forEach(function (folder) {
         var u = url + encodeURIComponent(folder.name) + '/'
-        console.log(u)
         self.$http.jsonp(u).then(
           function (response) {
             folder.entries = response.data
@@ -90,7 +94,13 @@
       },
       hasChildren (index) {
         return this.folders[index].entries.folders &&
-          this.folders[index].entries.folders.length > 0
+          this.folders[index].entries.folders.length > 0 ||
+          this.folders[index].entries.files &&
+          this.folders[index].entries.files.length > 0
+      },
+      isWaiting (index) {
+        return !('folders' in this.folders[index].entries ||
+          'files' in this.folders[index].entries)
       }
     }
   }

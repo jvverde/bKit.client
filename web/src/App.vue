@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <img class="logo" src="./assets/00-Logotipo/256x256.png">
     <computers name="Maria"></computers>
+  </div>
 </template>
 
 <script>
@@ -21,16 +21,14 @@
 
   body {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+    align-items: left;
+    justify-content: left;
   }
 
   #app {
     color: #2c3e50;
-    margin-top: -100px;
-    max-width: 600px;
     font-family: Source Sans Pro, Helvetica, sans-serif;
+    font-size: 12pt;
     text-align: center;
   }
 
@@ -39,8 +37,49 @@
     text-decoration: none;
   }
 
-  .logo {
-    width: 100px;
-    height: 100px
+  .tree{
+    text-align: left;    
+  }
+  .tree ul,
+  .tree li
+  {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+  }
+  .tree ul{
+    margin-left: .5em;
+    position:relative;
+  }
+  .tree ::before{
+    border-width: 0;
+    border-style: dotted;
+    border-color: #AA3;
+    position:absolute;
+    display:block;
+    content:"";
+  }
+  .tree ul::before {
+    content:"";
+    width:0;
+    top:0;
+    bottom:.7em;            /* (line-height/2) */
+    left:0;
+    border-left-width:1px;
+  }
+  .tree li {
+    margin:0;
+    padding:0 1em;          /* indentation = .5em */
+    line-height:1.4em;  
+    position:relative;
+    cursor: pointer;
+  }
+  .tree li::before {
+    width:.9em;             /* 90% of indentation */
+    height:0;
+    border-top-width:1px;
+    margin-top:-1px;        /* border top width */
+    top:.7em;               /* (line-height/2) */
+    left:0;
   }
 </style>

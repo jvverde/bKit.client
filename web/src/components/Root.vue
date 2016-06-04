@@ -1,9 +1,8 @@
 <template>
   <ul class="root">
-    <li v-for="root in roots">
-      <span @click="toggle_root($index)" class="dir">
-        {{root.name}}
-      </span>
+    <li v-for="root in roots" @click.stop="toggle_root($index)">
+      <icon name="database" scale=".8"></icon>
+      {{root.name}}
       <ul v-if="root.open">
         <backup v-for="backup in root.backups"
           :location="{computer:this.computer, root:root.name, backup:backup}">
@@ -15,6 +14,7 @@
 
 <script>
   import Backup from './Backup'
+  import Icon from 'vue-awesome/src/components/Icon'
   export default {
     data () {
       return {
@@ -23,7 +23,8 @@
       }
     },
     components: {
-      Backup
+      Backup,
+      Icon
     },
     props: ['path'],
     ready () {

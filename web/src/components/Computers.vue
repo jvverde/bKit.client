@@ -5,11 +5,10 @@
       <h1>{{ msg }} {{name}}</h1>
     </header>
     <ul class="tree">
-      <li v-for="computer in computers" class="computer">
-        <icon name="tv" scale=".7" label="Backup computer"></icon>
-        <span @click="toggle_roots($index)" class="computer">
-          {{computer.name}}
-        </span>
+      <li v-for="computer in computers" class="computer" 
+        @click.stop="toggle_roots($index)" >
+        <icon name="tv" scale=".8" label="Backup computer"></icon>
+        {{computer.name}}
         <root v-if="computer.open"
           :path="{name:computer.name,fullname:computer.id}">
         </root>

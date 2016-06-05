@@ -1,16 +1,19 @@
 <template>
-  <div class="directory">
     <ul class="directories">
       <li v-for="folder in folders" @click.stop="toggle($index)">
         <span v-if="hasChildren($index)">
           <icon name="minus-square-o" scale=".8" v-if="folder.open"></icon>
           <icon name="plus-square-o" scale=".8" v-else></icon>
         </span>
-        <icon name="refresh" spin="true" scale=".8" v-if="isWaiting($index)"></icon>
+        <icon name="refresh" :spin="true" scale=".8" v-if="isWaiting($index)"></icon>
         <icon name="folder-open-o" scale=".8" v-if="folder.open"></icon>
         <icon name="folder-o" scale=".8" v-else></icon>
         {{folder.name}}
-        <directory v-if="folder.open" keep-alive
+        <a @click.stop=""
+          :href="getUrl('rsync',location,path,folder.name)">
+          <icon name="retweet" scale=".8"></icon>
+        </a>
+        <directory v-if="folder.open"
           :entries="folder.entries"
           :path="path + encodeURIComponent(folder.name)"
           :location="location">
@@ -20,10 +23,24 @@
     <ul class="files">
       <li v-for="file in files">
         <icon name="file-o" scale=".8"></icon>
-        {{file}}
+        <a :download="file" class="file" @click.stop=""
+          :href="getUrl('download',location,path,file)">
+          {{file}}
+        </a>
+        <a :download="file" @click.stop=""
+          :href="getUrl('download',location,path,file)">
+          <icon name="download" scale=".8"></icon>
+        </a>        
+        <a target="_blank" @click.stop=""
+          :href="getUrl('view',location,path,file)">
+          <icon name="eye" scale=".8"></icon>
+        </a>
+        <a @click.stop=""
+          :href="getUrl('rsync',location,path,file)">
+          <icon name="retweet" scale=".8"></icon>
+        </a>
       </li>      
-    </ul>
-  </div>
+    </ul>  
 </template>
 
 <script>
@@ -48,6 +65,13 @@
       return obj.folders instanceof Array
     }
   }
+  function getUrl (base, location, path, entry) {
+    return 'http://10.1.2.219:8082/' + base +
+      '/' + location.computer +
+      '/' + location.root +
+      '/' + location.backup +
+      path + encodeURIComponent(entry || '')
+  }
   import Icon from 'vue-awesome/src/components/Icon'
   export default {
     name: 'directory',
@@ -67,18 +91,14 @@
     },
     created () {
       this.files = this.entries.files
-      var url = 'http://10.1.2.219:8082/folder' +
-        '/' + this.location.computer +
-        '/' + this.location.root +
-        '/' + this.location.backup +
-        this.path
+
       this.folders = this.entries.folders.map(function (folder) {
         return {name: folder, open: false, entries: {}}
       })
       var self = this
       this.folders.forEach(function (folder) {
-        var u = url + encodeURIComponent(folder.name) + '/'
-        self.$http.jsonp(u).then(
+        var url = getUrl('folder', self.location, self.path, folder.name)
+        self.$http.jsonp(url).then(
           function (response) {
             folder.entries = response.data
           },
@@ -89,6 +109,7 @@
       })
     },
     methods: {
+      getUrl: getUrl,
       toggle (index) {
         this.folders[index].open = !this.folders[index].open
       },
@@ -107,5 +128,7 @@
 </script>
 
 <style scoped>
-
+  a.file{
+    color: inherit;
+  }
 </style>

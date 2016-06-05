@@ -23,16 +23,13 @@
     display: flex;
     align-items: left;
     justify-content: left;
-  }
-
-  #app {
     color: #2c3e50;
     font-family: Source Sans Pro, Helvetica, sans-serif;
     font-size: 12pt;
     text-align: center;
   }
 
-  #app a {
+  a {
     color: #42b983;
     text-decoration: none;
   }

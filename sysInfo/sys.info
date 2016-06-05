@@ -1,0 +1,22 @@
+{
+   "version" : [
+      "",
+      10,
+      0,
+      10586,
+      2,
+      0,
+      0,
+      768,
+      1
+   ],
+   "osName" : "Win10",
+   "domainName" : "WORKGROUP",
+   "arch" : "AMD64",
+   "displayName" : "Windows 10 Home Premium (64-bit)",
+   "oem" : 850,
+   "product" : 101,
+   "chip" : 8664,
+   "nodeName" : "PICA"
+}
+

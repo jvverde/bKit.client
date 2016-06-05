@@ -8,6 +8,7 @@ use File::Which;
 #http://stackoverflow.com/questions/1015699/perl-modules-for-creating-a-simple-microsoft-windows-gui
 #http://search.cpan.org/dist/IUP/lib/IUP.pod
 #http://www.cavapackager.com/
+#http://www.arl.wustl.edu/projects/fpx/references/perl/cookbook/ch15_16.htm
 
 ($\,$,) = ("\n","\t");
 

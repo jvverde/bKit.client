@@ -40,6 +40,8 @@
         function (response) {
           this.computers = Object.keys(response.data).map(function (key) {
             return {name: key, id: response.data[key], open: false}
+          }).sort(function (a, b) {
+            return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
           })
         },
         function (response) {

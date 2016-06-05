@@ -6,7 +6,7 @@
       <icon name="database" scale=".8"></icon>
       {{root.name}}
       <ul v-if="root.open">
-        <backup v-for="backup in root.backups"
+        <backup v-for="backup in root.backups | orderBy -1"
           :location="{computer:this.computer, root:root.name, backup:backup}">
         </backup>
       </ul>

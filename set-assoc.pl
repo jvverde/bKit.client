@@ -8,19 +8,13 @@ use Config::Simple;
 
 ($\,$,) = ("\n","\t");
 
-my $server = shift or do {print "Usage:\n\t$0 server-address"; exit};
+my $script = shift or do {print "Usage:\n\t$0 script ext"; exit};
+my $ext = shift or do {print "Usage:\n\t$0 script ext"; exit};
 
 my $cd = dirname abs_path $0;
 
 my $perl = which 'perl';
-my $assoc = which 'Assoc';
-my $ftype = which 'Ftype';
 
-print $perl;
-print $assoc;
-print $ftype;
-
-
-
-
+print qx|Assoc .$ext=rsync|;
+print qx|Ftype rsync=$perl $cd\\$script \%1|;
 

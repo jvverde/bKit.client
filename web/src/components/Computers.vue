@@ -22,6 +22,7 @@
 <script>
   import Root from './Root'
   import Icon from 'vue-awesome/src/components/Icon'
+  import server from '../config.js'
 
   export default {
     data () {
@@ -36,7 +37,7 @@
     },
     props: ['name'],
     ready () {
-      this.$http.jsonp('http://10.1.2.219:8082/computers').then(
+      this.$http.jsonp(server.url + 'computers/').then(
         function (response) {
           this.computers = Object.keys(response.data).map(function (key) {
             return {name: key, id: response.data[key], open: false}

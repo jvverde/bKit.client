@@ -10,7 +10,7 @@
         <icon name="folder-o" scale=".8" v-else></icon>
         {{folder.name}}
         <a @click.stop=""
-          :href="getUrl('rsync',location,path,folder.name)">
+          :href="getUrl('bkit',location,path,folder.name)">
           <icon name="retweet" scale=".8"></icon>
         </a>
         <directory v-if="folder.open"
@@ -36,7 +36,7 @@
           <icon name="eye" scale=".8"></icon>
         </a>
         <a @click.stop=""
-          :href="getUrl('rsync',location,path,file)">
+          :href="getUrl('bkit',location,path,file)">
           <icon name="retweet" scale=".8"></icon>
         </a>
       </li>      
@@ -66,13 +66,14 @@
     }
   }
   function getUrl (base, location, path, entry) {
-    return 'http://10.1.2.219:8082/' + base +
+    return server.url + base +
       '/' + location.computer +
       '/' + location.root +
       '/' + location.backup +
       path + encodeURIComponent(entry || '')
   }
   import Icon from 'vue-awesome/src/components/Icon'
+  import server from '../config.js'
   export default {
     name: 'directory',
     data () {

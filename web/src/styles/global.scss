@@ -1,0 +1,64 @@
+
+html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  color: #000000;
+  font-family: Source Sans Pro, Helvetica, sans-serif;
+  font-size: 12pt;
+  text-align: center;
+}
+
+a {
+  color: #42b983;
+  text-decoration: none;
+}
+
+.tree{
+  $line-height: 1.4em;
+  $li-ident: 0.7em;
+  text-align: left;    
+  ul,li{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    position:relative;
+    &::before{
+      border-width: 0;
+      border-style: dotted;
+      border-color: #AA3;
+      position:absolute;
+      display:block;
+      content:"";
+    }
+  }
+  ul{
+    margin-left: .25em;
+    &::before {
+      content:"";
+      width:0;
+      top:-.8 * ($line-height / 2);
+      bottom:$line-height / 2;      /*stop at half os last li */
+      left:0;
+      border-left-width:1px;
+    }
+  }
+  li {
+    margin:0;
+    padding:0 $li-ident;            /* indentation = .5em */
+    line-height:$line-height;  
+    cursor: pointer;
+    &::before {
+      width:.95 * $li-ident;        /* 95% of indentation */
+      height:0;
+      border-top-width:1px;
+      margin-top:-1px;              /* border top width */
+      top:$line-height / 2;              
+      left:0;
+    }
+  }
+}

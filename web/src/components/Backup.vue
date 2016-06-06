@@ -15,7 +15,7 @@
 <script>
   import Directory from './Directory'
   import Icon from 'vue-awesome/src/components/Icon'
-
+  import server from '../config.js'
   export default {
     data () {
       return {
@@ -29,7 +29,7 @@
     },
     props: ['location'],
     ready () {
-      var url = 'http://10.1.2.219:8082/folder' +
+      var url = server.url + 'folder' +
         '/' + this.location.computer +
         '/' + this.location.root +
         '/' + this.location.backup

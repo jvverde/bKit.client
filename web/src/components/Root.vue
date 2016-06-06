@@ -17,6 +17,7 @@
 <script>
   import Backup from './Backup'
   import Icon from 'vue-awesome/src/components/Icon'
+  import server from '../config.js'
   export default {
     data () {
       return {
@@ -31,7 +32,7 @@
     props: ['path'],
     ready () {
       this.computer = this.path.fullname
-      this.$http.jsonp('http://10.1.2.219:8082/backups/' + this.computer).then(
+      this.$http.jsonp(server.url + 'backups/' + this.computer).then(
         function (response) {
           this.roots = Object.keys(response.data).map(function (key) {
             return {name: key, backups: response.data[key], open: false}

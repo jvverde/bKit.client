@@ -89,12 +89,11 @@ my $fmt = q#"%t|%o|%i|%l|%b|%f"#;
 if (defined $cur){
   my ($shcN) = $cur =~ /(HarddiskVolumeShadowCopy\d+)/;
   open my $handler, "|-"
-    ,qq|${rsync} -rlitzvvhR --chmod=ugo=rwX --inplace --delete-after --force --delete-excluded --stats --fuzzy|
-	.qq| --skip-compress=gz/zip/z/rpm/deb/iso/bz2/t[gb]z/7z/mp[34]/mov/avi/ogg/jpg/jpeg|
+    ,qq|${rsync} -rlitzvvhR --chmod=ugo=rwX --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
 	.qq| --exclude-from=$cd\\conf\\excludes.txt|
 	.qq| --out-format=${fmt}|
     .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path} ${url}/{$drive}/current/|
-    .qq| 2>${bkit}\\logs\\err.txt >${bkit}\\logs\\logs.txt|;
+    .qq| 2>${bkit}\\logs\\send-err.txt >${bkit}\\logs\\send-logs.txt|;
   print $handler "${pass}\n\n";
 }
 

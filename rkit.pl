@@ -41,12 +41,9 @@ my $bkit = "$drive:\\$bkitDir";
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);
 my $acls = "$perms\\acls.txt";
 
-
-
 my $fmt = q#"%t|%o|%i|%l|%b|%f"#;
 if (defined $drive && defined $backup && defined $computer){
-  my $r = qq|${rsync} -rlitzvvhR --chmod=ugo=rwX --inplace --delete-after --force --delete-excluded --stats --fuzzy|
-	.qq| --skip-compress=gz/zip/z/rpm/deb/iso/bz2/t[gb]z/7z/mp[34]/mov/avi/ogg/jpg/jpeg|
+  my $r = qq|${rsync} -rlitzvvhR --delete-delay --force --stats --fuzzy|
 	.qq| --out-format=${fmt}|
     .qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
     .qq| 2>${bkit}\\logs\\err.txt >${bkit}\\logs\\logs.txt|;

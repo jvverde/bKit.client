@@ -13,7 +13,7 @@ Windows/ShellIconCache
 System32/LogFiles/
 Windows/Logs/
 Windows/Prefetch/
-AppData/Local/Microsoft/Windows/WER
+Windows/WER
 iobw.tst
 RECYCLER/
 Temp/

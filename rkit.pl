@@ -55,8 +55,8 @@ if (defined $drive && defined $backup && defined $computer){
 			.qq| 2>$rerr 1>$rlog|;
 		open my $handler, "|-", $r; 									#Now we can restore it
 		print $handler "${pass}\n\n";  
-		qx|${push} 2>$poserr 1>$poslog|;									#push another backup to server	
-		$? == 0 or die "The command $push exit with non zero value:$?\nSee file $prerr for details";
+		qx|${push} 2>$poserr 1>$poslog|;								#push another backup to server	
+		$? == 0 or die "The command $push exit with non zero value:$?\nSee file $poserr for details";
 	} or die "Die while executing rsync: $@";
 }
 

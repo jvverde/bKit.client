@@ -43,15 +43,20 @@ my $acls = "$perms\\acls.txt";
 
 my $fmt = q#"%t|%o|%i|%l|%b|%f"#;
 if (defined $drive && defined $backup && defined $computer){
-	my $wpath = $path;
-	$wpath =~ s#/#\\#g;
-	qx|$perl $cd\\bkit.pl $drive:\\$wpath|;
-	my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
-		.qq| --out-format=${fmt}|
-		.qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
-		.qq| 2>${bkit}\\logs\\recv-err.txt >${bkit}\\logs\\recv-logs.txt|;
-	open my $handler, "|-", $r;
-	print $handler "${pass}\n\n";  
+	my $lpath = "$drive:\\$path";
+	$lpath =~ s#/#\\#g;
+	eval{
+		my $push = "$perl $cd\\bkit.pl $lpath";							#First backup it to server
+		qx|${push} 2>${logs}\\pback-err.txt 1>${logs}\\pback-logs.txt|;
+		$? == 0 or die "The command $push exit with non zero value:$?";
+																		#Now we can restore it
+		my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
+			.qq| --out-format=${fmt}|
+			.qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
+			.qq| 2>${logs}\\recv-err.txt 1>${logs}\\recv-logs.txt|;
+		open my $handler, "|-", $r;
+		print $handler "${pass}\n\n";  
+	} or die "Die while executing rsync: $@";
 }
 
 END {

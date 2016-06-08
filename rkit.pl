@@ -49,7 +49,7 @@ if (defined $drive && defined $backup && defined $computer){
 	.qq| --skip-compress=gz/zip/z/rpm/deb/iso/bz2/t[gb]z/7z/mp[34]/mov/avi/ogg/jpg/jpeg|
 	.qq| --out-format=${fmt}|
     .qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
-    .qq| 2>${bkit}\\logs\\err.txt >${bkit}\\logs\\logs.txt|;
+    .qq| 2>${bkit}\\logs\\recv-err.txt >${bkit}\\logs\\recv-logs.txt|;
   print $r;
   open my $handler, "|-", $r;
   print $handler "${pass}\n\n";  

@@ -62,7 +62,7 @@ my $cfg = new Config::Simple("$confdir\\init.conf") or die "File $confdir\\init.
 my $url = $cfg->param('url');
 my $pass = $cfg->param('pass');
 
-my $bkitDir = '.bkit.me';
+my $bkitDir = '.bkit.pt';
 my $bkit = "$drive:\\$bkitDir";
 -d $bkit or mkdir $bkit;
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);

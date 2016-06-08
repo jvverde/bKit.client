@@ -43,7 +43,7 @@ my $acls = "$perms\\acls.txt";
 
 my $fmt = q#"%t|%o|%i|%l|%b|%f"#;
 if (defined $drive && defined $backup && defined $computer){
-  my $r = qq|${rsync} -rlitzvvhR --delete-delay --force --stats --fuzzy|
+  my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
 	.qq| --out-format=${fmt}|
     .qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
     .qq| 2>${bkit}\\logs\\err.txt >${bkit}\\logs\\logs.txt|;
@@ -53,5 +53,5 @@ if (defined $drive && defined $backup && defined $computer){
 }
 
 END {
-
+ 
 }

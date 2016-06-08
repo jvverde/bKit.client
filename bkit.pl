@@ -10,6 +10,7 @@ use Win32;
 use Sys::Hostname;
 use Net::Domain qw|hostfqdn hostdomain|;
 use Config::Simple;
+#https://github.com/candera/shadowspawn
 
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;

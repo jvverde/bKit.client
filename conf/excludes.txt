@@ -22,5 +22,6 @@ tmp
 *.tmp
 cache/
 Cache/
-Cache2 /
+Cache2/
+cache2/
 System Volume Information

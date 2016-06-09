@@ -46,7 +46,7 @@ my $dir = shift or die 'You must specify a directory';
 my ($drive,$path) = ($dir =~ /^([a-z]):(.*)$/i) or die 'You must include drive letter in directory';
 $drive = uc $drive;
 $path =~ s/^[^\\]?/\\$&/; #garante um backslash no inicio do path
-$path =~ s/[\\]/\//g;    #dos->unix 
+$path =~ s/[\\]+/\//g;    #dos->unix and remove duplicates
 
 my $cd = dirname abs_path $0;
 my $confdir = "$cd\\local-conf";
@@ -96,7 +96,9 @@ if (defined $cur){
     ,qq|${rsync} -rlitzvvhR --chmod=ugo=rwX --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
     .qq| --exclude-from=$cd\\conf\\excludes.txt|
     .qq| --out-format=${fmt}|
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path} ${url}/{$drive}/current/|
+    .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/logs|          #src1
+    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path}|                   #src2
+    .qq| ${url}/{$drive}/current/|                                          #dst
     .qq| 1>${bkit}\\logs\\send.log 2>&1|;
   print $handler "${pass}\n\n";
 }

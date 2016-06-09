@@ -1,14 +1,12 @@
 use strict;
 use warnings;
 use Cwd qw|abs_path|;
-use File::Basename qw |dirname|;
+use File::Basename qw|dirname|;
 use File::Which;
 use JSON;
 use Data::Dumper;
 use Win32;
-#use Win32::DriveInfo;
-use Sys::Hostname;
-use Net::Domain qw|hostfqdn hostdomain|;
+use File::Path qw|make_path|;
 use Config::Simple;
 
 ($\,$,) = ("\n","\t");
@@ -27,7 +25,7 @@ my $location =  eval {
   $json->decode($endpoint);
 } or die "Cannot decode input file: $@";
 
-my ($drive, $backup,$computer,$path) = @{$location}{qw|drive backup computer path|};
+my ($drive, $backup,$computer,$path,$file) = @{$location}{qw|drive backup computer path file|};
 
 my $confdir = "$cd\\local-conf";
 -d $confdir or die "$confdir not found";
@@ -43,15 +41,25 @@ my $acls = "$perms\\acls.txt";
 
 my $fmt = q#"%t|%o|%i|%b|%l|%f"#;
 if (defined $drive && defined $backup && defined $computer){
-  my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
-	.qq| --out-format=${fmt}|
-    .qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
-    .qq| 2>${bkit}\\logs\\recv-err.txt >${bkit}\\logs\\recv-logs.txt|;
-  print $r;
-  open my $handler, "|-", $r;
-  print $handler "${pass}\n\n";  
+	my $lpath = "$drive:\\$path";
+	my ($prelog,$prerr,$rlog,$rerr,$poslog,$poserr) = map {"${logs}\\$_"} qw|pre.log pre.err recv.log recv.err pos.log pos.err|;
+	eval{
+		-d $lpath or make_path $lpath; 
+		$lpath =~ s#/#\\#g;												#linux2dos
+		my $push = "$perl $cd\\bkit.pl $lpath";							#First backup it to server
+		qx|${push} 2>$prerr 1>$prelog|;
+		$? == 0 or die "The command $push exit with non zero value:$?\nSee file $prerr for details";
+		my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
+			.qq| --out-format=${fmt}|
+			.qq| ${url}/${drive}/${backup}/./${path} /cygdrive/${drive}/|
+			.qq| 2>$rerr 1>$rlog|;
+		open my $handler, "|-", $r; 									#Now we can restore it
+		print $handler "${pass}\n\n";  
+		qx|${push} 2>$poserr 1>$poslog|;								#push another backup to server	
+		$? == 0 or die "The command $push exit with non zero value:$?\nSee file $poserr for details";
+	} or die "Die while executing rsync: $@";
 }
 
 END {
- 
+	print 'rkit done';
 }

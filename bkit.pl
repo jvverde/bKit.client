@@ -78,7 +78,7 @@ my $lsv = qx|$perl $cd\\getvol.pl| or die "Error code $?";
 saveData "$vols\\volumes.txt", $lsv;
 
 my $devId = drive2DevId $drive, $lsv or die "Cannot get DeviceId for drive $drive:$!";
-system qq|$perl $cd\\csc.pl $drive| and die "Cannot create shadow copy, Error value: $? ($!)";
+qx|$perl $cd\\csc.pl $drive| or die "Cannot create shadow copy, Error value: $? ($!)";
 my $lsh = qx|$perl $cd\\lsh.pl| or die "Error code $? ($!)";
 my $cvss = getShadowCopies $devId, $lsh;
 die 'Cannot get shadow Copies' unless defined $cvss and scalar %$cvss;
@@ -96,8 +96,8 @@ if (defined $cur){
     ,qq|${rsync} -rlitzvvhR --chmod=ugo=rwX --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
     .qq| --exclude-from=$cd\\conf\\excludes.txt|
     .qq| --out-format=${fmt}|
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/logs|          #src1
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path}|                   #src2
+    .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/logs|          #src1	=> logs from previous run
+    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path}|                   #src2	=> the real data
     .qq| ${url}/{$drive}/current/|                                          #dst
     .qq| 1>${bkit}\\logs\\send.log 2>&1|;
   print $handler "${pass}\n\n";

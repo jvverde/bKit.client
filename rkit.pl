@@ -41,7 +41,7 @@ my $bkit = "$drive:\\$bkitDir";
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);
 my $acls = "$perms\\acls.txt";
 
-my $fmt = q#"%t|%o|%i|%l|%b|%f"#;
+my $fmt = q#"%t|%o|%i|%b|%l|%f"#;
 if (defined $drive && defined $backup && defined $computer){
   my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
 	.qq| --out-format=${fmt}|

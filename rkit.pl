@@ -39,23 +39,22 @@ my $bkit = "$drive:\\$bkitDir";
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);
 my $acls = "$perms\\acls.txt";
 
-my $fmt = q#"%t|%o|%i|%b|%l|%f"#;
+my $fmt = q#'"%p|%t|%o|%i|%b|%l|%f"'#;
 if (defined $drive && defined $backup && defined $computer){
 	my $lpath = "$drive:/$path";
-	my ($prelog,$prerr,$rlog,$rerr,$poslog,$poserr) = map {"${logs}\\$_"} qw|pre.log pre.err recv.log recv.err pos.log pos.err|;
 	eval{
 		-d $lpath or make_path $lpath; 
 		$lpath =~ s#/#\\#g;												          #linux2dos
 		my $push = "$perl $cd\\bkit.pl $lpath\\$entry";							#First backup it to server
-		qx|${push} 2>$prerr 1>$prelog|;
+		print qx|${push} 2>&1|;
 		$? == 0 or die "The command $push exit with non zero value:$?\nSee file $prerr for details";
 		my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
 			.qq| --out-format=${fmt}|
 			.qq| ${url}/${drive}/${backup}/./${path}/${entry} /cygdrive/${drive}/|
-			.qq| 2>$rerr 1>$rlog|;
+			.qq| 1>${logs}\\recv.log 2>&1|;
 		open my $handler, "|-", $r; 									#Now we can restore it
 		print $handler "${pass}\n\n";  
-		qx|${push} 2>$poserr 1>$poslog|;								#push another backup to server	
+		print qx|${push} 2>&1|;								#push another backup to server	
 		$? == 0 or die "The command $push exit with non zero value:$?\nSee file $poserr for details";
 	} or die "Die while executing rsync: $@";
 }

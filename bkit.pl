@@ -85,7 +85,7 @@ die 'Cannot get shadow Copies' unless defined $cvss and scalar %$cvss;
 my $lastVssKey = pop @{[sort keys %$cvss]};
 my $cur = $cvss->{$lastVssKey}->{volume};
 
-my $fmt = q#"%t|%o|%i|%b|%l|%f"#;
+my $fmt = q#'"%p|%t|%o|%i|%b|%l|%f"'#;
 my $arch = lc Win32::GetArchName() || 'x86';
 my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
 $rsync = which 'rsync' or die "Cannot find rsync" unless -e $rsync;
@@ -97,7 +97,7 @@ if (defined $cur){
     .qq| --exclude-from=$cd\\conf\\excludes.txt|
     .qq| --out-format=${fmt}|
     .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path} ${url}/{$drive}/current/|
-    .qq| 2>${bkit}\\logs\\send-err.txt >${bkit}\\logs\\send-logs.txt|;
+    .qq| 1>${bkit}\\logs\\send.log 2>&1|;
   print $handler "${pass}\n\n";
 }
 

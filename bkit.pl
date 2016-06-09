@@ -11,7 +11,7 @@ use Sys::Hostname;
 use Net::Domain qw|hostfqdn hostdomain|;
 use Config::Simple;
 #https://github.com/candera/shadowspawn
-use Getop::Long;
+use File::Path qw|make_path|;
 
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;
@@ -42,40 +42,39 @@ sub getShadowCopies{
   } grep {defined $volumes->[$_] and $volumes->[$_] eq $volume} 0..$#{$volumes}};
 }
 
-my $perl = which 'perl';
-my $vssadmin = which 'vssadmin';
-my $cd = dirname abs_path $0;
-
-my $arch = lc Win32::GetArchName() || 'x86';
-my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
-$rsync = which 'rsync' or die "Cannot find rsync $rsync" unless -e $rsync;
-my $subinacl = (which 'subinacl') || "$cd\\3rd-party\\subinacl\\subinacl.exe";
-
 my $dir = shift or die 'You must specify a directory';
 my ($drive,$path) = ($dir =~ /^([a-z]):(.*)$/i) or die 'You must include drive letter in directory';
 $drive = uc $drive;
 $path =~ s/^[^\\]?/\\$&/; #garante um backslash no inicio do path
 $path =~ s/[\\]/\//g;    #dos->unix 
 
+my $cd = dirname abs_path $0;
 my $confdir = "$cd\\local-conf";
 -d $confdir or die "$confdir not found";
 my $cfg = new Config::Simple("$confdir\\init.conf") or die "File $confdir\\init.conf not found";
 my $url = $cfg->param('url');
 my $pass = $cfg->param('pass');
+my $bkitDir = $cfg->param('histofile') || '.bkit';
+$bkitDir =~ s#^([a-z]:)?(/|\\)*##i; #just in case. It should be a relative path to backup drive. Not an absolute path
 
-my $bkitDir = '.bkit';
 my $bkit = "$drive:\\$bkitDir";
--d $bkit or mkdir $bkit;
+-d $bkit or make_path $bkit;
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);
 
-my $acls = "$perms\\acls.txt";
+my $perl = which 'perl';
+my $vssadmin = which 'vssadmin';
 
+
+my $subinacl = "$cd\\3rd-party\\subinacl\\subinacl.exe";
+$subinacl = which 'subinacl' unless -e $subinacl;
+my $acls = "$perms\\acls.txt";
 my $mtime = (stat $acls)[9] if -e $acls;
 $mtime //= 0;
+my $aclstimeout = $cfg->param('aclstimeout') || 3600*24*8;
 print qx|$subinacl /noverbose /output=$acls /subdirectories $drive:\\| 
-  if -e $subinacl and (time - $mtime) > 3600*24*8;#8 day
+  if -e $subinacl and (time - $mtime) > $aclstimeout;
 
-my $lsv = qx|$perl $cd\\getvol.pl| or die "Error code $? ($!)";
+my $lsv = qx|$perl $cd\\getvol.pl| or die "Error code $?";
 saveData "$vols\\volumes.txt", $lsv;
 
 my $devId = drive2DevId $drive, $lsv or die "Cannot get DeviceId for drive $drive:$!";
@@ -85,9 +84,12 @@ my $cvss = getShadowCopies $devId, $lsh;
 die 'Cannot get shadow Copies' unless defined $cvss and scalar %$cvss;
 my $lastVssKey = pop @{[sort keys %$cvss]};
 my $cur = $cvss->{$lastVssKey}->{volume};
-#my $VolumeSerialNumber = (Win32::DriveInfo::VolumeInfo ( $drive ))[1] || "DRIVE_$drive";
 
 my $fmt = q#"%t|%o|%i|%b|%l|%f"#;
+my $arch = lc Win32::GetArchName() || 'x86';
+my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
+$rsync = which 'rsync' or die "Cannot find rsync" unless -e $rsync;
+
 if (defined $cur){
   my ($shcN) = $cur =~ /(HarddiskVolumeShadowCopy\d+)/;
   open my $handler, "|-"

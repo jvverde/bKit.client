@@ -11,6 +11,7 @@ use Sys::Hostname;
 use Net::Domain qw|hostfqdn hostdomain|;
 use Config::Simple;
 #https://github.com/candera/shadowspawn
+use Getop::Long;
 
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;
@@ -62,7 +63,7 @@ my $cfg = new Config::Simple("$confdir\\init.conf") or die "File $confdir\\init.
 my $url = $cfg->param('url');
 my $pass = $cfg->param('pass');
 
-my $bkitDir = '.bkit.pt';
+my $bkitDir = '.bkit';
 my $bkit = "$drive:\\$bkitDir";
 -d $bkit or mkdir $bkit;
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);

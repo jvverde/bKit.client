@@ -15,13 +15,23 @@ my $json = (new JSON)->utf8->pretty;
 
 my $man = 0;
 my $help = 0;
-GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+my $server = 'bkit';
+my $port = 8733;
+my $user = 'user';
+my $section = 'bkit';
+my $pass = 'us3r';
+GetOptions(
+  'help|?' => \$help, 
+   man => \$man,
+   'server|s=s' => \$server,
+   'port=i' => \$port,
+   user => \$user,
+   pass => \$pass,
+   section => \$section
+) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitval => 0, -verbose => 2) if $man;
-    
-    
-my $server = shift or do {print "Usage:\n\t$0 server-address"; exit};
-
+   
 sub saveData{
   my ($file,$data) = @_;
   open my $fhv, ">$file" or (warn "Cannot save info to $file" and return undef);
@@ -76,40 +86,63 @@ my $uuid = $wmiInfo->{Win32_ComputerSystemProduct}->{UUID} || '_';
 my $name = $sysInfo->{nodeName};
 my $domain = $sysInfo->{domainName}; 
 
-my $cfg = new Config::Simple(syntax=>'http');
-$cfg->param('url',"rsync://user\@${server}:8733/${domain}.${name}.${uuid}");
-$cfg->param('pass','us3r');
-$cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";
-
 my $path = $sysDir;
 $path =~ s/[\\]/\//g; #dos->unix
 $path =~ s/^([a-z]):/\/cygdrive\/$1/i;
 
-my $init = qq|${rsync} -rltvvhR --inplace --stats |
-  .qq| ${path}/./ rsync://admin\@${server}:8733/bkit.me/win/${domain}/${name}/${uuid}|
-  .qq| 2>${logDir}\\err.txt >${logDir}\\logs.txt|
+my $exec = qq|${rsync} -rltvvhR --inplace --stats |
+  .qq| ${path}/./ rsync://admin\@${server}:${port}/${section}/win/${domain}/${name}/${uuid}|
 ;
 
-print qx|$init|;
+print "Executing:\n\t$exec\n";
 
+my $init = qx|$exec 2>&1|;
+
+print $init;
+
+$? and die "Exit value non null => $?";
+
+my $cfg = new Config::Simple(syntax=>'http');
+$cfg->param('url',"rsync://${user}\@${server}:${port}/${domain}.${name}.${uuid}");
+$cfg->param('pass',$pass);
+$cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";
+
+print 'Init done';
 
 __END__
+
+=pod
+
 =head1 NAME
-sample - Using Getopt::Long and Pod::Usage
+bkit - Usage
+
 =head1 SYNOPSIS
-sample [options] [file ...]
- Options:
-   -help            brief help message
-   -man             full documentation
+
+  init [options]
+    Options:
+      -help            brief help message
+      -man             full documentation
+      server           server name or ip address, Default:bkit
+      port             port number, Default:8733
+      user             rsync user for the backup, Default: user
+      pass             rsync pass 
+      section          rsyncd.conf section, Default: bkit 
+
 =head1 OPTIONS
-=over 8
+
+=over 4
+
 =item B<-help>
 Print a brief help message and exits.
+
 =item B<-man>
 Prints the manual page and exits.
+
 =back
+
 =head1 DESCRIPTION
-B<This program> will read the given input file(s) and do something
-useful with the contents thereof.
+
+B<This program> inits the client side for a bkit server.
+
 =cut
 

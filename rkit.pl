@@ -8,7 +8,6 @@ use Data::Dumper;
 use Win32;
 use File::Path qw|make_path|;
 use Config::Simple;
-use Getop::Long;
 
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;

@@ -97,7 +97,8 @@ if (defined $cur){
     .qq| --exclude-from=$cd\\conf\\excludes.txt|
     .qq| --out-format=${fmt}|
     .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/logs|          #src1	=> logs from previous run
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path}|                   #src2	=> the real data
+    .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/perms|         #src2	=> acls
+    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path}|                   #src3	=> the real data
     .qq| ${url}/{$drive}/current/|                                          #dst
     .qq| 1>${bkit}\\logs\\send.log 2>&1|;
   print $handler "${pass}\n\n";

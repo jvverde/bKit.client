@@ -27,6 +27,8 @@ my $location =  eval {
 
 my ($drive, $backup,$computer,$path,$entry) = @{$location}{qw|drive backup computer path entry|};
 
+my $tmpdir = "$cd\\tmp";
+-d $tmpdir or mkdir $tmpdir;
 my $confdir = "$cd\\local-conf";
 -d $confdir or die "$confdir not found";
 my $cfg = new Config::Simple("$confdir\\init.conf") or die "File $confdir\\init.conf has a wrong configuration";
@@ -54,14 +56,15 @@ if (defined $drive && defined $backup && defined $computer && defined $entry){
 		$? == 0 or die "The command $push exit with non zero value:$?\nSee file ${logfile} for details";
 		my $r = qq|${rsync} -rlitzvvhR --no-perms --delete-delay --delay-updates --force --stats --fuzzy|
 			.qq| --out-format=${fmt}|
-			.qq| ${url}/${drive}/${backup}/./${acls}|							#SRC1: data
-			.qq| ${url}/${drive}/${backup}/./${path}/${entry}|					#SRC2: acls
-			.qq| /cygdrive/${drive}/|											#DST
+			.qq| ${url}/${drive}/${backup}/./${acls}|							#SRC1: acls
+			.qq| ${url}/${drive}/${backup}/./${path}/${entry}|		#SRC2: data
+			.qq| /cygdrive/${drive}/|											        #DST
 			.qq| 1>${logfile} 2>&1|;
 		open my $handler, "|-", $r; 									#Now we can restore it
 		print $handler "${pass}\n\n";  
 		print qx|${push} 2>&1|;								#push another backup to server	
 		$? == 0 or die "The command $push exit with non zero value:$?\nSee file ${logfile} for details";
+    
 	} or die "Die while executing rsync: $@";
 }
 

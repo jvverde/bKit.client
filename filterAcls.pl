@@ -1,10 +1,9 @@
 use strict;
 use warnings;
 
-$| = 1;
-my ($dir,$aclfile,$result) = @ARGV[0..2];
+my ($entry,$aclfile,$result) = @ARGV[0..2];
 
-my $sep = quotemeta "+File $dir";
+my $sep = quotemeta "+File $entry";
 my $rei = qr/$sep/i;
 my $reo = qr/===+/i;
 open my $in, "<:raw:encoding(UTF-16LE)",$aclfile or die "Can't open file $aclfile:$!";

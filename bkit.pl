@@ -5,13 +5,10 @@ use File::Basename qw |dirname|;
 use File::Which;
 use JSON;
 use Data::Dumper;
-use Win32;
-#use Win32::DriveInfo;
-use Sys::Hostname;
-use Net::Domain qw|hostfqdn hostdomain|;
 use Config::Simple;
-#https://github.com/candera/shadowspawn
 use File::Path qw|make_path|;
+
+#https://github.com/candera/shadowspawn See later
 
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;

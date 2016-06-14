@@ -60,12 +60,15 @@ if (defined $drive && defined $backup && defined $computer && defined $entry){
 			.qq| 1>${logfile} 2>&1|;
 		open my $handler, "|-", $r; 									#Now we can restore it
 		print $handler "${pass}\n\n";
+    close $handler;
+    $? == 0 or die "The command $r exit with non zero value:$?\nSee file ${logfile} for details";
     print qx|$perl $cd\\filterAcls.pl $lpath\\$entry $perms\\acls.txt $logs\\temp.acls|;
     my $subinacl = "$cd\\3rd-party\\subinacl\\subinacl.exe";
     $subinacl = which 'subinacl' unless -e $subinacl;
-    qx|$subinacl /playfile $logs\\temp.acls  1>$logs\\apply-acls.log 2>&1|;
+    my $sub = qq|$subinacl /playfile $logs\\temp.acls|;
+    qx|$sub 1>$logs\\apply-acls.log 2>&1| // die "The command $sub exit with non zero value:$?\nSee logs for details";
 		print qx|${push} 2>&1|;								#push another backup to server	
-		$? == 0 or die "The command $push exit with non zero value:$?\nSee file ${logfile} for details";
+		$? == 0 or die "The command $push exit with non zero value:$?\nSee logs for details";
     
 	} or die "Die while executing rsync: $@";
 }

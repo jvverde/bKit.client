@@ -96,16 +96,16 @@ qx|$subinacl /noverbose /output=$acls /subdirectories $drive:\\ 1>>$bkitlog 2>&1
 
 my $perl = which 'perl';
 
-my $lsv = qx|$perl $cd\\getvol.pl  2>>$bkitlog|;
+my $lsv = qx|$perl $cd\\getVolumes.pl  2>>$bkitlog|;
 $? and die "Cannot get volumes. Error code: $?";
 saveData "$volspath\\volumes.txt", $lsv;
 
 my $devId = drive2DevId $drive, $lsv or die "Cannot get DeviceId for drive $drive:$!";
 
-qx|$perl $cd\\csc.pl $drive 1>>$bkitlog 2>&1|;
+qx|$perl $cd\\createShadowCopy.pl $drive 1>>$bkitlog 2>&1|;
 $? and die "Cannot create shadow copy, Error value: $?";
 
-my $lsh = qx|$perl $cd\\lsh.pl 2>>$bkitlog|;
+my $lsh = qx|$perl $cd\\listShadows.pl 2>>$bkitlog|;
 $? and die "Cannot list shadow copies. Error code $?";
 
 my $cvss = getShadowCopies $devId, $lsh;

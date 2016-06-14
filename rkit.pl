@@ -12,13 +12,6 @@ use Config::Simple;
 ($\,$,) = ("\n","\t");
 my $json = (new JSON)->utf8->pretty;
 
-my $perl = which 'perl';
-my $cd = dirname abs_path $0;
-
-my $arch = lc Win32::GetArchName() || 'x86';
-my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
-$rsync = which 'rsync' or die "Cannot find rsync $rsync" unless -e $rsync;
-
 my $location =  eval {
   local $/ = undef;
   my $endpoint = <>;
@@ -27,19 +20,26 @@ my $location =  eval {
 
 my ($drive, $backup,$computer,$path,$entry) = @{$location}{qw|drive backup computer path entry|};
 
+my $cd = dirname abs_path $0;
 my $confdir = "$cd\\local-conf";
 -d $confdir or die "$confdir not found";
 my $cfg = new Config::Simple("$confdir\\init.conf") or die "File $confdir\\init.conf has a wrong configuration";
 my $url = $cfg->param('url');
 my $pass = $cfg->param('pass');
+my $bkitDir = $cfg->param('histofile') || '.bkit';
+$bkitDir =~ s#^([a-z]:)?(/|\\)*##i; #just in case. It should be a relative path to backup drive. Not an absolute path
 
-my $bkitDir = '.bkit';
 my $bkit = "$drive:\\$bkitDir";
 -d $bkit or mkdir $bkit;
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);
 
 my $fmt = q#'"%p|%t|%o|%i|%b|%l|%f"'#;
 if (defined $drive && defined $backup && defined $computer && defined $entry){
+  my $perl = which 'perl';
+  my $arch = lc Win32::GetArchName() || 'x86';
+  my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
+  $rsync = which 'rsync' or die "Cannot find rsync $rsync" unless -e $rsync;
+
 	my $lpath = "$drive:/$path";
 	my $logfile = "${logs}\\recv.log";
 	my $acls = "$perms/acls.txt";

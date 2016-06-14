@@ -93,7 +93,7 @@ $rsync = which 'rsync' or die "Cannot find rsync" unless -e $rsync;
 if (defined $cur){
   my ($shcN) = $cur =~ /(HarddiskVolumeShadowCopy\d+)/;
   open my $handler, "|-"
-    ,qq|${rsync} -rlitzvvhRApogDEH --numeric-ids --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
+    ,qq|${rsync} -rlitzvvhR --chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
     .qq| --exclude-from=$cd\\conf\\excludes.txt|
     .qq| --out-format=${fmt}|
     .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/logs|          #src1	=> logs from previous run

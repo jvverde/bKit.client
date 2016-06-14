@@ -20,7 +20,7 @@ my $port = 8733;
 my $user = 'user';
 my $section = 'bkit';
 my $pass = 'us3r';
-my $histofile = '.bkit';
+my $workdir = '.bkit';
 my $aclstimeout = 3600*24*8; #8 days
 GetOptions(
   'help|?' => \$help, 
@@ -30,7 +30,7 @@ GetOptions(
    user => \$user,
    pass => \$pass,
    section => \$section,
-   histofile => \$histofile,
+   workdir => \$workdir,
    aclstimeout => \$aclstimeout
 ) or pod2usage(2);
 pod2usage(1) if $help;
@@ -109,7 +109,7 @@ $? and die "Exit value non null => $?";
 my $cfg = new Config::Simple(syntax=>'http');
 $cfg->param('url',"rsync://${user}\@${server}:${port}/${domain}.${name}.${uuid}");
 $cfg->param('pass',$pass);
-$cfg->param('histofile',$histofile);
+$cfg->param('workdir',$workdir);
 $cfg->param('aclstimeout',$aclstimeout);
 
 $cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";

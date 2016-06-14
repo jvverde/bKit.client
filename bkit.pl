@@ -51,10 +51,10 @@ my $confdir = "$cd\\local-conf";
 my $cfg = new Config::Simple("$confdir\\init.conf") or die "File $confdir\\init.conf not found";
 my $url = $cfg->param('url');
 my $pass = $cfg->param('pass');
-my $bkitDir = $cfg->param('histofile') || '.bkit';
-$bkitDir =~ s#^([a-z]:)?(/|\\)*##i; #just in case. It should be a relative path to backup drive. Not an absolute path
+my $workdir = $cfg->param('workdir') || '.bkit';
+$workdir =~ s#^([a-z]:)?(/|\\)*##i; #just in case. It should be a path relative to backup drive. Not an absolute path
 
-my $bkit = "$drive:\\$bkitDir";
+my $bkit = "$drive:\\$workdir";
 -d $bkit or make_path $bkit;
 my ($logs,$perms,$vols) = map {-d $_ or mkdir $_; $_} map {"$bkit\\$_"} qw(logs perms vols);
 
@@ -93,9 +93,9 @@ if (defined $cur){
     ,qq|${rsync} -rlitzvvhR --chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
     .qq| --exclude-from=$cd\\conf\\excludes.txt|
     .qq| --out-format=${fmt}|
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/logs|          #src1	=> logs from previous run
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/.././${bkitDir}/perms|         #src2	=> acls
-    .qq| /proc/sys/Device/${shcN}/${bkitDir}/../.${path}|                   #src3	=> the real data
+    .qq| /proc/sys/Device/${shcN}/${workdir}/.././${workdir}/logs|          #src1	=> logs from previous run
+    .qq| /proc/sys/Device/${shcN}/${workdir}/.././${workdir}/perms|         #src2	=> acls
+    .qq| /proc/sys/Device/${shcN}/${workdir}/../.${path}|                   #src3	=> the real data
     .qq| ${url}/{$drive}/current/|                                          #dst
     .qq| 1>${bkit}\\logs\\send.log 2>&1|;
   print $handler "${pass}\n\n";

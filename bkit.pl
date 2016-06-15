@@ -11,26 +11,27 @@ use Getopt::Long;
 
 #https://github.com/candera/shadowspawn See later
 
-($\,$,) = ("\n","\t");
+($\,$|) = ("\n",1);
 my $json = (new JSON)->utf8->pretty;
-
 
 sub saveData{
   my ($file,$data) = @_;
-  open my $fhv, ">$file" or (warn "Cannot save info to $file" and return undef);
-  print $fhv $data; 
-  close $fhv;
-  return $data;
+  eval{
+    open my $fhv, ">$file" or die $!;
+    print $fhv $data; 
+    close $fhv;
+  } // warn "Warning: Can't save data to $file\n$@";
 } 
 sub drive2DevId{
   my ($drive,$lsv) = @_;
-  my $volumes = $json->decode($lsv) or die "Not json:$!";
-  my ($volume) = grep{defined $_->{DriveLetter} and uc $_->{DriveLetter} eq "$drive:"} @$volumes;
+  my $volumes = $json->decode($lsv) or die "The content\n\t$lsv\nis not json:$!";
+  my ($volume) = grep{defined $_->{DriveLetter} and uc $_->{DriveLetter} eq "$drive:"} @$volumes; 
+  $volume // die "Volume for drive $drive not found on $lsv";
   return $volume->{DeviceID};
 }
 sub getShadowCopies{
   my ($volume,$lsh) = @_;
-  my $shadows = $json->decode($lsh) or die "Not json:$!";
+  my $shadows = $json->decode($lsh) or die "The content\n\t$lsh\nis not json:$!";
   return undef unless defined $shadows->{InstallDate} and defined $shadows->{DeviceObject} and defined $shadows->{VolumeName};
   my $volumes = $shadows->{VolumeName};
   return {map {
@@ -82,9 +83,8 @@ my ($logspath,$permspath,$volspath) = map {-d $_ or mkdir $_; $_} map {"$workpat
 #dirs to be used on rsync
 my ($logsdir,$permsdir) = map{s#[\\]+#/#g;$_} map {"$workdir/$_"} qw(logs perms);
 
-#logfiles
-my ($bkitlog,$sendlog) = map{"$logspath\\$_"} qw(bkit.log send.log);
-unlink $bkitlog if -e $bkitlog;
+#logfile
+my $sendlog = "$logspath\\send.log";
 
 my $subinacl = "$cd\\3rd-party\\subinacl\\subinacl.exe";
 $subinacl = which 'subinacl' unless -e $subinacl;
@@ -92,64 +92,63 @@ my $acls = "$permspath\\acls.txt";
 my $mtime = (stat $acls)[9] if -e $acls;
 $mtime //= 0;
 my $aclstimeout = $cfg->param('aclstimeout') || 3600*24*8;
-qx|$subinacl /noverbose /output=$acls /subdirectories $drive:\\ 1>>$bkitlog 2>&1|
+print qx|$subinacl /noverbose /output=$acls /subdirectories $drive:\\ 2>&1|
   if -e $subinacl and (time - $mtime) > $aclstimeout;
+$? and warn "Cannot get acls\n\tError code: $?";
 
 my $perl = which 'perl';
 
-my $lsv = qx|$perl $cd\\getVolumes.pl  2>>$bkitlog|;
-$? and die "Cannot get volumes. Error code: $?";
+my $lsv = qx|$perl $cd\\getVolumes.pl 2>&1|;
+$? and die "Cannot get volumes\n\t$lsv\n\tError code: $?";
 saveData "$volspath\\volumes.txt", $lsv;
 
-my $devId = drive2DevId $drive, $lsv or die "Cannot get DeviceId for drive $drive:$!";
+my $devId = drive2DevId $drive, $lsv or die "Cannot get DeviceId for drive $drive: $!\n$lsv";
 
-qx|$perl $cd\\createShadowCopy.pl $drive 1>>$bkitlog 2>&1|;
-$? and die "Cannot create shadow copy, Error value: $?";
+print qx|$perl $cd\\createShadowCopy.pl $drive 2>&1|;
+$? and die "Cannot create shadow copy\n\tError value: $?";
 
-my $lsh = qx|$perl $cd\\listShadows.pl 2>>$bkitlog|;
-$? and die "Cannot list shadow copies. Error code $?";
+my $lsh = qx|$perl $cd\\listShadows.pl 2>&1|;
+$? and die "Cannot list shadow copies\n\t$lsh\n\tError code $?";
 
 my $cvss = getShadowCopies $devId, $lsh;
 die 'Cannot get shadow Copies' unless defined $cvss and scalar %$cvss;
 my $lastVssKey = pop @{[sort keys %$cvss]};
-my $cur = $cvss->{$lastVssKey}->{volume};
+my $volume = $cvss->{$lastVssKey}->{volume} // die "Volume is undefined";
 
 my $fmt = q#'"%p|%t|%o|%i|%b|%l|%f"'#;
 my $arch = lc Win32::GetArchName() || 'x86';
 my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
 $rsync = which 'rsync' or die "Cannot find rsync" unless -e $rsync;
 
-if (defined $cur){
-  my ($shcN) = $cur =~ /(HarddiskVolumeShadowCopy\d+)/;
-  my $exec = qq|${rsync} -rlitzvvhR --chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
-    .qq| --exclude-from=$cd\\conf\\excludes.txt|
-    .qq| --out-format=${fmt}|
-    .qq| /proc/sys/Device/${shcN}/${workdir}/.././${logsdir}|          #src1	=> logs from previous run
-    .qq| /proc/sys/Device/${shcN}/${workdir}/.././${permsdir}|         #src2	=> acls
-    .qq| /proc/sys/Device/${shcN}/${workdir}/.././${path}|             #src3	=> the real data
-    .qq| ${url}/${drive}/current/|                                     #dst
-    .qq| 1>${sendlog} 2>&1|;
-  print "Backup with command\n\t $exec";
-  open my $handler, "|-",$exec;
-  print $handler "${pass}\n\n";
-  close $handler;
-  $? and die "Error while runing rsync:$?";
-  print "Done Backup";
-}
+my ($shcN) = $volume =~ /(HarddiskVolumeShadowCopy\d+)/;
+$shcN // die "Can't found a HarddiskVolumeShadowCopyN on string $volume";
+my $exec = qq|${rsync} -rlitzvvhR --chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy|
+  .qq| --exclude-from=$cd\\conf\\excludes.txt|
+  .qq| --out-format=${fmt}|
+  .qq| /proc/sys/Device/${shcN}/${workdir}/.././${logsdir}|          #src1	=> logs from previous run
+  .qq| /proc/sys/Device/${shcN}/${workdir}/.././${permsdir}|         #src2	=> acls
+  .qq| /proc/sys/Device/${shcN}/${workdir}/.././${path}|             #src3	=> the real data
+  .qq| ${url}/${drive}/current/|                                     #dst
+  .qq| 1>${sendlog} 2>&1|;
+print "Backup with command\n\t $exec";
+open my $handler, "|-",$exec;
+print $handler "${pass}\n\n";
+close $handler;
+$? and die "Error while runing rsync:$?";
+print "Backup done successfully";
 
 END {
   my $exit = $?;
   eval{
     my $last = $cvss->{$lastVssKey}->{id};
     my $vssadmin = which 'vssadmin' or die "Cannot found vssadmin";
-    qx|$vssadmin Delete Shadows /Shadow=$last /Quiet 1>>$bkitlog 2>&1|;
-    $? and die "Cannot delete shadows";
-  } // warn "$@" if defined $lastVssKey;
-  close $bkitlog;
+    print qx|$vssadmin Delete Shadows /Shadow=$last /Quiet 2>&1|;
+    $? and die "Cannot delete shadow copy $last";
+  } // warn "Warning: $@" if defined $lastVssKey;
   open STDOUT, ">&",$OLDSTD or die "$!" if defined $OLDSTD;
   my $localtime = localtime;
-  print "Done ($0) at $localtime" and exit unless $exit;
-  print "Error ($0) at $localtime";
+  print "Script ($0) end successfully at $localtime" and exit unless $exit;
+  print "Script ($0) end abnormally ($exit) at $localtime";
   exit($exit);
 }
 

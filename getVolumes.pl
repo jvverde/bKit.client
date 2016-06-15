@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Win32::OLE('in');use Data::Dumper;
 use JSON;
 
@@ -6,7 +7,7 @@ my $json = (new JSON)->utf8->pretty;
 use constant wbemFlagReturnImmediately => 0x10;
 use constant wbemFlagForwardOnly => 0x20;
 
-my $objWMIService = Win32::OLE->GetObject("winmgmts:\\\\.\\root\\CIMV2") or die "WMI connection failed.\n";
+my $objWMIService = Win32::OLE->GetObject("winmgmts:\\\\.\\root\\CIMV2") or die "WMI connection failed";
 my $colItems = $objWMIService->ExecQuery("SELECT * FROM Win32_Volume", "WQL", wbemFlagReturnImmediately | wbemFlagForwardOnly);
 my $result = [];
 

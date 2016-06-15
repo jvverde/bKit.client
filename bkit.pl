@@ -42,8 +42,9 @@ sub getShadowCopies{
 }
 
 my $cd = dirname abs_path $0;
+$cd =~ s#/+#\\#g; 
 my $config = "$cd\\local-conf\\init.conf";
-open my $OLDSTD, ">&STDOUT" or die "$!";
+open my $OLDSTD, ">&STDOUT" or die "$!"; #OLDSTD -> STDOUT
 GetOptions(
    'config=s' => \$config,
    'output:s' => sub{
@@ -128,12 +129,12 @@ if (defined $cur){
     .qq| /proc/sys/Device/${shcN}/${workdir}/.././${path}|             #src3	=> the real data
     .qq| ${url}/${drive}/current/|                                     #dst
     .qq| 1>${sendlog} 2>&1|;
-  print "Go to run\n\t $exec";
+  print "Backup with command\n\t $exec";
   open my $handler, "|-",$exec;
   print $handler "${pass}\n\n";
   close $handler;
-  die "Error while runing rsync:$?" if $?;
-  print "Done rsync";
+  $? and die "Error while runing rsync:$?";
+  print "Done Backup";
 }
 
 END {
@@ -141,7 +142,8 @@ END {
   eval{
     my $last = $cvss->{$lastVssKey}->{id};
     my $vssadmin = which 'vssadmin' or die "Cannot found vssadmin";
-    qx|$vssadmin Delete Shadows /Shadow=$last /Quiet 1>>$bkitlog 2>&1| // die "Cannot delete shadows";
+    qx|$vssadmin Delete Shadows /Shadow=$last /Quiet 1>>$bkitlog 2>&1|;
+    $? and die "Cannot delete shadows";
   } // warn "$@" if defined $lastVssKey;
   close $bkitlog;
   open STDOUT, ">&",$OLDSTD or die "$!" if defined $OLDSTD;

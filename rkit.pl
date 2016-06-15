@@ -98,11 +98,12 @@ eval{
   print "Backup again";
   print qx|${push} 2>&1|;								#push another backup to server	
   $? and die "The command $push exit with non zero value:$?\nSee logs for details";
-  print "Done Recovery";
+  print "Recovery done successfully";
 } or die "Die while executing rsync: $@";
 
 END {
   open STDOUT, ">&",$OLDSTD or die "$!" if defined $OLDSTD;
   my $localtime = localtime;
-  print "Done ($0) at $localtime";
+  print "Script ($0) end successfully at $localtime" and exit unless $?;
+  print "Script ($0) end abnormally ($?) at $localtime";  
 }

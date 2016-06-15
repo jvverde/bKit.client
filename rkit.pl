@@ -9,7 +9,7 @@ use File::Path qw|make_path|;
 use Config::Simple;
 use Getopt::Long;
 
-($\,$,) = ("\n","\t");
+($\,$,) = ("\n","");
 my $json = (new JSON)->utf8->pretty;
 
 my $cd = dirname abs_path $0;

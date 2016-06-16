@@ -24,8 +24,9 @@ GetOptions(
         -d $mylog or mkdir $mylog or die "Can't mkdir $mylog:$!";
         return $mylog . '\\bkit.log';
       } or die "$@";
-      my $localtime = localtime;
-      print "$localtime => Output redirected to $mylog. Please check the result there";
+      print "Output redirected to $mylog.";
+      print "\tYou can check the result there when I have finished this job.";
+      print "\tPlease wait until this window closes by itself";
       open STDOUT, ">$mylog" or die "Can't redirect output to $mylog:$!";
       open STDERR, ">&STDOUT" or die "Can't redirect stderr to stdout:$!";
     }
@@ -34,7 +35,7 @@ GetOptions(
 print "Read configuration from $config";
 -e $config or die "File $config not found";
 
-my $cfg = new Config::Simple("$config") or die "File $config has a wrong configuration";
+my $cfg = new Config::Simple($config) or die "File $config has a wrong configuration";
 my $url = $cfg->param('url');
 my $pass = $cfg->param('pass');
 my $workdir = $cfg->param('workdir') || '.bkit';

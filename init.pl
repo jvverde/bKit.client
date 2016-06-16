@@ -45,6 +45,7 @@ sub saveData{
 } 
 
 my $cd = dirname abs_path $0;
+$cd =~ s#/+#\\#g; 
 my $sysDir = "$cd\\sysInfo";
 my $logDir = "$cd\\logs";
 my $confDir = "$cd\\local-conf";
@@ -113,6 +114,8 @@ $cfg->param('workdir',$workdir);
 $cfg->param('aclstimeout',$aclstimeout);
 
 $cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";
+
+print qx|$perl $cd\\set-assoc.pl $cd\\runasadmin.pl $cd\\rkit.pl -o $cd\\logs\\rkit.log|;
 
 print 'Init done';
 

@@ -18,7 +18,7 @@ my $script = shift or do {print "Usage:\n\t$0 script ..."; exit};
 my $args = join ' ', @ARGV;
 my $ext = 'bkit';
 
-$script = abs_path "$cd\\$script" if dirname($script) !~ m#^(?:[a-z]:)?(?:/|\\)#;
+$script = abs_path "$cd\\$script" if dirname($script) !~ m#^(?:[a-z]:)?(?:/|\\)#i;
 $script =~ s#/+#\\#g; 
 
 my $perl = which 'perl';

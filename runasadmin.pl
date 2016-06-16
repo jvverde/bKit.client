@@ -8,10 +8,8 @@ use File::Which;
 my $shell = Win32::OLE->new('Shell.Application') or die "Can't create a Shell.Application: '$!'";
 
 my $perl = which 'perl' or die "Can't find perl";
-my $cd = dirname abs_path $0;
-$cd =~ s#/+#\\#g; 
 
 s/"/\\"/g foreach (@ARGV);
 my $args = join '" "', @ARGV;
 
-$shell->ShellExecute($perl, qq|"$args"|,$cd,'runas');
+$shell->ShellExecute($perl, qq|"$args"|,undef,'runas');

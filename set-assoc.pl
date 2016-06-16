@@ -13,7 +13,7 @@ use File::Which;
 ($\,$,) = ("\n","\t");
 
 my $cd = dirname abs_path $0;
-
+$cd =~ s#/+#\\#g;
 my $script = shift or do {print "Usage:\n\t$0 script ..."; exit};
 my $args = join ' ', @ARGV;
 my $ext = 'bkit';

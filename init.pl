@@ -105,7 +105,7 @@ my $init = qx|$exec 2>&1|;
 
 print $init;
 
-$? and die "Exit value non null => $?";
+$? and die "Exit value of rsync is non null: $?";
 
 my $cfg = new Config::Simple(syntax=>'http');
 $cfg->param('url',"rsync://${user}\@${server}:${port}/${domain}.${name}.${uuid}");
@@ -115,10 +115,14 @@ $cfg->param('aclstimeout',$aclstimeout);
 
 $cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";
 
-print qx|$perl $cd\\set-assoc.pl $cd\\runasadmin.pl $cd\\rkit.pl -o $cd\\logs\\rkit.log|;
+print qx|$perl $cd\\set-assoc.pl $cd\\admin-rkit.pl -o $cd\\logs\\rkit.log|;
 
-print 'Init done';
-
+END{
+  print 'Init finished ' . ($? ? "abormally: $?": 'successfully');
+  print 'Press ENTER to continue...';
+  <>;
+  print 'Bye';
+}
 __END__
 
 =pod

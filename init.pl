@@ -38,10 +38,11 @@ pod2usage(-exitval => 0, -verbose => 2) if $man;
    
 sub saveData{
   my ($file,$data) = @_;
-  open my $fhv, ">$file" or (warn "Cannot save info to $file" and return undef);
-  print $fhv $data; 
-  close $fhv;
-  return $data;
+  eval{
+    open my $fhv, ">$file" or die "Cannot save info to $file";
+    print $fhv $data; 
+    close $fhv;
+  } // warn "Warning:$@";
 } 
 
 my $cd = dirname abs_path $0;
@@ -78,8 +79,7 @@ my $sysInfo = {
 saveData $sysFile, $json->encode($sysInfo);
  
 my $wmi = qx|$perl $cd\\getinfo.pl|;
-die "Cannot launch $cd\\getinfo.pl:$!" unless defined $wmi;
-die "Error while running $cd\\getinfo.pl:$wmi($?)\n" if $?;
+$? and die "Error while running $cd\\getinfo.pl:$wmi($?)\n";
 
 saveData $wmiFile, $wmi;
 
@@ -101,11 +101,9 @@ my $exec = qq|${rsync} -rltvvhR --inplace --stats |
 
 print "Executing:\n\t$exec\n";
 
-my $init = qx|$exec 2>&1|;
-
-print $init;
-
+print qx|$exec 2>&1|;
 $? and die "Exit value of rsync is non null: $?";
+
 
 my $cfg = new Config::Simple(syntax=>'http');
 $cfg->param('url',"rsync://${user}\@${server}:${port}/${domain}.${name}.${uuid}");
@@ -113,9 +111,15 @@ $cfg->param('pass',$pass);
 $cfg->param('workdir',$workdir);
 $cfg->param('aclstimeout',$aclstimeout);
 
+
 $cfg->save("$confDir\\init.conf") or die "Error while saving init.conf file to $confDir";
 
+print "Saved configuration to $confDir\\init.conf";
+
 print qx|$perl $cd\\set-assoc.pl $cd\\admin-rkit.pl -o $cd\\logs\\rkit.log|;
+$? and die "Exit value of set-assoc.pl is non null: $?";
+
+print "Associated bkit extension with rkit";
 
 END{
   print 'Init finished ' . ($? ? "abormally: $?": 'successfully');

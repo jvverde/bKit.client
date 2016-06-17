@@ -10,11 +10,11 @@
 		          <icon name="folder-open-o" scale=".9" v-if="folder.open"></icon>
 		          <icon name="folder-o" scale=".9" v-else></icon>
 		        </span>
-		        {{folder.name}}
+		        <span class="text">{{folder.name}}</span>
 	        </div>
 	        <a @click.stop=""
-	          :href="getUrl('bkit',location,path,folder.name)">
-	          <icon name="undo" scale=".9" ></icon>
+	          :href="getUrl('bkit',location,path,folder.name)" title="Recuperar">
+	          <icon name="undo" scale=".9"  ></icon>
 	        </a>
         </div>
         <directory v-if="folder.open"
@@ -31,21 +31,21 @@
 		        <icon name="file-o" scale=".9" ></icon>
 		        <a :download="file" class="file" @click.stop=""
 		          :href="getUrl('download',location,path,file)">
-		          {{file}}
+		          <span class="text">{{file}}</span>
 		        </a>
 	        </div>
 	        <div>
 		        <a :download="file" @click.stop=""
-		          :href="getUrl('download',location,path,file)">
-		          <icon name="download" scale=".9"></icon>
+		          :href="getUrl('download',location,path,file)" title="Download">
+		          <icon name="download" scale=".9" ></icon>
 		        </a>        
 		        <a target="_blank" @click.stop=""
-		          :href="getUrl('view',location,path,file)">
-		          <icon name="eye" scale=".9"></icon>
+		          :href="getUrl('view',location,path,file)" title="Ver">
+		          <icon name="eye" scale=".9" ></icon>
 		        </a>
 		        <a @click.stop=""
-		          :href="getUrl('bkit',location,path,file)">
-		          <icon name="undo" scale=".9"></icon>
+		          :href="getUrl('bkit',location,path,file)" title="Recuperar">
+		          <icon name="undo" scale=".9" ></icon>
 		        </a>
 	        </div>
         </div>

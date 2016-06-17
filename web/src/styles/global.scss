@@ -55,7 +55,6 @@ a:hover {
     padding:0 $li-ident;            /* indentation = .5em */
     line-height:$line-height;  
     cursor: pointer;
-    
     &::before {
       width:.5 * $li-ident;        /* 50% of indentation */
       height:0;
@@ -69,11 +68,11 @@ a:hover {
       display:flex;
       flex-wrap:wrap;
       justify-content:space-between;
-    /*>:hover{
-      background:#cccccc;
-    }*/
+
     }
-    
+   /* li:first-child {
+      background:#dddddd;
+    }*/
    
   }
 }

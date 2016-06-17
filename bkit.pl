@@ -70,6 +70,7 @@ my $acls = "$perms\\acls.txt";
 
 my $mtime = (stat $acls)[9] if -e $acls;
 $mtime //= 0;
+#https://blogs.technet.microsoft.com/justinturner/2009/02/26/quick-tip-back-up-your-ntfs-security-permissions/
 print qx|$subinacl /noverbose /output=$acls /subdirectories $drive:\\| 
   if -e $subinacl and (time - $mtime) > 3600*24*8;#8 day
 

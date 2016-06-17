@@ -22,7 +22,7 @@ a:hover {
   color: #7fff00;
 }
 #app{
-  padding-right:6em;
+  padding-right:4em;
 }
 .tree{
   $line-height: 2em;
@@ -45,12 +45,11 @@ a:hover {
     }
   }
   ul{
-    //margin-left: .45em;
     &::before {
       content:"";
       top:-.3 * ($line-height / 2);
       bottom:$line-height / 2;      /*stop at half of last li */
-      left:0em;
+      left: $li-ident / 4;
       border-left-width:1px;
     }
   }
@@ -62,18 +61,18 @@ a:hover {
     line-height:$line-height;  
     cursor: pointer;
     &::before {
-      width:.5 * $li-ident;        /* 50% of indentation */
+      width: .5 * $li-ident;          /* 50% of indentation */
       height:0;
       border-top-width:1px;
-      margin-top:-1px;              /* border top width */
+      margin-top:-1px;                  /* border top width */
       top:$line-height / 2;              
-      left:0;
+      left:$li-ident / 4;
     }
     >div {
       width:100%;
       box-sizing: border-box;
       display:flex;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
       justify-content:space-between;
       &:hover{
            background:#eeeeee;
@@ -81,13 +80,22 @@ a:hover {
            padding-right:7px;
            padding-left:7px;
       }
+      *{
+        display:flex;
+        flex-wrap:nowrap;
+        align-items: center;
+        &:not(:first-child):not(a){
+          padding-left: 4px;
+        }
+      } 
       .text{
         text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden; 
       }
       a{
         padding-left:5px;
       }
-
     }
   }
 }

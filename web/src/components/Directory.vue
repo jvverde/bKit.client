@@ -1,18 +1,21 @@
 <template>
     <ul class="directories">
       <li v-for="folder in folders" @click.stop="toggle($index)">
-        <span v-if="hasChildren($index)">
-          <icon name="minus-square-o" scale=".8" v-if="folder.open"></icon>
-          <icon name="plus-square-o" scale=".8" v-else></icon>
-        </span>
-        <icon name="refresh" :spin="true" scale=".8" v-if="isWaiting($index)"></icon>
-        <icon name="folder-open-o" scale=".8" v-if="folder.open"></icon>
-        <icon name="folder-o" scale=".8" v-else></icon>
-        {{folder.name}}
-        <a @click.stop=""
-          :href="getUrl('bkit',location,path,folder.name)">
-          <icon name="retweet" scale=".8"></icon>
-        </a>
+        <div>
+	        <div><icon name="refresh" :spin="true" scale=".9" v-if="isWaiting($index)"></icon>
+	        <icon name="folder-open" scale=".9" v-if="folder.open"></icon>
+	        <icon name="folder" scale=".9" v-else></icon>
+	        <span v-if="hasChildren($index)">
+	          <icon name="folder-open-o" scale=".9" v-if="folder.open"></icon>
+	          <icon name="folder-o" scale=".9" v-else></icon>
+	        </span>
+	        {{folder.name}}
+	        </div>
+	        <a @click.stop=""
+	          :href="getUrl('bkit',location,path,folder.name)">
+	          <icon name="undo" scale=".9" ></icon>
+	        </a>
+        </div>
         <directory v-if="folder.open"
           :entries="folder.entries"
           :path="path + encodeURIComponent(folder.name)"
@@ -22,23 +25,27 @@
     </ul>
     <ul class="files">
       <li v-for="file in files">
-        <icon name="file-o" scale=".8"></icon>
-        <a :download="file" class="file" @click.stop=""
-          :href="getUrl('download',location,path,file)">
-          {{file}}
-        </a>
-        <a :download="file" @click.stop=""
-          :href="getUrl('download',location,path,file)">
-          <icon name="download" scale=".8"></icon>
-        </a>        
-        <a target="_blank" @click.stop=""
-          :href="getUrl('view',location,path,file)">
-          <icon name="eye" scale=".8"></icon>
-        </a>
-        <a @click.stop=""
-          :href="getUrl('bkit',location,path,file)">
-          <icon name="retweet" scale=".8"></icon>
-        </a>
+        <div>
+	        <div><icon name="file-o" scale=".9" ></icon>
+	        <a :download="file" class="file" @click.stop=""
+	          :href="getUrl('download',location,path,file)">
+	          {{file}}
+	        </a></div>
+	        <div>
+		        <a :download="file" @click.stop=""
+		          :href="getUrl('download',location,path,file)">
+		          <icon name="download" scale=".9"></icon>
+		        </a>        
+		        <a target="_blank" @click.stop=""
+		          :href="getUrl('view',location,path,file)">
+		          <icon name="eye" scale=".9"></icon>
+		        </a>
+		        <a @click.stop=""
+		          :href="getUrl('bkit',location,path,file)">
+		          <icon name="undo" scale=".9"></icon>
+		        </a>
+	        </div>
+        </div>
       </li>      
     </ul>  
 </template>

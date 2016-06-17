@@ -1,9 +1,9 @@
 <template>
   <ul class="root">
     <li v-for="root in roots" @click.stop="toggle_root($index)">
-      <icon name="minus-square-o" scale=".8" v-if="root.open"></icon>
-      <icon name="plus-square-o" scale=".8" v-else></icon>
-      <icon name="database" scale=".8"></icon>
+      <icon name="database" scale=".9" v-if="root.open"></icon>
+      <icon name="database" scale=".9" v-else></icon>
+      <!--<icon name="database" scale=".9"></icon>-->
       {{root.name}}
       <ul v-if="root.open">
         <backup v-for="backup in root.backups | orderBy -1"

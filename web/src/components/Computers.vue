@@ -1,15 +1,16 @@
 <template>
   <div class="computers">
     <header>
-      <img class="logo" src="../assets/00-Logotipo/256x256.png">
-      <h1>{{ msg }} {{name}}</h1>
+      <img class="logo" src="../assets/00-Logotipo/128x128.png">
+      <h1>bK<span style="color:#67a9fb">i</span><span style="color:#7fff00">t</span></h1><br/>
+      
     </header>
     <ul class="tree">
       <li v-for="computer in computers" class="computer" 
         @click.stop="toggle_roots($index)" >
-        <icon name="minus-square-o" scale=".8" v-if="computer.open"></icon>
-        <icon name="plus-square-o" scale=".8" v-else></icon>
-        <icon name="tv" scale=".8" label="Backup computer"></icon>
+        <icon name="desktop" scale=".9" v-if="computer.open"></icon>
+        <icon name="desktop" scale=".9" v-else></icon>
+        <!--<icon name="desktop" scale=".9" label="Backup computer"></icon>-->
         {{computer.name}}
         <root v-if="computer.open"
           :path="{name:computer.name,fullname:computer.id}">
@@ -27,7 +28,6 @@
   export default {
     data () {
       return {
-        msg: 'Bkit!',
         computers: []
       }
     },
@@ -65,12 +65,17 @@
 </style>
 <style scoped>
   .logo {
-    width: 5em;
-    height: 5em;
+    width: 9em;
+    height: 9em;
+    padding:25px;
   }
   h1 {
-    color: #42b983;
-    margin-left: 1em;
+    color: #777777;
+    font-size:120px;
+    position:relative;
+    left:15px;
+    top:0px;
+    
   }
   header {
     display: flex;
@@ -82,11 +87,11 @@
   }
   ul.tree{
     margin: 0em;
-    margin-top: 2em;
+    margin-top: 1em;
     padding-left: 1em;
   }
   ul.tree>li{
-    padding-left: 0em;
+    padding-left: 1em;
   }
-
+  
 </style>

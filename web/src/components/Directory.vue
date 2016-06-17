@@ -1,5 +1,5 @@
 <template>
-    <ul class="directories">
+    <ul class="directories" v-if="folders.length > 0">
       <li v-for="folder in folders" @click.stop="toggle($index)">
         <div>
 	        <div>

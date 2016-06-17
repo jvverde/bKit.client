@@ -4,25 +4,35 @@ html {
 }
 
 body {
-  display: flex;
+  width:100%;
+  display: auto;
   align-items: left;
   justify-content: left;
-  color: #000000;
+  color: #777777;
   font-family: Source Sans Pro, Helvetica, sans-serif;
   font-size: 12pt;
   text-align: center;
 }
 
 a {
-  color: #42b983;
+  color: #67a9fb;
   text-decoration: none;
 }
 
+a:hover {
+  color: #7fff00;
+}
+.computers,#app{
+   width:100%;
+}
 .tree{
-  $line-height: 1.4em;
-  $li-ident: 0.7em;
+  $line-height: 2em;
+  $li-ident: 1.3em;
   text-align: left;    
+  width:100%;
+  
   ul,li{
+    width:100%;
     padding: 0;
     margin: 0;
     list-style: none;
@@ -30,20 +40,20 @@ a {
     &::before{
       border-width: 0;
       border-style: dotted;
-      border-color: #AA3;
+      border-color: #777777;
       position:absolute;
       display:block;
       content:"";
     }
   }
   ul{
-    margin-left: .25em;
+    margin-left: .45em;
     &::before {
       content:"";
       width:0;
-      top:-.8 * ($line-height / 2);
+      top:-.3 * ($line-height / 2);
       bottom:$line-height / 2;      /*stop at half os last li */
-      left:0;
+      left:0em;
       border-left-width:1px;
     }
   }
@@ -52,13 +62,25 @@ a {
     padding:0 $li-ident;            /* indentation = .5em */
     line-height:$line-height;  
     cursor: pointer;
+    
     &::before {
-      width:.95 * $li-ident;        /* 95% of indentation */
+      width:.5 * $li-ident;        /* 50% of indentation */
       height:0;
       border-top-width:1px;
       margin-top:-1px;              /* border top width */
       top:$line-height / 2;              
       left:0;
     }
+    >div {
+      width:100%;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:space-between;
+    /*>:hover{
+      background:#cccccc;
+    }*/
+    }
+    
+   
   }
 }

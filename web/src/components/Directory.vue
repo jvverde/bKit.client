@@ -2,14 +2,15 @@
     <ul class="directories">
       <li v-for="folder in folders" @click.stop="toggle($index)">
         <div>
-	        <div><icon name="refresh" :spin="true" scale=".9" v-if="isWaiting($index)"></icon>
-	        <icon name="folder-open" scale=".9" v-if="folder.open"></icon>
-	        <icon name="folder" scale=".9" v-else></icon>
-	        <span v-if="hasChildren($index)">
-	          <icon name="folder-open-o" scale=".9" v-if="folder.open"></icon>
-	          <icon name="folder-o" scale=".9" v-else></icon>
-	        </span>
-	        {{folder.name}}
+	        <div>
+		        <icon name="refresh" :spin="true" scale=".9" v-if="isWaiting($index)"></icon>
+		        <icon name="folder-open" scale=".9" v-if="folder.open"></icon>
+		        <icon name="folder" scale=".9" v-else></icon>
+		        <span v-if="hasChildren($index)">
+		          <icon name="folder-open-o" scale=".9" v-if="folder.open"></icon>
+		          <icon name="folder-o" scale=".9" v-else></icon>
+		        </span>
+		        {{folder.name}}
 	        </div>
 	        <a @click.stop=""
 	          :href="getUrl('bkit',location,path,folder.name)">
@@ -26,11 +27,13 @@
     <ul class="files">
       <li v-for="file in files">
         <div>
-	        <div><icon name="file-o" scale=".9" ></icon>
-	        <a :download="file" class="file" @click.stop=""
-	          :href="getUrl('download',location,path,file)">
-	          {{file}}
-	        </a></div>
+	        <div>
+		        <icon name="file-o" scale=".9" ></icon>
+		        <a :download="file" class="file" @click.stop=""
+		          :href="getUrl('download',location,path,file)">
+		          {{file}}
+		        </a>
+	        </div>
 	        <div>
 		        <a :download="file" @click.stop=""
 		          :href="getUrl('download',location,path,file)">

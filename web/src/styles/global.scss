@@ -46,10 +46,13 @@ a:hover {
     &::before {
       content:"";
       top:-.3 * ($line-height / 2);
-      bottom:$line-height / 2;      /*stop at half os last li */
+      bottom:$line-height / 2;      /*stop at half of last li */
       left:0em;
       border-left-width:1px;
     }
+  }
+  ul.directories + ul.files::before {
+    top:-1 * ($line-height / 2);  
   }
   li {
     padding:0 $li-ident;            /* indentation = .5em */

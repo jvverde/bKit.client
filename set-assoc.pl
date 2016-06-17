@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Cwd qw|abs_path|;
-use File::Basename qw |dirname|;
+use File::Basename;
 use File::Which;
 #See
 #https://github.com/dk/Prima
@@ -12,13 +12,19 @@ use File::Which;
 
 ($\,$,) = ("\n","\t");
 
-my $script = shift or do {print "Usage:\n\t$0 script [ext]"; exit};
-my $ext = shift || 'rsync';
-
 my $cd = dirname abs_path $0;
+$cd =~ s#/+#\\#g;
+my $script = shift or do {print "Usage:\n\t$0 script ..."; exit};
+my $args = join ' ', @ARGV;
+my $ext = 'bkit';
+
+$script = abs_path "$cd\\$script" if dirname($script) !~ m#^(?:[a-z]:)?(?:/|\\)#i;
+$script =~ s#/+#\\#g; 
 
 my $perl = which 'perl';
+-e $perl or die "Can't find $perl";
+-e $script or die "Can't find $script";
 
-print qx|Assoc .$ext=rsync|;
-print qx|Ftype rsync=$perl $cd\\$script \%1|;
+print qx|Assoc .$ext=bkit|;
+print qx|Ftype bkit=$perl $script $args \%1|;
 

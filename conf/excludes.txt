@@ -13,7 +13,7 @@ Windows/ShellIconCache
 System32/LogFiles/
 Windows/Logs/
 Windows/Prefetch/
-AppData/Local/Microsoft/Windows/WER
+Windows/WER
 iobw.tst
 RECYCLER/
 Temp/
@@ -21,6 +21,7 @@ tmp
 *.dmp
 *.tmp
 cache/
-cache/
-Cache2 /
+Cache/
+Cache2/
+cache2/
 System Volume Information

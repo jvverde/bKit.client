@@ -2,7 +2,7 @@
   <div class="computers">
     <header>
       <img class="logo" src="../assets/00-Logotipo/128x128.png">
-      <h1>bK<span style="color:#67a9fb">i</span><span style="color:#7fff00">t</span></h1><br/>
+      <h1>BK<span style="color:#67a9fb">i</span><span style="color:#7fff00">t</span></h1><br/>
       
     </header>
     <ul class="tree">
@@ -67,7 +67,7 @@
   .logo {
     width: 9em;
     height: 9em;
-    padding:25px;
+    padding:10px 25px;
   }
   h1 {
     color: #777777;

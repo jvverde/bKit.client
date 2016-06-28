@@ -8,8 +8,4 @@ if [ ! -z $MINUTES ]
 then
 	NEW="-mmin -$MINUTES"
 fi
-find $BPATH -not -empty -type f $NEW -print0|xargs -0 --no-run-if-empty md5sum|
-while read id path 
-do
-	echo -e "$id\t$path"
-done
+find $BPATH -not -empty -type f $NEW -print0 |xargs -0 --no-run-if-empty md5sum

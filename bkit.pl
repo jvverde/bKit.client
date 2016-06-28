@@ -46,8 +46,10 @@ my $cd = dirname abs_path $0;
 $cd =~ s#/+#\\#g; 
 my $config = "$cd\\local-conf\\init.conf";
 open my $OLDSTD, ">&STDOUT" or die "$!"; #OLDSTD -> STDOUT
+my $quit = 0;
 GetOptions(
    'config=s' => \$config,
+   'quit|q' => \$quit,
    'output:s' => sub{
       my $mylog = $_[1] || eval{
         my $mylog = "$cd\\logs";
@@ -147,8 +149,12 @@ END {
   } // warn "Warning: $@" if defined $lastVssKey;
   open STDOUT, ">&",$OLDSTD or die "$!" if defined $OLDSTD;
   my $localtime = localtime;
-  print "Script ($0) end successfully at $localtime" and exit unless $exit;
-  print "Script ($0) end abnormally ($exit) at $localtime";
+  print "Script ($0) end successfully at $localtime" unless $exit;
+  print "Script ($0) end abnormally ($exit) at $localtime" if $exit;
+  print 'Press ENTER to finish...';
+  $quit || <>;
+  print 'Bye';
+
   exit($exit);
 }
 

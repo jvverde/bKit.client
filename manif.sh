@@ -1,6 +1,2 @@
 #!/bin/bash
-for VOL in $(ls /cygdrive)
-do
-  find /cygdrive/$VOL -not -empty -type f -printf "%H|/%P\n"
-done
-exit
+find /cygdrive/? -maxdepth 0 -type d -printf "%f\0" |xargs -0 -I{} find /cygdrive/{} -not -empty -type f -printf "{}|/%P\n" 

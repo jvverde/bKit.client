@@ -1,8 +1,10 @@
 #!/bin/bash
+UFDIR=$(dirname "$(readlink -f "$0")")	#Unix Full DIR
+WDIR=$(cygpath -w $UFDIR)				#Windows Full DIR
+ARCHREG=$(CMD.EXE /C $WDIR\\get-arch-from-reg.bat)
+[[ $ARCHREG = ~x86 ]] && ARCH=x86 || ARCH=x64 
+
 VER=$(CMD.EXE /C VER)
-echo $VER
-ARCH=$(CMD.EXE /C arch.bat)
-echo $ARCH
 
 [[ $VER =~ "5\.1\." ]] && VSSHADOW=vshadow-xp-x86.exe
 [[ $VER =~ "5\.2\." ]] && VSSHADOW=vshadow-2003-x86

@@ -14,13 +14,19 @@ echo "$uuid"
 echo "$domain"
 echo "$name"
 MANIFDIR="$DIR/run"
-##$DIR/manif.sh > $MANIF/manif.txt
+DIFF=$((($(date +%s)-$(stat -c %Y "$MANIFDIR/manif.txt"))/60+1))
+echo $DIFF
+MTIME=$( [[ -e "$MANIFDIR/manif.txt" ]] && echo "-mmin -$DIFF")
+echo $MTIME
+find /cygdrive/? -maxdepth 0 -type d -printf "%f\0" |xargs -0 -I{} find /cygdrive/{} $MTIME -not -empty -type f -printf "{}|/%P\n"
+exit
+##$DIR/manif.sh > $MANIFDIR/manif.txt
 RSYNC=$(find $DIR -type f -name "rsync.exe" -print | head -n 1)
 #echo $RSYNC
 
 ${RSYNC} -rltvvhR --inplace --stats ${MANIFDIR}/./ rsync://admin\@${SERVER}:${port}/${section}/win/${domain}/${name}/${uuid}
 
-[ "$?" -ne "0" ] &&  echo "Exit value of rsync is non null: $?" && exit 1
+[[ "$?" -ne "0" ]] && echo "Exit value of rsync is non null: $?" && exit 1
 
 exit
 

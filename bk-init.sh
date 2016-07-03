@@ -1,31 +1,28 @@
 #!/bin/bash
+DIR=$(dirname "$(readlink -f "$0")")	#Full DIR
 section=bkit
 port=8733
 user=us3r
 workdir=.bkit
 aclstimeout=3600*24*8
+SERVER=$1
 
-uuid="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}')"
-domain="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}')"
-name="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /name/ {print $2}')"
+uuid="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}' | sed '#\r+##g') "
+domain="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}' | sed '#\r+##g')"
+name="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /name/ {print $2}' | sed '#\r+##g')"
 echo "$uuid"
 echo "$domain"
 echo "$name"
+MANIFDIR="$DIR/run"
+##$DIR/manif.sh > $MANIF/manif.txt
+RSYNC=$(find $DIR -type f -name "rsync.exe" -print | head -n 1)
+#echo $RSYNC
+
+${RSYNC} -rltvvhR --inplace --stats ${MANIFDIR}/./ rsync://admin\@${SERVER}:${port}/${section}/win/${domain}/${name}/${uuid}
+
+[ "$?" -ne "0" ] &&  echo "Exit value of rsync is non null: $?" && exit 1
+
 exit
-
-my $path = $sysDir;
-$path =~ s/[\\]/\//g; #dos->unix
-$path =~ s/^([a-z]):/\/cygdrive\/$1/i;
-
-my $exec = qq|${rsync} -rltvvhR --inplace --stats |
-  .qq| ${path}/./ rsync://admin\@${server}:${port}/${section}/win/${domain}/${name}/${uuid}|
-;
-
-print "Executing:\n\t$exec\n";
-
-print qx|$exec 2>&1|;
-$? and die "Exit value of rsync is non null: $?";
-
 
 my $cfg = new Config::Simple(syntax=>'http');
 $cfg->param('url',"rsync://${user}\@${server}:${port}/${domain}.${name}.${uuid}");

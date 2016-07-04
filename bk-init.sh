@@ -6,13 +6,14 @@ user=us3r
 workdir=.bkit
 pass=us3r
 aclstimeout=3600*24*8
+[[ $1 == "-m" ]] && MANIF=1 && shift
 SERVER=$1
-[[ "$1" == "" ]] && echo -e "Usage:\n\t$0 server-address" && exit 1
+[[ "$SERVER" == "" ]] && echo -e "Usage:\n\t$0 [-m] server-address" && exit 1
 NC=$(find $DIR -type f -path "*/cygwin/*" -name "nc.exe" -print | head -n 1)
 echo Contacting the server ... please wait!
 [[ -e "$NC" ]] && ( $NC -z $SERVER $port 2>/dev/null && echo "Server OK" || (echo "Server $SERVER not respond on port $port" && exit 1)) || exit 1
 echo continue...
-exit
+#exit
 
 uuid="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}' | sed '#\r+##g') "
 domain="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}' | sed '#\r+##g')"
@@ -20,19 +21,15 @@ name="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolo
 
 MANIFDIR="$DIR/run"
 MANIFILE="$MANIFDIR/manif.txt"
-DIFF=$((($(date +%s)-$(stat -c %Y "$MANIFILE"))/60+60*24)) #last modifications time of manif.txt + 1 day
-MTIME=$( [[ -e "$MANIFILE" ]] && echo "-mmin -$DIFF")
 date +%X
-#find /cygdrive/? -maxdepth 0 -type d -printf "%f\0" |xargs -0 -I{} find /cygdrive/{} $MTIME -not -empty -type f -printf "{}|/%P\n" >> $MANIFILE
-date +%X
-#sort -u $MANIFILE > ${MANIFILE}.tmp && mv ${MANIFILE}.tmp $MANIFILE
+[ $MANIF ] && find /cygdrive/? -maxdepth 0 -type d -printf "%f\0" |xargs -0 -I{} find /cygdrive/{} -not -empty -type f -printf "{}|/%P\n" > $MANIFILE
 date +%X
 RSYNC=$(find $DIR -type f -name "rsync.exe" -print | head -n 1)
 #echo $RSYNC
 
-#${RSYNC} -rltvvhR --inplace --stats ${MANIFDIR}/./ rsync://admin\@${SERVER}:${port}/${section}/win/${domain}/${name}/${uuid}
+${RSYNC} -rltvvhR --inplace --stats ${MANIFDIR}/./ rsync://admin\@${SERVER}:${port}/${section}/win/${domain}/${name}/${uuid}
 
-#[[ "$?" -ne "0" ]] && echo "Exit value of rsync is non null: $?" && exit 1
+[[ "$?" -ne "0" ]] && echo "Exit value of rsync is non null: $?" && exit 1
 
 CONFDIR=$DIR/conf
 find $CONFDIR -type f -name "init.sample" -print |xargs cat|

@@ -6,11 +6,13 @@ set "OP=%~dp0"
 
 if not exist %OP%3rd-party\NUL mkdir %OP%3rd-party
 if not exist %OP%3rd-party\cygwin\NUL mkdir %OP%3rd-party\cygwin
+if not exist %OP%3rd-party\vsshadow\NUL mkdir %OP%3rd-party\vsshadow
+if not exist %OP%run\NUL mkdir %OP%run
 
 call %OP%setup\install.bat
 set bash=%OP%3rd-party\cygwin\bin\bash.exe
 if not exist %bash% (
-	echo bash.exe not found in /usr/bin/perl: /usr/bin/perl: cannot execute binary file directory
+	echo bash.exe not found 
 	exit /b
 )
 for %%F in ("%bash%") do set dirname=%%~dpF

@@ -3,9 +3,9 @@ UFDIR=$(dirname "$(readlink -f "$0")")	#Unix Full DIR
 WDIR=$(cygpath -w $UFDIR)				#Windows Full DIR
 ARCHREG=$(CMD.EXE /C $WDIR\\get-arch-from-reg.bat)
 [[ $ARCHREG = ~x86 ]] && ARCH=x86 || ARCH=x64 
-
+echo arch $ARCH
 VER=$(CMD.EXE /C VER)
-
+echo ver $VER
 [[ $VER =~ "5\.1\." ]] && VSSHADOW=vshadow-xp-x86.exe
 [[ $VER =~ "5\.2\." ]] && VSSHADOW=vshadow-2003-x86
 [[ $VER =~ "6\.0\." ]] && VSSHADOW=vshadow-2008-$ARCH

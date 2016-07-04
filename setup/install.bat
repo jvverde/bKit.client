@@ -8,11 +8,11 @@ cd %~dp0
 
 for %%i in ("%~dp0..") do set "PARENT=%%~fi"
 
-set MODULES=awk,rsync,perl,xargs
+set MODULES=awk,rsync,perl,xargs,ping,nc
 
 set ARGS= -B -R %PARENT%\3rd-party\cygwin -d -N -n -X -q -s http://ftp.snt.utwente.nl/pub/software/cygwin/ -P %MODULES%
 
-reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x86" > NUL && set OSARCH=32BIT || set OSARCH=64BIT
+reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | findstr /i "x86" > NUL && set OSARCH=32BIT || set OSARCH=64BIT
 
 if %OSARCH%==32BIT ( 
 	%~dp0\cygwin\setup-x86.exe %ARGS%

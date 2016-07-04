@@ -1,3 +1,5 @@
 3rd-party/
 bash.bat
 run/
+conf/*.conf
+logs/

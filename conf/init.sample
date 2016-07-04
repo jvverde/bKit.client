@@ -1,0 +1,6 @@
+url: rsync://_USER_@_SERVER_:_PORT_/_DOMAIN_._NAME_._UUID_
+workdir: _WORKDIR_
+pass: _PASS_
+aclstimeout: 691200
+
+

@@ -20,7 +20,7 @@ domain="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" '
 name="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /name/ {print $2}' | sed '#\r+##g')"
 
 MANIFDIR="$DIR/run"
-MANIFILE="$MANIFDIR/manif.txt"
+MANIFILE="$MANIFDIR/manifest.txt"
 date +%X
 [ $MANIF ] && find /cygdrive/? -maxdepth 0 -type d -printf "%f\0" |xargs -0 -I{} find /cygdrive/{} -not -empty -type f -printf "{}|/%P\n" > $MANIFILE
 date +%X

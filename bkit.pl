@@ -44,7 +44,7 @@ sub getShadowCopies{
 
 my $cd = dirname abs_path $0;
 $cd =~ s#/+#\\#g; 
-my $config = "$cd\\local-conf\\init.conf";
+my $config = "$cd\\conf\\init.conf";
 open my $OLDSTD, ">&STDOUT" or die "$!"; #OLDSTD -> STDOUT
 my $quit = 0;
 GetOptions(
@@ -119,7 +119,7 @@ my $volume = $cvss->{$lastVssKey}->{volume} // die "Volume is undefined";
 
 my $fmt = q#'"%p|%t|%o|%i|%b|%l|%f"'#;
 my $arch = lc Win32::GetArchName() || 'x86';
-my $rsync = "$cd\\cygwin-$arch\\rsync.exe";
+my $rsync = "$cd\\3rd-party\\cygwin\\bin\\rsync.exe";
 $rsync = which 'rsync' or die "Cannot find rsync" unless -e $rsync;
 
 my ($shcN) = $volume =~ /(HarddiskVolumeShadowCopy\d+)/;

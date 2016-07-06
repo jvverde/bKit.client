@@ -1,11 +1,14 @@
 #!/bin/bash
 SDIR=$(dirname "$(readlink -f "$0")")	#Full DIR
 BACKUPDIR=$1
-! [[ $BACKUPDIR =~ ^[a-zA-Z]:\\ ]] && echo -e "Usage:\n\t$0 Drive:\\full-path-of-backup-dir" && exit 1
+! [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] && echo -e "Usage:\n\t$0 Drive:\\full-path-of-backup-dir" && exit 1
 BUDIR=$(cygpath $BACKUPDIR)
 ! [[ -d $BUDIR ]] && echo "The directory $BACKUPDIR doesn't exist" && exit 1
 
 DRIVE=${BACKUPDIR%%:*}
+BPATH=${BACKUPDIR#*:}
+BPATH=${BPATH#*\\}
+echo $BPATH
 DRIVE=${DRIVE^^}
 VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
 eval "$VARS"
@@ -13,6 +16,8 @@ echo Name $NAME
 echo VolumeSerialNumber $VOLUMESERIALNUMBER
 echo VolumeName $VOLUMENAME
 echo Description $DESCRIPTION
+RID="$DRIVE|$VOLUMESERIALNUMBER|$VOLUMENAME ($DESCRIPTION)|${BPATH//\\/|}"
+echo $RID
 exit
 # | awk '{print "aa:" $0}'
 #echo T=$T

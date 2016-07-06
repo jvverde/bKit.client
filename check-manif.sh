@@ -6,17 +6,14 @@ BUDIR=$(cygpath $BACKUPDIR)
 ! [[ -d $BUDIR ]] && echo "The directory $BACKUPDIR doesn't exist" && exit 1
 
 DRIVE=${BACKUPDIR%%:*}
+DRIVE=${DRIVE^^}
 BPATH=${BACKUPDIR#*:}
 BPATH=${BPATH#*\\}
-echo $BPATH
-DRIVE=${DRIVE^^}
 VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
 eval "$VARS"
-echo Name $NAME
-echo VolumeSerialNumber $VOLUMESERIALNUMBER
-echo VolumeName $VOLUMENAME
-echo Description $DESCRIPTION
-RID="$DRIVE|$VOLUMESERIALNUMBER|$VOLUMENAME ($DESCRIPTION)|${BPATH//\\/|}"
+RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME ($DESCRIPTION).${BPATH//\\/.}"
+mkdir -p "$SDIR/cache"
+#[[ -e "$SDIR/cache/$RID.man" ]] 
 echo $RID
 exit
 # | awk '{print "aa:" $0}'

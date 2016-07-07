@@ -1,10 +1,13 @@
 #!/bin/bash
 SDIR=$(dirname "$(readlink -f "$0")")	#Full DIR
 BACKUPDIR="$1"
-! [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] && echo -e "Usage:\n\t$0 Drive:\\full-path-of-backup-dir" && exit 1
+die() { echo -e "$@"; exit 1; }
+
+[[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "Usage:\n\t$0 Drive:\\full-path-of-backup-dir"
+
 BUDIR="$(cygpath "$BACKUPDIR")"
 
-! [[ -d "$BUDIR" ]] && echo "The directory $BACKUPDIR ($BUDIR)doesn't exist" && exit 1
+[[ -d "$BUDIR" ]] || die "The directory $BACKUPDIR ($BUDIR)doesn't exist"
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
@@ -15,17 +18,11 @@ eval "$VARS"
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME ($DESCRIPTION).${BPATH//\\/.}"
 mkdir -p "$SDIR/cache"
 MANIFPATH="$SDIR/cache/$RID.man"
-if [[ ! -f "$MANIFPATH" || $(find "$MANIFPATH" -mmin +1) ]] 
+if [[ ! -f "$MANIFPATH" || $(find "$MANIFPATH" -mmin +120) ]] 
 then
   echo Get manifest of $BACKUPDIR
   find "$BUDIR" -type f -printf "%P\n" > "$MANIFPATH"
-  RSYNC=$(find $SDIR -type f -name "rsync.exe" -print | head -n 1)
+  RSYNC=$(find $DIR -type f -name "rsync.exe" -print | head -n 1)
+  [[ -f $RSYNC ]] || die "Rsync.exe not found"
+  echo $RSYNC
 fi
-
-
-echo $RSYNC
-exit
-${RSYNC} -rltvvhR --inplace --stats ${MANIFPATH}/./ rsync://admin\@${SERVER}:${port}/${section}/win/${domain}/${name}/${uuid}
-
-[[ "$?" -ne "0" ]] && echo "Exit value of rsync is non null: $?" && exit 1
-

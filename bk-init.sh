@@ -8,7 +8,8 @@ SERVER=$1
 die() { echo "$@"; exit 1; }
 [[ -z ${SERVER+x} ]] && die "Usage:\n\t$0 [-m] server-address"
 echo Contacting the server ... please wait!
-find $DIR -type f -path "*/cygwin/*" -name "nc.exe" -print | xargs -L 1 -I{} sh -c "{} -z $SERVER $PORT" || die Server $SERVER not found
+find $DIR -type f -path "*/cygwin/*" -name "nc.exe" -print | 
+xargs -L 1 -I{} sh -c "{} -z $SERVER $PORT" || die Server $SERVER not found
 
 UUID="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}' | sed '#\r+##g')"
 DOMAIN="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}' | sed '#\r+##g')"
@@ -20,8 +21,8 @@ mkdir -p "$CONFDIR"
 echo Writing configuration to $CONFDIR/conf.init
 
 cat > "$CONFDIR/conf.init" <<EOL
-BACKUPURL="rsync://$USER\@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.data"
-MANIFURL="rsync://$USER\@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.manifest"
+BACKUPURL="rsync://$USER@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.data"
+MANIFURL="rsync://$USER@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.manifest"
 PASS="$PASS"
 EOL
 

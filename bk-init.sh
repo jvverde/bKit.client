@@ -18,13 +18,17 @@ NAME="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolo
 CONFDIR="$DIR/conf"
 mkdir -p "$CONFDIR"
 
-echo Writing configuration to $CONFDIR/conf.init
 
-cat > "$CONFDIR/conf.init" <<EOL
-BACKUPURL="rsync://$USER@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.data"
-MANIFURL="rsync://$USER@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.manifest"
-PASS="$PASS"
-EOL
+INITFILE=$CONFDIR/conf.init
+
+echo Writing configuration to $INITFILE
+
+echo "BACKUPURL=rsync://$USER@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.data" > $INITFILE
+echo "MANIFURL=rsync://$USER@$SERVER:$PORT/$DOMAIN.$NAME.$UUID.manifest" >> $INITFILE
+
+PASSFILE=$CONFDIR/pass.txt
+echo $PASS > $PASSFILE
+chmod 600 $PASSFILE
 
 RSYNC=$(find $DIR -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die "Rsync.exe not found"

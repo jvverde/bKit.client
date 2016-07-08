@@ -37,10 +37,6 @@ then
   [[ -f $CONF ]] || die Cannot found configuration file at $CONF
   source $CONF
   
-  EXEC="$RSYNC -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats ${MANIFESTDIR}/./ $MANIFURL/"
-  echo perl -e "open H, '|-', q|$EXEC >/dev/null 2>&1|; print H qq|$PASS\n\n|; close H"
-  
-  #echo $EXEC
-  echo send it now
-  echo ending...
+  EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats ${MANIFESTDIR}/./ $MANIFURL/"
+  $EXEC
 fi

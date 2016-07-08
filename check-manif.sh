@@ -12,11 +12,13 @@ BUDIR="$(cygpath "$BACKUPDIR")"
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
-BPATH=${BACKUPDIR#*:}
-BPATH=${BPATH#*\\}
+BPATH=${BACKUPDIR#*:} #remove anything until character ':' inclusive
+BPATH=${BPATH#*\\}    #remove anything until character '\' inclusive
+BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
 VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
 eval "$VARS"
-RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME ($DESCRIPTION).${BPATH//\\/.}"
+DESCRIPTION=$(echo $DESCRIPTION | sed 's#[^a-z]#-#gi')
+RID="$DRIVE.$VOLUMESERIALNUMBER.${VOLUMENAME:-_}.$DESCRIPTION.${BPATH//\\/.}"
 MANIFESTDIR=$SDIR/cache
 RUNDIR=$SDIR/run
 mkdir -p "$MANIFESTDIR"
@@ -25,7 +27,7 @@ W=$RUNDIR/W
 R=$RUNDIR/R
 [[ -p $W ]] || mkfifo $W  || die cannot create the fifo $W
 [[ -p $R ]] || mkfifo $R  || die cannot create the fifo $R
-MANIFESTFILE=$MANIFESTDIR/$RID.man
+MANIFESTFILE=$MANIFESTDIR/$RID.manifest
 if [[ ! -f "$MANIFESTFILE" || $(find "$MANIFESTFILE" -mmin +0) ]] 
 then
   echo Get manifest of $BACKUPDIR

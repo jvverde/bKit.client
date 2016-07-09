@@ -16,5 +16,5 @@ if [ $VSSHADOW ]
 then
 	CMD /C $WDIR\\3rd-party\\vsshadow\\$VSSHADOW.exe -script=$WDIR\\run\\vss.cmd -exec=$WDIR\\backup.bat $DRIVE:
 else
-	echo 'smothing else'
+	echo 'something else'
 fi

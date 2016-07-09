@@ -1,5 +1,8 @@
 #!/bin/bash
+: ${1?"Usage: $0 Drive[:\\Path]"}
 DRIVE=${1%%:*}
+DRIVE=${DRIVE^^}
+
 UFDIR=$(dirname "$(readlink -f "$0")")	#Unix Full DIR
 WDIR=$(cygpath -w $UFDIR)				#Windows Full DIR
 ARCHREG=$(CMD.EXE /C $WDIR\\get-arch-from-reg.bat)
@@ -16,5 +19,11 @@ if [ $VSSHADOW ]
 then
 	CMD /C $WDIR\\3rd-party\\vsshadow\\$VSSHADOW.exe -script=$WDIR\\run\\vss.cmd -exec=$WDIR\\backup.bat $DRIVE:
 else
-	echo 'something else'
+  echo call wmic
+	SHADOW=$(wmic shadowcopy call create ClientAccessible,$DRIVE:\\ | 
+    sed -e 's#\r##g' | awk -F "=" '/ShadowID/ {print $2}'|
+    sed -E 's#"\{(.*)\}";#\1#'
+  ) 
+  #| sed -E 's/.*[{](.*)[}].*/\1/gim')
+  echo SHD $SHD
 fi

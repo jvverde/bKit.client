@@ -31,7 +31,7 @@ MANIFESTFILE=$MANIFESTDIR/manifest
 if [[ ! -f "$MANIFESTFILE" || $(find "$MANIFESTFILE" -mmin +120) ]] 
 then
   echo Get manifest of $BACKUPDIR
-  find "$BUDIR" -type f -printf "%P:%s\n" > "$MANIFESTFILE"
+  find "$BUDIR" -type f -printf "%P:%s\n" |LC_ALL=C sort > "$MANIFESTFILE"
 fi
 RSYNC=$(find "$SDIR" -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die Rsync.exe not found

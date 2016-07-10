@@ -21,9 +21,9 @@ then
 else
   echo call wmic
 	SHADOW=$(wmic shadowcopy call create ClientAccessible,$DRIVE:\\ | 
-    sed -e 's#\r##g' | awk -F "=" '/ShadowID/ {print $2}'|
+    sed -e 's#\r##g' | 
+    awk -F "=" '/ShadowID/ {print $2}'|
     sed -E 's#"\{(.*)\}";#\1#'
   ) 
-  #| sed -E 's/.*[{](.*)[}].*/\1/gim')
-  echo SHD $SHD
+  echo SHADOW $SHADOW
 fi

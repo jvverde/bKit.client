@@ -1,8 +1,8 @@
 @echo off
-set DIR=%~dp0
-echo %DIR%
-echo %1
-dir %1
-PAUSE
-::call %DIR%run\\vss.cmd
-::echo SHADOW_DEVICE_1 %SHADOW_DEVICE_1%
+set SDIR=%~dp0
+pushd .
+cd %SDIR%
+set DIR=%~f1
+popd
+
+%SDIR%3rd-party\shadowspawn\ShadowSpawn.exe c:\ B:\ %SDIR%bash.bat backup.sh %DIR% b:

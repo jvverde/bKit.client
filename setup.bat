@@ -6,7 +6,6 @@ set "OP=%~dp0"
 
 if not exist %OP%3rd-party\NUL mkdir %OP%3rd-party
 if not exist %OP%3rd-party\cygwin\NUL mkdir %OP%3rd-party\cygwin
-if not exist %OP%3rd-party\vsshadow\NUL mkdir %OP%3rd-party\vsshadow
 if not exist %OP%run\NUL mkdir %OP%run
 if not exist %OP%cache\NUL mkdir %OP%cache
 
@@ -19,6 +18,7 @@ if not exist %bash% (
 for %%F in ("%bash%") do set dirname=%%~dpF
 
 >bash.bat echo ^@echo OFF
+>>bash.bat echo ":: This file is automatically create by setup.bat. Don't change it" 
 >>bash.bat echo set oldhome=%%HOME%%
 >>bash.bat echo set oldshell=%%SHELL%%
 >>bash.bat echo set oldpath=%%path%%

@@ -1,27 +1,44 @@
-$Recycle.Bin
+#System Volume Information #nao incluir
 $RECYCLE.BIN
-pagefile.sys
-hiberfil.sys
-swapfile.sys
-Users/*/AppData/Local/Temp
-Documents and Settings/*/Cookies
-Documents and Settings/*/Recent
-Documents and Settings/*/Local Settings/Temp
-AppData/Local/IconCache.db
-Local Settings/Application Data/IconCache.db
-Windows/ShellIconCache
-System32/LogFiles/
-Windows/Logs/
-Windows/Prefetch/
-Windows/WER
-iobw.tst
-RECYCLER/
-Temp/
-tmp
+$Recycle.Bin
 *.dmp
 *.tmp
-cache/
+*/AppData/Local/Microsoft/Windows/INetCache
+*/AppData/Local/Microsoft/Windows/Temporary Internet Files
+*/AppData/Local/Temp
+*/Local Settings/Temp
+AppData/Local/IconCache.db
 Cache/
 Cache2/
+Documents and Settings/*/Application Data/Sun/Java/Deployment/cache
+Documents and Settings/*/Cookies
+Documents and Settings/*/History
+Documents and Settings/*/Local Settings/Temp
+Documents and Settings/*/Local Settings/Temporary Internet Files
+Documents and Settings/*/Recent
+Local Settings/Application Data/IconCache.db
+RECYCLER/
+System32/LogFiles/
+Temp/
+Users/*/AppData/*/Microsoft/Windows/Recent Items
+Users/*/AppData/Local/Microsoft/Windows/History 
+Users/*/AppData/Local/Microsoft/Windows/History/Low
+Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files  
+Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files/Low
+Users/*/AppData/Local/Temp
+Users/*/AppData/Local/Temp/Low
+Users/*/AppData/Local/Low/Sun/Java/Deployment/cache
+Users/*/AppData/Local/Low/Temp
+Users/*/AppData/Roaming/Microsoft/Windows/Recent  
+Windows/Logs/
+Windows/Prefetch/
+Windows/ShellIconCache
+Windows/SoftwareDistribution/Download
+Windows/Temp/
+cache/
 cache2/
-System Volume Information
+hiberfil.sys
+iobw.tst
+pagefile.sys
+swapfile.sys
+tmp

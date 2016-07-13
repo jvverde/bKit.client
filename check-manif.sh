@@ -1,10 +1,12 @@
 #!/bin/bash
-SDIR=$(dirname "$(readlink -f "$0")")	#Full DIR
+SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+[[ $1 == "-u" ]] && UPDATE=true && shift
+[[ $1 == "-f" ]] && FORCE=true && shift
 BACKUPDIR="$1"
 
 die() { echo -e "$@"; exit 1; }
 
-[[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "Usage:\n\t$0 Drive:\\full-path-of-backup-dir"
+[[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "Usage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir"
 
 BUDIR="$(cygpath "$BACKUPDIR")"
 
@@ -28,7 +30,7 @@ R=$RUNDIR/R
 [[ -p $W ]] || mkfifo $W  || die cannot create the fifo $W
 [[ -p $R ]] || mkfifo $R  || die cannot create the fifo $R
 MANIFESTFILE=$MANIFESTDIR/manifest
-if [[ ! -f "$MANIFESTFILE" || $(find "$MANIFESTFILE" -mmin +120) ]] 
+if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mmin +120) ]] 
 then
   echo Get manifest of $BACKUPDIR
   find "$BUDIR" -type f -printf "%P:%s\n" |LC_ALL=C sort > "$MANIFESTFILE"

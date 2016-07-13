@@ -1,6 +1,7 @@
 #!/bin/bash
 
-SDIR=$(dirname "$(readlink -f "$0")")	#Full DIR
+SDIR="$(cygpath "$(dirname "$(readlink -f "$0")")")"	#Full DIR
+
 BACKUPDIR="$1"
 MAPDRIVE="$2"
 
@@ -37,6 +38,7 @@ RSYNC=$(find $SDIR -type f -name "rsync.exe" -print | head -n 1)
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
+echo PASS $PASS
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 ${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/
 

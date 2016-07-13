@@ -8,26 +8,18 @@ for %%i in ("%SDIR%..") do set "PARENT=%%~fi\"
 pushd %cd%
 
 cd /d %SDIR%
-reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | findstr /i "x86" > NUL && set OSARCH=32BIT || set OSARCH=64BIT
+set "XP="
+reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | findstr /i "x86" > NUL && set "OSARCH=x86" || set "OSARCH=x64"
+ver | findstr /IL "5.1." > NUL && set "XP=-XP"
+set "SHADOW=%SDIR%shadowspawn\ShadowSpawn-0.2.2-%OSARCH%%XP%.zip"
+echo unzip %SHADOW%
+call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SHADOW%"
 
-if %OSARCH%==64BIT ( 
-  reg Query "HKLM\SOFTWARE\Classes\Installer\Products\1926E8D15D0BCE53481466615F760A7F" |findstr /i "10.0.40219" > NUL || set VCR=NO
-  if %VCR%==NO ( 
-    call %SDIR%shadowspawn\vcredist-2010_x64.exe
-  )
-  call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SDIR%shadowspawn\ShadowSpawn-0.2.2-x64.zip"
-) else ( 
-  reg Query "HKLM\SOFTWARE\Classes\Installer\Products\1D5E3C0FEDA1E123187686FED06E995A" |findstr /i "10.0.40219" > NUL || set VCR=NO
-  if %VCR%==NO ( 
-    call %SDIR%shadowspawn\vcredist-2010_x86.exe
-  )
-  VER | FINDSTR /IL "5.1." > NUL
-  IF %ERRORLEVEL% EQU 0 (
-    call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SDIR%shadowspawn\ShadowSpawn-0.2.2-x86-XP.zip"
-  ) else (
-    call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SDIR%shadowspawn\ShadowSpawn-0.2.2-x86.zip"
-  )
-)
+set "KEY=1D5E3C0FEDA1E123187686FED06E995A"
+if %OSARCH%==x64 set "KEY=1926E8D15D0BCE53481466615F760A7F" 
+set "STRING=HKLM\SOFTWARE\Classes\Installer\Products\%KEY%"
+set "VCR=%SDIR%shadowspawn\vcredist-2010_%OSARCH%.exe"
+reg Query %STRING% | findstr /IL "10.0.40219" > NUL || call %VCR%
 
 popd
 exit /b

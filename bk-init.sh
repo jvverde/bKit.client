@@ -4,10 +4,11 @@ SECTION=bkit
 PORT=8733
 USER=user
 PASS=us3r
-SERVER=$1
-die() { echo "$@"; exit 1; }
-[[ -z ${SERVER+x} ]] && die "Usage:\n\t$0 [-m] server-address"
+SERVER="$1"
+die() { echo -e "$@"; exit 1; }
+[[ -z $SERVER ]] && die "Usage:\n\t$0 server-address"
 echo Contacting the server ... please wait!
+
 find $DIR -type f -path "*/cygwin/*" -name "nc.exe" -print | 
 xargs -L 1 -I{} sh -c "{} -z $SERVER $PORT" || die Server $SERVER not found
 

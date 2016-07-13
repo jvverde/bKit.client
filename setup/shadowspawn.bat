@@ -21,7 +21,12 @@ if %OSARCH%==64BIT (
   if %VCR%==NO ( 
     call %SDIR%shadowspawn\vcredist-2010_x86.exe
   )
-  call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SDIR%shadowspawn\ShadowSpawn-0.2.2-x86.zip"
+  VER | FINDSTR /IL "5.1." > NUL
+  IF %ERRORLEVEL% EQU 0 (
+    call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SDIR%shadowspawn\ShadowSpawn-0.2.2-x86-XP.zip"
+  ) else (
+    call :UnZipFile "%PARENT%3rd-party\shadowspawn" "%SDIR%shadowspawn\ShadowSpawn-0.2.2-x86.zip"
+  )
 )
 
 popd

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SDIR="$(cygpath "$(dirname "$(readlink -f "$0")")")"	#Full DIR
-
+SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+$($SDIR/check-manifest.sh)
 BACKUPDIR="$1"
 MAPDRIVE="$2"
 

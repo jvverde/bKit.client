@@ -1,9 +1,9 @@
 #!/bin/bash
 
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
-$($SDIR/check-manifest.sh)
 BACKUPDIR="$1"
 MAPDRIVE="$2"
+sh -c "$SDIR/manifest.sh $BACKUPDIR"
 
 die() { echo "$@"; exit 1; }
 
@@ -16,7 +16,7 @@ DRIVE=${DRIVE^^}
 
 BPATH=${BACKUPDIR#*:} #remove anything before character ':' inclusive
 BPATH=${BPATH#*\\}    #remove anything before character '\' inclusive
-BPATH="$(cygpath "$BPATH")"
+[[ -n $BPATH ]] && BPATH="$(cygpath "$BPATH")"
 
 ROOT="$(cygpath "$MAPDRIVE")"
 BUDIR=$ROOT/$BPATH

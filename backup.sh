@@ -3,6 +3,7 @@
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 BACKUPDIR="$1"
 MAPDRIVE="$2"
+sh -c "$SDIR/manifest.sh $BACKUPDIR"
 
 sh -c "$SDIR/manifest.sh $BACKUPDIR"
 

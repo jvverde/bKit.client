@@ -1,5 +1,8 @@
 3rd-party/
 bash.bat
 run/
-conf/*.conf
+conf/*
+!conf/excludes.txt
 logs/
+cache/
+run/

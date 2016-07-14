@@ -1,16 +1,14 @@
 #!/bin/bash
-
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 BACKUPDIR="$1"
 MAPDRIVE="$2"
-
-sh -c "$SDIR/manifest.sh $BACKUPDIR"
 
 die() { echo "$@"; exit 1; }
 
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
+sh -c "$SDIR/manifest.sh $BACKUPDIR"
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}

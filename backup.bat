@@ -18,7 +18,7 @@ if %NTFS%==yes if %FIXED%==yes (
 ) 
 
 echo backup directly -- without shadow copy
-echo %SDIR%bash.bat %SDIR%backup.sh %DIR% %DRIVE%
+%SDIR%bash.bat %SDIR%backup.sh %DIR% %DRIVE%
 goto :EOF
 
 

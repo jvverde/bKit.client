@@ -2,6 +2,7 @@
 SETLOCAL
 set SDIR=%~dp0
 set DRIVE=%~d1
+
 pushd .
 cd %SDIR%
 set DIR=%~f1

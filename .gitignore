@@ -1,5 +1,9 @@
-3rd-party/
+3rd-party/*
+!3rd-party/subinacl
 bash.bat
 run/
-conf/*.conf
+conf/*
+!conf/excludes.txt
 logs/
+cache/
+run/

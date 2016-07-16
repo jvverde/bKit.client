@@ -8,6 +8,8 @@ cd %SDIR%
 set DIR=%~f1
 popd
 
+if not exist %SDIR%logs\NUL mkdir %SDIR%logs
+
 set CMD="%SDIR%3rd-party\cygwin\bin\bash.exe"
 set SHSPW="%SDIR%3rd-party\shadowspawn\ShadowSpawn.exe"
 

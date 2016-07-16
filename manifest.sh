@@ -1,6 +1,5 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-exec 2>&1
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
 [[ $1 == "-u" ]] && UPDATE=true && shift
@@ -27,7 +26,7 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.${VOLUMENAME:-_}.$DESCRIPTION/${BPATH}"
 MANIFESTDIR=$SDIR/cache/$RID
 mkdir -p "$MANIFESTDIR"
 MANIFESTFILE=$MANIFESTDIR/manifest
-if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mmin +120) ]] 
+if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mtime +1) ]] 
 then
   echo Get manifest of $BACKUPDIR
   find "$BUDIR" -type f -printf "%P:%s\n" |LC_ALL=C sort > "$MANIFESTFILE"
@@ -39,4 +38,6 @@ CONF="$SDIR/conf/conf.init"
 source $CONF
 
 EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats $SDIR/cache/./ $MANIFURL/"
-$EXEC
+$EXEC >$SDIR/logs/manifest.rsync.log 2>$SDIR/logs/manifest.rsync.err
+
+echo Sent manifest of $BACKUPDIR 

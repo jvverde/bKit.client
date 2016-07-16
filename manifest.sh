@@ -1,5 +1,8 @@
 #!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
+exec 2>&1
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+
 [[ $1 == "-u" ]] && UPDATE=true && shift
 [[ $1 == "-f" ]] && FORCE=true && shift
 BACKUPDIR="$1"
@@ -22,13 +25,7 @@ eval "$VARS"
 DESCRIPTION=$(echo $DESCRIPTION | sed 's#[^a-z]#-#gi')
 RID="$DRIVE.$VOLUMESERIALNUMBER.${VOLUMENAME:-_}.$DESCRIPTION/${BPATH}"
 MANIFESTDIR=$SDIR/cache/$RID
-RUNDIR=$SDIR/run
 mkdir -p "$MANIFESTDIR"
-mkdir -p "$RUNDIR"
-W=$RUNDIR/W
-R=$RUNDIR/R
-[[ -p $W ]] || mkfifo $W  || die cannot create the fifo $W
-[[ -p $R ]] || mkfifo $R  || die cannot create the fifo $R
 MANIFESTFILE=$MANIFESTDIR/manifest
 if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mmin +120) ]] 
 then

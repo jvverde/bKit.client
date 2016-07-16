@@ -24,7 +24,9 @@ echo backup directly -- without shadow copy
 goto :EOF
 
 :HARDDRIVE
-echo backup a shadow copy
-%SDIR%3rd-party\shadowspawn\ShadowSpawn.exe %DRIVE%\ %LETTER%: %SDIR%bash.bat %SDIR%backup.sh %DIR% %LETTER%:
+echo backup shadow copy
+::%SDIR%3rd-party\shadowspawn\ShadowSpawn.exe %DRIVE%\ %LETTER%: %SDIR%bash.bat %SDIR%backup.sh %DIR% %LETTER%:
+set CMD=C:\bkit\scripts\client\3rd-party\cygwin\bin\bash.exe
+%SDIR%3rd-party\shadowspawn\ShadowSpawn.exe %DRIVE%\ %LETTER%: %CMD% "/cygdrive/c/bkit/scripts/client/backup.sh" %DIR% %LETTER%:
 
 :EOF

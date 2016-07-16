@@ -1,5 +1,8 @@
 #!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
+exec 2>&1
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+
 BACKUPDIR="$1"
 MAPDRIVE="$2"
 

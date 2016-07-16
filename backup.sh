@@ -8,6 +8,8 @@ die() { echo "$@"; exit 1; }
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
+echo Backup $1 on mapped drive $2
+
 sh -c "$SDIR/manifest.sh $BACKUPDIR"
 
 DRIVE=${BACKUPDIR%%:*}

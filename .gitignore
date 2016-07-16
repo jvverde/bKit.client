@@ -4,6 +4,6 @@ bash.bat
 run/
 conf/*
 !conf/excludes.txt
-logs/
+logs/*
 cache/
 run/

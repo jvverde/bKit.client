@@ -1,5 +1,7 @@
 #!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+
 BACKUPDIR="$1"
 MAPDRIVE="$2"
 
@@ -8,7 +10,9 @@ die() { echo "$@"; exit 1; }
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
-sh -c "$SDIR/manifest.sh $BACKUPDIR"
+echo Backup $1 on mapped drive $2
+
+sh -c "$SDIR/manifest.sh $BACKUPDIR" 
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
@@ -37,8 +41,9 @@ RSYNC=$(find $SDIR -type f -name "rsync.exe" -print | head -n 1)
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
-echo PASS $PASS
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/
+${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/ >$SDIR/logs/backup.rsync.log 2>$SDIR/logs/manifest.rsync.err
 
 [[ "$?" -ne 0 ]] && echo "Exit value of rsync is non null: $?" && exit 1
+
+echo Backup of $BACKUPDIR done

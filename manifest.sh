@@ -1,5 +1,7 @@
 #!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+
 [[ $1 == "-u" ]] && UPDATE=true && shift
 [[ $1 == "-f" ]] && FORCE=true && shift
 BACKUPDIR="$1"
@@ -22,15 +24,9 @@ eval "$VARS"
 DESCRIPTION=$(echo $DESCRIPTION | sed 's#[^a-z]#-#gi')
 RID="$DRIVE.$VOLUMESERIALNUMBER.${VOLUMENAME:-_}.$DESCRIPTION/${BPATH}"
 MANIFESTDIR=$SDIR/cache/$RID
-RUNDIR=$SDIR/run
 mkdir -p "$MANIFESTDIR"
-mkdir -p "$RUNDIR"
-W=$RUNDIR/W
-R=$RUNDIR/R
-[[ -p $W ]] || mkfifo $W  || die cannot create the fifo $W
-[[ -p $R ]] || mkfifo $R  || die cannot create the fifo $R
 MANIFESTFILE=$MANIFESTDIR/manifest
-if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mmin +120) ]] 
+if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mtime +1) ]] 
 then
   echo Get manifest of $BACKUPDIR
   find "$BUDIR" -type f -printf "%P:%s\n" |LC_ALL=C sort > "$MANIFESTFILE"
@@ -42,4 +38,6 @@ CONF="$SDIR/conf/conf.init"
 source $CONF
 
 EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats $SDIR/cache/./ $MANIFURL/"
-$EXEC
+$EXEC >$SDIR/logs/manifest.rsync.log 2>$SDIR/logs/manifest.rsync.err
+
+echo Sent manifest of $BACKUPDIR 

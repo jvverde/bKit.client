@@ -1,5 +1,5 @@
-3rd-party/
-!3rd-party/subinacl/
+3rd-party/*
+!3rd-party/subinacl
 bash.bat
 run/
 conf/*

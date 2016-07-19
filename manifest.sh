@@ -12,6 +12,7 @@ die() { echo -e "$@"; exit 1; }
 
 BUDIR="$(cygpath "$BACKUPDIR")"
 
+echo Check manifest for $BACKUPDIR
 [[ -d "$BUDIR" ]] || die "The directory $BACKUPDIR ($BUDIR)doesn't exist"
 
 DRIVE=${BACKUPDIR%%:*}
@@ -19,10 +20,11 @@ DRIVE=${DRIVE^^}
 BPATH=${BACKUPDIR#*:} #remove anything until character ':' inclusive
 BPATH=${BPATH#*\\}    #remove anything until character '\' inclusive
 BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
-VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
-eval "$VARS"
-DESCRIPTION=$(echo $DESCRIPTION | sed 's#[^a-z]#-#gi')
-RID="$DRIVE.$VOLUMESERIALNUMBER.${VOLUMENAME:-_}.$DESCRIPTION/${BPATH}"
+#VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
+#eval "$VARS"
+. $SDIR/drive.sh
+RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/${BPATH}"
+
 MANIFESTDIR=$SDIR/cache/$RID
 mkdir -p "$MANIFESTDIR"
 MANIFESTFILE=$MANIFESTDIR/manifest
@@ -38,6 +40,6 @@ CONF="$SDIR/conf/conf.init"
 source $CONF
 
 EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats $SDIR/cache/./ $MANIFURL/"
-$EXEC >$SDIR/logs/manifest.rsync.log 2>$SDIR/logs/manifest.rsync.err
+$EXEC 2>&1 |xargs -I{} echo rsync: {}
 
 echo Sent manifest of $BACKUPDIR 

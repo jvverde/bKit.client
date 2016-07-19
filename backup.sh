@@ -1,6 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+[[ $1 == '-log' ]] && shift && exec 1>$1 2>&1 && shift
 
 BACKUPDIR="$1"
 MAPDRIVE="$2"
@@ -12,7 +13,7 @@ die() { echo -e "$@"; exit 1; }
 
 echo Backup $1 on mapped drive $2
 
-$SDIR/manifest.sh $BACKUPDIR 2>&1 |cat
+$SDIR/manifest.sh $BACKUPDIR 2>&1 |xargs -I{} echo manifest: {}
 
 echo 'Manifest done'
 DRIVE=${BACKUPDIR%%:*}
@@ -43,7 +44,7 @@ FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |cat
+${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |xargs -I{} echo rsync: {}
 
 [[ "$?" -ne 0 ]] && echo "Exit value of rsync is non null: $?" && exit 1
 

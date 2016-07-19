@@ -15,6 +15,7 @@ set SHSPW="%SDIR%3rd-party\shadowspawn\ShadowSpawn.exe"
 set SUFFIX=%DIR::=_%
 set SUFFIX=%SUFFIX:\=.%
 set LOGFILE="%SDIR%logs\backup.bat.%SUFFIX%.log"
+set LOGFILE2="%SDIR%logs\backup.sh.%SUFFIX%.log"
 
 
 FSUTIL FSINFO VOLUMEINFO %DRIVE%\ | findstr /IC:"File System Name" | findstr /IL "NTFS" >NUL && set "NTFS=yes" || set "NTFS=no"
@@ -29,11 +30,11 @@ if %NTFS%==yes if %FIXED%==yes (
 ) 
 
 echo Backup directly -- without shadow copy
-%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% >%LOGFILE% 2>&1
+%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% >%LOGFILE% 2>&1 & type %LOGFILE%
 goto :EOF
 
 :HARDDRIVE
 echo Backup shadow copy
-%SHSPW% /verbosity=4 %DRIVE%\ %LETTER% %CMD% "%SDIR%backup.sh" '%DIR%' %LETTER% >%LOGFILE% 2>&1 
+%SHSPW% /verbosity=4 %DRIVE%\ %LETTER% %CMD% "%SDIR%backup.sh" -log %LOGFILE2% '%DIR%' %LETTER% >%LOGFILE% 2>&1 & type %LOGFILE%
 
 :EOF

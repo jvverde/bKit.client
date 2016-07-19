@@ -40,6 +40,6 @@ CONF="$SDIR/conf/conf.init"
 source $CONF
 
 EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats $SDIR/cache/./ $MANIFURL/"
-$EXEC 2>&1 |cat
+$EXEC 2>&1 |xargs -I{} echo rsync: {}
 
 echo Sent manifest of $BACKUPDIR 

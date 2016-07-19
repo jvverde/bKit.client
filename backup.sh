@@ -14,8 +14,8 @@ die() { echo -e "$@"; exit 1; }
 echo Backup $1 on mapped drive $2
 
 $SDIR/manifest.sh $BACKUPDIR 2>&1 |xargs -I{} echo manifest: {}
-
 echo 'Manifest done'
+
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
 

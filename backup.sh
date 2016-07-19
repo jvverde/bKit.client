@@ -5,7 +5,7 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 BACKUPDIR="$1"
 MAPDRIVE="$2"
 
-die() { echo "$@"; exit 1; }
+die() { echo -e "$@"; exit 1; }
 
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
@@ -27,10 +27,10 @@ BUDIR=$ROOT/$BPATH
 
 [[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
 
-VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
-eval "$VARS"
-DESCRIPTION=$(echo $DESCRIPTION | sed 's#[^a-z]#-#gi')
-RID="$DRIVE.$VOLUMESERIALNUMBER.${VOLUMENAME:-_}.$DESCRIPTION"
+#VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
+#eval "$VARS"
+. $SDIR/drive.sh
+RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF

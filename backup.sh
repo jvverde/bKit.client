@@ -12,8 +12,9 @@ die() { echo "$@"; exit 1; }
 
 echo Backup $1 on mapped drive $2
 
-sh -c "$SDIR/manifest.sh $BACKUPDIR" 
+$SDIR/manifest.sh $BACKUPDIR 2>&1 |cat
 
+echo 'Manifest done'
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
 
@@ -42,7 +43,7 @@ FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/ >$SDIR/logs/backup.rsync.log 2>$SDIR/logs/manifest.rsync.err
+${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |cat
 
 [[ "$?" -ne 0 ]] && echo "Exit value of rsync is non null: $?" && exit 1
 

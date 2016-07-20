@@ -33,7 +33,7 @@ mkdir -p "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
-if [[ $FORCE || ! -f "$FLAG" || $(find "$FLAG" -mtime +7) ]]
+if [[ $FORCE || ! -f "$FLAG" || $(find "$FLAG" -mtime +1) ]]
 then 
   echo Get acls of $BACKUPDIR
   WACLDIR="$(cygpath -w "$ACLSDIR/$BPATH/")"

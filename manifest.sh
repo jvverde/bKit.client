@@ -20,8 +20,8 @@ DRIVE=${DRIVE^^}
 BPATH=${BACKUPDIR#*:} #remove anything until character ':' inclusive
 BPATH=${BPATH#*\\}    #remove anything until character '\' inclusive
 BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
-#VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
-#eval "$VARS"
+
+
 . $SDIR/drive.sh
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/$BPATH"
 

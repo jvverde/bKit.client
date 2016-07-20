@@ -4,6 +4,7 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
 [[ $1 == "-u" ]] && UPDATE=true && shift
 [[ $1 == "-f" ]] && FORCE=true && shift
+
 BACKUPDIR="$1"
 
 die() { echo -e "$@"; exit 1; }

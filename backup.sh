@@ -30,8 +30,6 @@ BUDIR=$ROOT/$BPATH
 
 [[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
 
-#VARS="$(wmic logicaldisk WHERE "Name='$DRIVE:'" GET Name,VolumeSerialNumber,VolumeName,Description /format:textvaluelist.xsl |sed 's#\r##g' |awk -F "=" '$1 {print toupper($1) "=" "\"" $2 "\""}')"
-#eval "$VARS"
 . $SDIR/drive.sh
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 METADATADIR=$SDIR/cache/$RID

@@ -37,16 +37,15 @@ if [[ $FORCE || ! -f "$FLAG" || $(find "$FLAG" -mtime +7) ]]
 then 
   echo Get acls of $BACKUPDIR
   WACLDIR="$(cygpath -w "$ACLSDIR/$BPATH/")"
-  $SUBINACL /noverbose /output="${WACLDIR}this.acls" /file "$BACKUPDIR"
+  $SUBINACL /noverbose /output="${WACLDIR}this.acls" /dumpcachedsids="${WACLDIR}this.sids" /file "$BACKUPDIR"
   doalarm 5 wmic useraccount get > $ACLSDIR/$BPATH/users
-  exit
   find "$BUDIR" -path "*/.bkit/.acls/*" -prune -o -type d -printf "%P\n" | 
   while read DIR
   do
     SPATH="$(cygpath -w "$BUDIR/$DIR")"
     DPATH="$(cygpath -w "$ACLSDIR/$DIR")"
     mkdir -p "$DPATH" || continue
-    $SUBINACL /noverbose /output="$DPATH\\acls" /file $SPATH\*
+    $SUBINACL /noverbose /output="$DPATH\\acls" /dumpcachedsids="$DPATH\\sids" /file $SPATH\*
   done
   touch $FLAG
   echo ACLS done for $BACKUPDIR 

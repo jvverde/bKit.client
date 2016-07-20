@@ -32,7 +32,7 @@ BUDIR=$ROOT/$BPATH
 #eval "$VARS"
 . $SDIR/drive.sh
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
-
+METADATADIR=$SDIR/cache/$RID
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
@@ -44,7 +44,7 @@ FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |xargs -I{} echo rsync: {}
+${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $METADATADIR/./.bkit/$BPATH $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |xargs -I{} echo rsync: {}
 
 [[ "$?" -ne 0 ]] && echo "Exit value of rsync is non null: $?" && exit 1
 

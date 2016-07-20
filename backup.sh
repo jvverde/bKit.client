@@ -15,6 +15,8 @@ echo Backup $1 on mapped drive $2
 
 $SDIR/manifest.sh $BACKUPDIR 2>&1 |xargs -I{} echo manifest: {}
 echo 'Manifest done'
+$SDIR/acls.sh $BACKUPDIR 2>&1 |xargs -I{} echo acls: {}
+echo 'ACLs done'
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}

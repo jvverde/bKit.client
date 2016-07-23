@@ -31,7 +31,7 @@ FSUTIL FSINFO DRIVETYPE %DRIVE% | findstr /IC:"Fixed Drive" >NUL && set "FIXED=y
 for /f "tokens=*" %%a in ('FSUTIL FSINFO DRIVES') do set freedrv_drives=%%a
 
 if %NTFS%==yes if %FIXED%==yes (
-  for %%p in (E F G H I J K L M N O P Q R S T U V W X Y Z A B C D) do echo %freedrv_drives% | find /i "%%p:\" > nul || set LETTER=%%p:&& goto :HARDDRIVE
+  for %%p in (E F G H I J K L M N O P Q R S T U V W X Y Z A B C D) do echo %freedrv_drives% | find /i "%%p:\" > nul || set "LETTER=%%p:" && goto :HARDDRIVE
   goto :EOF
 ) 
 
@@ -46,8 +46,7 @@ echo Backup shadow copy
 :EOF
 exit /b
 
-
-:checkfile ::check if the file in use by another proccess
+:checkfile ::check if the file in use by another proccess. Receive file by reference
   setlocal enableDelayedExpansion
   ::call set file=%%%~1%% alternative to enableDelayedExpansion
   set file=!%~1!
@@ -55,7 +54,7 @@ exit /b
   endlocal & set "%~1="%return%""
   exit /b
   
-:findfile ::find a file not used by any other process
+:findfile ::find a file not in use by any other process. First argument is the filename and second is used by reference to return the result
   setlocal
   set "file=%~1"
   set /a c=0

@@ -36,9 +36,7 @@ if %NTFS%==yes if %FIXED%==yes (
 ) 
 
 echo Backup directly -- without shadow copy
-%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% 
-::>>%LOGFILE% 2>&1 
-::& type %LOGFILE%
+%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% >>%LOGFILE% 2>&1 & type %LOGFILE%
 goto :EOF
 
 :HARDDRIVE

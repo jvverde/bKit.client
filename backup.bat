@@ -17,7 +17,14 @@ set SUFFIX=%SUFFIX:\=.%
 set LOGFILE="%SDIR%logs\backup.bat.%SUFFIX%.log"
 set LOGFILE2="%SDIR%logs\backup.sh.%SUFFIX%.log"
 
-
+echo logfile begore %LOGFILE%
+echo logfile2 begore %LOGFILE2%
+call :busy LOGFILE
+call :busy LOGFILE2
+echo ----------
+echo logfile after %LOGFILE%
+echo logfile2 after %LOGFILE2%
+exit /b
 FSUTIL FSINFO VOLUMEINFO %DRIVE%\ | findstr /IC:"File System Name" | findstr /IL "NTFS" >NUL && set "NTFS=yes" || set "NTFS=no"
 FSUTIL FSINFO DRIVETYPE %DRIVE% | findstr /IC:"Fixed Drive" >NUL && set "FIXED=yes" || set "FIXED=no"
 
@@ -30,7 +37,9 @@ if %NTFS%==yes if %FIXED%==yes (
 ) 
 
 echo Backup directly -- without shadow copy
-%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% >%LOGFILE% 2>&1 & type %LOGFILE%
+%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% 
+::>>%LOGFILE% 2>&1 
+::& type %LOGFILE%
 goto :EOF
 
 :HARDDRIVE
@@ -38,3 +47,25 @@ echo Backup shadow copy
 %SHSPW% /verbosity=4 %DRIVE%\ %LETTER% %CMD% "%SDIR%backup.sh" -log %LOGFILE2% '%DIR%' %LETTER% >%LOGFILE% 2>&1 & type %LOGFILE%
 
 :EOF
+exit /b
+
+
+:busy
+  setlocal enableDelayedExpansion
+  echo ---------------
+  echo %~1=!%~1!
+ echo 1: %1 
+ set file=!%~1!
+ echo file init: !file!
+ :WHILE
+  2>nul (
+    >>!file! echo off
+  ) && goto :CONT
+  set file=!file!0
+  echo file: !file!
+  goto :WHILE
+:CONT 
+  echo file end: !file!
+ set "%~1=!file!"
+ echo %~1=!%~1!
+ exit /b

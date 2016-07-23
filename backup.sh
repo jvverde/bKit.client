@@ -11,11 +11,10 @@ die() { echo -e "$@"; exit 1; }
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
-echo Backup $1 on mapped drive $2
-
-$SDIR/manifest.sh $BACKUPDIR 2>&1 |xargs -I{} echo manifest: {}
+echo Backup $1 on mapped Drive $2
+$SDIR/manifest.sh $BACKUPDIR 2>&1 | xargs -I{} echo Manifest: '{}'
 echo 'Manifest done'
-$SDIR/acls.sh $BACKUPDIR 2>&1 |xargs -I{} echo acls: {}
+$SDIR/acls.sh $BACKUPDIR 2>&1 |  xargs -I{} echo Acls: '{}'
 echo 'ACLs done'
 
 DRIVE=${BACKUPDIR%%:*}
@@ -44,7 +43,7 @@ FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $METADATADIR/./.bkit/$BPATH $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |xargs -I{} echo rsync: {}
+${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $METADATADIR/./.bkit/$BPATH $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |xargs -I{} echo Rsync: {}
 
 [[ "$?" -ne 0 ]] && echo "Exit value of rsync is non null: $?" && exit 1
 

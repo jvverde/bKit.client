@@ -12,7 +12,7 @@ die() { echo -e "$@"; exit 1; }
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
 echo Backup $1 on mapped Drive $2
-$SDIR/manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Manifest: '{}'
+$SDIR/send-manifest.sh -c $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
 echo 'Manifest done'
 $SDIR/acls.sh $BACKUPDIR 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 echo 'ACLs done'
@@ -36,7 +36,7 @@ CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
 
-RSYNC=$(find $SDIR -type f -name "rsync.exe" -print | head -n 1)
+RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die "Rsync.exe not found"
 
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'

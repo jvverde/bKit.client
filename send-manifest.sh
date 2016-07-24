@@ -25,7 +25,7 @@ BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
 . $SDIR/drive.sh
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/$BPATH"
 
-$SDIR/manifest.sh $BACKUPDIR 2>&1 |xargs -I{} echo manifest: {}
+$SDIR/manifest.sh $BACKUPDIR 2>&1 |xargs -d '\n' -I{} echo manifest: {}
 
 RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die Rsync.exe not found
@@ -34,6 +34,9 @@ CONF="$SDIR/conf/conf.init"
 source $CONF
 
 EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats $SDIR/cache/./$RID/manifest $MANIFURL/"
-$EXEC 2>&1 |xargs -I{} echo rsync: {}
+$EXEC 2>&1 |xargs -d '\n' -I{} echo rsync: {}
+
+RETURN=${PIPESTATUS[0]}
+[ $RETURN -ne 0 ] && echo "Fail to send manifest. Exit value of rsync is non null: $RETURN" && exit 1
 
 echo Sent manifest of $BACKUPDIR 

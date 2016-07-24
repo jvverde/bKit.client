@@ -28,10 +28,10 @@ FSUTIL FSINFO VOLUMEINFO %DRIVE%\ | findstr /IC:"File System Name" | findstr /IL
 FSUTIL FSINFO DRIVETYPE %DRIVE% | findstr /IC:"Fixed Drive" >NUL && set "FIXED=yes" || set "FIXED=no"
 
 
-for /f "tokens=*" %%a in ('FSUTIL FSINFO DRIVES') do set freedrv_drives=%%a
+for /f "tokens=*" %%a in ('FSUTIL FSINFO DRIVES') do set used_drives=%%a
 
 if %NTFS%==yes if %FIXED%==yes (
-  for %%p in (E F G H I J K L M N O P Q R S T U V W X Y Z A B C D) do echo %freedrv_drives% | find /i "%%p:\" > nul || set "LETTER=%%p:" && goto :HARDDRIVE
+  for %%p in (E F G H I J K L M N O P Q R S T U V W X Y Z A B C D) do echo %used_drives% | findstr /IL "%%p:" >nul || set "LETTER=%%p:" && goto :HARDDRIVE
   goto :EOF
 ) 
 

@@ -36,7 +36,7 @@ if %NTFS%==yes if %FIXED%==yes (
 ) 
 
 echo Backup directly -- without shadow copy
-%CMD% "%SDIR%backup.sh" '%DIR%' %DRIVE% >%LOGFILE% 2>&1 & type %LOGFILE%
+%CMD% "%SDIR%backup.sh" -log %LOGFILE2% '%DIR%' %DRIVE% >%LOGFILE% 2>&1 & type %LOGFILE%
 goto :EOF
 
 :HARDDRIVE
@@ -62,6 +62,6 @@ exit /b
   2>nul (
     >>"%file%" echo off
   ) || set /a c=1+%c% && set "file=%file%.%c%" && goto :until
-  endlocal & set "%~2=%file%"
+  endlocal & set "%~2=%file%"  
   exit /b
   

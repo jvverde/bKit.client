@@ -2,13 +2,13 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
-[[ $1 == "-u" ]] && UPDATE=true && shift
 [[ $1 == "-f" ]] && FORCE=true && shift
+
 BACKUPDIR="$1"
 
 die() { echo -e "$@"; exit 1; }
 
-[[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "Usage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir"
+[[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "Usage:\n\t$0 [-f] Drive:\\full-path-of-backup-dir"
 
 BUDIR="$(cygpath "$BACKUPDIR")"
 
@@ -28,7 +28,7 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/$BPATH"
 MANIFESTDIR=$SDIR/cache/$RID
 mkdir -p "$MANIFESTDIR"
 MANIFESTFILE=$MANIFESTDIR/manifest
-if [[ $FORCE || ! -f "$MANIFESTFILE" || $UPDATE && $(find "$MANIFESTFILE" -mtime +30) ]] 
+if [[ $FORCE || ! -f "$MANIFESTFILE" || $(find "$MANIFESTFILE" -mtime +30) ]] 
 then
   echo Get manifest of $BACKUPDIR
   find "$BUDIR" -type f -printf "%P:%s\n" |LC_ALL=C sort > "$MANIFESTFILE"

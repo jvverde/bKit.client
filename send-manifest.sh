@@ -27,7 +27,7 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/$BPATH"
 
 $SDIR/manifest.sh $FORCE $BACKUPDIR 2>&1 |xargs -d '\n' -I{} echo manifest: {}
 SENT=$SDIR/cache/$RID/.sent
-$CHECK && [[ -f $SENT ]] && echo No need to sent it again && exit 0
+[[ -n ${CHECK:+x} ]] && [[ -f $SENT ]] && echo No need to sent it again && exit 0
 
 RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die Rsync.exe not found

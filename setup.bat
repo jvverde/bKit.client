@@ -22,16 +22,18 @@ if not exist %bash% (
 )
 for %%F in ("%bash%") do set dirname=%%~dpF
 
->bash.bat echo ^@echo OFF
->>bash.bat echo :: This file is automatically create by %0. Don't change it
->>bash.bat echo set oldhome=%%HOME%%
->>bash.bat echo set oldshell=%%SHELL%%
->>bash.bat echo set oldpath=%%path%%
->>bash.bat echo set path=%dirname%;%%path%%
->>bash.bat echo set HOME=/home/user
->>bash.bat echo set SHELL=/bin/bash
->>bash.bat echo call %bash% %%*
->>bash.bat echo set path=%%oldpath%%
->>bash.bat echo set SHELL=%%oldshell%%
->>bash.bat echo set HOME=%%oldhome%%
+>bash.bat (
+  echo ^@echo OFF
+  echo :: This file is automatically create by %0. Don't change it
+  echo set oldhome=%%HOME%%
+  echo set oldshell=%%SHELL%%
+  echo set oldpath=%%path%%
+  echo set path=%dirname%;%%path%%
+  echo set HOME=/home/user
+  echo set SHELL=/bin/bash
+  echo call %bash% %%*
+  echo set path=%%oldpath%%
+  echo set SHELL=%%oldshell%%
+  echo set HOME=%%oldhome%%
+)
 

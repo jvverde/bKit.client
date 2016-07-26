@@ -43,9 +43,28 @@ FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $METADATADIR/./.bkit/$BPATH $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 |xargs -d '\n' -I{} echo Rsync: {}
+{
+  while true
+  do
+    ${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $METADATADIR/./.bkit/$BPATH $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 
+    ret=$?
+    case $ret in
+      0) 
+        break
+        ;;
+      5|10|23|30|35)
+        DELAY=$((RANDOM % 300))
+        echo Received error $ret. Try again in $DELAY seconds
+        sleep $DELAY
+        echo Try again now
+        ;;
+      *)
+        echo Fail to backup. Exit value of rsync is non null: $ret 
+        exit 1
+        ;;
+    esac
+  done
+} > >(xargs -d '\n' -I{} echo Rsync [$(date)]: {})
 
-RETURN=${PIPESTATUS[0]}
-[ $RETURN -ne 0 ] && echo "Fail to backup. Exit value of rsync is non null: $RETURN" && exit 1
 
 echo Backup of $BACKUPDIR done

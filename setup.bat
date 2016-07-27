@@ -7,6 +7,7 @@ set "OP=%~dp0"
 if not exist %OP%conf\NUL mkdir %OP%conf
 if not exist %OP%logs\NUL mkdir %OP%logs
 if not exist %OP%cache\NUL mkdir %OP%cache
+if not exist %OP%run\NUL mkdir %OP%run
 if not exist %OP%3rd-party\NUL mkdir %OP%3rd-party
 if not exist %OP%3rd-party\cygwin\NUL mkdir %OP%3rd-party\cygwin
 if not exist %OP%3rd-party\shadowspawn\NUL mkdir %OP%3rd-party\shadowspawn

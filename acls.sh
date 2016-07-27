@@ -27,6 +27,7 @@ BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
 . $SDIR/drive.sh
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 
+[[ $FILESYSTEM == 'NTFS' ]] || die Not a NTFS file system: $FILESYSTEM
 
 ACLSDIR="$SDIR/cache/$RID/.bkit.acls.d"
 FLAGFILE="$ACLSDIR/$BPATH/.bkit.flag.f"
@@ -39,14 +40,14 @@ then
   echo Get acls of $BACKUPDIR
   WACLDIR="$(cygpath -w "$ACLSDIR/$BPATH/")"
   $SUBINACL /noverbose /output="${WACLDIR}.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}.bkit.this.sids.f" /file "$BACKUPDIR"
-  doalarm 5 wmic useraccount get > $ACLSDIR/$BPATH/.bkit.users.file
+  doalarm 5 wmic useraccount get > $ACLSDIR/$BPATH/.bkit.users.f
   find "$BUDIR" -path "*/.bkit/.bkit.acls.d/*" -prune -o -type d -printf "%P\n" | 
   while read DIR
   do
-    SPATH="$(cygpath -w "$BUDIR/$DIR")"
-    DPATH="$(cygpath -w "$ACLSDIR/$DIR")"
+    SPATH=$(cygpath -w "$BUDIR/$DIR")
+    DPATH=$(cygpath -w "$ACLSDIR/$DIR")
     mkdir -p "$DPATH" || continue
-    $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file $SPATH\*
+    $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file "$SPATH\*"
   done
   touch $FLAGFILE
   echo ACLS done for $BACKUPDIR 

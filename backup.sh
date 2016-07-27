@@ -12,8 +12,6 @@ die() { echo -e "$@"; exit 1; }
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
 echo Backup $1 on mapped Drive $2
-$SDIR/send-manifest.sh -c $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
-echo 'Manifest done'
 $SDIR/acls.sh $BACKUPDIR 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 echo 'ACLs done'
 
@@ -42,38 +40,35 @@ RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
-#if [[ $FILESYSTEM == 'NTFS']
-#then
-#  PERM="--chmod=D750,F640"
-#else
 PERM="--acls --owner --group --super --numeric-ids"
-#fi
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 {
-  while true
-  do
-    ${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
-    ret=$?
-    case $ret in
-      0) 
-        break
-        ;;
-      10)
-        echo "Fail with Error in socket I/O. Maybe the manifest wasn't sent yet. I will sent it again"
-        $SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
-        ;;
-      5|23|30|35)
-        DELAY=$((120 + RANDOM % 480))
-        echo Received error $ret. Try again in $DELAY seconds
-        sleep $DELAY
-        echo Try again now
-        ;;
-      *)
-        echo Fail to backup. Exit value of rsync is non null: $ret 
-        exit 1
-        ;;
-    esac
-  done
+	CNT=60
+	while true
+	do
+		(( --CNT > 0)) || echo "I'm tired of waiting" && break 
+		${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
+		ret=$?
+		case $ret in
+			0) 
+				break
+				;;
+			10)
+				echo "Fail with Error in socket I/O. Maybe the manifest wasn't sent yet. I will sent it again"
+				$SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
+				;;
+			5|23|30|35)
+				DELAY=$((120 + RANDOM % 480))
+				echo Received error $ret. Try again in $DELAY seconds
+				sleep $DELAY
+				echo Try again now
+				;;
+			*)
+				echo Fail to backup. Exit value of rsync is non null: $ret 
+				exit 1
+				;;
+		esac
+	done
 } > >(xargs -d '\n' -I{} echo Rsync: {})
 
 

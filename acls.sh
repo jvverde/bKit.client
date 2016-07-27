@@ -44,10 +44,10 @@ then
   find "$BUDIR" -path "*/.bkit/.bkit.acls.d/*" -prune -o -type d -printf "%P\n" | 
   while read DIR
   do
-    SPATH="$(cygpath -w "$BUDIR/$DIR")"
-    DPATH="$(cygpath -w "$ACLSDIR/$DIR")"
+    SPATH=$(cygpath -w "$BUDIR/$DIR")
+    DPATH=$(cygpath -w "$ACLSDIR/$DIR")
     mkdir -p "$DPATH" || continue
-    $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file $SPATH\*
+    $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file "$SPATH\*"
   done
   touch $FLAGFILE
   echo ACLS done for $BACKUPDIR 

@@ -53,7 +53,7 @@ OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --
         break
         ;;
       5|10|23|30|35)
-        DELAY=$((RANDOM % 300))
+        DELAY=$((120 + RANDOM % 480))
         echo Received error $ret. Try again in $DELAY seconds
         sleep $DELAY
         echo Try again now

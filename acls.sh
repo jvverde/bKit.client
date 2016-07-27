@@ -27,27 +27,28 @@ BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
 . $SDIR/drive.sh
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 
-ACLSDIR="$SDIR/cache/$RID/.acls"
-FLAG="$ACLSDIR/$BPATH/.flag"
+
+ACLSDIR="$SDIR/cache/$RID/.bkit.acls.d"
+FLAGFILE="$ACLSDIR/$BPATH/.bkit.flag.f"
 mkdir -p "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
-if [[ $FORCE || ! -f "$FLAG" || $(find "$FLAG" -mtime +1) ]]
+if [[ $FORCE || ! -f "$FLAGFILE" || $(find "$FLAGFILE" -mtime +1) ]]
 then 
   echo Get acls of $BACKUPDIR
   WACLDIR="$(cygpath -w "$ACLSDIR/$BPATH/")"
-  $SUBINACL /noverbose /output="${WACLDIR}this.acls" /dumpcachedsids="${WACLDIR}this.sids" /file "$BACKUPDIR"
-  doalarm 5 wmic useraccount get > $ACLSDIR/$BPATH/users
-  find "$BUDIR" -path "*/.bkit/.acls/*" -prune -o -type d -printf "%P\n" | 
+  $SUBINACL /noverbose /output="${WACLDIR}.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}.bkit.this.sids.f" /file "$BACKUPDIR"
+  doalarm 5 wmic useraccount get > $ACLSDIR/$BPATH/.bkit.users.file
+  find "$BUDIR" -path "*/.bkit/.bkit.acls.d/*" -prune -o -type d -printf "%P\n" | 
   while read DIR
   do
     SPATH="$(cygpath -w "$BUDIR/$DIR")"
     DPATH="$(cygpath -w "$ACLSDIR/$DIR")"
     mkdir -p "$DPATH" || continue
-    $SUBINACL /noverbose /output="$DPATH\\acls" /dumpcachedsids="$DPATH\\sids" /file $SPATH\*
+    $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file $SPATH\*
   done
-  touch $FLAG
+  touch $FLAGFILE
   echo ACLS done for $BACKUPDIR 
 else
   echo "$BACKUPDIR doesn't need compute ACLs this time"

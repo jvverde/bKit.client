@@ -39,7 +39,7 @@ EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 
 	do
 		$EXEC 2>&1
 		ret=$?
-		(( --CNT > 0)) || echo "I'm tired of waiting" && break 
+		(( --CNT < 0)) && echo "I'm tired of waiting" && break 
 		case $ret in
 			0) break;;
 			5|10|23|30|35)

@@ -8,6 +8,5 @@ set NAME=%DIR:\=-%
 set NAME=%NAME::=%
 if "%NAME:~-1%"=="-" set "NAME=%NAME:~0,-1%"
 set TASK=%SDIR%backup.bat
-schtasks /CREATE /RU "SYSTEM" /SC MINUTE /MO 15 /TN "BKIT_%NAME%" /TR "%TASK% \"%DIR%\"" 
-::">"%SDIR%logs\task-%NAME%.log" 2>&1
+schtasks /CREATE /RU "SYSTEM" /SC MINUTE /MO 15 /TN "BKIT_%NAME%" /TR "%TASK% \"%DIR%\"" ">"%SDIR%logs\task-%NAME%.log" 2>&1
 :EOF

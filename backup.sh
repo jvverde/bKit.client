@@ -46,7 +46,7 @@ OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --
 {
   while true
   do
-    ${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $METADATADIR/./.bkit/$BPATH $ROOT/./$BPATH $BACKUPURL/$RID/current/ 2>&1 
+    ${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
     ret=$?
     case $ret in
       0) 
@@ -64,7 +64,7 @@ OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --
         ;;
     esac
   done
-} > >(xargs -d '\n' -I{} echo Rsync [$(date)]: {})
+} > >(xargs -d '\n' -I{} echo Rsync: {})
 
 
-echo Backup of $BACKUPDIR done
+echo Backup of $BACKUPDIR done at $(date -R)

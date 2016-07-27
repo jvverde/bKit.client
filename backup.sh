@@ -42,17 +42,27 @@ RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
-OPTIONS="--chmod=D750,F640 --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
+#if [[ $FILESYSTEM == 'NTFS']
+#then
+#  PERM="--chmod=D750,F640"
+#else
+PERM="--acls --owner --group --super --numeric-ids"
+#fi
+OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 {
   while true
   do
-    ${RSYNC} -rlitzvvhR $OPTIONS $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
+    ${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
     ret=$?
     case $ret in
       0) 
         break
         ;;
-      5|10|23|30|35)
+      10)
+        echo "Fail with Error in socket I/O. Maybe the manifest wasn't sent yet. I will sent it again"
+        $SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
+        ;;
+      5|23|30|35)
         DELAY=$((120 + RANDOM % 480))
         echo Received error $ret. Try again in $DELAY seconds
         sleep $DELAY

@@ -46,7 +46,7 @@ OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 	CNT=60
 	while true
 	do
-		(( --CNT > 0)) || echo "I'm tired of waiting" && break 
+		(( --CNT < 0 )) && echo "I'm tired of waiting" && break 
 		${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
 		ret=$?
 		case $ret in

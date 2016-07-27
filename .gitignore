@@ -1,7 +1,7 @@
 3rd-party/*
 !3rd-party/subinacl
 bash.bat
-cache/
-logs/
+cache/*
+logs/*
 conf/*
 !conf/excludes.txt

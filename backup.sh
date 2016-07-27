@@ -57,7 +57,7 @@ OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 				echo "Fail with Error in socket I/O. Maybe the manifest wasn't sent yet. I will sent it again"
 				$SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
 				;;
-			5|23|30|35)
+			5|30|35)
 				DELAY=$((120 + RANDOM % 480))
 				echo Received error $ret. Try again in $DELAY seconds
 				sleep $DELAY

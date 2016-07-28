@@ -3,5 +3,6 @@
 bash.bat
 cache/*
 logs/*
+run/*
 conf/*
 !conf/excludes.txt

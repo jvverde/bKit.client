@@ -32,6 +32,7 @@ Users/*/AppData/Local/Low/Temp
 Users/*/AppData/Roaming/Microsoft/Windows/Recent  
 Windows/Logs/
 Windows/Prefetch/
+WINDOWS/Prefetch/
 Windows/ShellIconCache
 Windows/SoftwareDistribution/Download
 Windows/Temp/

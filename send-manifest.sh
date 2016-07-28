@@ -35,10 +35,14 @@ source $CONF
 EXEC="$RSYNC --password-file="$SDIR/conf/pass.txt" -rlitzvvhR --chmod=D750,F640 --inplace --fuzzy --stats $SDIR/cache/./$RID/manifest $MANIFURL/"
 {
 	CNT=60
+  mkdir -p $SDIR/run #jus in case
 	while true
 	do
-		$EXEC 2>&1
-		ret=$?
+    {
+      flock -x 9
+      $EXEC 2>&1
+      ret=$?
+    } 9> $SDIR/run/.lock
 		(( --CNT < 0)) && echo "I'm tired of waiting" && break 
 		case $ret in
 			0) break;;

@@ -45,11 +45,15 @@ PERM="--acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 {
 	CNT=60
+  mkdir -p $SDIR/run #jus in case
 	while true
 	do
 		(( --CNT < 0 )) && echo "I'm tired of waiting" && break 
-		${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
-		ret=$?
+    {
+      flock -x 9
+      ${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
+      ret=$?
+    } 9> $SDIR/run/.lock
 		case $ret in
 			0) 
 				break

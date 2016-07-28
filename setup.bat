@@ -14,6 +14,7 @@ if not exist %OP%3rd-party\shadowspawn\NUL mkdir %OP%3rd-party\shadowspawn
 if not exist %OP%run\NUL mkdir %OP%run
 if not exist %OP%cache\NUL mkdir %OP%cache
 
+call %OP%setup\subinacl.bat
 call %OP%setup\cygwin.bat
 call %OP%setup\shadowspawn.bat
 set bash=%OP%3rd-party\cygwin\bin\bash.exe

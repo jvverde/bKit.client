@@ -28,6 +28,7 @@ BUDIR=$ROOT/$BPATH
 [[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
 
 . $SDIR/drive.sh
+[[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 METADATADIR=$SDIR/cache/$RID
 CONF="$SDIR/conf/conf.init"

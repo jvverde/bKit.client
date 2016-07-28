@@ -54,8 +54,8 @@ OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 			0) 
 				break
 				;;
-			10)
-				echo "Fail with Error in socket I/O. Maybe the manifest wasn't sent yet. I will sent it again"
+			10|12)
+				echo "Fail with Error $ret. Maybe the manifest wasn't sent yet. I will sent it again"
 				$SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
 				;;
 			5|30|35)

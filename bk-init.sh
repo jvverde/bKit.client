@@ -12,9 +12,9 @@ echo Contacting the server ... please wait!
 find $DIR -type f -path "*/cygwin/*" -name "nc.exe" -print | 
 xargs -L 1 -I{} sh -c "{} -z $SERVER $PORT" || die Server $SERVER not found
 
-UUID="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}' | sed '#\r+##g')"
-DOMAIN="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}' | sed '#\r+##g')"
-NAME="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /name/ {print $2}' | sed '#\r+##g')"
+UUID="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}' | sed 's#\r+##g' | sed -E 's#\s#_#g')"
+DOMAIN="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}' | sed 's#\r+##g' | sed -E 's#\s#_#g')"
+NAME="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /name/ {print $2}' | sed 's#\r+##g' | sed -E 's#\s#_#g')"
 
 CONFDIR="$DIR/conf"
 mkdir -p "$CONFDIR"
@@ -35,5 +35,5 @@ RSYNC=$(find $DIR -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die "Rsync.exe not found"
 
 ${RSYNC} -rltvvhR --inplace --stats ${CONFDIR}/./ rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
-
-[[ "$?" -ne 0 ]] && echo "Exit value of rsync is non null: $?" && exit 1
+RET=$?
+[[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1

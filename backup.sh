@@ -28,6 +28,7 @@ BUDIR=$ROOT/$BPATH
 [[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
 
 . $SDIR/drive.sh
+[[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 METADATADIR=$SDIR/cache/$RID
 CONF="$SDIR/conf/conf.init"
@@ -44,17 +45,21 @@ PERM="--acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 {
 	CNT=60
+  mkdir -p $SDIR/run #jus in case
 	while true
 	do
 		(( --CNT < 0 )) && echo "I'm tired of waiting" && break 
-		${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
-		ret=$?
+    {
+      flock -x 9
+      ${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
+      ret=$?
+    } 9> $SDIR/run/.lock
 		case $ret in
 			0) 
 				break
 				;;
-			10)
-				echo "Fail with Error in socket I/O. Maybe the manifest wasn't sent yet. I will sent it again"
+			10|12)
+				echo "Fail with Error $ret. Maybe the manifest wasn't sent yet. I will sent it again"
 				$SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
 				;;
 			5|30|35)

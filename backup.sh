@@ -53,11 +53,10 @@ OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
       flock -x 9
       ${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
       ret=$?
+      [ $ret -eq 0 ] && sleep 120 #be nice to others, by don't release the lock immediately
     } 9> $SDIR/run/.lock
 		case $ret in
-			0) 
-				break
-				;;
+			0) break ;;
 			10|12)
 				echo "Fail with Error $ret. Maybe the manifest wasn't sent yet. I will sent it again"
 				$SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'

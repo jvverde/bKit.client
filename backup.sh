@@ -4,19 +4,21 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>$1 2>&1 && shift
 
 BACKUPDIR="$1"
-MAPDRIVE="$2"
 
 die() { echo -e "$@"; exit 1; }
 
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
-[[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
-
-echo Backup $1 on mapped Drive $2
-$SDIR/acls.sh $BACKUPDIR 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
-echo 'ACLs done'
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
+MAPDRIVE="${2:-$DRIVE:}"
+
+[[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
+
+echo Backup $1 on mapped Drive $2
+#$SDIR/acls.sh $BACKUPDIR 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
+echo 'ACLs done'
+
 
 BPATH=${BACKUPDIR#*:} #remove anything before character ':' inclusive
 BPATH=${BPATH#*\\}    #remove anything before character '\' inclusive
@@ -43,6 +45,22 @@ EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
+#FOPTIONS=" --stats --fuzzy"
+
+
+RRE=$(echo $ROOT|sed 's/[^-a-zA-Z0-9_]/\\&/g')
+find $BUDIR -type f | 
+xargs -I{} sha512sum -b {} | 
+sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
+while read HASH FILE
+do
+  FILE="$(echo $FILE|sed "s#^*$RRE/##")"
+  SRC="$ROOT/./$FILE"
+  DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$FILE"
+  echo $RSYNC -ltizvvhR $PASS $FMT $SRC $BACKUPURL/$RID/manifest/$DST
+done  
+exit; 
+
 {
 	CNT=60
   mkdir -p $SDIR/run #jus in case

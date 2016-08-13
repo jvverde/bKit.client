@@ -16,7 +16,7 @@ MAPDRIVE="${2:-$DRIVE:}"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
 echo Backup $1 on mapped Drive $2
-#$SDIR/acls.sh $BACKUPDIR 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
+"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 echo 'ACLs done'
 
 
@@ -43,55 +43,55 @@ RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
-PERM="--acls --owner --group --super --numeric-ids"
+PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 #FOPTIONS=" --stats --fuzzy"
+mkdir -p $SDIR/run #jus in case
 
-
-RRE=$(echo $ROOT|sed 's/[^-a-zA-Z0-9_]/\\&/g')
-find $BUDIR -type f | 
-xargs -I{} sha512sum -b {} | 
-sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
-while read HASH FILE
-do
-  FILE="$(echo $FILE|sed "s#^*$RRE/##")"
-  SRC="$ROOT/./$FILE"
-  DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$FILE"
-  echo $RSYNC -ltizvvhR $PASS $FMT $SRC $BACKUPURL/$RID/manifest/$DST
-done  
-exit; 
-
-{
-	CNT=60
-  mkdir -p $SDIR/run #jus in case
+dorsync(){
+	CNT=10
 	while true
 	do
-		(( --CNT < 0 )) && echo "I'm tired of waiting" && break 
+		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
     {
       flock -x 9
-      ${RSYNC} -rlitzvvhR $OPTIONS $PERM $PASS $FMT $EXC $ROOT/./$BPATH $METADATADIR/./.bkit/$BPATH $BACKUPURL/$RID/current/ 2>&1 
+      ${RSYNC} "$@" 2>&1 
       ret=$?
-      [ $ret -eq 0 ] && sleep 120 #be nice to others, by don't release the lock immediately
     } 9> $SDIR/run/.lock
 		case $ret in
-			0) break ;;
-			10|12)
-				echo "Fail with Error $ret. Maybe the manifest wasn't sent yet. I will sent it again"
-				$SDIR/send-manifest.sh $BACKUPDIR 2>&1 | xargs -d '\n' -I{} echo Send-manifest: '{}'
-				;;
-			5|30|35)
+			0) break 
+      ;;
+			5|10|30|35)
 				DELAY=$((120 + RANDOM % 480))
 				echo Received error $ret. Try again in $DELAY seconds
 				sleep $DELAY
 				echo Try again now
-				;;
+			;;
 			*)
 				echo Fail to backup. Exit value of rsync is non null: $ret 
 				exit 1
-				;;
-		esac
-	done
-} > >(xargs -d '\n' -I{} echo Rsync: {})
+			;;
+    esac
+  done
+}
 
+
+for DIR in "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH"
+do
+  BASE="${DIR%%/./*}"
+  RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
+  dorsync -nariRH $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" | 
+  grep '^[><]f'| cut -d' ' -f2-|
+  xargs -I{} sha512sum -b $BASE/{} | 
+  sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
+  while read HASH FILE
+  do
+    FILE="$(echo $FILE|sed "s#^*$RE/##")"
+    SRC="$BASE/$FILE"
+    DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$FILE"
+    dorsync -ltiz $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
+  done
+done 
+${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" 2>&1 
 
 echo Backup of $BACKUPDIR done at $(date -R)

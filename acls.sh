@@ -13,7 +13,7 @@ doalarm(){ perl -e 'alarm shift; exec @ARGV' -- "$@";}
 
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir"
 
-BUDIR="$(cygpath "$BACKUPDIR")"
+BUDIR=$(cygpath "$BACKUPDIR")
 
 echo Check acls for $BACKUPDIR
 [[ -d "$BUDIR" ]] || die "The directory $BACKUPDIR ($BUDIR)doesn't exist"
@@ -29,27 +29,28 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 
 [[ $FILESYSTEM == 'NTFS' ]] || die Not a NTFS file system: $FILESYSTEM
 
-ACLSDIR="$SDIR/cache/$RID/.bkit.acls.d"
+ACLSDIR="$SDIR/cache/$RID"
 FLAGFILE="$ACLSDIR/$BPATH/.bkit.flag.f"
-mkdir -p "$ACLSDIR" || die Cannot create dir $ACLSDIR
+mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 if [[ $FORCE || ! -f "$FLAGFILE" || $(find "$FLAGFILE" -mtime +1) ]]
 then 
   echo Get acls of $BACKUPDIR
-  WACLDIR="$(cygpath -w "$ACLSDIR/$BPATH/")"
-  $SUBINACL /noverbose /output="${WACLDIR}.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}.bkit.this.sids.f" /file "$BACKUPDIR"
-  doalarm 5 wmic useraccount get > $ACLSDIR/$BPATH/.bkit.users.f
-  find "$BUDIR" -path "*/.bkit/.bkit.acls.d/*" -prune -o -type d -printf "%P\n" | 
+  mkdir -pv "$ACLSDIR/$BPATH"
+  WACLDIR=$(cygpath -w "$ACLSDIR/$BPATH")
+  $SUBINACL /noverbose /output="${WACLDIR}/.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}/.bkit.this.sids.f" /file "$BACKUPDIR"
+  doalarm 5 wmic useraccount get > "$ACLSDIR/$BPATH/.bkit.users.f"
+  find "$BUDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
   while read DIR
   do
     SPATH=$(cygpath -w "$BUDIR/$DIR")
-    DPATH=$(cygpath -w "$ACLSDIR/$DIR")
-    mkdir -p "$DPATH" || continue
+    DPATH=$(cygpath -w "$ACLSDIR/$BPATH/$DIR")
+    mkdir -pv "$DPATH" || continue
     $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file "$SPATH\*"
   done
-  touch $FLAGFILE
+  touch "$FLAGFILE"
   echo ACLS done for $BACKUPDIR 
 else
   echo "$BACKUPDIR doesn't need compute ACLs this time"

@@ -68,10 +68,11 @@ dorsync(){
 				echo Fail to backup. Exit value of rsync is non null: $ret 
 				exit 1
 			;;
-    esac
-  done
+		esac
+	done
 }
 
+trap 'echo SIGPIPE received' SIGPIPE
 
 for DIR in "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH"
 do

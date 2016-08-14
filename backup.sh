@@ -75,6 +75,7 @@ dorsync(){
 
 for DIR in "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH"
 do
+  [[ -e $DIR ]] || ! echo $DIR does not exist || continue
   BASE="${DIR%%/./*}"
   RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
   dorsync -nariRH $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" | 
@@ -90,6 +91,11 @@ do
     dorsync -ltiz $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
   done
 done 
-${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" 2>&1 
-
+if [[ -e "$METADATADIR/./.bkit/$BPATH" ]] 
+then 
+  ${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" 2>&1 
+else
+  ${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/" 2>&1 
+fi
+  
 echo Backup of $BACKUPDIR done at $(date -R)

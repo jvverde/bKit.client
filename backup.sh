@@ -59,7 +59,7 @@ dorsync(){
 			0) break 									#this is a success
 			;;
 			5|10|30|35)
-				DELAY=$((120 + RANDOM % 480))
+				DELAY=$((1 + RANDOM % 60))
 				echo Received error $ret. Try again in $DELAY seconds
 				sleep $DELAY
 				echo Try again now

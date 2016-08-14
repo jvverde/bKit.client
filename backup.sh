@@ -82,12 +82,13 @@ do
   RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
   dorsync -nariRH $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" | 
   grep '^[><]f'| cut -d' ' -f2-|
-  xargs -I{} sha512sum -b $BASE/{} | 
+  xargs -r -t -d'\n' -I{} sha512sum -b "$BASE/{}" | 
   sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
   while read HASH FILE
   do
     FILE="$(echo $FILE|sed "s#^*$RE/##")"
     SRC="$BASE/$FILE"
+	echo send hash $HASH for file $SRC 
     DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$FILE"
     dorsync -ltiz $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
   done

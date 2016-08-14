@@ -53,14 +53,11 @@ dorsync(){
 	while true
 	do
 		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
-    {
-      flock -x 9
-      ${RSYNC} "$@" 2>&1 
-      ret=$?
-    } 9> $SDIR/run/.lock
+		${RSYNC} "$@" 2>&1 
+		ret=$?
 		case $ret in
-			0) break 
-      ;;
+			0) break 									#this is a success
+			;;
 			5|10|30|35)
 				DELAY=$((120 + RANDOM % 480))
 				echo Received error $ret. Try again in $DELAY seconds
@@ -82,8 +79,8 @@ do
   RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
   dorsync -nariRH $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" | 
   grep '^[><]f'| cut -d' ' -f2-|
-  xargs -r -t -d'\n' -I{} sha512sum -b "$BASE/{}" | 
   sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
+  xargs -r -t -d'\n' -I{} sha512sum -b "$BASE/{}" | 
   while read HASH FILE
   do
     FILE="$(echo $FILE|sed "s#^*$RE/##")"

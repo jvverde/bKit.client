@@ -49,7 +49,7 @@ OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 mkdir -p $SDIR/run #jus in case
 
 dorsync(){
-	CNT=10
+	CNT=1000
 	while true
 	do
 		(( --CNT < 0 )) && echo "I'm tired of trying" && break 

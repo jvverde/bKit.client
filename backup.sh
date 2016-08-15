@@ -78,19 +78,24 @@ do
   [[ -e $DIR ]] || ! echo $DIR does not exist || continue
   BASE="${DIR%%/./*}"
   RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
+  let CNT=4
   dorsync -nariRH $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" | 
   grep '^[><]f'| cut -d' ' -f2-|
   sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
   xargs -r -t -d'\n' -I{} sha512sum -b "$BASE/{}" | 
   while read HASH FILE
   do
+    let ++CNT
+    echo aqui $CNT
     FILE="$(echo $FILE|sed "s#^*$RE/##")"
     SRC="$BASE/$FILE"
-	echo send hash $HASH for file $SRC 
+    echo Send hash $HASH for file $SRC 
     DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$FILE"
-    dorsync -ltiz $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
+    #dorsync -ltiz $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
   done
+  echo CNT $CNT
 done 
+exit
 if [[ -e "$METADATADIR/./.bkit/$BPATH" ]] 
 then 
   ${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" 2>&1 

@@ -58,7 +58,7 @@ dorsync(){
 		case $ret in
 			0) break 									#this is a success
 			;;
-			5|10|30|35)
+			5|10|12|30|35)
 				DELAY=$((1 + RANDOM % 60))
 				echo Received error $ret. Try again in $DELAY seconds
 				sleep $DELAY
@@ -72,8 +72,7 @@ dorsync(){
 	done
 }
 
-trap 'echo SIGPIPE received' SIGPIPE
-
+trap '' SIGPIPE
 for DIR in "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH"
 do
   [[ -e $DIR ]] || ! echo $DIR does not exist || continue

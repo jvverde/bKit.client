@@ -73,7 +73,9 @@ dorsync(){
 	done
 }
 
-FMT_QUERY='--out-format=%i|%n|%L|%f'
+INPLACE="--inplace"
+CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
+FMT_QUERY='--out-format=%i|%n|%L|/%f'
 trap '' SIGPIPE
 for DIR in "$ROOT/./$BPATH" #"$METADATADIR/./.bkit/$BPATH"
 do
@@ -81,18 +83,19 @@ do
 	BASE="${DIR%%/./*}"
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
-		FULLPATH=/$FULLPATH
 		echo miss "$I|$FILE|$LINK|$FULLPATH"
 		FILE=$(echo $FILE|sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##')
 		[[ $I =~ ^[c.][dLDS] ]] && dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/" && continue
+		#continue
 		[[ $I =~ ^[\<.]f ]] && 
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			dorsync -ltiz $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue
+			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue
 		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			dorsync -ltiz $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$LINK" &&
-			dorsync -dltHRi $PERM $PASS $FMT "$BASE/./$FILE" "$BASE/./$LINK" "$BACKUPURL/$RID/current/"
-	done < <(dorsync -narilDHR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/current/")
+			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$LINK" &&
+			dorsync -dtHRi $PERM $PASS $FMT "$BASE/./$FILE" "$BASE/./$LINK" "$BACKUPURL/$RID/current/"
+	done < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/current/")
+	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
 done
 exit 
 if [[ -e "$METADATADIR/./.bkit/$BPATH" ]] 

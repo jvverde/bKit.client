@@ -40,7 +40,8 @@ source $CONF
 RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die "Rsync.exe not found"
 
-FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
+#FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
+FMT='--out-format=%i|%n|%L|%o|%c|%b|%l|%B|%G|%M|%f|%t'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
@@ -72,33 +73,24 @@ dorsync(){
 	done
 }
 
+FMT='--out-format=%i|%n|%L|%f'
 trap '' SIGPIPE
 for DIR in "$ROOT/./$BPATH" #"$METADATADIR/./.bkit/$BPATH"
 do
 	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
 	BASE="${DIR%%/./*}"
-	RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
-	dorsync -narilDHR $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" |
-	while IFS= read -r MISSING
+	dorsync -narilDHR $PASS $EXC $FMT "$DIR" "$BACKUPURL/$RID/current/" |
+	while IFS='|' read -r I FILE LINK FULLPATH
 	do
-		echo miss $MISSING
-			#echo dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$ENTRY" "$BACKUPURL/$RID/current/"
-
-		RESOURCE=$(echo $MISSING |grep '^[c.][dD]' | cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##') 
-		[[ -n $RESOURCE ]] && dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$RESOURCE" "$BACKUPURL/$RID/current/"
-		RESOURCE=$(echo $MISSING |grep '^[c.][S]' | cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##') 
-		[[ -n $RESOURCE ]] && dorsync -tDRi --super $PERM $PASS $FMT "$BASE/./$RESOURCE" "$BACKUPURL/$RID/current/"
-		#RESOURCE=$(echo $MISSING |grep '^[c.]L' | cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##') 
-		#[[ -n $RESOURCE ]] && (dorsync -dltRi $PERM $PASS $FMT "$BASE/./$RESOURCE" "$BACKUPURL/$RID/current/")
-		#continue
-		RESOURCE=$(echo $MISSING | grep '^[<.]f'| cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g")
-		[[ -n $RESOURCE ]] && sha512sum -b "$BASE/$RESOURCE" |( 
-			read -r HASH FILE
-			SRC="$BASE/$RESOURCE"
-			#echo Send hash $HASH for file $SRC 
-			DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$RESOURCE"
-			dorsync -ltiz $PERM $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
-		)
+		FULLPATH=/$FULLPATH
+		echo miss "$I|$FILE|$LINK|$FULLPATH"
+		FILE=$(echo $FILE|sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##')
+		[[ $I =~ ^[c.][dLDS] ]] && dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/" && continue
+		[[ $I =~ ^[\<.]f ]] && 
+			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
+			dorsync -ltiz $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue
+		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&
+			dorsync -dltHRi $PERM $PASS $FMT "$BASE/./$FILE" "$BASE/./$LINK" "$BACKUPURL/$RID/current/"
 	done
 done
 exit 

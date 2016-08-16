@@ -16,7 +16,7 @@ MAPDRIVE="${2:-$DRIVE:}"
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
 echo Backup $1 on mapped Drive $2
-"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
+#"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 echo 'ACLs done'
 
 
@@ -73,29 +73,35 @@ dorsync(){
 }
 
 trap '' SIGPIPE
-for DIR in "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH"
+for DIR in "$ROOT/./$BPATH" #"$METADATADIR/./.bkit/$BPATH"
 do
-  [[ -e $DIR ]] || ! echo $DIR does not exist || continue
-  BASE="${DIR%%/./*}"
-  RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
-  let CNT=4
-  dorsync -nariRH $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" | 
-  grep '^[><]f'| cut -d' ' -f2-|
-  sed -e 's/"/\\"/g' -e "s/'/\\'/g" |
-  xargs -r -t -d'\n' -I{} sha512sum -b "$BASE/{}" | 
-  while read HASH FILE
-  do
-    let ++CNT
-    echo aqui $CNT
-    FILE="$(echo $FILE|sed "s#^*$RE/##")"
-    SRC="$BASE/$FILE"
-    echo Send hash $HASH for file $SRC 
-    DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$FILE"
-    #dorsync -ltiz $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
-  done
-  echo CNT $CNT
-done 
-exit
+	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
+	BASE="${DIR%%/./*}"
+	RE=$(echo $BASE|sed 's/[^-a-zA-Z0-9_]/\\&/g')
+	dorsync -narilDHR $PASS $EXC "$DIR" "$BACKUPURL/$RID/current/" |
+	while IFS= read -r MISSING
+	do
+		echo miss $MISSING
+			#echo dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$ENTRY" "$BACKUPURL/$RID/current/"
+
+		RESOURCE=$(echo $MISSING |grep '^[c.][dD]' | cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##') 
+		[[ -n $RESOURCE ]] && dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$RESOURCE" "$BACKUPURL/$RID/current/"
+		RESOURCE=$(echo $MISSING |grep '^[c.][S]' | cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##') 
+		[[ -n $RESOURCE ]] && dorsync -tDRi --super $PERM $PASS $FMT "$BASE/./$RESOURCE" "$BACKUPURL/$RID/current/"
+		#RESOURCE=$(echo $MISSING |grep '^[c.]L' | cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##') 
+		#[[ -n $RESOURCE ]] && (dorsync -dltRi $PERM $PASS $FMT "$BASE/./$RESOURCE" "$BACKUPURL/$RID/current/")
+		#continue
+		RESOURCE=$(echo $MISSING | grep '^[<.]f'| cut -d' ' -f2-| sed -e 's/"/\\"/g' -e "s/'/\\'/g")
+		[[ -n $RESOURCE ]] && sha512sum -b "$BASE/$RESOURCE" |( 
+			read -r HASH FILE
+			SRC="$BASE/$RESOURCE"
+			#echo Send hash $HASH for file $SRC 
+			DST="$(echo $HASH | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')/$RESOURCE"
+			dorsync -ltiz $PERM $PASS $FMT "$SRC" "$BACKUPURL/$RID/@manifest/$DST"
+		)
+	done
+done
+exit 
 if [[ -e "$METADATADIR/./.bkit/$BPATH" ]] 
 then 
   ${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" 2>&1 

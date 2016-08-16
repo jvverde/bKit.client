@@ -41,7 +41,7 @@ RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
 [[ -f $RSYNC ]] || die "Rsync.exe not found"
 
 #FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
-FMT='--out-format=%i|%n|%L|%o|%c|%b|%l|%B|%G|%M|%f|%t'
+FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
@@ -73,13 +73,12 @@ dorsync(){
 	done
 }
 
-FMT='--out-format=%i|%n|%L|%f'
+FMT_QUERY='--out-format=%i|%n|%L|%f'
 trap '' SIGPIPE
 for DIR in "$ROOT/./$BPATH" #"$METADATADIR/./.bkit/$BPATH"
 do
 	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
 	BASE="${DIR%%/./*}"
-	dorsync -narilDHR $PASS $EXC $FMT "$DIR" "$BACKUPURL/$RID/current/" |
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
 		FULLPATH=/$FULLPATH
@@ -90,8 +89,10 @@ do
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			dorsync -ltiz $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue
 		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&
+			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
+			dorsync -ltiz $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$LINK" &&
 			dorsync -dltHRi $PERM $PASS $FMT "$BASE/./$FILE" "$BASE/./$LINK" "$BACKUPURL/$RID/current/"
-	done
+	done < <(dorsync -narilDHR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/current/")
 done
 exit 
 if [[ -e "$METADATADIR/./.bkit/$BPATH" ]] 

@@ -15,11 +15,6 @@ MAPDRIVE="${2:-$DRIVE:}"
 
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
-echo Backup $1 on mapped Drive $2
-#"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
-echo 'ACLs done'
-
-
 BPATH=${BACKUPDIR#*:} #remove anything before character ':' inclusive
 BPATH=${BPATH#*\\}    #remove anything before character '\' inclusive
 [[ -n $BPATH ]] && BPATH="$(cygpath "$BPATH")"
@@ -76,9 +71,11 @@ dorsync(){
 INPLACE="--inplace"
 CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
+
 trap '' SIGPIPE
-for DIR in "$ROOT/./$BPATH" #"$METADATADIR/./.bkit/$BPATH"
-do
+
+backup(){
+	DIR=$1
 	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
 	BASE="${DIR%%/./*}"
 	while IFS='|' read -r I FILE LINK FULLPATH
@@ -97,19 +94,16 @@ do
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			dorsync -tHRi $PERM $PASS $FMT "$BASE/./$LINK" "$BASE/./$FILE" "$BACKUPURL/$RID/current/" 
 			
-	done < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/snap/")
+	done
 
-	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
-done
-exit 
+}
 
+backup "$ROOT/./$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/")
 
+"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 
-if [[ -e "$METADATADIR/./.bkit/$BPATH" ]] 
-then 
-  ${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" 2>&1 
-else
-  ${RSYNC} -rlitzvvhHDR $OPTIONS $PERM $PASS $FMT $EXC "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/" 2>&1 
-fi
-  
+backup "$METADATADIR/./.bkit/$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/")
+
+dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
+ 
 echo Backup of $BACKUPDIR done at $(date -R)

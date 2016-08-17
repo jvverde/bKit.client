@@ -99,7 +99,7 @@ do
 			
 	done < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/current/")
 
-	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
+	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"
 done
 exit 
 

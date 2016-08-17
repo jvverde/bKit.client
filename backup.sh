@@ -85,15 +85,17 @@ do
 	do
 		echo miss "$I|$FILE|$LINK|$FULLPATH"
 		FILE=$(echo $FILE|sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##')
-		[[ $I =~ ^[c.][dLDS] ]] && dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/" && continue
-		#continue
 		[[ $I =~ ^[\<.]f ]] && 
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue
 		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$LINK" &&
-			dorsync -dtHRi $PERM $PASS $FMT "$BASE/./$FILE" "$BASE/./$LINK" "$BACKUPURL/$RID/current/"
+			dorsync -dtHRi $PERM $PASS $FMT "$BASE/./$FILE" "$BASE/./$LINK" "$BACKUPURL/$RID/current/" && continue
+			
+		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && 
+			dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/" && continue
+			
 	done < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/current/")
 	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
 done

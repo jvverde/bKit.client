@@ -97,9 +97,9 @@ do
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			dorsync -tHRi $PERM $PASS $FMT "$BASE/./$LINK" "$BASE/./$FILE" "$BACKUPURL/$RID/current/" 
 			
-	done < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/current/")
+	done < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$DIR" "$BACKUPURL/$RID/snap/")
 
-	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"
+	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
 done
 exit 
 

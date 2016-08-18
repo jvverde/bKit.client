@@ -103,12 +103,23 @@ update_file(){
 	wait4jobs
 }
 
-
+RUNDIR=$SDIR/run
+HLIST=$SDIR/run/hardlink-list
+mkdir -p $RUNDIR
+exec 99>"$HLIST"
+postpone_hl(){ 
+	(IFS=$'\n' && echo "$*" ) >&99
+}
+update_hardlinks(){
+	dorsync --archive --hard-links --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$BASE" "$BACKUPURL/$RID/current/"
+	wait4jobs
+	exec 99>"$HLIST"
+}
 
 backup(){
-	DIR=$1
-	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
-	BASE="${DIR%%/./*}"
+	[[ -e $1 ]] || ! echo $1 does not exist || continue
+	BASE="${1%%/./*}"
+	unset HLINK
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
 		echo miss "$I|$FILE|$LINK|$FULLPATH"
@@ -121,20 +132,26 @@ backup(){
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue 
 
-		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  update_dirs "$BASE/./$LINK" "$BASE/./$FILE" && continue
+		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 
-	done
+		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing
+
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$@")
   update_dirs	#flush any content
+	update_hardlinks
 }
 
-backup "$ROOT/./$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/")
+backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"											#make a snapshot and backup data
+
+[[ -n $HLINK ]] && backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
 
 "$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 
-backup "$METADATADIR/./.bkit/$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/")
+backup "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/"			#backup metadata to current volume state
+
 
 wait4jobs 0
 
-dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
+dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" #clean deleted files
  
 echo Backup of $BACKUPDIR done at $(date -R)

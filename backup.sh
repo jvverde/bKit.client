@@ -74,14 +74,37 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f'
 
 trap '' SIGPIPE
 
-let NPROC=3*$(nproc)
+let NJOBS=3*$(nproc)
 wait4jobs(){
-  while list=($(jobs -rp)) && ((${#list[*]} > $NPROC))
-  do
-    echo wait for jobs "${list[@]}" to finish
-    wait -n
-  done
+	LIMIT=${1-$NJOBS}
+	while list=($(jobs -rp)) && ((${#list[*]} > $LIMIT))
+	do
+		echo wait for jobs "${list[@]}" to finish
+		wait -n
+	done
 }
+
+let SIZE=100
+DIRSLIST=()
+
+update_dirs(){ #without arguments rsync everything. Otherwise push args to the list and flush/rsync on threshold 
+	(($# > 0)) && THRESHOLD=$SIZE && DIRSLIST=("${DIRSLIST[@]}" "$@") || THRESHOLD=0
+	
+	((${#DIRSLIST[*]} > $THRESHOLD)) && {
+		echo update dirs "${DIRSLIST[@]}"
+		dorsync -dltDRi $PERM $PASS $FMT "${DIRSLIST[@]}" "$BACKUPURL/$RID/current/"&
+		DIRSLIST=()
+		wait4jobs
+	}
+}
+
+update_file(){
+	dorsync -tiz $INPLACE $PERM $PASS $FMT "$@"&
+	wait4jobs
+}
+
+
+
 backup(){
 	DIR=$1
 	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
@@ -89,26 +112,19 @@ backup(){
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
 		echo miss "$I|$FILE|$LINK|$FULLPATH"
-		FILE=$(echo $FILE|sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##')
 
-		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && {
-			dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/"&
-      wait4jobs && continue
-    }
+		FILE=$(echo $FILE|sed -e 's#/$##')  #only to avoid sync file in a directory directly on /current
 
-		[[ $I =~ ^[\<.]f ]] && {
-			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')
-			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE"& 
-      wait4jobs && continue
-    }
+		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && update_dirs "$BASE/./$FILE" && continue
 
-		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  {
-			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') 
-			dorsync -tHRi $PERM $PASS $FMT "$BASE/./$LINK" "$BASE/./$FILE" "$BACKUPURL/$RID/current/"&
-      wait4jobs && continue
-		}	
+		[[ $I =~ ^[\<.]f ]] &&
+			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
+			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue 
+
+		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  update_dirs "$BASE/./$LINK" "$BASE/./$FILE" && continue
+
 	done
-
+  update_dirs	#flush any content
 }
 
 backup "$ROOT/./$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/")
@@ -116,6 +132,8 @@ backup "$ROOT/./$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$ROOT/./$BP
 "$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 
 backup "$METADATADIR/./.bkit/$BPATH" < <(dorsync -narilHDR $PASS $EXC $FMT_QUERY "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/")
+
+wait4jobs 0
 
 dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
  

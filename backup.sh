@@ -74,6 +74,14 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f'
 
 trap '' SIGPIPE
 
+let NPROC=3*$(nproc)
+wait4jobs(){
+  while list=($(jobs -rp)) && ((${#list[*]} > $NPROC))
+  do
+    echo wait for jobs "${list[@]}" to finish
+    wait -n
+  done
+}
 backup(){
 	DIR=$1
 	[[ -e $DIR ]] || ! echo $DIR does not exist || continue
@@ -83,17 +91,22 @@ backup(){
 		echo miss "$I|$FILE|$LINK|$FULLPATH"
 		FILE=$(echo $FILE|sed -e 's/"/\\"/g' -e "s/'/\\'/g" -e 's#/$##')
 
-		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && 
-			dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/" && continue
+		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && {
+			dorsync -dltDRi $PERM $PASS $FMT "$BASE/./$FILE" "$BACKUPURL/$RID/current/"&
+      wait4jobs && continue
+    }
 
-		[[ $I =~ ^[\<.]f ]] && 
-			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue
+		[[ $I =~ ^[\<.]f ]] && {
+			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')
+			dorsync -tiz $INPLACE $PERM $PASS $FMT "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE"& 
+      wait4jobs && continue
+    }
 
-		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&
-			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			dorsync -tHRi $PERM $PASS $FMT "$BASE/./$LINK" "$BASE/./$FILE" "$BACKUPURL/$RID/current/" 
-			
+		[[ $I =~ ^hf && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  {
+			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') 
+			dorsync -tHRi $PERM $PASS $FMT "$BASE/./$LINK" "$BASE/./$FILE" "$BACKUPURL/$RID/current/"&
+      wait4jobs && continue
+		}	
 	done
 
 }

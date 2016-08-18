@@ -141,9 +141,9 @@ backup(){
 	update_hardlinks
 }
 
-backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"											#make a snapshot and backup data
+backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"												#make a snapshot and backup data
 
-[[ -n $HLINK ]] && backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"
+[[ -n $HLINK ]] && backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/" #if missing HARDLINK then do it again
 
 "$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 

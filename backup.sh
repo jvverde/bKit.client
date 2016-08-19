@@ -106,12 +106,12 @@ update_file(){
 RUNDIR=$SDIR/run
 HLIST=$SDIR/run/hardlink-list
 mkdir -p $RUNDIR
-exec 99>"$HLIST"
+exec 99>>"$HLIST"
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
 }
 update_hardlinks(){
-	dorsync --archive --hard-links --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$BASE" "$BACKUPURL/$RID/current/"
+	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$BASE" "$BACKUPURL/$RID/current/"
 	wait4jobs
 	exec 99>"$HLIST"
 }
@@ -137,18 +137,17 @@ backup(){
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing
 
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$@")
-  update_dirs	#flush any content
-	update_hardlinks
+	update_dirs	#flush any content
+	update_hardlinks 
 }
 
-backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"												#make a snapshot and backup data
+backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"							#make a snapshot and backup data
 
-[[ -n $HLINK ]] && backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/" #if missing HARDLINK then do it again
+[[ -n $HLINK ]] && backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"	#if missing HARDLINK then do it again
 
 "$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
 
 backup "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/"			#backup metadata to current volume state
-
 
 wait4jobs 0
 

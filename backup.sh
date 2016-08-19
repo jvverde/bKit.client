@@ -68,7 +68,6 @@ dorsync(){
 	done
 }
 
-INPLACE="--inplace"
 CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 
@@ -79,78 +78,93 @@ wait4jobs(){
 	LIMIT=${1-$NJOBS}
 	while list=($(jobs -rp)) && ((${#list[*]} > $LIMIT))
 	do
-		echo wait for jobs "${list[@]}" to finish
+		echo Wait for jobs "${list[@]}" to finish
 		wait -n
 	done
 }
 
-let SIZE=100
-DIRSLIST=()
-
-update_dirs(){ #without arguments rsync everything. Otherwise push args to the list and flush/rsync on threshold 
-	(($# > 0)) && THRESHOLD=$SIZE && DIRSLIST=("${DIRSLIST[@]}" "$@") || THRESHOLD=0
-	
-	((${#DIRSLIST[*]} > $THRESHOLD)) && {
-		echo update dirs "${DIRSLIST[@]}"
-		dorsync -dltDRi $PERM $PASS $FMT "${DIRSLIST[@]}" "$BACKUPURL/$RID/current/"&
-		DIRSLIST=()
-		wait4jobs
-	}
-}
-
 update_file(){
-	dorsync -tiz $INPLACE $PERM $PASS $FMT "$@"&
+	dorsync -tiz --inplace $PERM $PASS $FMT "$@"&
 	wait4jobs
 }
 
 RUNDIR=$SDIR/run
 HLIST=$SDIR/run/hardlink-list
+DLIST=$SDIR/run/dirs-list
 mkdir -p $RUNDIR
-exec 99>>"$HLIST"
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
 }
+postpone_dir(){ 
+	(IFS=$'\n' && echo "$*" ) >&98
+}
+exec 99>"$HLIST"
 update_hardlinks(){
-	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$BASE" "$BACKUPURL/$RID/current/"
+	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
 	wait4jobs
 	exec 99>"$HLIST"
 }
+exec 98>"$DLIST"
+update_dirs(){
+	dorsync --archive --hard-links --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
+	wait4jobs
+	exec 98>"$DLIST"
+}
 
 backup(){
-	[[ -e $1 ]] || ! echo $1 does not exist || continue
-	BASE="${1%%/./*}"
+	BASE=$1
+	SRC="$1/./$2"
+	DST=$3
+	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
+	TYPE=${DST##*/}
 	unset HLINK
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
 		echo miss "$I|$FILE|$LINK|$FULLPATH"
-
 		FILE=$(echo $FILE|sed -e 's#/$##')  #only to avoid sync file in a directory directly on /current
 
-		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && update_dirs "$BASE/./$FILE" && continue
+		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_dir "$FILE" && continue
 
 		[[ $I =~ ^[\<.]f ]] &&
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$FILE" && continue 
+			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing
 
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$@")
-	update_dirs	#flush any content
-	update_hardlinks 
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
+	wait4jobs 0
+	update_hardlinks "$BASE" "$DST"
+	wait4jobs 0
+	update_dirs	"$BASE" "$DST"
+}
+clean(){
+	BASE=$1
+	SRC="$1/./$2"
+	DST=$3
+	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
+	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$SRC" "$DST" #clean deleted files
+}
+snapshot(){
+	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
 }
 
-backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/snap/"							#make a snapshot and backup data
+snapshot																		#first create a snapshot
 
-[[ -n $HLINK ]] && backup "$ROOT/./$BPATH" "$BACKUPURL/$RID/current/"	#if missing HARDLINK then do it again
+backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"							#backup data
 
-"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}
+[[ -n $HLINK ]] && backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"		#if missing HARDLINK then do it again
 
-backup "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/"			#backup metadata to current volume state
+clean "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
+
+"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}			#get ACLS
+
+backup "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata"		#backup metadata
+
+clean "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
 
 wait4jobs 0
 
-dorsync -riHDR $CLEAN $PERM $PASS $FMT "$ROOT/./$BPATH" "$METADATADIR/./.bkit/$BPATH" "$BACKUPURL/$RID/current/" #clean deleted files
  
 echo Backup of $BACKUPDIR done at $(date -R)

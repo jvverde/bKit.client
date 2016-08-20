@@ -29,29 +29,31 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 
 [[ $FILESYSTEM == 'NTFS' ]] || die Not a NTFS file system: $FILESYSTEM
 
-ACLSDIR="$SDIR/cache/$RID"
-FLAGFILE="$ACLSDIR/$BPATH/.bkit.flag.f"
+ACLSDIR="$SDIR/cache/$RID/$BPATH"
 mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
-if [[ $FORCE || ! -f "$FLAGFILE" || $(find "$FLAGFILE" -mtime +1) ]]
-then 
-  echo Get acls of $BACKUPDIR
-  mkdir -pv "$ACLSDIR/$BPATH"
-  WACLDIR=$(cygpath -w "$ACLSDIR/$BPATH")
-  $SUBINACL /noverbose /output="${WACLDIR}/.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}/.bkit.this.sids.f" /file "$BACKUPDIR"
-  doalarm 5 wmic useraccount get > "$ACLSDIR/$BPATH/.bkit.users.f"
-  find "$BUDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
-  while read DIR
-  do
-    SPATH=$(cygpath -w "$BUDIR/$DIR")
-    DPATH=$(cygpath -w "$ACLSDIR/$BPATH/$DIR")
-    mkdir -pv "$DPATH" || continue
-    $SUBINACL /noverbose /output="$DPATH\\.bkit.acls.f" /dumpcachedsids="$DPATH\\.bkit.sids.f" /file "$SPATH\*"
-  done
-  touch "$FLAGFILE"
-  echo ACLS done for $BACKUPDIR 
-else
-  echo "$BACKUPDIR doesn't need compute ACLs this time"
-fi
+
+[[ -e "$ACLSDIR/.bkit.users.f" ]] || doalarm 5 wmic useraccount get > "$ACLSDIR/.bkit.users.f"
+
+[[ -e "$ACLSDIR/.bkit.this.acls.f" ]] || (
+	WACLDIR=$(cygpath -w "$ACLSDIR/")
+	$SUBINACL /noverbose /output="${WACLDIR}\\.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}\\.bkit.this.sids.f" /file "$BACKUPDIR"
+)
+
+find "$BUDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
+while read -r DIR
+do
+	SPATH="$BUDIR/$DIR"
+	DPATH="$ACLSDIR/$DIR"
+	mkdir -pv "$DPATH" || continue
+	ACLSFILE="$DPATH/.bkit.acls.f"
+	WSPATH=$(cygpath -w "$SPATH")
+	WSIDSFILE=$(cygpath -w "$DPATH/.bkit.sids.f")
+	WACLSFILE=$(cygpath -w "$ACLSFILE")
+	[[ -e "$ACLSFILE" ]] || $SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="$WSIDSFILE" /file "$WSPATH\*"
+	NEW=($(find "$SPATH" -maxdepth 1 -mindepth 1 -newercm "$ACLSFILE" -print -quit))
+	((${#NEW[@]} > 0 )) && $SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="$WSIDSFILE" /file "$WSPATH\*"
+done
+echo ACLS done for $BACKUPDIR 

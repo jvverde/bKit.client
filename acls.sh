@@ -35,25 +35,45 @@ mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
-[[ -e "$ACLSDIR/.bkit.users.f" ]] || doalarm 5 wmic useraccount get > "$ACLSDIR/.bkit.users.f"
+acldir(){
+	WSPATH=$(cygpath -w "$1")
+	WACLSFILE=$(cygpath -w "$2")	
+	WSIDSFILE=$(cygpath -w "$3")
+	$SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="WSIDSFILE" /file "$WSPATH"
+}
+aclfiles(){
+	WSPATH=$(cygpath -w "$1")
+	WACLSFILE=$(cygpath -w "$2")	
+	WSIDSFILE=$(cygpath -w "$3")
+	$SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="WSIDSFILE" /file "$WSPATH\\*"
+}
 
-[[ -e "$ACLSDIR/.bkit.this.acls.f" ]] || (
-	WACLDIR=$(cygpath -w "$ACLSDIR/")
-	$SUBINACL /noverbose /output="${WACLDIR}\\.bkit.this.acls.f" /dumpcachedsids="${WACLDIR}\\.bkit.this.sids.f" /file "$BACKUPDIR"
-)
+THISFLAG="$ACLSDIR/.this.flag.f"
 
+test -n "$(find "$THISFLAG" -mtime -1)" && echo "Is too soon to check it again" && exit 
+
+SYSTEMUSERS="$ACLSDIR/.bkit.users.f"
+doalarm 5 wmic useraccount get > "$SYSTEMUSERS"
+
+THISACL="$ACLSDIR/.bkit.this.acls.f"
+
+[[ -e $THISACL ]] || acldir "$BACKUPDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
+
+test -n "$(find "$BACKUPDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" && 
+	acldir "$BACKUPDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
+	
 find "$BUDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
 while read -r DIR
 do
 	SPATH="$BUDIR/$DIR"
+	echo Check $SPATH
 	DPATH="$ACLSDIR/$DIR"
 	mkdir -pv "$DPATH" || continue
 	ACLSFILE="$DPATH/.bkit.acls.f"
-	WSPATH=$(cygpath -w "$SPATH")
-	WSIDSFILE=$(cygpath -w "$DPATH/.bkit.sids.f")
-	WACLSFILE=$(cygpath -w "$ACLSFILE")
-	[[ -e "$ACLSFILE" ]] || $SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="$WSIDSFILE" /file "$WSPATH\*"
-	NEW=($(find "$SPATH" -maxdepth 1 -mindepth 1 -newercm "$ACLSFILE" -print -quit))
-	((${#NEW[@]} > 0 )) && $SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="$WSIDSFILE" /file "$WSPATH\*"
+	[[ -e "$ACLSFILE" ]] || aclfiles "$SPATH" "$ACLSFILE" "$DPATH/.bkit.this.sids.f"
+	test -n "$(find "$SPATH" -maxdepth 1 -mindepth 1 -newercm "$ACLSFILE" -print -quit)" &&
+		aclfiles "$SPATH" "$ACLSFILE" "$DPATH/.bkit.this.sids.f"
 done
+
+touch "$THISFLAG"
 echo ACLS done for $BACKUPDIR 

@@ -94,12 +94,12 @@ update_file(){
 
 RUNDIR=$SDIR/run
 HLIST=$SDIR/run/hardlink-list.$$
-DLIST=$SDIR/run/dirs-list.$$
+DLIST=$SDIR/run/update-list.$$
 mkdir -p $RUNDIR
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
 }
-postpone_dir(){ 
+postpone_update(){ 
 	(IFS=$'\n' && echo "$*" ) >&98
 }
 exec 99>"$HLIST"
@@ -129,18 +129,25 @@ backup(){
 		echo miss "$I|$FILE|$LINK"
 		
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
-
-		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_dir "$FILE" && continue
-
-		[[ $I =~ ^[\<.]f ]] &&
+		
+		#if a directory, symlink, device or special
+		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
+		
+		#if file only need to be update
+		[[ $I =~ ^.f ]] && postpone_update "$FILE" && continue
+		
+		#this is the main (and most costly) case. A file, or part of it, need to be transfer
+		[[ $I =~ ^[\<]f ]] &&
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
-
+		
+		#if a hard links (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
-
+		
+		#there are situations where the rsync don't know yet the target of a hardlink, so we need to label it to ran gain later
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
 
-		echo something else
+		echo Is something else
 		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
 	wait4jobs 0

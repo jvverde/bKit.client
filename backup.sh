@@ -64,7 +64,7 @@ dorsync(){
 				exit 1
 			;;
 			23|24)
-				echo Rsync returns a non null valor ($ret) but I will ignore it 
+				echo Rsync returns a non null valor "'$ret'" but I will ignore it 
 				break
 			;;
 		esac

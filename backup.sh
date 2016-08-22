@@ -102,7 +102,7 @@ exec 99>"$HLIST"
 update_hardlinks(){
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
 	wait4jobs
-	exec 99>"$HLIST"
+	exec 99>/dev/null
 	rm -fv "$HLIST"
 }
 exec 98>"$DLIST"

@@ -89,8 +89,8 @@ update_file(){
 }
 
 RUNDIR=$SDIR/run
-HLIST=$SDIR/run/hardlink-list
-DLIST=$SDIR/run/dirs-list
+HLIST=$SDIR/run/hardlink-list.$$
+DLIST=$SDIR/run/dirs-list.$$
 mkdir -p $RUNDIR
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
@@ -103,12 +103,14 @@ update_hardlinks(){
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
 	wait4jobs
 	exec 99>"$HLIST"
+	rm -fv "$HLIST"
 }
 exec 98>"$DLIST"
 update_dirs(){
 	dorsync --archive --hard-links --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
 	wait4jobs
-	exec 98>"$DLIST"
+	exec 98>/dev/null
+	rm -fv "$DLIST"
 }
 
 backup(){

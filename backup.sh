@@ -48,7 +48,6 @@ dorsync(){
 	CNT=1000
 	while true
 	do
-		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
 		${RSYNC} "$@" 2>&1 
 		ret=$?
 		case $ret in
@@ -65,6 +64,7 @@ dorsync(){
 				exit 1
 			;;
 		esac
+		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
 	done
 }
 
@@ -107,7 +107,7 @@ update_hardlinks(){
 }
 exec 98>"$DLIST"
 update_dirs(){
-	dorsync --archive --hard-links --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
+	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
 	wait4jobs
 	exec 98>/dev/null
 	rm -fv "$DLIST"

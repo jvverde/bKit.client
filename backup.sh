@@ -42,7 +42,7 @@ PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 #FOPTIONS=" --stats --fuzzy"
-mkdir -p $SDIR/run #jus in case
+mkdir -p $SDIR/run 										#jusy in case
 
 dorsync(){
 	CNT=1000
@@ -62,6 +62,10 @@ dorsync(){
 			*)
 				echo Fail to backup. Exit value of rsync is non null: $ret 
 				exit 1
+			;;
+			23|24)
+				echo Rsync returns a non null valor ($ret) but I will ignore it 
+				break
 			;;
 		esac
 		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
@@ -122,8 +126,9 @@ backup(){
 	unset HLINK
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
-		echo miss "$I|$FILE|$LINK|$FULLPATH"
-		FILE=$(echo $FILE|sed -e 's#/$##')  #only to avoid sync file in a directory directly on /current
+		echo miss "$I|$FILE|$LINK"
+		
+		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 
 		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_dir "$FILE" && continue
 
@@ -133,8 +138,10 @@ backup(){
 
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 
-		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing
+		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
 
+		echo something else
+		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
 	wait4jobs 0
 	update_hardlinks "$BASE" "$DST"

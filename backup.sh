@@ -96,25 +96,27 @@ RUNDIR=$SDIR/run
 HLIST=$SDIR/run/hardlink-list.$$
 DLIST=$SDIR/run/update-list.$$
 mkdir -p $RUNDIR
+
+init_lists(){
+	exec 99>"$HLIST"
+	exec 98>"$DLIST"
+}
+remove_lists(){
+	rm -rf "$HLIST" "$DLIST"
+}
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
 }
 postpone_update(){ 
 	(IFS=$'\n' && echo "$*" ) >&98
 }
-exec 99>"$HLIST"
 update_hardlinks(){
+	wait4jobs 0
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
-	wait4jobs
-	exec 99>/dev/null
-	rm -fv "$HLIST"
 }
-exec 98>"$DLIST"
 update_dirs(){
+	wait4jobs 0
 	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
-	wait4jobs
-	exec 98>/dev/null
-	rm -fv "$DLIST"
 }
 
 backup(){
@@ -124,6 +126,7 @@ backup(){
 	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
 	TYPE=${DST##*/}
 	unset HLINK
+	init_lists
 	while IFS='|' read -r I FILE LINK FULLPATH
 	do
 		echo miss "$I|$FILE|$LINK"
@@ -144,16 +147,15 @@ backup(){
 		#if a hard links (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 		
-		#there are situations where the rsync don't know yet the target of a hardlink, so we need to label it to ran gain later
+		#there are situations where the rsync don't know yet the target of a hardlink, so we need to label it to run again later
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
 
 		echo Is something else
 		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
-	wait4jobs 0
 	update_hardlinks "$BASE" "$DST"
-	wait4jobs 0
 	update_dirs	"$BASE" "$DST"
+	remove_lists
 }
 clean(){
 	BASE=$1

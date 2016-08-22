@@ -134,10 +134,10 @@ backup(){
 		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
 		
 		#if file only need to be update
-		[[ $I =~ ^.f ]] && postpone_update "$FILE" && continue
+		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
-		[[ $I =~ ^[\<]f ]] &&
+		[[ $I =~ ^[.\<]f ]] &&
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		

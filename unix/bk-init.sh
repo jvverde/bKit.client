@@ -10,12 +10,11 @@ SERVER="$1"
 die() { echo -e "$@"; exit 1; }
 [[ -z $SERVER ]] && die "Usage:\n\t$0 server-address"
 echo Contacting the server ... please wait!
-
-find $DIR/3rd-party -type f -path "*/cygwin/*" -name "nc.exe" -print | 
-xargs -r -L 1 -I{} sh -c "{} -z $SERVER $PORT" || die Server $SERVER not found
+type nc 2>/dev/null 1>&2 && (nc -z $SERVER $PORT || die Server $SERVER not found;)
 
 . computer.sh
 
+exit
 CONFDIR="$DIR/conf"
 mkdir -p "$CONFDIR"
 

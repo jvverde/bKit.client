@@ -1,39 +1,37 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+SDIR="$(dirname "$(readlink -f "$0")")"								#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" 2>&1 && shift
 
 BACKUPDIR="$1"
 
 die() { echo -e "$@"; exit 1; }
 
-[[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
+[[ $BACKUPDIR == /dev/* ]] && { 
 
-DRIVE=${BACKUPDIR%%:*}
-DRIVE=${DRIVE^^}
-MAPDRIVE="${2:-$DRIVE:}"
+	DEV=$(readlink -ne $BACKUPDIR)
+	
+	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 
-[[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
+	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && { 
+		mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+		trap "umount $DEV && rm -rvf $MOUNT" EXIT 
+	} 
+	ROOT=$MOUNT
+	BPATH=""
+} || die mais logo vejo isso
+echo ROOT $ROOT
+echo BAPTH $BPATH
 
-BPATH=${BACKUPDIR#*:} #remove anything before character ':' inclusive
-BPATH=${BPATH#*\\}    #remove anything before character '\' inclusive
-[[ -n $BPATH ]] && BPATH="$(cygpath "$BPATH")"
+. $SDIR/drive.sh $DEV
 
-ROOT="$(cygpath "$MAPDRIVE")"
-BUDIR=$ROOT/$BPATH
-
-[[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
-
-. $SDIR/drive.sh
-[[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
-RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
-METADATADIR=$SDIR/cache/$RID
+RID="_.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
 
-RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
-[[ -f $RSYNC ]] || die "Rsync.exe not found"
+type rsync 2>/dev/null 1>&2 || die rsync is not on path
+
 
 #FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
@@ -49,7 +47,7 @@ dorsync(){
 	while true
 	do
 		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
-		${RSYNC} "$@" 2>&1 
+		rsync "$@" 2>&1 
 		ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -73,7 +71,7 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f'
 
 trap '' SIGPIPE
 
-let NJOBS=3*$(nproc)
+let NJOBS=1+$(nproc)
 wait4jobs(){
 	LIMIT=${1-$NJOBS}
 	while list=($(jobs -rp)) && ((${#list[*]} > $LIMIT))
@@ -135,9 +133,9 @@ backup(){
 
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
 	wait4jobs 0
-	update_hardlinks "$BASE" "$DST"
+	update_hardlinks "$BASE/" "$DST"
 	wait4jobs 0
-	update_dirs	"$BASE" "$DST"
+	update_dirs	"$BASE/" "$DST"
 }
 clean(){
 	BASE=$1
@@ -158,11 +156,6 @@ backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"							#backup data
 
 clean "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
 
-"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}			#get ACLS
-
-backup "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata"		#backup metadata
-
-clean "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
 
 wait4jobs 0
 

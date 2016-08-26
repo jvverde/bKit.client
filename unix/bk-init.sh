@@ -10,11 +10,10 @@ SERVER="$1"
 die() { echo -e "$@"; exit 1; }
 [[ -z $SERVER ]] && die "Usage:\n\t$0 server-address"
 echo Contacting the server ... please wait!
-type nc 2>/dev/null 1>&2 && (nc -z $SERVER $PORT || die Server $SERVER not found;)
+type nc 2>/dev/null 1>&2 && { nc -z $SERVER $PORT || die Server $SERVER not found;}
 
 . computer.sh
 
-exit
 CONFDIR="$DIR/conf"
 mkdir -p "$CONFDIR"
 
@@ -22,17 +21,17 @@ mkdir -p "$CONFDIR"
 INITFILE=$CONFDIR/conf.init
 
 echo Writing configuration to $INITFILE
-
-echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID" > $INITFILE
-echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID" >> $INITFILE
+(
+	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
+	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
+)> "$INITFILE"
 
 PASSFILE=$CONFDIR/pass.txt
 echo $PASS > $PASSFILE
 chmod 600 $PASSFILE
 
-RSYNC=$(find $DIR/3rd-party -type f -name "rsync.exe" -print | head -n 1)
-[[ -f $RSYNC ]] || die "Rsync.exe not found"
+type rsync 2>/dev/null 1>&2 || die rsync not found
 
-${RSYNC} -rltvvhR --inplace --stats ${CONFDIR}/./ rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
+rsync -rltvvhR --inplace --stats ${CONFDIR}/./ rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1

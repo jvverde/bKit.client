@@ -59,13 +59,13 @@ dorsync(){
 				sleep $DELAY
 				echo Try again now
 			;;
+			23|24)
+				echo Rsync returns a non null value "'$ret'" but I will ignore it 
+				break
+			;;
 			*)
 				echo Fail to backup. Exit value of rsync is non null: $ret 
 				exit 1
-			;;
-			23|24)
-				echo Rsync returns a non null valor "'$ret'" but I will ignore it 
-				break
 			;;
 		esac
 		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
@@ -73,7 +73,6 @@ dorsync(){
 }
 
 CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
-FMT_QUERY='--out-format=%i|%n|%L|/%f'
 
 trap '' SIGPIPE
 
@@ -93,16 +92,21 @@ update_file(){
 }
 
 RUNDIR=$SDIR/run
-HLIST=$SDIR/run/hardlink-list.$$
-DLIST=$SDIR/run/update-list.$$
+FLIST=$SDIR/run/file-list.$$
+HLIST=$SDIR/run/hl-list.$$
+DLIST=$SDIR/run/dir-list.$$
 mkdir -p $RUNDIR
 
 init_lists(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"
+	exec 97>"$FLIST"
 }
 remove_lists(){
 	rm -rf "$HLIST" "$DLIST"
+}
+postpone_file(){ 
+	(IFS=$'\n' && echo "$*" ) >&97
 }
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
@@ -119,6 +123,9 @@ update_dirs(){
 	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
 
+FMT_QUERY='--out-format=%i|%n|%L|/%f'
+FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
+
 backup(){
 	BASE=$1
 	SRC="$1/./$2"
@@ -127,9 +134,9 @@ backup(){
 	TYPE=${DST##*/}
 	unset HLINK
 	init_lists
-	while IFS='|' read -r I FILE LINK FULLPATH
+	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
-		echo miss "$I|$FILE|$LINK"
+		echo miss "$I|$FILE|$LINK|$LEN"
 		
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 		
@@ -140,9 +147,22 @@ backup(){
 		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
-		[[ $I =~ ^[.\<]f ]] &&
-			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
+		[[ $I =~ ^[.\<]f ]] && {
+      #HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')
+      #postpone_file "$FULLPATH|$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE"
+      postpone_file "$FULLPATH|$LEN|$MODIFICATION"
+      # SIZE=LEN
+      # for CNT in {4..0}
+      # do
+        # let A[CNT]=SIZE%1000
+        # let SIZE=SIZE/1000
+      # done
+      # PREFIX=$(IFS='/' && echo "${A[*]}")
+      #postpone_file "$LEN|$FULLPATH|$BACKUPURL/$RID/@manifest/$PREFIX/$TYPE/$FILE" 
+    } && continue
+      #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
+			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
+			#3update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		
 		#if a hard links (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
@@ -152,10 +172,10 @@ backup(){
 
 		echo Is something else
 		
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
-	update_hardlinks "$BASE" "$DST"
-	update_dirs	"$BASE" "$DST"
-	remove_lists
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
+	#update_hardlinks "$BASE" "$DST"
+	#update_dirs	"$BASE" "$DST"
+	#remove_lists
 }
 clean(){
 	BASE=$1
@@ -172,6 +192,8 @@ snapshot																		#first create a snapshot
 
 backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"							#backup data
 
+exit
+
 [[ -n $HLINK ]] && backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"		#if missing HARDLINK then do it again
 
 clean "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
@@ -183,6 +205,5 @@ backup "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata"		#backu
 clean "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
 
 wait4jobs 0
-
  
 echo Backup of $BACKUPDIR done at $(date -R)

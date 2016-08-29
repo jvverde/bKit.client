@@ -165,7 +165,7 @@ backup(){
         let SIZE=SIZE/1000
       done
       PREFIX=$(IFS='/' && echo "${A[*]}")
-      update_file "$LEN|$FULLPATH|$BACKUPURL/$RID/@manifest/$PREFIX/$TYPE/$FILE" 
+      update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$PREFIX/$TYPE/$FILE" 
     } && continue
       #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
@@ -180,9 +180,9 @@ backup(){
 		echo Is something else
 		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
-	#update_hardlinks "$BASE" "$DST"
-	#update_dirs	"$BASE" "$DST"
-	#remove_lists
+	update_hardlinks "$BASE" "$DST"
+	update_dirs	"$BASE" "$DST"
+	remove_lists
 }
 clean(){
 	BASE=$1

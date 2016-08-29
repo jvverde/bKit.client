@@ -86,10 +86,6 @@ wait4jobs(){
 	done
 }
 
-update_file(){
-	dorsync -tiz --inplace $PERM $PASS $FMT "$@"&
-	wait4jobs
-}
 
 RUNDIR=$SDIR/run
 FLIST=$SDIR/run/file-list.$$
@@ -97,7 +93,16 @@ HLIST=$SDIR/run/hl-list.$$
 DLIST=$SDIR/run/dir-list.$$
 mkdir -p $RUNDIR
 
-init_lists(){
+# hash_file(){
+  # while read HASH FILE
+  # do
+    # echo HASH $HASH
+    # echo FILE $FILE
+  # done < <(
+    # tail -n +1 -f "$FLIST" --pid=$$ | xargs sha256sum -b |  cut -d '*' -s --output-delimiter='' -f1-
+  # )
+# }
+clear_lists(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"
 	exec 97>"$FLIST"
@@ -122,6 +127,9 @@ update_dirs(){
 	wait4jobs 0
 	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
+update_file(){
+	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
+}
 
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
@@ -133,7 +141,7 @@ backup(){
 	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
 	TYPE=${DST##*/}
 	unset HLINK
-	init_lists
+	clear_lists
 	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -150,19 +158,18 @@ backup(){
 		[[ $I =~ ^[.\<]f ]] && {
       #HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')
       #postpone_file "$FULLPATH|$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE"
-      postpone_file "$FULLPATH|$LEN|$MODIFICATION"
-      # SIZE=LEN
-      # for CNT in {4..0}
-      # do
-        # let A[CNT]=SIZE%1000
-        # let SIZE=SIZE/1000
-      # done
-      # PREFIX=$(IFS='/' && echo "${A[*]}")
-      #postpone_file "$LEN|$FULLPATH|$BACKUPURL/$RID/@manifest/$PREFIX/$TYPE/$FILE" 
+      SIZE=LEN
+      for CNT in {4..0}
+      do
+        let A[CNT]=SIZE%1000
+        let SIZE=SIZE/1000
+      done
+      PREFIX=$(IFS='/' && echo "${A[*]}")
+      update_file "$LEN|$FULLPATH|$BACKUPURL/$RID/@manifest/$PREFIX/$TYPE/$FILE" 
     } && continue
       #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			#3update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
+			#update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		
 		#if a hard links (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
@@ -187,6 +194,9 @@ clean(){
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
 }
+
+#clear_lists
+#hash_file&
 
 snapshot																		#first create a snapshot
 

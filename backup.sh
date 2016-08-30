@@ -144,7 +144,7 @@ backup(){
 			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		
-		#if a hard links (to file or to symlink)
+		#if a hard link (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 		
 		#there are situations where the rsync don't know yet the target of a hardlink, so we need to label it to run again later

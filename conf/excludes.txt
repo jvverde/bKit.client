@@ -43,3 +43,7 @@ iobw.tst
 pagefile.sys
 swapfile.sys
 tmp
+.cache/*
+.cpan/*
+.cpanm/*
+.npm/*

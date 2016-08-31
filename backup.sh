@@ -15,14 +15,13 @@ MAPDRIVE="${2:-$DRIVE:}"
 
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
-BPATH=${BACKUPDIR#*:} #remove anything before character ':' inclusive
-BPATH=${BPATH#*\\}    #remove anything before character '\' inclusive
-[[ -n $BPATH ]] && BPATH="$(cygpath "$BPATH")"
+STARTDIR=${BACKUPDIR#*:}              #remove anything before character ':' inclusive
+STARTDIR=${STARTDIR#*\\}              #remove anything before character '\' inclusive
+[[ -n $STARTDIR ]] && STARTDIR="$(cygpath "$STARTDIR")"
 
 ROOT="$(cygpath "$MAPDRIVE")"
-BUDIR=$ROOT/$BPATH
 
-[[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
+[[ -d "$ROOT/$STARTDIR" ]] || die "The mapped directory $ROOT/$STARTDIR doesn't exist"
 
 . $SDIR/drive.sh
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
@@ -130,6 +129,9 @@ update_dirs(){
 update_file(){
 	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
 }
+update_files(){
+  
+}
 
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
@@ -156,17 +158,8 @@ backup(){
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && {
-      #HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])')
-      #postpone_file "$FULLPATH|$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE"
-      SIZE=LEN
-      for CNT in {4..0}
-      do
-        let A[CNT]=SIZE%1000
-        let SIZE=SIZE/1000
-      done
-      PREFIX=$(IFS='/' && echo "${A[*]}")
-      update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$PREFIX/$TYPE/$FILE" 
-    } && continue
+      postpone_file "$FILE"
+    }
       #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			#update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
@@ -180,6 +173,8 @@ backup(){
 		echo Is something else
 		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
+  exit
+  update_files "$BASE" "$BACKUPURL/$RID/@manifest/$TYPE"
 	update_hardlinks "$BASE" "$DST"
 	update_dirs	"$BASE" "$DST"
 	remove_lists
@@ -200,19 +195,19 @@ snapshot(){
 
 snapshot																		#first create a snapshot
 
-backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"							#backup data
+backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"							#backup data
 
 exit
 
-[[ -n $HLINK ]] && backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"		#if missing HARDLINK then do it again
+[[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"		#if missing HARDLINK then do it again
 
-clean "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
+clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
 
 "$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}			#get ACLS
 
-backup "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata"		#backup metadata
+backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata"		#backup metadata
 
-clean "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
+clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
 
 wait4jobs 0
  

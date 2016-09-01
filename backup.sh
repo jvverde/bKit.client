@@ -20,10 +20,11 @@ STARTDIR=${STARTDIR#*\\}              #remove anything before character '\' incl
 [[ -n $STARTDIR ]] && STARTDIR="$(cygpath "$STARTDIR")"
 
 ROOT="$(cygpath "$MAPDRIVE")"
+FULLPATHDIR="$ROOT/$STARTDIR"
 
-[[ -d "$ROOT/$STARTDIR" ]] || die "The mapped directory $ROOT/$STARTDIR doesn't exist"
+[[ -d "$FULLPATHDIR" ]] || die "The mapped directory $FULLPATHDIR doesn't exist"
 
-. $SDIR/drive.sh
+. $SDIR/drive.sh $DRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 METADATADIR=$SDIR/cache/$RID
@@ -31,23 +32,15 @@ CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
 
-RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
-[[ -f $RSYNC ]] || die "Rsync.exe not found"
+type rsync || die Cannot find rsync
 
-#FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
-FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-EXC="--exclude-from=$SDIR/conf/excludes.txt"
-PASS="--password-file=$SDIR/conf/pass.txt"
-PERM="--perms --acls --owner --group --super --numeric-ids"
-OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-#FOPTIONS=" --stats --fuzzy"
-mkdir -p $SDIR/run 										#jusy in case
+trap '' SIGPIPE
 
 dorsync(){
 	CNT=1000
 	while true
 	do
-		${RSYNC} "$@" 2>&1 
+		rsync "$@" 2>&1 
 		ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -71,11 +64,8 @@ dorsync(){
 	done
 }
 
-CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
 
-trap '' SIGPIPE
-
-let NJOBS=3*$(nproc)
+let NJOBS=$(nproc)
 wait4jobs(){
 	LIMIT=${1-$NJOBS}
 	while list=($(jobs -rp)) && ((${#list[*]} > $LIMIT))
@@ -85,22 +75,13 @@ wait4jobs(){
 	done
 }
 
-
 RUNDIR=$SDIR/run
 FLIST=$SDIR/run/file-list.$$
 HLIST=$SDIR/run/hl-list.$$
 DLIST=$SDIR/run/dir-list.$$
 mkdir -p $RUNDIR
 
-# hash_file(){
-  # while read HASH FILE
-  # do
-    # echo HASH $HASH
-    # echo FILE $FILE
-  # done < <(
-    # tail -n +1 -f "$FLIST" --pid=$$ | xargs sha256sum -b |  cut -d '*' -s --output-delimiter='' -f1-
-  # )
-# }
+
 clear_lists(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"
@@ -118,6 +99,18 @@ postpone_hl(){
 postpone_update(){ 
 	(IFS=$'\n' && echo "$*" ) >&98
 }
+
+#FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
+FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
+EXC="--exclude-from=$SDIR/conf/excludes.txt"
+PASS="--password-file=$SDIR/conf/pass.txt"
+PERM="--perms --acls --owner --group --super --numeric-ids"
+OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
+#FOPTIONS=" --stats --fuzzy"
+CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
+FMT_QUERY='--out-format=%i|%n|%L|/%f'
+FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
+
 update_hardlinks(){
 	wait4jobs 0
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
@@ -132,9 +125,6 @@ update_file(){
 update_files(){
   
 }
-
-FMT_QUERY='--out-format=%i|%n|%L|/%f'
-FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
 
 backup(){
 	BASE=$1
@@ -190,6 +180,9 @@ snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
 }
 
+NEW=$(bash ./hash.sh -f "$FULLPATHDIR")
+[[ -e $NEW ]] && update_file "$NEW" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/"
+exit
 #clear_lists
 #hash_file&
 

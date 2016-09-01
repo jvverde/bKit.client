@@ -32,7 +32,7 @@ CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
 
-type rsync || die Cannot find rsync
+type rsync >/dev/null || die Cannot find rsync
 
 trap '' SIGPIPE
 
@@ -76,10 +76,10 @@ wait4jobs(){
 }
 
 RUNDIR=$SDIR/run
-FLIST=$SDIR/run/file-list.$$
-HLIST=$SDIR/run/hl-list.$$
-DLIST=$SDIR/run/dir-list.$$
 mkdir -p $RUNDIR
+FLIST=$RUNDIR/file-list.$$
+HLIST=$RUNDIR/hl-list.$$
+DLIST=$RUNDIR/dir-list.$$
 
 
 clear_lists(){
@@ -123,7 +123,7 @@ update_file(){
 	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
 }
 update_files(){
-  
+		echo MISSING
 }
 
 backup(){
@@ -134,6 +134,8 @@ backup(){
 	TYPE=${DST##*/}
 	unset HLINK
 	clear_lists
+	HASHESFILE=$(bash $SDIR/hash.sh -l "$SRC") || die Cannot found a hashfile
+	echo HASHESFILE $HASHESFILE
 	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -148,7 +150,11 @@ backup(){
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && {
-      postpone_file "$FILE"
+      #postpone_file "SDIR"
+			echo FILE $FILE
+			echo FULLPATh $FULLPATH
+			echo LEN $LEN
+			echo TIME $MODIFICATION
     }
       #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
@@ -180,13 +186,12 @@ snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
 }
 
-NEW=$(bash ./hash.sh -f "$FULLPATHDIR")
-[[ -e $NEW ]] && update_file "$NEW" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/"
-exit
-#clear_lists
-#hash_file&
+MANIFEST=$RUNDIR/manifest.$$
+bash $SDIR/hash.sh -f "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst"
+update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst"
 
-snapshot																		#first create a snapshot
+#snapshot																		#first create a snapshot
 
 backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"							#backup data
 

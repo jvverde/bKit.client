@@ -22,14 +22,20 @@ FILES="$WD/$$.files"
 HASHES="$WD/$$.hash"
 RESULT="$WD/$$.lst"
 NEW="$CACHE/new.lst"
-FINAL="$CACHE/all.lst"
+FINAL="$CACHE/hashes.db"
 [[ -n $LIST && -e $FINAL ]] && echo $FINAL && exit
 [[ -n $LIST && ! -e "$FINAL" ]] && exit 1
 
 mkdir -pv "$CACHE"
 mkdir -p "$WD"
 
-[[ -e $FINAL ]] || touch "$FINAL"
+
+type sqlite3>/dev/null || die Cannot found sqlite3
+
+DB="$(cygpath -w "$FINAL")"
+echo DB=$DB
+
+sqlite3 "$DB" "CREATE TABLE IF NOT EXISTS H(hash TEXT, filename TEXT PRIMARY KEY)" || die Cannot open DB $DB
 LC_ALL=C
 touch "$INITTIME"
 
@@ -43,8 +49,15 @@ cd $MOUNT
 	else
 		find "./$DIR" -ignore_readdir_race -xdev -type f -printf "$FORMAT"
 	fi
-}|tee "$FILES"|cut -d'|' -f3|xargs -r -d '\n' sha256sum -b|sed -e 's/\s*\*/|/'> "$HASHES"
+}|tee "$FILES"|cut -d'|' -f3|xargs -r -d '\n' sha256sum -b|(
+	echo "INSERT OR REPLACE INTO H"
+	sed -E "1s/([0-9A-Z]*)\s*\*(.*)/SELECT '\1' as 'hash', '\2' as 'filename'/i; 1 ! s/([0-9A-Z]*)\s*\*(.*)/UNION ALL SELECT '\1','\2'/i"
+	echo ';'
+)
+#|sqlite3 "$DB" 
 
+
+exit
 cd "$WD"
 if [[ -s "$FILES" && -s "$HASHES" ]]
 then

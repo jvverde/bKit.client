@@ -3,6 +3,7 @@ die() { echo -e "$@"; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 [[ $1 == '-f' ]] && FULL=true && shift				#get -f option if present
 [[ $1 == '-l' ]] && LIST=true && shift				#get -l option if present
+[[ $1 == '-b' ]] && LBD=true && shift				#get -l option if present
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 FULLPATH="$(readlink -e "$1")"
@@ -24,17 +25,19 @@ HASHES="$WD/$$.hash"
 NEW="$CACHE/new.csv"
 FINAL="$CACHE/all.csv"
 DB="$CACHE/hashes.db"
-
-[[ -e $FINAL ]] || touch "$FINAL"
+exists cygpath && DB=$(cygpath -w "$DB")
 
 #DB="$CACHE/hashes.db"
 
 [[ -n $LIST && -e $FINAL ]] && echo $FINAL && exit
-[[ -n $LIST && ! -e "$FINAL" ]] && exit 1
+[[ -n $LIST ]] && exit 1
+[[ -n $LBD && -e $DB ]] && echo $DB && exit
+[[ -n $LDB ]] && exit 1
 
 mkdir -pv "$CACHE"
 mkdir -p "$WD"
 
+[[ -e $FINAL ]] || touch "$FINAL"
 
 LC_ALL=C
 touch "$INITTIME"
@@ -61,12 +64,11 @@ mv -f "${FINAL}.tmp" "${FINAL}"
 mv -f "$INITTIME" "$MARK"
 
 exists sqlite3 || die Cannot fine sqlite3
-exists cygpath && DB=$(cygpath -w "$DB")
 {
 	echo "DROP TABLE IF EXISTS H;"
-	echo "CREATE TABLE H(hash TEXT, size INT, time REAL,filename TEXT PRIMARY KEY);"
+	echo "CREATE TABLE IF NOT EXISTS H(hash TEXT, size INT, time REAL,filename TEXT PRIMARY KEY);"
 	echo '.separator "|"'
-	echo ".import '$FINAL' H" 
+	echo ".import '$FINAL' H"
 }|sqlite3 "$DB" 
 
 rm -f "$FILES" "$HASHES"

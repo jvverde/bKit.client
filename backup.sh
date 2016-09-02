@@ -155,6 +155,8 @@ backup(){
 			echo FULLPATh $FULLPATH
 			echo LEN $LEN
 			echo TIME $MODIFICATION
+			IFS='|' read HASH SIZE TIME < <($(fgrep -m1 $FILE $HASHESFILE))
+			echo MATCH=$MATCH
     }
       #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&

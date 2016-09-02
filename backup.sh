@@ -27,7 +27,7 @@ FULLPATHDIR="$ROOT/$STARTDIR"
 . $SDIR/drive.sh $DRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
-METADATADIR=$SDIR/cache/$RID
+METADATADIR=$SDIR/cache/metadata/$RID
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
@@ -61,17 +61,6 @@ dorsync(){
 			;;
 		esac
 		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
-	done
-}
-
-
-let NJOBS=$(nproc)
-wait4jobs(){
-	LIMIT=${1-$NJOBS}
-	while list=($(jobs -rp)) && ((${#list[*]} > $LIMIT))
-	do
-		echo Wait for jobs "${list[@]}" to finish
-		wait -n
 	done
 }
 
@@ -112,11 +101,9 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
 
 update_hardlinks(){
-	wait4jobs 0
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
 update_dirs(){
-	wait4jobs 0
 	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
 update_file(){
@@ -128,12 +115,11 @@ backup(){
 	BASE=$1
 	SRC="$1/./$2"
 	DST=$3
-	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
+	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
 	TYPE=${DST##*/}
 	unset HLINK
 	clear_lists
-	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot found a hashfile
-	echo HASHDB $HASHDB
+	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot find a hashfile
 	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -148,20 +134,12 @@ backup(){
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
-      #postpone_file "SDIR"
-			echo FILE $FILE
-			echo FULLPATh $FULLPATH
-			echo LEN $LEN
-			echo TIME $MODIFICATION
-			#IFS='|' read HASH SIZE TIME < <($(fgrep -m1 $FILE $HASHDB))
 			IFS='|' read HASH TIME < <(sqlite3 "$HASHDB" "SELECT hash,CAST(time as INTEGER) FROM H WHERE filename='$FILE'")
-			echo HASH=$HASH
-			echo TIME=$TIME
-			NEWTIME=$(stat -c "%Y" "$FULLPATH")
-			echo NEWTIME=$NEWTIME
-			[[ -z $HASH || -z $TIME || (($NEWTIME > $TIME )) ]] && {
-				echo Compute a new HASH
+			CTIME=$(stat -c "%Y" "$FULLPATH")
+			#check if we need to compute a HASH
+			[[ -z $HASH || -z $TIME || (($CTIME > $TIME )) ]] && {
 				HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
+				sqlite3 "$HASHDB" "INSERT OR REPLACE INTO H ('hash','size','time','filename') VALUES ('$HASH','$LEN','$CTIME','$FILE');"
 			}
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
@@ -187,7 +165,7 @@ clean(){
 	BASE=$1
 	SRC="$1/./$2"
 	DST=$3
-	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
+	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
 	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
@@ -195,26 +173,22 @@ snapshot(){
 }
 
 MANIFEST=$RUNDIR/manifest.$$
-bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst"
-update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst"
+time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
+time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 
+time update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst" && echo manifest applied
 
-#snapshot																		#first create a snapshot
+time snapshot	&& echo snapshot done 
 
-backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"							#backup data
+time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
-exit
+time ([[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
 
-[[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"		#if missing HARDLINK then do it again
+time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
+time ("$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
 
-"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}			#get ACLS
+time backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" &&	echo backup metadata done
 
-backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata"		#backup metadata
-
-clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
-
-wait4jobs 0
+time clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" && echo clean deleted metadata files
  
 echo Backup of $BACKUPDIR done at $(date -R)

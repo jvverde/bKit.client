@@ -122,9 +122,7 @@ update_dirs(){
 update_file(){
 	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
 }
-update_files(){
-		echo MISSING
-}
+
 
 backup(){
 	BASE=$1
@@ -134,8 +132,8 @@ backup(){
 	TYPE=${DST##*/}
 	unset HLINK
 	clear_lists
-	HASHESFILE=$(bash $SDIR/hash.sh -l "$SRC") || die Cannot found a hashfile
-	echo HASHESFILE $HASHESFILE
+	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot found a hashfile
+	echo HASHDB $HASHDB
 	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -149,15 +147,25 @@ backup(){
 		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
-		[[ $I =~ ^[.\<]f ]] && {
+		[[ $I =~ ^[.\<]f ]] && (
       #postpone_file "SDIR"
 			echo FILE $FILE
 			echo FULLPATh $FULLPATH
 			echo LEN $LEN
 			echo TIME $MODIFICATION
-			IFS='|' read HASH SIZE TIME < <($(fgrep -m1 $FILE $HASHESFILE))
-			echo MATCH=$MATCH
-    }
+			#IFS='|' read HASH SIZE TIME < <($(fgrep -m1 $FILE $HASHDB))
+			IFS='|' read HASH TIME < <(sqlite3 "$HASHDB" "SELECT hash,CAST(time as INTEGER) FROM H WHERE filename='$FILE'")
+			echo HASH=$HASH
+			echo TIME=$TIME
+			NEWTIME=$(stat -c "%Y" "$FULLPATH")
+			echo NEWTIME=$NEWTIME
+			[[ -z $HASH || -z $TIME || (($NEWTIME > $TIME )) ]] && {
+				echo Compute a new HASH
+				HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
+			}
+			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
+			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
+    ) && continue
       #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			#update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
@@ -171,8 +179,6 @@ backup(){
 		echo Is something else
 		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
-  exit
-  update_files "$BASE" "$BACKUPURL/$RID/@manifest/$TYPE"
 	update_hardlinks "$BASE" "$DST"
 	update_dirs	"$BASE" "$DST"
 	remove_lists
@@ -189,7 +195,7 @@ snapshot(){
 }
 
 MANIFEST=$RUNDIR/manifest.$$
-bash $SDIR/hash.sh -f "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst"
 update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst"
 

@@ -29,7 +29,7 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 
 [[ $FILESYSTEM == 'NTFS' ]] || die Not a NTFS file system: $FILESYSTEM
 
-ACLSDIR="$SDIR/cache/$RID/$BPATH"
+ACLSDIR="$SDIR/cache/metadata/$RID/$BPATH"
 mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)

@@ -46,7 +46,7 @@ cd $MOUNT
 {
 	PREFIX=${DIR:+$DIR/}
 	FORMAT="%s|%T@|${PREFIX}%P\n"
-	if [[ -z $FULL && -e "$MARK" && -s "$FINAL" && ! "$FINAL" -ot "$MARK" ]]
+	if [[ -z $FULL && -e "$MARK" && -s "$FINAL" && ! "$FINAL" -ot "$MARK" && -s "$DB" && ! "$DB" -ot "$FINAL" ]]
 	then
 		find "./$DIR" -ignore_readdir_race -xdev -type f -newer "$MARK" -printf "$FORMAT"
 	else
@@ -65,10 +65,17 @@ mv -f "$INITTIME" "$MARK"
 
 exists sqlite3 || die Cannot fine sqlite3
 {
-	echo "DROP TABLE IF EXISTS H;"
+	# echo "DROP TABLE IF EXISTS H;"
+	# echo "CREATE TABLE IF NOT EXISTS H(hash TEXT, size INT, time REAL,filename TEXT PRIMARY KEY);"
+	# echo '.separator "|"'
+	# echo ".import '$FINAL' H"
+	echo "DROP TABLE IF EXISTS TMP;"
+	echo "CREATE TABLE TMP(hash TEXT, size INT, time REAL,filename TEXT);"
 	echo "CREATE TABLE IF NOT EXISTS H(hash TEXT, size INT, time REAL,filename TEXT PRIMARY KEY);"
 	echo '.separator "|"'
-	echo ".import '$FINAL' H"
+	echo ".import '$NEW' TMP"
+	echo "INSERT OR REPLACE INTO H SELECT * FROM TMP;"
+	echo "DROP TABLE IF EXISTS TMP;"
 }|sqlite3 "$DB" 
 
 rm -f "$FILES" "$HASHES"

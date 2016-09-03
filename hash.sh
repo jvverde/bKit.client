@@ -8,6 +8,7 @@ exists() { type "$1" >/dev/null 2>&1;}
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 FULLPATH="$(readlink -e "$1")"
 [[ -d $FULLPATH ]] || die Directory $FULLPATH does not exist
+EXCUDELIST="$2"
 
 MOUNT="$(stat -c %m "$FULLPATH")"
 DIR="${FULLPATH#$MOUNT}"
@@ -40,17 +41,32 @@ mkdir -p "$WD"
 LC_ALL=C
 touch "$INITTIME"
 
+EXC=$( 
+	[[ -n $EXCUDELIST ]] || EXCUDELIST="$SDIR/conf/excludes.txt"
+	[[ -f $EXCUDELIST ]] && cat $EXCUDELIST|
+	sed -e /^#/d -e 's/ /?/g'|
+	sed -E "
+		/^[^/]*$/{s%%-name '&'%p;d}
+		/^([^/]*)[/]$/{s%%-name '\1' -type d%p;d}
+		/^[/](.*[^/])$/{s%%-wholename './$DIR\1'%p;d}
+		/^[/](.*)[/]$/{s%%-path './$DIR\1' -type d%p;d}
+		/^(.*)[/]$/{s%%-path '\1' -type d%p;d}
+		/^[*].*[*]$/{s%%-path '&'%p;d}
+		/^[*].*[^*]$/{s%%-path '&/*'%p;d}
+		/^[^*].*[*]$/{s%%-path '*/&'%p;d}
+		s%.*/.*%-path '*&*'%
+	"|
+	sed 's/^\s*-.*$/& -prune -o/'|
+	tr '\n' ' '
+) 
+
+PREFIX=${DIR:+$DIR/}
+FORMAT="%s|%T@|${PREFIX}%P\n"
+[[ -z $FULL && -e "$MARK" && -s "$FINAL" && ! "$FINAL" -ot "$MARK" && -s "$DB" && ! "$DB" -ot "$FINAL" ]] && NEWER="-newer '$MARK'"
+
 cd $MOUNT
-{
-	PREFIX=${DIR:+$DIR/}
-	FORMAT="%s|%T@|${PREFIX}%P\n"
-	if [[ -z $FULL && -e "$MARK" && -s "$FINAL" && ! "$FINAL" -ot "$MARK" && -s "$DB" && ! "$DB" -ot "$FINAL" ]]
-	then
-		find "./$DIR" -ignore_readdir_race -xdev -type f -newer "$MARK" -printf "$FORMAT"
-	else
-		find "./$DIR" -ignore_readdir_race -xdev -type f -printf "$FORMAT"
-	fi
-}|tee >(sort -t'|' -k3 -o "$FILES")|cut -d'|' -f3|xargs -r -d '\n' sha256sum -b|sed -E 's/\s+\*/|/'|(sort -t'|' -k2 -o "$HASHES")
+sh -c "find './$DIR' -ignore_readdir_race -xdev $EXC -type f $NEWER -printf '$FORMAT'"|
+tee >(sort -t'|' -k3 -o "$FILES")|cut -d'|' -f3|xargs -r -d '\n' sha256sum -b|sed -E 's/\s+\*/|/'|(sort -t'|' -k2 -o "$HASHES")
 
 #join hashes with sizes and times, output it to stdout, and also save it on NEW tmp file
 join -t '|' -1 3 -2 2 -o 2.1,1.1,1.2,1.3 "$FILES" "$HASHES" | sort -t'|' -k4,4 -k3,3nr | tee "$NEW"																															#and then save it on NEW file
@@ -67,6 +83,7 @@ exists sqlite3 || die Cannot fine sqlite3
 	# echo "CREATE TABLE IF NOT EXISTS H(hash TEXT, size INT, time REAL,filename TEXT PRIMARY KEY);"
 	# echo '.separator "|"'
 	# echo ".import '$FINAL' H"
+	exists cygpath && NEW=$(cygpath -w "$NEW")
 	echo "DROP TABLE IF EXISTS TMP;"
 	echo "CREATE TABLE TMP(hash TEXT, size INT, time REAL,filename TEXT);"
 	echo "CREATE TABLE IF NOT EXISTS H(hash TEXT, size INT, time REAL,filename TEXT PRIMARY KEY);"

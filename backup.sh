@@ -171,9 +171,18 @@ clean(){
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
 }
-
+wait4jobs(){
+	while list=($(jobs -rp)) && ((${#list[*]} > 0))
+	do
+		echo Wait for jobs "${list[@]}" to finish
+		wait -n
+	done
+}
 MANIFEST=$RUNDIR/manifest.$$
+(
+)&
 time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
+exit
 time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 
 time update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst" && echo manifest applied
 

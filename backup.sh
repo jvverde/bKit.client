@@ -134,7 +134,7 @@ backup(){
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
-			IFS='|' read HASH TIME < <(sqlite3 "$HASHDB" "SELECT hash,CAST(time as INTEGER) FROM H WHERE filename='$FILE'")
+			IFS='|' read HASH TIME < <(sqlite3 "$HASHDB" "SELECT hash,time FROM H WHERE filename='$FILE'")
 			CTIME=$(stat -c "%Y" "$FULLPATH")
 			#check if we need to compute a HASH
 			[[ -z $HASH || -z $TIME || (($CTIME > $TIME )) ]] && {

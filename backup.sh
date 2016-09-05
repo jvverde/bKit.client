@@ -15,40 +15,32 @@ MAPDRIVE="${2:-$DRIVE:}"
 
 [[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
 
-BPATH=${BACKUPDIR#*:} #remove anything before character ':' inclusive
-BPATH=${BPATH#*\\}    #remove anything before character '\' inclusive
-[[ -n $BPATH ]] && BPATH="$(cygpath "$BPATH")"
+STARTDIR=${BACKUPDIR#*:}              #remove anything before character ':' inclusive
+STARTDIR=${STARTDIR#*\\}              #remove anything before character '\' inclusive
+[[ -n $STARTDIR ]] && STARTDIR="$(cygpath "$STARTDIR")"
 
 ROOT="$(cygpath "$MAPDRIVE")"
-BUDIR=$ROOT/$BPATH
+FULLPATHDIR="$ROOT/$STARTDIR"
 
-[[ -d "$BUDIR" ]] || die "The mapped directory $BUDIR doesn't exist"
+[[ -d "$FULLPATHDIR" ]] || die "The mapped directory $FULLPATHDIR doesn't exist"
 
-. $SDIR/drive.sh
+. $SDIR/drive.sh $DRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
-METADATADIR=$SDIR/cache/$RID
+METADATADIR=$SDIR/cache/metadata/$RID
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
 
-RSYNC=$(find "$SDIR/3rd-party" -type f -name "rsync.exe" -print | head -n 1)
-[[ -f $RSYNC ]] || die "Rsync.exe not found"
+type rsync >/dev/null || die Cannot find rsync
 
-#FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
-FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-EXC="--exclude-from=$SDIR/conf/excludes.txt"
-PASS="--password-file=$SDIR/conf/pass.txt"
-PERM="--perms --acls --owner --group --super --numeric-ids"
-OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-#FOPTIONS=" --stats --fuzzy"
-mkdir -p $SDIR/run 										#jusy in case
+trap '' SIGPIPE
 
 dorsync(){
-	CNT=1000
+	RETRIES=1000
 	while true
 	do
-		${RSYNC} "$@" 2>&1 
+		rsync "$@" 2>&1 
 		ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -59,50 +51,36 @@ dorsync(){
 				sleep $DELAY
 				echo Try again now
 			;;
+			23|24)
+				echo Rsync returns a non null value "'$ret'" but I will ignore it 
+				break
+			;;
 			*)
 				echo Fail to backup. Exit value of rsync is non null: $ret 
 				exit 1
 			;;
-			23|24)
-				echo Rsync returns a non null valor "'$ret'" but I will ignore it 
-				break
-			;;
 		esac
-		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
+		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break 
 	done
-}
-
-CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
-FMT_QUERY='--out-format=%i|%n|%L|/%f'
-
-trap '' SIGPIPE
-
-let NJOBS=3*$(nproc)
-wait4jobs(){
-	LIMIT=${1-$NJOBS}
-	while list=($(jobs -rp)) && ((${#list[*]} > $LIMIT))
-	do
-		echo Wait for jobs "${list[@]}" to finish
-		wait -n
-	done
-}
-
-update_file(){
-	dorsync -tiz --inplace $PERM $PASS $FMT "$@"&
-	wait4jobs
 }
 
 RUNDIR=$SDIR/run
-HLIST=$SDIR/run/hardlink-list.$$
-DLIST=$SDIR/run/update-list.$$
 mkdir -p $RUNDIR
+FLIST=$RUNDIR/file-list.$$
+HLIST=$RUNDIR/hl-list.$$
+DLIST=$RUNDIR/dir-list.$$
 
-init_lists(){
+
+set_postpone_files(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"
+	exec 97>"$FLIST"
 }
-remove_lists(){
-	rm -rf "$HLIST" "$DLIST"
+remove_postpone_files(){
+	rm -rfv "$HLIST" "$DLIST" "$FLIST"
+}
+postpone_file(){ 
+	(IFS=$'\n' && echo "$*" ) >&97
 }
 postpone_hl(){ 
 	(IFS=$'\n' && echo "$*" ) >&99
@@ -110,26 +88,42 @@ postpone_hl(){
 postpone_update(){ 
 	(IFS=$'\n' && echo "$*" ) >&98
 }
+
+#FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
+FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
+EXC="--exclude-from=$SDIR/conf/excludes.txt"
+PASS="--password-file=$SDIR/conf/pass.txt"
+PERM="--perms --acls --owner --group --super --numeric-ids"
+OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
+#FOPTIONS=" --stats --fuzzy"
+CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
+FMT_QUERY='--out-format=%i|%n|%L|/%f'
+FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
+FMT_QUERY3='--out-format=%i|%n'
+
 update_hardlinks(){
-	wait4jobs 0
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
 update_dirs(){
-	wait4jobs 0
 	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
+update_file(){
+	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
+}
+
 
 backup(){
 	BASE=$1
 	SRC="$1/./$2"
 	DST=$3
-	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
+	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
 	TYPE=${DST##*/}
 	unset HLINK
-	init_lists
-	while IFS='|' read -r I FILE LINK FULLPATH
+	set_postpone_files
+	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot find a hashfile
+	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
-		echo miss "$I|$FILE|$LINK"
+		echo miss "$I|$FILE|$LINK|$LEN"
 		
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 		
@@ -140,9 +134,20 @@ backup(){
 		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
-		[[ $I =~ ^[.\<]f ]] &&
-			HASH=$(sha512sum -b "$FULLPATH" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
+		[[ $I =~ ^[.\<]f ]] && (
+			IFS='|' read HASH TIME < <(sqlite3 "$HASHDB" "SELECT hash,time FROM H WHERE filename='$FILE'")
+			CTIME=$(stat -c "%Y" "$FULLPATH")
+			#check if we need to compute a HASH
+			[[ -z $HASH || -z $TIME || (($CTIME > $TIME )) ]] && {
+				HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
+				sqlite3 "$HASHDB" "INSERT OR REPLACE INTO H ('hash','size','time','filename') VALUES ('$HASH','$LEN','$CTIME','$FILE');"
+			}
+			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
+			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
+		) && continue
+			#SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
+			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
+			#update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		
 		#if a hard link (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
@@ -152,37 +157,86 @@ backup(){
 
 		echo Is something else
 		
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY "$SRC" "$DST")
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
 	update_hardlinks "$BASE" "$DST"
 	update_dirs	"$BASE" "$DST"
-	remove_lists
+	remove_postpone_files
 }
 clean(){
 	BASE=$1
 	SRC="$1/./$2"
 	DST=$3
-	[[ -e $SRC ]] || ! echo $SRC does not exist || continue
+	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
 	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
 }
+wait4jobs(){
+	while list=($(jobs -rp)) && ((${#list[*]} > 0))
+	do
+		echo Wait for jobs "${list[@]}" to finish
+		wait -n
+	done
+}
+MANIFEST=$RUNDIR/manifest.$$
+ENDFLAG=$RUNDIR/endflag.$$
+[[ -e $MANIFEST ]] || touch "$MANIFEST"
+[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
+(
+	let START=1
+	let LEN=500
+	SEGMENT=$RUNDIR/segment.$$
+	SEGFILES=$RUNDIR/segment-files.$$	
+	while true
+	do
+		set_postpone_files
+		let END=LEN+START-1
+		let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
+		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
+		(( CNT == 0 )) && sleep 1 && continue
+		(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
+		update_file "$SEGMENT" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst"
+		update_file "$SEGMENT" "$BACKUPURL/$RID/@apply-manifest/data/$STARTDIR/manifest.lst"		
+		cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
+		while IFS='|' read -r I FILE INK
+		do
+			echo miss "$I|$FILE|$LINK"
+			[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
+			[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
+			[[ $I =~ ^[.\<]f ]] && (
+				ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
+				[[ -n $ID ]] && update_file "$ROOT/$FILE" "$BACKUPURL/$RID/@by-id/$ID/data/$FILE"
+			)
+		done < <(dorsync --dry-run --archive --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$ROOT" "$BACKUPURL/$RID/@current/data")
+		update_hardlinks "$ROOT" "$BACKUPURL/$RID/@current/data"
+		update_dirs	"$ROOT" "$BACKUPURL/$RID/@current/data"
+		echo sent $CNT lines of manifest starting at $START
+		let START+=CNT
+	done
+	rm -fv "$ENDFLAG" "$SEGMENT" "$SEGFILES"
+	remove_postpone_files
+)&
+time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
+touch "$ENDFLAG"
+wait4jobs
+echo done $$
+exit
+time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 
+time update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst" && echo manifest applied
 
-snapshot																		#first create a snapshot
+time snapshot	&& echo snapshot done 
 
-backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"							#backup data
+time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
-[[ -n $HLINK ]] && backup "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data"		#if missing HARDLINK then do it again
+time ([[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
 
-clean "$ROOT" "$BPATH" "$BACKUPURL/$RID/@current/data" 							#clean deleted files
+time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-"$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}			#get ACLS
+time ("$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
 
-backup "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata"		#backup metadata
+time backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" &&	echo backup metadata done
 
-clean "$METADATADIR" ".bkit/$BPATH" "$BACKUPURL/$RID/@current/metadata" 		#clean deleted files
-
-wait4jobs 0
-
+time clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" && echo clean deleted metadata files
  
 echo Backup of $BACKUPDIR done at $(date -R)

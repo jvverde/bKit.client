@@ -1,3 +1,1 @@
-cat /var/lib/dbus/machine-id
-sudo dmidecode -s system-uuid
-
+lsblk -ln -o NAME,SIZE,LABEL,TRAN,PARTLABEL,UUID,PARTUUID,FSTYPE,MOUNTPOINT,TYPE,PARTTYPE,SERIAL,VENDOR,MODEL

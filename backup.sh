@@ -37,7 +37,7 @@ type rsync >/dev/null || die Cannot find rsync
 trap '' SIGPIPE
 
 dorsync(){
-	RETRIES=1000
+	local RETRIES=1000
 	while true
 	do
 		rsync "$@" 2>&1 
@@ -113,11 +113,11 @@ update_file(){
 
 
 backup(){
-	BASE=$1
-	SRC="$1/./$2"
-	DST=$3
+	local BASE=$1
+	local SRC="$1/./$2"
+	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	TYPE=${DST##*/}
+	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
 	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot find a hashfile
@@ -145,14 +145,11 @@ backup(){
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
 		) && continue
-			#SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
-			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
-			#update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		
 		#if a hard link (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 		
-		#there are situations where the rsync don't know yet the target of a hardlink, so we need to label it to run again later
+		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take are of it
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
 
 		echo Is something else
@@ -163,9 +160,9 @@ backup(){
 	remove_postpone_files
 }
 clean(){
-	BASE=$1
-	SRC="$1/./$2"
-	DST=$3
+	local BASE=$1
+	local SRC="$1/./$2"
+	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
 	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$SRC" "$DST" #clean deleted files
 }
@@ -179,51 +176,61 @@ wait4jobs(){
 		wait -n
 	done
 }
+
 MANIFEST=$RUNDIR/manifest.$$
 ENDFLAG=$RUNDIR/endflag.$$
-[[ -e $MANIFEST ]] || touch "$MANIFEST"
-[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
-(
-	let START=1
-	let LEN=500
-	SEGMENT=$RUNDIR/segment.$$
-	SEGFILES=$RUNDIR/segment-files.$$	
-	while true
-	do
-		set_postpone_files
-		let END=LEN+START-1
-		let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
-		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
-		(( CNT == 0 )) && sleep 1 && continue
-		(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-		update_file "$SEGMENT" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst"
-		update_file "$SEGMENT" "$BACKUPURL/$RID/@apply-manifest/data/$STARTDIR/manifest.lst"		
-		cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-		while IFS='|' read -r I FILE INK
+
+bg_upload_manifest(){	
+	local BASE="$1"
+	local STARTDIR="$2"
+	local DST="$3"
+	local TYPE=${DST##*/}
+	[[ -e $MANIFEST ]] || touch "$MANIFEST"
+	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
+
+	(	#start a subshell to run in background
+		let START=1
+		let LEN=500
+		SEGMENT=$RUNDIR/segment.$$
+		SEGFILES=$RUNDIR/segment-files.$$	
+		while true
 		do
-			echo miss "$I|$FILE|$LINK"
-			[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
-			[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
-			[[ $I =~ ^[.\<]f ]] && (
-				ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
-				[[ -n $ID ]] && update_file "$ROOT/$FILE" "$BACKUPURL/$RID/@by-id/$ID/data/$FILE"
-			)
-		done < <(dorsync --dry-run --archive --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$ROOT" "$BACKUPURL/$RID/@current/data")
-		update_hardlinks "$ROOT" "$BACKUPURL/$RID/@current/data"
-		update_dirs	"$ROOT" "$BACKUPURL/$RID/@current/data"
-		echo sent $CNT lines of manifest starting at $START
-		let START+=CNT
-	done
-	rm -fv "$ENDFLAG" "$SEGMENT" "$SEGFILES"
-	remove_postpone_files
-)&
+			set_postpone_files
+			let END=LEN+START-1
+			let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
+			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
+			(( CNT == 0 )) && sleep 1 && continue
+			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
+			update_file "$SEGMENT" "$BACKUPURL/$RID/@manifest/$TYPE/$STARTDIR/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RID/@apply-manifest/$TYPE/$STARTDIR/manifest.lst"		
+			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
+			while IFS='|' read -r I FILE INK
+			do
+				echo miss "$I|$FILE|$LINK"
+				[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
+				[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
+				[[ $I =~ ^[.\<]f ]] && (
+					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
+					[[ -n $ID ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
+				)
+			done < <(dorsync --dry-run --archive --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$BASE" "$DST")
+			update_hardlinks "$BASE" "$DST"
+			update_dirs	"$BASE" "$DST"
+			echo sent $CNT lines of manifest starting at $START
+			let START+=CNT
+		done
+		rm -fv "$ENDFLAG" "$SEGMENT" "$SEGFILES"
+		remove_postpone_files
+	)&
+}
+
+bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
+
 time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
 wait4jobs
 echo done $$
 exit
-time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 
-time update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst" && echo manifest applied
 
 time snapshot	&& echo snapshot done 
 

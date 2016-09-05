@@ -8,7 +8,7 @@ cd %~dp0
 
 for %%i in ("%~dp0..") do set "PARENT=%%~fi"
 
-set MODULES=awk,rsync,perl,xargs,ping,nc,util-linux,ntfsprogs
+set MODULES=awk,rsync,perl,xargs,ping,nc,util-linux,ntfsprogs,sqlite3
 
 set ARGS= -B -R %PARENT%\3rd-party\cygwin -d -N -n -X -q -s http://ftp.snt.utwente.nl/pub/software/cygwin/ -P %MODULES%
 

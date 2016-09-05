@@ -37,7 +37,7 @@ type rsync >/dev/null || die Cannot find rsync
 trap '' SIGPIPE
 
 dorsync(){
-	CNT=1000
+	RETRIES=1000
 	while true
 	do
 		rsync "$@" 2>&1 
@@ -60,7 +60,7 @@ dorsync(){
 				exit 1
 			;;
 		esac
-		(( --CNT < 0 )) && echo "I'm tired of trying" && break 
+		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break 
 	done
 }
 
@@ -71,13 +71,13 @@ HLIST=$RUNDIR/hl-list.$$
 DLIST=$RUNDIR/dir-list.$$
 
 
-clear_lists(){
+set_postpone_files(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"
 	exec 97>"$FLIST"
 }
-remove_lists(){
-	rm -rf "$HLIST" "$DLIST"
+remove_postpone_files(){
+	rm -rfv "$HLIST" "$DLIST" "$FLIST"
 }
 postpone_file(){ 
 	(IFS=$'\n' && echo "$*" ) >&97
@@ -99,6 +99,7 @@ OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
+FMT_QUERY3='--out-format=%i|%n'
 
 update_hardlinks(){
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
@@ -118,7 +119,7 @@ backup(){
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
 	TYPE=${DST##*/}
 	unset HLINK
-	clear_lists
+	set_postpone_files
 	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot find a hashfile
 	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
 	do
@@ -143,8 +144,8 @@ backup(){
 			}
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
-    ) && continue
-      #SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
+		) && continue
+			#SIZE=$(stat --format="%s" "$FULLPATH") && echo SIZE=$SIZE && continue
 			##HASH=$(sha512sum -b "postpone_file" | cut -d' ' -f1 | perl -lane '@a=split //,$F[0]; print join(q|/|,@a[0..3],$F[0])') &&
 			#update_file "$FULLPATH" "$BACKUPURL/$RID/@manifest/$HASH/$TYPE/$FILE" && continue 
 		
@@ -159,7 +160,7 @@ backup(){
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
 	update_hardlinks "$BASE" "$DST"
 	update_dirs	"$BASE" "$DST"
-	remove_lists
+	remove_postpone_files
 }
 clean(){
 	BASE=$1
@@ -184,24 +185,41 @@ ENDFLAG=$RUNDIR/endflag.$$
 [[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
 (
 	let START=1
-	let LEN=10
+	let LEN=500
 	SEGMENT=$RUNDIR/segment.$$
+	SEGFILES=$RUNDIR/segment-files.$$	
 	while true
 	do
+		set_postpone_files
 		let END=LEN+START-1
 		let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
 		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 		(( CNT == 0 )) && sleep 1 && continue
 		(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-		echo lines $CNT from $START
-		cat "$SEGMENT"
+		update_file "$SEGMENT" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst"
+		update_file "$SEGMENT" "$BACKUPURL/$RID/@apply-manifest/data/$STARTDIR/manifest.lst"		
+		cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
+		while IFS='|' read -r I FILE INK
+		do
+			echo miss "$I|$FILE|$LINK"
+			[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
+			[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
+			[[ $I =~ ^[.\<]f ]] && (
+				ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
+				[[ -n $ID ]] && update_file "$ROOT/$FILE" "$BACKUPURL/$RID/@by-id/$ID/data/$FILE"
+			)
+		done < <(dorsync --dry-run --archive --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$ROOT" "$BACKUPURL/$RID/@current/data")
+		update_hardlinks "$ROOT" "$BACKUPURL/$RID/@current/data"
+		update_dirs	"$ROOT" "$BACKUPURL/$RID/@current/data"
+		echo sent $CNT lines of manifest starting at $START
 		let START+=CNT
 	done
-	rm -fv "$ENDFLAG" "$SEGMENT"
+	rm -fv "$ENDFLAG" "$SEGMENT" "$SEGFILES"
+	remove_postpone_files
 )&
-time (bash $SDIR/hash.sh -f "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
+time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
-timeout -k 1m 6h wait4jobs
+wait4jobs
 echo done $$
 exit
 time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 

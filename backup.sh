@@ -190,8 +190,9 @@ ENDFLAG=$RUNDIR/endflag.$$
 	do
 		let END=LEN+START-1
 		let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
-		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && echo exit with cnt=$CNT && break
+		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 		(( CNT == 0 )) && sleep 1 && continue
+		(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
 		echo lines $CNT from $START
 		cat "$SEGMENT"
 		let START+=CNT
@@ -200,8 +201,8 @@ ENDFLAG=$RUNDIR/endflag.$$
 )&
 time (bash $SDIR/hash.sh -f "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
-wait4jobs
-echo done
+timeout -k 1m 6h wait4jobs
+echo done $$
 exit
 time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 
 time update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst" && echo manifest applied

@@ -190,10 +190,10 @@ ENDFLAG=$RUNDIR/endflag.$$
 	do
 		let END=LEN+START-1
 		let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
-		echo lines $CNT from $START
-		cat "$SEGMENT"
 		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && echo exit with cnt=$CNT && break
 		(( CNT == 0 )) && sleep 1 && continue
+		echo lines $CNT from $START
+		cat "$SEGMENT"
 		let START+=CNT
 	done
 	rm -fv "$ENDFLAG" "$SEGMENT"

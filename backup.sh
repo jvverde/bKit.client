@@ -179,20 +179,29 @@ wait4jobs(){
 	done
 }
 MANIFEST=$RUNDIR/manifest.$$
+ENDFLAG=$RUNDIR/endflag.$$
 [[ -e $MANIFEST ]] || touch "$MANIFEST"
-
-	tail -n +1 --follow=name --pid=$$ "$MANIFEST"|{
-		let cnt=0
-		SEGMENT=$RUNDIR/segment.$$
-		while IFS='|' read -r LINE
-		do
-			echo LINE $LINE
-			((++cnt>10)) && echo enviar segmento && let cnt=0
-		done
-	}&
-	
-time (bash $SDIR/hash.sh -f "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' | tee "$MANIFEST") && echo got hashes 
-
+[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
+(
+	let START=1
+	let LEN=10
+	SEGMENT=$RUNDIR/segment.$$
+	while true
+	do
+		let END=LEN+START-1
+		let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
+		echo lines $CNT from $START
+		cat "$SEGMENT"
+		(( CNT == 0 )) && [[ -e $ENDFLAG ]] && echo exit with cnt=$CNT && break
+		(( CNT == 0 )) && sleep 1 && continue
+		let START+=CNT
+	done
+	rm -fv "$ENDFLAG" "$SEGMENT"
+)&
+time (bash $SDIR/hash.sh -f "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
+touch "$ENDFLAG"
+wait4jobs
+echo done
 exit
 time update_file "$MANIFEST" "$BACKUPURL/$RID/@manifest/data/$STARTDIR/manifest.lst" && echo sent manifest 
 time update_file "$MANIFEST" "$BACKUPURL/$RID/apply-manifest/data/$STARTDIR/manifest.lst" && echo manifest applied

@@ -187,6 +187,7 @@ bg_upload_manifest(){
 	local TYPE=${DST##*/}
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
 	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
+	set_postpone_files
 
 	(	#start a subshell to run in background
 		let START=1
@@ -195,7 +196,6 @@ bg_upload_manifest(){
 		SEGFILES=$RUNDIR/segment-files.$$	
 		while true
 		do
-			set_postpone_files
 			let END=LEN+START-1
 			let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
@@ -214,13 +214,10 @@ bg_upload_manifest(){
 					[[ -n $ID ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
 				)
 			done < <(dorsync --dry-run --archive --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$BASE" "$DST")
-			update_hardlinks "$BASE" "$DST"
-			update_dirs	"$BASE" "$DST"
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
 		rm -fv "$ENDFLAG" "$SEGMENT" "$SEGFILES"
-		remove_postpone_files
 	)&
 }
 
@@ -229,6 +226,8 @@ bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
 wait4jobs
+#update_hardlinks "$ROOT" "$BACKUPURL/$RID/@current/data"
+#update_dirs	"$ROOT" "$BACKUPURL/$RID/@current/data"
 echo done $$
 exit
 

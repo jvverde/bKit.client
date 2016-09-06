@@ -206,7 +206,7 @@ bg_upload_manifest(){
 			while IFS='|' read -r I FILE
 			do
 				echo miss "$I|$FILE"
-				[[ $I =~ ^[.\<]f ]] && (
+				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else in this phase
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
 					[[ -n $ID ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
 				)

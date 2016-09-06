@@ -41,7 +41,7 @@ dorsync(){
 	while true
 	do
 		rsync "$@" 2>&1 
-		ret=$?
+		local ret=$?
 		case $ret in
 			0) break 									#this is a success
 			;;
@@ -187,7 +187,6 @@ bg_upload_manifest(){
 	local TYPE=${DST##*/}
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
 	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
-	set_postpone_files
 
 	(	#start a subshell to run in background
 		let START=1
@@ -204,11 +203,9 @@ bg_upload_manifest(){
 			update_file "$SEGMENT" "$BACKUPURL/$RID/@manifest/$TYPE/$STARTDIR/manifest.lst"
 			update_file "$SEGMENT" "$BACKUPURL/$RID/@apply-manifest/$TYPE/$STARTDIR/manifest.lst"		
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-			while IFS='|' read -r I FILE INK
+			while IFS='|' read -r I FILE
 			do
-				echo miss "$I|$FILE|$LINK"
-				[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
-				[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
+				echo miss "$I|$FILE"
 				[[ $I =~ ^[.\<]f ]] && (
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
 					[[ -n $ID ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
@@ -226,8 +223,6 @@ bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
 wait4jobs
-#update_hardlinks "$ROOT" "$BACKUPURL/$RID/@current/data"
-#update_dirs	"$ROOT" "$BACKUPURL/$RID/@current/data"
 echo done $$
 exit
 

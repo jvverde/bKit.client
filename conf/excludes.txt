@@ -13,19 +13,19 @@ $Recycle.Bin
 CVS/
 core
 /MSOCache/
-All Users/Application Data/Microsoft/Search
-All Users/Application Data/Microsoft Help
-All Users/Application Data/Microsoft/HelpLibrary
-All Users/Application Data/Microsoft/Windows Defender
-All Users/Application Data/Apple Computer/Installer Cache
-All Users/Application Data/Apple/Installer Cache
-/ProgramData/Application Data/Microsoft/Search
-/ProgramData/Application Data/Microsoft Help
-/ProgramData/Application Data/Microsoft/HelpLibrary
-/ProgramData/Application Data/Microsoft/Windows Defender
-/ProgramData/Application Data/Apple Computer/Installer Cache
-/ProgramData/Application Data/Apple/Installer Cache
-Application Data/**/Cache
+All Users/*/Microsoft/Search
+All Users/*/Microsoft Help
+All Users/*/Microsoft/HelpLibrary
+All Users/*/Microsoft/Windows Defender
+All Users/*/Apple Computer/Installer Cache
+All Users/*/Apple/Installer Cache
+/ProgramData/*/Microsoft/Search
+/ProgramData/*/Microsoft Help
+/ProgramData/*/Microsoft/HelpLibrary
+/ProgramData/*/Microsoft/Windows Defender
+/ProgramData/*/Apple Computer/Installer Cache
+/ProgramData/*/Apple/Installer Cache
+**/Cache
 
 AppData/Local/Microsoft/Windows/WER/ReportArchive
 
@@ -34,13 +34,13 @@ AppData/Local/Microsoft/Windows/WER/ReportArchive
 */AppData/Local/Temp
 */Local Settings/Temp
 AppData/Local/IconCache.db
-Documents and Settings/*/Application Data/Sun/Java/Deployment/cache
+Documents and Settings/*/*/Sun/Java/Deployment/cache
 Documents and Settings/*/Cookies
 Documents and Settings/*/History
 Documents and Settings/*/Local Settings/Temp
 Documents and Settings/*/Local Settings/Temporary Internet Files
 Documents and Settings/*/Recent
-Local Settings/Application Data/IconCache.db
+Local Settings/*/IconCache.db
 RECYCLER/
 System32/LogFiles/
 Users/*/AppData/*/Microsoft/Windows/Recent Items

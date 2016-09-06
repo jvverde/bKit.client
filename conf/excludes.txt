@@ -3,6 +3,7 @@ $RECYCLE.BIN
 $Recycle.Bin
 *.dmp
 *.tmp
+*.log
 */AppData/Local/Microsoft/Windows/INetCache
 */AppData/Local/Microsoft/Windows/Temporary Internet Files
 */AppData/Local/Temp

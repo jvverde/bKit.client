@@ -2,6 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" 2>&1 && shift
+[[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
 
 BACKUPDIR="$1"
 
@@ -203,11 +204,11 @@ bg_upload_manifest(){
 			while IFS='|' read -r I FILE
 			do
 				echo miss "$I|$FILE"
-				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else in this phase
+				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else, in this phase
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
 					[[ -n $ID ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
 				)
-			done < <(dorsync --dry-run --archive --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$BASE" "$DST")
+			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $PERM $PASS $EXC $FMT_QUERY3 "$BASE" "$DST")
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
@@ -217,7 +218,7 @@ bg_upload_manifest(){
 
 bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
-time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
+time (bash $SDIR/hash.sh $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
 wait4jobs
 

@@ -12,6 +12,20 @@ $Recycle.Bin
 .svn/
 CVS/
 core
+/MSOCache/
+All Users/Application Data/Microsoft/Search
+All Users/Application Data/Microsoft Help
+All Users/Application Data/Microsoft/HelpLibrary
+All Users/Application Data/Microsoft/Windows Defender
+All Users/Application Data/Apple Computer/Installer Cache
+All Users/Application Data/Apple/Installer Cache
+/ProgramData/Application Data/Microsoft/Search
+/ProgramData/Application Data/Microsoft Help
+/ProgramData/Application Data/Microsoft/HelpLibrary
+/ProgramData/Application Data/Microsoft/Windows Defender
+/ProgramData/Application Data/Apple Computer/Installer Cache
+/ProgramData/Application Data/Apple/Installer Cache
+Application Data/**/Cache
 
 */AppData/Local/Microsoft/Windows/INetCache
 */AppData/Local/Microsoft/Windows/Temporary Internet Files

@@ -35,7 +35,7 @@ touch "$INITTIME"
 EXC=$( 
 	[[ -n $EXCUDELIST ]] || EXCUDELIST="$SDIR/conf/excludes.txt"
 	[[ -f $EXCUDELIST ]] && cat $EXCUDELIST|
-	sed -e /^#/d -e 's/ /?/g'|
+	sed -E '/^#/d;/^\s*$/d;s/ /?/g'|
 	sed -E "
 		/^[^/]*$/{s%%-name '&'%p;d}									
 		/^([^/]*)[/]$/{s%%-name '\1' -type d%p;d}
@@ -62,7 +62,7 @@ xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/'|
 while IFS='|' read -r HASH FILE
 do
 	echo "$HASH|$(stat -c '%s|%Y' "$FILE")|$FILE"
-done | tee "$NEW"
+done | sed -n '/^[^|]*[|][^|]*[|][^|]*[|][^|]*$/p'|tee "$NEW"
 
 exists sqlite3 || die Cannot fine sqlite3
 {

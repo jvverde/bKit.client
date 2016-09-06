@@ -1,9 +1,18 @@
 System Volume Information
 $RECYCLE.BIN
 $Recycle.Bin
+*.old
+*.bak
+*.BAK
+*.obj
 *.dmp
 *.tmp
 *.log
+.git/
+.svn/
+CVS/
+core
+
 */AppData/Local/Microsoft/Windows/INetCache
 */AppData/Local/Microsoft/Windows/Temporary Internet Files
 */AppData/Local/Temp

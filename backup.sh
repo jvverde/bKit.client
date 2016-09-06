@@ -89,16 +89,14 @@ postpone_update(){
 	(IFS=$'\n' && echo "$*" ) >&98
 }
 
-#FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-#FOPTIONS=" --stats --fuzzy"
 CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
-FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l|%M'
+FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
 FMT_QUERY3='--out-format=%i|%n'
 
 update_hardlinks(){
@@ -121,7 +119,7 @@ backup(){
 	unset HLINK
 	set_postpone_files
 	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot find a hashfile
-	while IFS='|' read -r I FILE LINK FULLPATH LEN MODIFICATION
+	while IFS='|' read -r I FILE LINK FULLPATH LEN
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
 		
@@ -160,7 +158,6 @@ backup(){
 	remove_postpone_files
 }
 clean(){
-	local BASE=$1
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
@@ -223,10 +220,6 @@ bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 time (bash $SDIR/hash.sh "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got hashes 
 touch "$ENDFLAG"
 wait4jobs
-echo done $$
-exit
-
-time snapshot	&& echo snapshot done 
 
 time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
@@ -239,5 +232,7 @@ time ("$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && 
 time backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" &&	echo backup metadata done
 
 time clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" && echo clean deleted metadata files
+
+time snapshot	&& echo snapshot done 
  
 echo Backup of $BACKUPDIR done at $(date -R)

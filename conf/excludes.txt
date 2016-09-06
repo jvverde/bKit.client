@@ -27,6 +27,8 @@ All Users/Application Data/Apple/Installer Cache
 /ProgramData/Application Data/Apple/Installer Cache
 Application Data/**/Cache
 
+AppData/Local/Microsoft/Windows/WER/ReportArchive
+
 */AppData/Local/Microsoft/Windows/INetCache
 */AppData/Local/Microsoft/Windows/Temporary Internet Files
 */AppData/Local/Temp

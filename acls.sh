@@ -32,46 +32,43 @@ RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 ACLSDIR="$SDIR/cache/metadata/$RID/$BPATH"
 mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
-SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print | head -n 1)
+SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
 acldir(){
-	WSPATH=$(cygpath -w "$1")
-	WACLSFILE=$(cygpath -w "$2")	
-	WSIDSFILE=$(cygpath -w "$3")
+	local WSPATH=$(cygpath -w "$1")
+	local WACLSFILE=$(cygpath -w "$2")	
+	local WSIDSFILE=$(cygpath -w "$3")
 	$SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="WSIDSFILE" /file "$WSPATH"
 }
 aclfiles(){
-	WSPATH=$(cygpath -w "$1")
-	WACLSFILE=$(cygpath -w "$2")	
-	WSIDSFILE=$(cygpath -w "$3")
+	local WSPATH=$(cygpath -w "$1")
+	local WACLSFILE=$(cygpath -w "$2")	
+	local WSIDSFILE=$(cygpath -w "$3")
 	$SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="WSIDSFILE" /file "$WSPATH\\*"
 }
 
 THISFLAG="$ACLSDIR/.this.flag.f"
 
-test -n "$(find "$THISFLAG" -mtime -1)" && echo "Is too soon to check it again" && exit 
+[[ -z $FORCE && -n "$(find "$THISFLAG" -mtime -1)" ]] && echo "Is too soon to check it again" && exit 
 
 SYSTEMUSERS="$ACLSDIR/.bkit.users.f"
 doalarm 5 wmic useraccount get > "$SYSTEMUSERS"
 
 THISACL="$ACLSDIR/.bkit.this.acls.f"
 
-[[ -e $THISACL ]] || acldir "$BACKUPDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
-
-test -n "$(find "$BACKUPDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" && 
+[[ ! -e $THISACL || -n "$(find "$BACKUPDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" ]] && 
 	acldir "$BACKUPDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
 	
 find "$BUDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
 while read -r DIR
 do
 	SPATH="$BUDIR/$DIR"
-	echo Check $SPATH
+	#echo Check $SPATH
 	DPATH="$ACLSDIR/$DIR"
-	mkdir -pv "$DPATH" || continue
+	[[ -d "$DPATH" ]] || mkdir -pv "$DPATH" || continue
 	ACLSFILE="$DPATH/.bkit.acls.f"
-	[[ -e "$ACLSFILE" ]] || aclfiles "$SPATH" "$ACLSFILE" "$DPATH/.bkit.this.sids.f"
-	test -n "$(find "$SPATH" -maxdepth 1 -mindepth 1 -newercm "$ACLSFILE" -print -quit)" &&
+	[[ ! -e "$ACLSFILE" || -n "$(find "$SPATH" -maxdepth 1 -mindepth 1 -newercm "$ACLSFILE" -print -quit)" ]] &&
 		aclfiles "$SPATH" "$ACLSFILE" "$DPATH/.bkit.this.sids.f"
 done
 

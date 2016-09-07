@@ -206,7 +206,7 @@ bg_upload_manifest(){
 				echo miss "$I|$FILE"
 				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else, in this phase
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
-					[[ -n $ID && $ID =~ /././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
+					[[ -n $ID && $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
 				)
 			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $PASS $FMT_QUERY3 "$BASE" "$DST")
 			echo sent $CNT lines of manifest starting at $START

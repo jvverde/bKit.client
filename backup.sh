@@ -138,13 +138,14 @@ backup(){
 			[[ -e $HASHDB ]] && IFS='|' read HASH TIME < <(
 				sqlite3 "$HASHDB" "SELECT hash,time FROM H WHERE filename='$FILE'"
 			)
-			CTIME=$(stat -c "%Y" "$FULLPATH")
+			CTIME=$(stat -c "%Y" "$FULLPATH") || echo unable to get stat of file $FULLPATH
 			#check if we need to compute a HASH
-			[[ -z $HASH || -z $TIME || (($CTIME > $TIME )) ]] && {
+			[[ -z $HASH || -z $TIME || -z $CTIME || (($CTIME > $TIME )) ]] && {
 				HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
 				[[ -e $HASHDB ]] && sqlite3 "$HASHDB" "INSERT OR REPLACE INTO H ('hash','size','time','filename') VALUES ('$HASH','$LEN','$CTIME','$FILE');"
 			}
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
+			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix $PREFIX !~ ././././././" && exit;}
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
 		) && continue
 		
@@ -209,7 +210,7 @@ bg_upload_manifest(){
 				echo miss "$I|$FILE"
 				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else, in this phase
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
-					[[ -n $ID && $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
+					[[ $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
 				)
 			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $EXC $PASS $FMT_QUERY3 "$BASE" "$DST")
 			echo sent $CNT lines of manifest starting at $START

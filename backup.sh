@@ -28,7 +28,7 @@ FULLPATHDIR="$ROOT/$STARTDIR"
 . $SDIR/drive.sh $DRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
-METADATADIR=$SDIR/cache/metadata/$RID
+METADATADIR=$SDIR/cache/metadata/by-volume/$VOLUMESERIALNUMBER
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
@@ -116,7 +116,7 @@ backup(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	local HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || return 1
+	local HASHDB=$(bash $SDIR/hash.sh -b "$SRC")
 	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
@@ -134,12 +134,14 @@ backup(){
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
-			IFS='|' read HASH TIME < <(sqlite3 "$HASHDB" "SELECT hash,time FROM H WHERE filename='$FILE'")
+			[[ -e $HASHDB ]] && IFS='|' read HASH TIME < <(
+				sqlite3 "$HASHDB" "SELECT hash,time FROM H WHERE filename='$FILE'"
+			)
 			CTIME=$(stat -c "%Y" "$FULLPATH")
 			#check if we need to compute a HASH
 			[[ -z $HASH || -z $TIME || (($CTIME > $TIME )) ]] && {
 				HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
-				sqlite3 "$HASHDB" "INSERT OR REPLACE INTO H ('hash','size','time','filename') VALUES ('$HASH','$LEN','$CTIME','$FILE');"
+				[[ -e $HASHDB ]] && sqlite3 "$HASHDB" "INSERT OR REPLACE INTO H ('hash','size','time','filename') VALUES ('$HASH','$LEN','$CTIME','$FILE');"
 			}
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
@@ -212,31 +214,34 @@ bg_upload_manifest(){
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
-		rm -fv "$ENDFLAG" "$SEGMENT" "$SEGFILES"
+		rm -fv "$SEGMENT" "$SEGFILES"
 	)&
 }
 
 bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
-time (bash $SDIR/hash.sh $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+echo Start to backup $FULLPATHDIR
+
+time (bash "$SDIR/hash.sh" $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
 touch "$ENDFLAG"
 wait4jobs
+rm -fv "$MANIFEST" "$ENDFLAG"
 
 time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
-time ( [[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
+[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks
 
 time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-time ("$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
+time (bash "$SDIR/acls.sh" "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
 
 time (
 	cd "$METADATADIR"
-	TARDIR=".tar/$STARTDIR"
+	PACKDIR=".tar/$STARTDIR"
 	SRCDIR=".bkit/$STARTDIR"
-	[[ -d $TARDIR ]] || mkdir -p "$TARDIR"
-	tar --update --file "$TARDIR/dir.tar" -v "$SRCDIR"
-	update_file "$METADATADIR/./$TARDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata/"
+	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
+	tar --update --file "$PACKDIR/dir.tar" -v "$SRCDIR"
+	backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata"
 ) && echo Metadata tar sent to backup
 
 time snapshot && echo snapshot done 

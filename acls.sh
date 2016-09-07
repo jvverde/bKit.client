@@ -7,16 +7,13 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 BACKUPDIR="$1"
 
 die() { echo -e "$@"; exit 1; }
-doalarm(){ perl -e 'alarm shift; exec @ARGV' -- "$@";}
-
-
 
 [[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir"
 
-BUDIR=$(cygpath "$BACKUPDIR")
+STARTDIR=$(cygpath "$BACKUPDIR")
 
 echo Check acls for $BACKUPDIR
-[[ -d "$BUDIR" ]] || die "The directory $BACKUPDIR ($BUDIR)doesn't exist"
+[[ -d "$STARTDIR" ]] || die "The directory $BACKUPDIR ($STARTDIR)doesn't exist"
 
 DRIVE=${BACKUPDIR%%:*}
 DRIVE=${DRIVE^^}
@@ -25,11 +22,10 @@ BPATH=${BPATH#*\\}    #remove anything until character '\' inclusive
 BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
 
 . $SDIR/drive.sh
-RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM/.bkit/"
 
 [[ $FILESYSTEM == 'NTFS' ]] || die Not a NTFS file system: $FILESYSTEM
 
-ACLSDIR="$SDIR/cache/metadata/$RID/$BPATH"
+ACLSDIR="$SDIR/cache/metadata/by-volume/$VOLUMESERIALNUMBER/.bkit/$BPATH"
 mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
@@ -50,21 +46,20 @@ aclfiles(){
 
 THISFLAG="$ACLSDIR/.this.flag.f"
 
-[[ -z $FORCE && -n "$(find "$THISFLAG" -mtime -1)" ]] && echo "Is too soon to check it again" && exit 
+[[ -z $FORCE && -e "$THISFLAG" && -n "$(find "$THISFLAG" -mtime -1)" ]] && echo "Is too soon to check it again" && exit 
 
 SYSTEMUSERS="$ACLSDIR/.bkit.users.f"
-doalarm 5 wmic useraccount get > "$SYSTEMUSERS"
+timeout -k 1m 1m wmic useraccount get > "$SYSTEMUSERS"
 
 THISACL="$ACLSDIR/.bkit.this.acls.f"
 
 [[ ! -e $THISACL || -n "$(find "$BACKUPDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" ]] && 
 	acldir "$BACKUPDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
 	
-find "$BUDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
+find "$STARTDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
 while read -r DIR
 do
-	SPATH="$BUDIR/$DIR"
-	#echo Check $SPATH
+	SPATH="$STARTDIR/$DIR"
 	DPATH="$ACLSDIR/$DIR"
 	[[ -d "$DPATH" ]] || mkdir -pv "$DPATH" || continue
 	ACLSFILE="$DPATH/.bkit.acls.f"

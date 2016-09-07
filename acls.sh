@@ -1,31 +1,22 @@
 #!/bin/bash
+die() { echo -e "$@"; exit 1; }
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
+
+type cygpath >/dev/null 2>&1 || die Cannot found cygpath
+
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
 [[ $1 == '-f' ]] && FORCE=true && shift
 
-BACKUPDIR="$1"
 
-die() { echo -e "$@"; exit 1; }
+STARTDIR=$(cygpath "$1")
+ACLSDIR=$(cygpath "$2")
 
-[[ $BACKUPDIR =~ ^[a-zA-Z]: ]]  || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir"
+[[ -d $STARTDIR ]]  || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir DestinationDir"
+[[ -n $ACLSDIR ]] || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir DestinationDir"
 
-STARTDIR=$(cygpath "$BACKUPDIR")
+echo Check acls for $STARTDIR
 
-echo Check acls for $BACKUPDIR
-[[ -d "$STARTDIR" ]] || die "The directory $BACKUPDIR ($STARTDIR)doesn't exist"
-
-DRIVE=${BACKUPDIR%%:*}
-DRIVE=${DRIVE^^}
-BPATH=${BACKUPDIR#*:} #remove anything until character ':' inclusive
-BPATH=${BPATH#*\\}    #remove anything until character '\' inclusive
-BPATH=${BPATH%%\\}    #remove last, if exist, character '\'
-
-. $SDIR/drive.sh
-
-[[ $FILESYSTEM == 'NTFS' ]] || die Not a NTFS file system: $FILESYSTEM
-
-ACLSDIR="$SDIR/cache/metadata/by-volume/$VOLUMESERIALNUMBER/.bkit/$BPATH"
 mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
@@ -53,8 +44,8 @@ timeout -k 1m 1m wmic useraccount get > "$SYSTEMUSERS"
 
 THISACL="$ACLSDIR/.bkit.this.acls.f"
 
-[[ ! -e $THISACL || -n "$(find "$BACKUPDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" ]] && 
-	acldir "$BACKUPDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
+[[ ! -e $THISACL || -n "$(find "$STARTDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" ]] && 
+	acldir "$STARTDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
 	
 find "$STARTDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
 while read -r DIR
@@ -68,4 +59,4 @@ do
 done
 
 touch "$THISFLAG"
-echo ACLS done for $BACKUPDIR 
+echo ACLS done for $STARTDIR 

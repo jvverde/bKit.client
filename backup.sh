@@ -216,26 +216,36 @@ bg_upload_manifest(){
 	)&
 }
 
-bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
+# bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
-time (bash $SDIR/hash.sh $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
-touch "$ENDFLAG"
-wait4jobs
+# time (bash $SDIR/hash.sh $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+# touch "$ENDFLAG"
+# wait4jobs
 
-time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
+# time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
-time ([[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
+# time ( [[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
 
-time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
+# time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-time ("$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
+time ("$SDIR"/acls.sh -f "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
 
-time (bash $SDIR/hash.sh $FSW "$METADATADIR/.bkit/$STARTDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got metadata hashes 
+time (
+	cd "$METADATADIR"
+	TARDIR=".tar/$STARTDIR"
+	SRCDIR=".bkit/$STARTDIR"
+	[[ -d $TARDIR ]] || mkdir -p "$TARDIR"
+	tar --update --file "$TARDIR/dir.tar" -v "$SRCDIR"
+	update_file "$METADATADIR/./$TARDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata/"
+)
+exit
+	
+#time (bash $SDIR/hash.sh $FSW "$METADATADIR/.bkit/$STARTDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got metadata hashes 
 
-time backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" &&	echo backup metadata done
+#time backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" &&	echo backup metadata done
 
-time clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" && echo clean deleted metadata files
+#time clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" && echo clean deleted metadata files
 
-time snapshot	&& echo snapshot done 
+time snapshot && echo snapshot done 
  
 echo Backup of $BACKUPDIR done at $(date -R)

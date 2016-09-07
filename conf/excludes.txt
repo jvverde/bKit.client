@@ -19,13 +19,13 @@ All Users/*/Microsoft/HelpLibrary
 All Users/*/Microsoft/Windows Defender
 All Users/*/Apple Computer/Installer Cache
 All Users/*/Apple/Installer Cache
-/ProgramData/*/Microsoft/Search
-/ProgramData/*/Microsoft Help
-/ProgramData/*/Microsoft/HelpLibrary
-/ProgramData/*/Microsoft/Windows Defender
-/ProgramData/*/Apple Computer/Installer Cache
-/ProgramData/*/Apple/Installer Cache
-**/Cache
+ProgramData/*/Microsoft/Search
+ProgramData/*/Microsoft Help
+ProgramData/*/Microsoft/HelpLibrary
+ProgramData/*/Microsoft/Windows Defender
+ProgramData/*/Apple Computer/Installer Cache
+ProgramData/*/Apple/Installer Cache
+ProgramData/**/Cache
 
 AppData/Local/Microsoft/Windows/WER/ReportArchive
 
@@ -34,7 +34,7 @@ AppData/Local/Microsoft/Windows/WER/ReportArchive
 */AppData/Local/Temp
 */Local Settings/Temp
 AppData/Local/IconCache.db
-Documents and Settings/*/*/Sun/Java/Deployment/cache
+Documents and Settings/**/Sun/Java/Deployment/cache
 Documents and Settings/*/Cookies
 Documents and Settings/*/History
 Documents and Settings/*/Local Settings/Temp
@@ -48,17 +48,13 @@ Users/*/AppData/Local/Microsoft/Windows/History
 Users/*/AppData/Local/Microsoft/Windows/History/Low
 Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files  
 Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files/Low
-Users/*/AppData/Local/Temp
-Users/*/AppData/Local/Temp/Low
 Users/*/AppData/Local/Low/Sun/Java/Deployment/cache
 Users/*/AppData/Local/Low/Temp
 Users/*/AppData/Roaming/Microsoft/Windows/Recent  
-Windows/Logs/
 Windows/Prefetch/
 WINDOWS/Prefetch/
 Windows/ShellIconCache
 Windows/SoftwareDistribution/Download
-Windows/Temp/
 hiberfil.sys
 iobw.tst
 pagefile.sys
@@ -76,4 +72,5 @@ logs/
 .cpan/
 .cpanm/
 .npm/
+Downloads/
 *.ost

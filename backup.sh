@@ -208,7 +208,7 @@ bg_upload_manifest(){
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
 					[[ -n $ID && $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
 				)
-			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $PASS $FMT_QUERY3 "$BASE" "$DST")
+			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $EXC $PASS $FMT_QUERY3 "$BASE" "$DST")
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done

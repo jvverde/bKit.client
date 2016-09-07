@@ -224,10 +224,14 @@ bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
 echo Start to backup $FULLPATHDIR
 
+echo Phase 1 - compute ids for new files and backup already server existing files
+
 time (bash "$SDIR/hash.sh" $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
 touch "$ENDFLAG"
 wait4jobs
 rm -fv "$MANIFEST" "$ENDFLAG"
+
+echo Phase 2 - backup everything includind attributes and acls
 
 time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
@@ -235,12 +239,11 @@ time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup d
 
 time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-time (bash "$SDIR/acls.sh" "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
-
-time (
+[[ $FILESYSTEM == 'NTFS' ]] && time (
+	SRCDIR=".bkit/$STARTDIR"
+	bash "$SDIR/acls.sh" "$BACKUPDIR" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
 	cd "$METADATADIR"
 	PACKDIR=".tar/$STARTDIR"
-	SRCDIR=".bkit/$STARTDIR"
 	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
 	tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
 	backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata"

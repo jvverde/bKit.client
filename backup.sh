@@ -116,10 +116,10 @@ backup(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
+	local HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || return 1
 	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
-	HASHDB=$(bash $SDIR/hash.sh -b "$SRC") || die Cannot find a hashfile
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -216,19 +216,19 @@ bg_upload_manifest(){
 	)&
 }
 
-# bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
+bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
-# time (bash $SDIR/hash.sh $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
-# touch "$ENDFLAG"
-# wait4jobs
+time (bash $SDIR/hash.sh $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+touch "$ENDFLAG"
+wait4jobs
 
-# time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
+time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
 
-# time ( [[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
+time ( [[ -n $HLINK ]] && backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks)
 
-# time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
+time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-time ("$SDIR"/acls.sh -f "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
+time ("$SDIR"/acls.sh "$BACKUPDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {}) && echo got ACLS
 
 time (
 	cd "$METADATADIR"
@@ -237,14 +237,7 @@ time (
 	[[ -d $TARDIR ]] || mkdir -p "$TARDIR"
 	tar --update --file "$TARDIR/dir.tar" -v "$SRCDIR"
 	update_file "$METADATADIR/./$TARDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata/"
-)
-exit
-	
-#time (bash $SDIR/hash.sh $FSW "$METADATADIR/.bkit/$STARTDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got metadata hashes 
-
-#time backup "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" &&	echo backup metadata done
-
-#time clean "$METADATADIR" ".bkit/$STARTDIR" "$BACKUPURL/$RID/@current/metadata" && echo clean deleted metadata files
+) && echo Metadata tar sent to backup
 
 time snapshot && echo snapshot done 
  

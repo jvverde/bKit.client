@@ -14,7 +14,7 @@ DIR="${FULLPATH#$MOUNT}"
 DIR="${DIR#/}"
 
 DEV=$(fgrep $MOUNT /proc/mounts | cut -d' ' -f1)
-. ./drive.sh $DEV || die Cannot execute drive.sh $DEV
+. "$SDIR/drive.sh" $DEV || die Cannot execute drive.sh $DEV
 
 CACHE="$SDIR/cache/hashes/by-volume/$VOLUMESERIALNUMBER/$DIR"
 MARK="$CACHE/.marktime"

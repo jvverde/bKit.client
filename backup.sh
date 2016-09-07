@@ -25,7 +25,7 @@ FULLPATHDIR="$ROOT/$STARTDIR"
 
 [[ -d "$FULLPATHDIR" ]] || die "The mapped directory $FULLPATHDIR doesn't exist"
 
-. $SDIR/drive.sh $DRIVE
+. "$SDIR/drive.sh" $DRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 METADATADIR=$SDIR/cache/metadata/by-volume/$VOLUMESERIALNUMBER
@@ -240,7 +240,7 @@ time (
 	PACKDIR=".tar/$STARTDIR"
 	SRCDIR=".bkit/$STARTDIR"
 	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
-	tar --update --file "$PACKDIR/dir.tar" -v "$SRCDIR"
+	tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
 	backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata"
 ) && echo Metadata tar sent to backup
 

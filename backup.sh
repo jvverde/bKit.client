@@ -95,7 +95,8 @@ EXC="--exclude-from=$SDIR/conf/excludes.txt"
 PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-CLEAN=" --delete --force --delete-excluded --ignore-non-existing --ignore-existing"
+CLEAN="--delete --force --delete-excluded --ignore-non-existing --ignore-existing"
+#CLEAN="--delete --force --delete-excluded"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
 FMT_QUERY3='--out-format=%i|%n'
@@ -164,7 +165,7 @@ clean(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	dorsync -riHDR $CLEAN $PERM $PASS $FMT "$SRC" "$DST" #clean deleted files
+	dorsync -riHDR $CLEAN $PERM $PASS $FMT $EXC  "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"

@@ -13,19 +13,19 @@ $Recycle.Bin
 CVS/
 core
 /MSOCache/
-All Users/*/Microsoft/Search
-All Users/*/Microsoft Help
-All Users/*/Microsoft/HelpLibrary
-All Users/*/Microsoft/Windows Defender
-All Users/*/Apple Computer/Installer Cache
-All Users/*/Apple/Installer Cache
-ProgramData/*/Microsoft/Search
-ProgramData/*/Microsoft Help
-ProgramData/*/Microsoft/HelpLibrary
-ProgramData/*/Microsoft/Windows Defender
-ProgramData/*/Apple Computer/Installer Cache
-ProgramData/*/Apple/Installer Cache
-ProgramData/**/Cache
+All Users/*/Microsoft/Search/*
+All Users/*/Microsoft Help/*
+All Users/*/Microsoft/HelpLibrary/*
+All Users/*/Microsoft/Windows Defender/*
+All Users/*/Apple Computer/Installer Cache/*
+All Users/*/Apple/Installer Cache/*
+ProgramData/*/Microsoft/Search/*
+ProgramData/*/Microsoft Help/*
+ProgramData/*/Microsoft/HelpLibrary/*
+ProgramData/*/Microsoft/Windows Defender/*
+ProgramData/*/Apple Computer/Installer Cache/*
+ProgramData/*/Apple/Installer Cache/*
+ProgramData/**/Cache/*
 AppData/Local/Microsoft/Windows/WER/ReportArchive
 */AppData/Local/Microsoft/Windows/INetCache/*
 */AppData/Local/Microsoft/Windows/Temporary Internet Files/*
@@ -47,7 +47,7 @@ Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files/
 Users/*/AppData/Local/Low/Sun/Java/Deployment/cache/*
 Users/*/AppData/Local/Low/Temp/*
 Users/*/AppData/Roaming/Microsoft/Windows/Recent/*  
-Windows/Prefetch/
+Windows/Prefetch/*
 Windows/ShellIconCache/*
 Windows/SoftwareDistribution/Download/*
 hiberfil.sys
@@ -69,5 +69,5 @@ logs/*
 .npm/*
 Downloads/*
 *.ost
-*/*Cache/
-*/*cache/
+*/*Cache/*
+*/*cache/*

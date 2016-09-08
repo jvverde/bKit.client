@@ -12,8 +12,8 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 STARTDIR=$(cygpath "$1")
 ACLSDIR=$(cygpath "$2")
 
-[[ -d $STARTDIR ]]  || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir DestinationDir"
-[[ -n $ACLSDIR ]] || die "\nUsage:\n\t$0 [-u|-f] Drive:\\full-path-of-backup-dir DestinationDir"
+[[ -d $STARTDIR ]]  || die "\nUsage:\n\t$0 [-u|-f] BackupDir DestinationDir"
+[[ -n $ACLSDIR ]] || die "\nUsage:\n\t$0 [-u|-f] BackupDir DestinationDir"
 
 echo Check acls for $STARTDIR
 

@@ -48,6 +48,7 @@ Users/*/AppData/Local/Low/Sun/Java/Deployment/cache/*
 Users/*/AppData/Local/Low/Temp/*
 Users/*/AppData/Roaming/Microsoft/Windows/Recent/*  
 Windows/Prefetch/*
+WINDOWS/Prefetch/*
 Windows/ShellIconCache/*
 Windows/SoftwareDistribution/Download/*
 hiberfil.sys

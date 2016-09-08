@@ -222,7 +222,7 @@ bg_upload_manifest(){
 
 bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
-echo Start to backup $FULLPATHDIR
+echo Start to backup $FULLPATHDIR at $(date -R)
 
 echo Phase 1 - compute ids for new files and backup already server existing files
 

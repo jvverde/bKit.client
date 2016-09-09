@@ -4,36 +4,43 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" 2>&1 && shift
 [[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
 
-BACKUPDIR="$1"
-
+exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@"; exit 1; }
 
-[[ $BACKUPDIR =~ ^[a-zA-Z]: ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
+[[ -d $1 ]] || die Cannot find directory $1
 
-DRIVE=${BACKUPDIR%%:*}
-DRIVE=${DRIVE^^}
-MAPDRIVE="${2:-$DRIVE:}"
+BACKUPDIR=$(readlink -ne "$1")
 
-[[ $MAPDRIVE =~ ^[a-zA-Z]:$ ]] || die "Usage:\n\t$0 Drive:\\backupDir mapDriveLetter:"
+[[ $BACKUPDIR == /dev/* ]] && { 
+        DEV=$BACKUPDIR
+        MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
+        [[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+                mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+                trap "umount $DEV && rm -rvf $MOUNT" EXIT
+        }
+        ROOT=$MOUNT
+        STARTDIR=""
+} || {
+	exists cygpath && BACKUPDIR=$(cygpath "$BACKUPDIR") 
+        ROOT=$(stat -c%m "$BACKUPDIR")
+        STARTDIR=${BACKUPDIR#$ROOT}
+        DEV=$(df --output=source "$ROOT"|tail -1)
+}
 
-STARTDIR=${BACKUPDIR#*:}              #remove anything before character ':' inclusive
-STARTDIR=${STARTDIR#*\\}              #remove anything before character '\' inclusive
-[[ -n $STARTDIR ]] && STARTDIR="$(cygpath "$STARTDIR")"
+echo DEV $DEV
+echo ROOT $ROOT
+echo STARTDIR $STARTDIR
 
-ROOT="$(cygpath "$MAPDRIVE")"
-FULLPATHDIR="$ROOT/$STARTDIR"
+MAPDRIVE="${2:-$DEV}"
 
-[[ -d "$FULLPATHDIR" ]] || die "The mapped directory $FULLPATHDIR doesn't exist"
-
-. "$SDIR/drive.sh" $DRIVE
+source "$SDIR/drive.sh" $MAPDRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
-RID="$DRIVE.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
-METADATADIR=$SDIR/cache/metadata/by-volume/$VOLUMESERIALNUMBER
+RID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
 
-type rsync >/dev/null || die Cannot find rsync
+exists rsync || die Cannot find rsync
 
 trap '' SIGPIPE
 
@@ -222,11 +229,11 @@ bg_upload_manifest(){
 
 bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
 
-echo Start to backup $FULLPATHDIR at $(date -R)
+echo Start to backup $BACKUPDIR at $(date -R)
 
 echo Phase 1 - compute ids for new files and backup already server existing files
 
-time (bash "$SDIR/hash.sh" $FSW "$FULLPATHDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
 touch "$ENDFLAG"
 wait4jobs
 rm -fv "$MANIFEST" "$ENDFLAG"
@@ -239,7 +246,10 @@ time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup d
 
 time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
 
-[[ $FILESYSTEM == 'NTFS' ]] && time (
+OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
+
+[[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
+	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 	SRCDIR=".bkit/$STARTDIR"
 	bash "$SDIR/acls.sh" "$BACKUPDIR" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
 	cd "$METADATADIR"

@@ -6,7 +6,7 @@ exists() { type "$1" >/dev/null 2>&1;}
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 FULLPATH="$(readlink -e "$1")"
-[[ -d $FULLPATH ]] || die Directory $FULLPATH does not exist
+[[ -d $FULLPATH ]] || die Directory $FULLPATH does not exists
 EXCUDELIST="$2"
 
 MOUNT="$(stat -c %m "$FULLPATH")"

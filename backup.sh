@@ -129,8 +129,8 @@ backup(){
 	local BASE=$1
 	local SRC="$1/./$2"
 	local DST=$3
-	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	local HASHDB=$(bash $SDIR/hash.sh -b "$SRC")
+	[[ -e $SRC ]] || ! echo $SRC does not exists || return 1
+	[[ -d $SRC ]] && local HASHDB=$(bash $SDIR/hash.sh -b "$SRC")
 	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
@@ -257,6 +257,7 @@ OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 [[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
 	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 	SRCDIR=".bkit/$STARTDIR"
+	[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
 	bash "$SDIR/acls.sh" "$BACKUPDIR" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
 	cd "$METADATADIR"
 	PACKDIR=".tar/$STARTDIR"

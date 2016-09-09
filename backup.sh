@@ -53,7 +53,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync "$@" 2>&1 
+		rsync --one-file-system "$@" 2>&1 
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success

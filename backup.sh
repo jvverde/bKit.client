@@ -7,35 +7,41 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@"; exit 1; }
 
+[[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
 [[ -d $1 ]] || die Cannot find directory $1
 
-BACKUPDIR=$(readlink -ne "$1")
+BACKUPDIR=$1
+
+exists cygpath && BACKUPDIR=$(cygpath "$1") 
+
+BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
 [[ $BACKUPDIR == /dev/* ]] && { 
-        DEV=$BACKUPDIR
-        MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
-        [[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
-                mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
-                trap "umount $DEV && rm -rvf $MOUNT" EXIT
-        }
-        ROOT=$MOUNT
-        STARTDIR=""
+	DEV=$BACKUPDIR
+	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
+	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+		mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+		trap "umount $DEV && rm -rvf $MOUNT" EXIT
+	}
+	ROOT=$MOUNT
+	STARTDIR=""
 } || {
-	exists cygpath && BACKUPDIR=$(cygpath "$BACKUPDIR") 
-        ROOT=$(stat -c%m "$BACKUPDIR")
-        STARTDIR=${BACKUPDIR#$ROOT}
-        DEV=$(df --output=source "$ROOT"|tail -1)
+	MOUNT=$(stat -c%m "$BACKUPDIR")
+	STARTDIR=${BACKUPDIR#$MOUNT}
+	STARTDIR=${STARTDIR#/}	
+	DEV=$(df --output=source "$MOUNT"|tail -1)
+	ROOT=$MOUNT
+	[[ -n $2 ]] && exists cygpath && ROOT=$(cygpath "$2")
 }
+BACKUPDIR="$ROOT/$STARTDIR"
+[[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
-echo DEV $DEV
-echo ROOT $ROOT
-echo STARTDIR $STARTDIR
+source "$SDIR/drive.sh" "$DEV"
 
-MAPDRIVE="${2:-$DEV}"
-
-source "$SDIR/drive.sh" $MAPDRIVE
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
-RID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+#compute Remote Volume ID
+RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF
@@ -153,7 +159,7 @@ backup(){
 			}
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix $PREFIX !~ ././././././" && exit;}
-			update_file "$FULLPATH" "$BACKUPURL/$RID/@by-id/$PREFIX/$TYPE/$FILE"
+			update_file "$FULLPATH" "$BACKUPURL/$RVID/@by-id/$PREFIX/$TYPE/$FILE"
 		) && continue
 		
 		#if a hard link (to file or to symlink)
@@ -176,7 +182,7 @@ clean(){
 	dorsync -riHDR $CLEAN $PERM $PASS $FMT $EXC  "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
-	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RID/@snap"
+	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RVID/@snap"
 }
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
@@ -209,15 +215,15 @@ bg_upload_manifest(){
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 			(( CNT == 0 )) && sleep 1 && continue
 			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-			update_file "$SEGMENT" "$BACKUPURL/$RID/@manifest/$TYPE/$STARTDIR/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$RID/@apply-manifest/$TYPE/$STARTDIR/manifest.lst"		
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/$TYPE/$STARTDIR/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/$TYPE/$STARTDIR/manifest.lst"		
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
 			while IFS='|' read -r I FILE
 			do
 				echo miss "$I|$FILE"
 				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else, in this phase
 					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
-					[[ $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RID/@by-id/$ID/$TYPE/$FILE"
+					[[ $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RVID/@by-id/$ID/$TYPE/$FILE"
 				)
 			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $EXC $PASS $FMT_QUERY3 "$BASE" "$DST")
 			echo sent $CNT lines of manifest starting at $START
@@ -227,7 +233,7 @@ bg_upload_manifest(){
 	)&
 }
 
-bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"
+bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"
 
 echo Start to backup $BACKUPDIR at $(date -R)
 
@@ -240,11 +246,11 @@ rm -fv "$MANIFEST" "$ENDFLAG"
 
 echo Phase 2 - backup everything includind attributes and acls
 
-time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo backup data done
+time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
 
-[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data"	&& echo checked missed hardlinks
+[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
 
-time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RID/@current/data" && echo cleaned deleted files
+time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 
@@ -256,7 +262,7 @@ OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 	PACKDIR=".tar/$STARTDIR"
 	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
 	tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
-	backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RID/@current/metadata"
+	backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata"
 ) && echo Metadata tar sent to backup
 
 time snapshot && echo snapshot done 

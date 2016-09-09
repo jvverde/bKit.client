@@ -60,6 +60,7 @@ Cache2/*
 cache/*
 cache2/*
 tmp
+var/log/*
 Temp/*
 temp/*
 Logs/*
@@ -72,3 +73,18 @@ Downloads/*
 *.ost
 */*Cache/*
 */*cache/*
+/dev/* 
+/home/*/.gvfs 
+/home/*/.mozilla/firefox/*/Cache 
+/home/*/.cache/chromium 
+/home/*/.thumbnails 
+/media/* 
+/mnt/* 
+/proc/* 
+/sys/*
+/tmp/* 
+/home/*/.local/share/Trash 
+/var/run/* 
+/var/lock/* 
+/lib/modules/*/volatile/.mounted
+/var/cache/apt/archives/*

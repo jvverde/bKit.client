@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" 2>&1 && shift
 [[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
 
@@ -10,9 +10,9 @@ die() { echo -e "$@">&2; exit 1; }
 [[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
 [[ -d $1 ]] || die Cannot find directory $1
 
-BACKUPDIR=$1
+BACKUPDIR="$1"
 
-exists cygpath && BACKUPDIR=$(cygpath "$1") 
+exists cygpath && BACKUPDIR=$(cygpath "$1") && SDIR=$(cygpath "$SDIR")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
@@ -41,7 +41,6 @@ source "$SDIR/drive.sh" "$DEV"
 [[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source $CONF

@@ -5,7 +5,7 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 [[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
 
 exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@"; exit 1; }
+die() { echo -e "$@">&2; exit 1; }
 
 [[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
 [[ -d $1 ]] || die Cannot find directory $1

@@ -1,5 +1,5 @@
 #!/bin/bash
-die() { echo -e "$@"; exit 1; }
+die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 [[ $1 == '-f' ]] && FULL=true && shift				#get -f option if present
 [[ $1 == '-b' ]] && LBD=true && shift				#get -l option if present

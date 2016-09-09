@@ -1,5 +1,5 @@
 #!/bin/bash
-die() { echo -e "$@"; exit 1; }
+die() { echo -e "$@">&2; exit 1; }
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
 type cygpath >/dev/null 2>&1 || die Cannot found cygpath

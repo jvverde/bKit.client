@@ -8,7 +8,7 @@ exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 
 [[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
-[[ -d $1 ]] || die Cannot find directory $1
+[[ -e $1 ]] || die Cannot find $1
 
 BACKUPDIR="$1"
 

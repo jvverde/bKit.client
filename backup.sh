@@ -117,10 +117,14 @@ update_hardlinks(){
 	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
 }
 update_dirs(){
-	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $PERM $PASS $FMT "$@"
+	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $EXC $PERM $PASS $FMT "$@"
 }
 update_file(){
 	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
+}
+update_files(){
+	FILES=$1 && shift
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILES" --itemize-changes $EXC $PERM $PASS $FMT "$@"
 }
 
 
@@ -197,8 +201,6 @@ ENDFLAG=$RUNDIR/endflag.$$
 bg_upload_manifest(){	
 	local BASE="$1"
 	local STARTDIR="$2"
-	local DST="$3"
-	local TYPE=${DST##*/}
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
 	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
 
@@ -214,17 +216,11 @@ bg_upload_manifest(){
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 			(( CNT == 0 )) && sleep 1 && continue
 			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/$TYPE/$STARTDIR/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/$TYPE/$STARTDIR/manifest.lst"		
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/data/$STARTDIR/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/data/$STARTDIR/manifest.lst"		
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-			while IFS='|' read -r I FILE
-			do
-				echo miss "$I|$FILE"
-				[[ $I == "<f++++"* ]] && (															#only meat! I mean only update data, nothing else, in this phase
-					ID=$(fgrep -m1 "|$FILE" "$SEGMENT" | cut -d'|' -f1)
-					[[ $ID =~ ././././././ ]] && update_file "$BASE/$FILE" "$BACKUPURL/$RVID/@by-id/$ID/$TYPE/$FILE"
-				)
-			done < <(dorsync --dry-run --links --size-only --files-from="$SEGFILES" --itemize-changes $EXC $PASS $FMT_QUERY3 "$BASE" "$DST")
+			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$RVID/@seed/data"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/data/$STARTDIR/manifest.lst"		
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
@@ -232,7 +228,7 @@ bg_upload_manifest(){
 	)&
 }
 
-bg_upload_manifest "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"
+bg_upload_manifest "$ROOT" "$STARTDIR"
 
 echo Start to backup $BACKUPDIR at $(date -R)
 

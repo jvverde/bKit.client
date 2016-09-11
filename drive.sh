@@ -21,7 +21,8 @@ exists lsblk && {
 	VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 	true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
-	VOLUMENAME=${VOLUMENAME//[[:space:]]/}
+	true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
+	VOLUMENAME=${VOLUMENAME//[[:space:]]/_}
 	FILESYSTEM=$(lsblk -ln -o FSTYPE $DEV)
 	DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
 	VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)

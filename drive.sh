@@ -15,24 +15,21 @@ exists fsutil && {
 	DRIVETYPE=$(fsutil fsinfo driveType $DRIVE: | tr -d '\r'| 
 		sed -e "s/^$DRIVE:.*- *//" | sed -E 's/[^a-z0-9]/-/gi;s/^$/_/;s/\s/_/g'
 	)
-}
+} 2>/dev/null
 exists lsblk && {
 	DEV=$1
 	VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 	true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
 	true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
-	shopt -s extglob
-	VOLUMENAME=${VOLUMENAME//+([[:space:]])/_}
-	shopt -u extglob
+	true ${VOLUMENAME:=$(echo $VOLUMENAME| sed 's/\s+/_/g')}
 	FILESYSTEM=$(lsblk -ln -o FSTYPE $DEV)
 	DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
 	true ${DRIVETYPE:=$(
-		NAME=${DEV##*/}
-		RESULT=$(find /dev/disk/by-id -lname "*/$NAME" -print -quit)
+		RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
 		RESULT=${RESULT##*/}
 		echo ${RESULT%%-*}
 	)}
 	VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
-}
+} 2>/dev/null
 true

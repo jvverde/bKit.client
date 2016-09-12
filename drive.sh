@@ -22,9 +22,17 @@ exists lsblk && {
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 	true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
 	true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
-	VOLUMENAME=${VOLUMENAME//[[:space:]]/_}
+	shopt -s extglob
+	VOLUMENAME=${VOLUMENAME//+([[:space:]])/_}
+	shopt -u extglob
 	FILESYSTEM=$(lsblk -ln -o FSTYPE $DEV)
 	DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
+	true ${DRIVETYPE:=$(
+		NAME=${DEV##*/}
+		RESULT=$(find /dev/disk/by-id -lname "*/$NAME" -print -quit)
+		RESULT=${RESULT##*/}
+		echo ${RESULT%%-*}
+	)}
 	VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
 }
 true

@@ -46,6 +46,7 @@ CONF="$SDIR/conf/conf.init"
 source $CONF
 
 exists rsync || die Cannot find rsync
+exists sqlite3 || die Cannot find sqlite3
 
 trap '' SIGPIPE
 
@@ -127,6 +128,8 @@ update_files(){
 	dorsync --archive --inplace --hard-links --relative --files-from="$FILES" --itemize-changes $EXC $PERM $PASS $FMT "$@"
 }
 
+MANIFEST=$RUNDIR/manifest.$$
+ENDFLAG=$RUNDIR/endflag.$$
 
 backup(){
 	local BASE=$1
@@ -151,8 +154,8 @@ backup(){
 		
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
-			[[ -e $HASHDB ]] && IFS='|' read HASH TIME < <(
-				sqlite3 "$HASHDB" "SELECT hash,time FROM H WHERE filename='$FILE'"
+			[[ -e $HASHDB ]] && IFS='|' read HASH SIZE TIME < <(
+				sqlite3 "$HASHDB" "SELECT hash,size,time FROM H WHERE filename='$FILE'"
 			)
 			CTIME=$(stat -c "%Y" "$FULLPATH") || echo unable to get stat of file $FULLPATH
 			#check if we need to compute a HASH
@@ -162,7 +165,8 @@ backup(){
 			}
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix $PREFIX !~ ././././././" && exit;}
-			update_file "$FULLPATH" "$BACKUPURL/$RVID/@by-id/$PREFIX/$TYPE/$FILE"
+			echo "$PREFIX|$SIZE|$TIME|$FILE" >> "$MANIFEST"
+			#update_file "$FULLPATH" "$BACKUPURL/$RVID/@by-id/$PREFIX/$TYPE/$FILE"
 		) && continue
 		
 		#if a hard link (to file or to symlink)
@@ -174,8 +178,8 @@ backup(){
 		echo Is something else
 		
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
-	update_hardlinks "$BASE" "$DST"
 	update_dirs	"$BASE" "$DST"
+	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
 }
 clean(){
@@ -194,9 +198,6 @@ wait4jobs(){
 		wait -n
 	done
 }
-
-MANIFEST=$RUNDIR/manifest.$$
-ENDFLAG=$RUNDIR/endflag.$$
 
 bg_upload_manifest(){	
 	local BASE="$1"
@@ -241,9 +242,16 @@ rm -fv "$MANIFEST" "$ENDFLAG"
 
 echo Phase 2 - backup everything includind attributes and acls
 
+bg_upload_manifest "$ROOT" "$STARTDIR"
+
 time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
 
 [[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+
+touch "$ENDFLAG"
+wait4jobs
+rm -fv "$MANIFEST" "$ENDFLAG"
+
 
 time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 

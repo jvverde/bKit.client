@@ -1,9 +1,11 @@
 #!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
+exists() { type "$1" ;}
 [[ $1 == '-f' ]] && FULL=true && shift				#get -f option if present
-[[ $1 == '-b' ]] && LBD=true && shift				#get -l option if present
+[[ $1 == '-b' ]] && LBD=true && shift					#get -b option if present
 
+exists sqlite3 || die sqlite3
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 FULLPATH="$(readlink -e "$1")"
 [[ -d $FULLPATH ]] || die Directory $FULLPATH does not exists
@@ -17,9 +19,8 @@ DEV=$(df --output=source "$MOUNT"|tail -1)
 source "$SDIR/drive.sh" "$DEV" || die Cannot execute $SDIR/drive.sh $DEV
 
 CACHE="$SDIR/cache/hashes/by-volume/$VOLUMESERIALNUMBER/$DIR"
-MARK="$CACHE/.marktime"
+MARK="$CACHE/.lastrun"
 WD="$SDIR/run"
-INITTIME="$WD/$$.inittime"
 NEW="$CACHE/new.csv"
 DB="$CACHE/hashes.db"
 exists cygpath && DB=$(cygpath -w "$DB")
@@ -30,7 +31,6 @@ exists cygpath && DB=$(cygpath -w "$DB")
 mkdir -p "$CACHE"
 mkdir -p "$WD"
 
-touch "$INITTIME"
 
 EXC=$( 
 	[[ -n $EXCUDELIST ]] || EXCUDELIST="$SDIR/conf/excludes.txt"
@@ -53,11 +53,18 @@ EXC=$(
 
 PREFIX=${DIR:+$DIR/}
 FORMAT="${PREFIX}%P\0"
-[[ -z $FULL && -e "$MARK" && -s "$DB" && ! "$DB" -ot "$MARK" ]] && NEWER="-newer '$MARK'"
+
+MTIME='01/01/1970'
+[[ -s "$DB" && -s "$MARK" && -z $FULL ]] || {
+	MTIME=$(cat $MARK)
+	date -d $MTIME || MTIME='01/01/1970'
+}
+
+date -R > "$MARK"
 
 cd $MOUNT
 
-sh -c "find './$DIR' -ignore_readdir_race -xdev $EXC -type f $NEWER -printf '$FORMAT'"|
+find "./$DIR" -ignore_readdir_race -xdev $EXC -type f -newermt "$MTIME" -printf "$FORMAT"|
 xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/'|
 while IFS='|' read -r HASH FILE
 do
@@ -75,8 +82,6 @@ exists sqlite3 || die Cannot fine sqlite3
 	echo "INSERT OR REPLACE INTO H SELECT * FROM TMP;"
 	echo "DROP TABLE IF EXISTS TMP;"
 }|sqlite3 "$DB" 
-
-mv -f "$INITTIME" "$MARK"
 
 
 

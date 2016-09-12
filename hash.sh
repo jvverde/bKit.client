@@ -1,11 +1,10 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" ;}
+exists() { type "$1" >/dev/null 2>&1 ;}
 [[ $1 == '-f' ]] && FULL=true && shift				#get -f option if present
 [[ $1 == '-b' ]] && LBD=true && shift					#get -b option if present
 
-exists sqlite3 || die sqlite3
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 FULLPATH="$(readlink -e "$1")"
 [[ -d $FULLPATH ]] || die Directory $FULLPATH does not exists
@@ -55,10 +54,10 @@ PREFIX=${DIR:+$DIR/}
 FORMAT="${PREFIX}%P\0"
 
 MTIME='01/01/1970'
-[[ -s "$DB" && -s "$MARK" && -z $FULL ]] || {
+[[ -s "$DB" && -s "$MARK" && -z $FULL ]] && {
 	MTIME=$(cat $MARK)
-	date -d $MTIME || MTIME='01/01/1970'
-}
+	date -d "$MTIME" || MTIME='01/01/1970'
+} >/dev/null 2>&1
 
 date -R > "$MARK"
 
@@ -72,6 +71,7 @@ do
 done | sed -n '/^[^|]*[|][^|]*[|][^|]*[|][^|]*$/p'|tee "$NEW"
 
 exists sqlite3 || die Cannot fine sqlite3
+
 {
 	exists cygpath && NEW=$(cygpath -w "$NEW")
 	echo "DROP TABLE IF EXISTS TMP;"

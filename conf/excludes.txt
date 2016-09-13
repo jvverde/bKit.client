@@ -52,6 +52,7 @@ Windows/Prefetch/*
 WINDOWS/Prefetch/*
 Windows/ShellIconCache/*
 Windows/SoftwareDistribution/Download/*
+WINDOWS/pchealth/helpctr/OfflineCache/
 hiberfil.sys
 iobw.tst
 pagefile.sys

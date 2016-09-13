@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-[[ $1 == '-log' ]] && shift && exec 1>"$1" 2>&1 && shift
+[[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
 [[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
 
 exists() { type "$1" >/dev/null 2>&1;}

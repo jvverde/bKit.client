@@ -63,7 +63,7 @@ date -R > "$MARK"
 
 cd $MOUNT
 
-find "./$DIR" -ignore_readdir_race -xdev $EXC -type f -newermt "$MTIME" -printf "$FORMAT"|
+sh -c "find './$DIR' -ignore_readdir_race -xdev $EXC -type f -newermt '$MTIME' -printf '$FORMAT'"|
 xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/'|
 while IFS='|' read -r HASH FILE
 do

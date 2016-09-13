@@ -47,7 +47,9 @@ Users/*/AppData/Local/Low/Sun/Java/Deployment/cache/*
 Users/*/AppData/Local/Low/Temp/*
 Users/*/AppData/Roaming/Microsoft/Windows/Recent/*
 Application Data/Google/Chrome/User Data/Default/Cache/ 
-*/Chrome/**/Cache/ 
+Chrome/**/Cache/ 
+thunderbird.profile/Cache/
+Microsoft SQL Server/**/Update Cache/
 Windows/Prefetch/*
 WINDOWS/Prefetch/*
 Windows/ShellIconCache/*

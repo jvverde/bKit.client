@@ -25,6 +25,7 @@ ProgramData/*/Microsoft/Windows Defender/*
 ProgramData/*/Apple Computer/Installer Cache/*
 ProgramData/*/Apple/Installer Cache/*
 ProgramData/**/Cache/*
+ProgramData/Package Cache/
 AppData/Local/Microsoft/Windows/WER/ReportArchive
 */AppData/Local/Microsoft/Windows/INetCache/*
 */AppData/Local/Microsoft/Windows/Temporary Internet Files/*

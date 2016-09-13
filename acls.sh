@@ -47,7 +47,7 @@ THISACL="$ACLSDIR/.bkit.this.acls.f"
 [[ ! -e $THISACL || -n "$(find "$STARTDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" ]] && 
 	acldir "$STARTDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
 	
-find "$STARTDIR" -path "$SDIR/cache/*" -prune -o -type d -printf "%P\n" | 
+find "$STARTDIR" -path "$SDIR/cache/*" -prune -o -name '.bkit' -prune -o -type d -printf "%P\n" | 
 while read -r DIR
 do
 	SPATH="$STARTDIR/$DIR"

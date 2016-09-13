@@ -45,7 +45,8 @@ Users/*/AppData/Local/Microsoft/Windows/History/
 Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files/  
 Users/*/AppData/Local/Low/Sun/Java/Deployment/cache/*
 Users/*/AppData/Local/Low/Temp/*
-Users/*/AppData/Roaming/Microsoft/Windows/Recent/*  
+Users/*/AppData/Roaming/Microsoft/Windows/Recent/* 
+Chrome/**/Cache/ 
 Windows/Prefetch/*
 WINDOWS/Prefetch/*
 Windows/ShellIconCache/*

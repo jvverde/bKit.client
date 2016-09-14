@@ -115,17 +115,26 @@ FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
 FMT_QUERY3='--out-format=%i|%n'
 
 update_hardlinks(){
-	dorsync --archive --hard-links --relative --files-from="$HLIST" --itemize-changes $PERM $PASS $FMT "$@"
+	FILE="${HLIST}.sort"
+	LC_ALL=C sort -o "$FILE" "$HLIST"
+	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	rm -f "$FILE"
 }
 update_dirs(){
-	dorsync --archive --relative --files-from="$DLIST" --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	FILE="${DLIST}.sort"
+	LC_ALL=C sort -o "$FILE" "$DLIST"
+	dorsync --archive --relative --files-from="$FILE" --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	rm -f "$FILE"
 }
 update_file(){
 	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
 }
 update_files(){
-	FILES=$1 && shift
-	dorsync --archive --inplace --hard-links --relative --files-from="$FILES" --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	SRC=$1 && shift
+	FILE="${SRC}.sort"
+	LC_ALL=C sort -o "$FILE" "$SRC"
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	rm -f "$FILE"
 }
 
 MANIFEST=$RUNDIR/manifest.$$

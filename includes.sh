@@ -10,5 +10,5 @@ EXC="--exclude-from=$SDIR/conf/excludes.txt"
 
 trap "rm -rf $RUNDIR" EXIT
 
-rsync --dry-run --recursive --links --one-file-system --itemize-changes --size-only $EXC $FMT $DIR $RUNDIR |
-  fgrep '|>f+++'|cut -d'|' -f1
+rsync --dry-run --recursive --relative --links --one-file-system --itemize-changes --size-only $EXC $FMT "$DIR" "$RUNDIR" |
+  fgrep -a '|>f+++'|cut -d'|' -f1

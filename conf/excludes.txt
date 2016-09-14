@@ -4,7 +4,6 @@ $Recycle.Bin
 *.old
 *.bak
 *.BAK
-*.obj
 *.dmp
 *.tmp
 *.log
@@ -66,8 +65,9 @@ logs/*
 /home/*/.cpan/*
 /home/*/.cpanm/*
 /home/*/.npm/*
-/home/**/npm_cache/*
+npm_cache/*
 Downloads/*
+tmp/*
 *.ost
 /dev/* 
 /home/*/.gvfs 

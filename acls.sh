@@ -11,6 +11,7 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
 STARTDIR=$(cygpath "$1")
 ACLSDIR=$(cygpath "$2")
+ACLSDIR=${ACLSDIR%/}
 
 [[ -d $STARTDIR ]]  || die "\nUsage:\n\t$0 [-u|-f] BackupDir DestinationDir"
 [[ -n $ACLSDIR ]] || die "\nUsage:\n\t$0 [-u|-f] BackupDir DestinationDir"
@@ -47,7 +48,9 @@ THISACL="$ACLSDIR/.bkit.this.acls.f"
 [[ ! -e $THISACL || -n "$(find "$STARTDIR" -maxdepth 0 -newercm "$THISACL" -print -quit)" ]] && 
 	acldir "$STARTDIR" "$THISACL" "$ACLSDIR/.bkit.this.sids.f"
 	
-find "$STARTDIR" -path "$SDIR/cache/*" -prune -o -path "$ACLSDIR" -prune -o -name '.bkit' -prune -o -type d -printf "%P\n" | 
+EXCDIR1="*/${ACLSDIR#/cygdrive/?/}"
+EXCDIR2="*/${SDIR#/cygdrive/?/}"
+find "$STARTDIR" -path "$EXCDIR1" -prune -o -path "$EXCDIR2" -prune -o -name '.bkit' -prune -o -type d -printf "%P\n" | 
 while read -r DIR
 do
 	SPATH="$STARTDIR/$DIR"

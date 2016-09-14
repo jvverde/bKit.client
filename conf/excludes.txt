@@ -24,12 +24,23 @@ ProgramData/*/Microsoft/Windows Defender/*
 ProgramData/*/Apple Computer/Installer Cache/*
 ProgramData/*/Apple/Installer Cache/*
 ProgramData/**/Cache/*
+ProgramData/Package Cache/
+Chrome/**/Cache/ 
+Opera/cache/*
 AppData/Local/Microsoft/Windows/WER/ReportArchive
-*/AppData/Local/Microsoft/Windows/INetCache/*
-*/AppData/Local/Microsoft/Windows/Temporary Internet Files/*
-*/AppData/Local/Temp/*
-*/Local Settings/Temp/*
+AppData/Local/Microsoft/Windows/INetCache/*
+AppData/Local/Microsoft/Windows/Temporary Internet Files/*
+AppData/Local/Temp/*
+AppData/**/Opera/cache/*
 AppData/Local/IconCache.db
+AppData/*/Microsoft/Windows/Recent Items/*
+AppData/Local/Microsoft/Windows/History/ *
+AppData/Local/Microsoft/Windows/Temporary Internet Files/*  
+AppData/Local/Low/Sun/Java/Deployment/cache/*
+AppData/Local/Low/Temp/*
+AppData/Roaming/Microsoft/Windows/Recent/*
+Application Data/Google/Chrome/User Data/Default/Cache/ 
+Local Settings/Temp/*
 Documents and Settings/**/Sun/Java/Deployment/cache/*
 Documents and Settings/*/Cookies/*
 Documents and Settings/*/History/*
@@ -39,15 +50,8 @@ Documents and Settings/*/Recent/*
 Local Settings/*/IconCache.db
 RECYCLER/
 System32/LogFiles/*
-Users/*/AppData/*/Microsoft/Windows/Recent Items/*
-Users/*/AppData/Local/Microsoft/Windows/History/ 
-Users/*/AppData/Local/Microsoft/Windows/Temporary Internet Files/  
-Users/*/AppData/Local/Low/Sun/Java/Deployment/cache/*
-Users/*/AppData/Local/Low/Temp/*
-Users/*/AppData/Roaming/Microsoft/Windows/Recent/*
-Application Data/Google/Chrome/User Data/Default/Cache/ 
-Chrome/**/Cache/ 
 thunderbird.profile/Cache/
+Thunderbird/**/Cache/
 Microsoft SQL Server/**/Update Cache/
 Windows/Prefetch/*
 WINDOWS/Prefetch/*

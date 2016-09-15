@@ -1,0 +1,9 @@
+*.old
+*.bak
+*.BAK
+*.dmp
+*.tmp
+*.log
+.git/
+.svn/
+CVS/

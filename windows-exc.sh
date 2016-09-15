@@ -1,5 +1,6 @@
 #!/bin/bash
 FILE=$1
+SYSTEMROOT=$(cygpath "$SYSTEMROOT")
 ALLUSERSPROFILE=$(cygpath "$ALLUSERSPROFILE")
 WINDIR=$(cygpath "$WINDIR")
 USERPROFILE=$(cygpath "$USERPROFILE"|sed "s|/$USERNAME|/*|")
@@ -10,6 +11,7 @@ TMP=$(cygpath "$TMP"|sed "s|/$USERNAME|/*|")
 	[[ -n $LOCALAPPDATA ]] && LOCALAPPDATA=$(cygpath "$LOCALAPPDATA"|sed "s|/$USERNAME|/*|") && cat "$1"
 	[[ -z $LOCALAPPDATA ]] && cat "$1" | sed /%LOCALAPPDATA%/d
 }| sed "
+	s|%SYSTEMROOT%|$SYSTEMROOT|;
 	s|%ALLUSERSPROFILE%|$ALLUSERSPROFILE|;
 	s|%USERPROFILE%|$USERPROFILE|;
 	s|%WINDIR%|$WINDIR|;

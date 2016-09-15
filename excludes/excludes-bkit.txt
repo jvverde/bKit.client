@@ -1,0 +1,6 @@
+bkit/**/client/run/
+bkit/**/client/cache/
+bkit/**/client/logs/
+bkit.*/**/client/run/
+bkit.*/**/client/cache/
+bkit.*/**/client/logs/

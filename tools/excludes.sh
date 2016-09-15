@@ -6,7 +6,7 @@ RUNDIR="$SDIR/run/dry-run.$$/"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 
 FMT='--out-format=%f|%i'
-INC="--include-from=$SDIR/conf/excludes2.txt"
+INC="--include-from=$SDIR/conf/excludes.txt"
 
 trap "rm -rf $RUNDIR" EXIT
 

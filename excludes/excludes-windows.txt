@@ -41,8 +41,8 @@
 %APPDATA%/IconCache.db
 %APPDATA%/Microsoft/Windows/History/*
 
-%APPDATA%/**/Google/Chrome/**/Cache/* 
-%APPDATA%/**/Opera/cache/*
+Google/Chrome/User Data/Default/Cache/*
+Opera/cache/*
 
 %TEMP%/
 %TMP%/

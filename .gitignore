@@ -5,4 +5,5 @@ logs/*
 run/*
 conf/*
 !conf/excludes.txt
+!conf/excludes-*
 bash.bat

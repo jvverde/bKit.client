@@ -1,0 +1,47 @@
+%ALLUSERSPROFILE%/*/Microsoft/Search/*
+%ALLUSERSPROFILE%/*/Microsoft Help/*
+%ALLUSERSPROFILE%/*/Microsoft/HelpLibrary/*
+%ALLUSERSPROFILE%/*/Microsoft/Windows Defender/*
+%ALLUSERSPROFILE%/*/Apple Computer/Installer Cache/*
+%ALLUSERSPROFILE%/*/Apple/Installer Cache/*
+%ALLUSERSPROFILE%/**/Cache/*
+%ALLUSERSPROFILE%/Package Cache/
+
+%USERPROFILE%/**/Sun/Java/Deployment/cache/*
+%USERPROFILE%/Cookies/*
+%USERPROFILE%/History/*
+%USERPROFILE%/Local Settings/Temp/*
+%USERPROFILE%/Local Settings/*/IconCache.db
+%USERPROFILE%/Local Settings/Temporary Internet Files/*
+%USERPROFILE%/Recent/*
+
+%WINDIR%/Prefetch/*
+%WINDIR%/ShellIconCache/*
+%WINDIR%/SoftwareDistribution/Download/*
+%WINDIR%/pchealth/helpctr/OfflineCache/
+
+%LOCALAPPDATA%/Microsoft/Windows/WER/ReportArchive/*
+%LOCALAPPDATA%/Microsoft/Windows/INetCache/*
+%LOCALAPPDATA%/Microsoft/Windows/Temporary Internet Files/*
+%LOCALAPPDATA%/Low/Sun/Java/Deployment/cache/*
+%LOCALAPPDATA%/Temp/*
+%LOCALAPPDATA%/Low/Temp/*
+%LOCALAPPDATA%/IconCache.db
+%LOCALAPPDATA%/Microsoft/Windows/History/*
+
+%APPDATA%/Microsoft/Windows/WER/ReportArchive/*
+%APPDATA%/Microsoft/Windows/INetCache/*
+%APPDATA%/Microsoft/Windows/Temporary Internet Files/*
+%APPDATA%/Microsoft/Windows/Recent/*
+%APPDATA%/Microsoft/Windows/Recent Items/*
+%APPDATA%/Low/Sun/Java/Deployment/cache/*
+%APPDATA%/Temp/*
+%APPDATA%/Low/Temp/*
+%APPDATA%/IconCache.db
+%APPDATA%/Microsoft/Windows/History/*
+
+%APPDATA%/**/Google/Chrome/**/Cache/* 
+%APPDATA%/**/Opera/cache/*
+
+%TEMP%/
+%TMP%/

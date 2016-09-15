@@ -16,6 +16,7 @@
 %USERPROFILE%/Recent/*
 
 %WINDIR%/Prefetch/*
+%WINDIR%/Temp/*
 %WINDIR%/ShellIconCache/*
 %WINDIR%/SoftwareDistribution/Download/*
 %WINDIR%/pchealth/helpctr/OfflineCache/
@@ -45,3 +46,25 @@
 
 %TEMP%/
 %TMP%/
+
+Microsoft SQL Server/**/Update Cache/
+System32/LogFiles/*
+
+System Volume Information
+$RECYCLE.BIN/
+$Recycle.Bin/
+RECYCLER/
+MSOCache/
+pagefile.sys
+hiberfil.sys
+iobw.tst
+swapfile.sys
+
+Config.Msi/
+#Thumbs.db
+#Local Settings/History/
+#NetHood/
+#PrintHood/
+#Cookies/
+#Recent/
+#SendTo/

@@ -15,6 +15,7 @@
 %USERPROFILE%/Local Settings/Temporary Internet Files/*
 %USERPROFILE%/Recent/*
 
+
 %WINDIR%/Prefetch/*
 %WINDIR%/Temp/*
 %WINDIR%/ShellIconCache/*

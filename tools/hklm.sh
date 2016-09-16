@@ -6,8 +6,5 @@ reg Query "HKLM\SYSTEM\CurrentControlSet\Control\BackupRestore\FilesNotToBackup"
 		s|\\0|\n|g;
 		s|\s*(/s)?$||mg;
 		s/%\w+%/\U&/g;
-		s|\\|/|g;
 		p
-	}'| 
-	bash "$SDIR/windows-exc.sh" 
-	#|#xargs -rI{} cygpath -u "{}"
+	}'| xargs -d'\n' -rI{} cygpath -u {} |bash "$SDIR/windows-exc.sh" 

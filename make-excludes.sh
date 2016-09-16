@@ -30,7 +30,7 @@ OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 		echo -e "\n\n#\tFrom windows-exc\n"
 		bash "$SDIR/tools/windows-exc.sh" "$EXCDIR/$WIN"
 		echo -e "\n\n#\tFrom registry\n"
-		bash "$SDIR/tools/hklm.sh" || true
+		bash "$SDIR/tools/hklm.sh" | bash "$SDIR/tools/windows-exc.sh" || true
 	} || {
 		cat "$EXCDIR/$UNIX"
 	}

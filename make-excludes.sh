@@ -1,8 +1,9 @@
 #!/bin/bash
 SDIR="$(dirname "$(readlink -f "$0")")"
-COPY=(excludes-all.txt excludes-bkit.txt)
+COPY=(excludes-all.txt)
 WIN=excludes-windows.txt
 UNIX=excludes-unix.txt
+BKIT=excludes-bkit.txt
 SRCDIR="$SDIR/excludes"
 DST="$SDIR/conf/excludes.txt"
 [[ -e $DST ]] || mkdir -pv "${DST%/*}"
@@ -21,6 +22,10 @@ OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 		echo -e "\n# From $F\n"
 		cat "$EXCDIR/$F"
 	done
+	
+	echo -e "\n# From BKIT\n"
+	bash "$SDIR/tools/bkit-exc.sh" "$EXCDIR/$BKIT"
+	
 	[[ $OS == 'cygwin' ]] && {
 		echo -e "\n\n#\tFrom windows-exc\n"
 		bash "$SDIR/tools/windows-exc.sh" "$EXCDIR/$WIN"

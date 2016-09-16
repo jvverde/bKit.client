@@ -14,9 +14,9 @@ if not exist "%OP%3rd-party\shadowspawn\" mkdir "%OP%3rd-party\shadowspawn"
 if not exist "%OP%run\" mkdir "%OP%run"
 if not exist "%OP%cache\" mkdir "%OP%cache"
 
-call %OP%setup\subinacl.bat
-call %OP%setup\cygwin.bat
-call %OP%setup\shadowspawn.bat
+::call %OP%setup\subinacl.bat
+::call %OP%setup\cygwin.bat
+::call %OP%setup\shadowspawn.bat
 set bash=%OP%3rd-party\cygwin\bin\bash.exe
 if not exist %bash% (
 	echo bash.exe not found 
@@ -24,7 +24,7 @@ if not exist %bash% (
 )
 for %%F in ("%bash%") do set dirname=%%~dpF
 
->bash.bat (
+>"%OP%bash.bat" (
   echo ^@echo OFF
   echo :: This file is automatically create by %0. Don't change it
   echo set oldhome=%%HOME%%
@@ -38,4 +38,5 @@ for %%F in ("%bash%") do set dirname=%%~dpF
   echo set SHELL=%%oldshell%%
   echo set HOME=%%oldhome%%
 )
-
+echo Compile excludes file
+call "%OP%bash.bat" "%OP%make-excludes.sh"

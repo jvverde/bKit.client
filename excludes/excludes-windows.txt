@@ -48,8 +48,8 @@ Opera/cache/*
 %TEMP%/
 %TMP%/
 
-Microsoft SQL Server/**/Update Cache/
-System32/LogFiles/*
+Microsoft SQL Server/**/Update Cache/*
+#System32/LogFiles/*
 
 #System Volume Information
 $RECYCLE.BIN/

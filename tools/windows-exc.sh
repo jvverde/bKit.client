@@ -2,10 +2,10 @@
 set -f
 FILE=${1:--}
 getcivar(){	
-	VAR=$(set|grep -Pio "^$1(?==)") && echo "${!VAR}" | sed 's#\\#\\\\#' || echo "%$1%"
+	VAR=$(set|grep -Pio "^$1(?==)") && echo "${!VAR}" | sed 's#\\#/#g' || echo "%$1%"
 }
 u2A(){
-	echo "$@"|sed "s|/$USERNAME|*|"	
+	echo "$@"|sed "s|/$USERNAME|/*|"	
 }
 USERNAME=$(getcivar USERNAME)
 SYSTEMROOT=$(getcivar SYSTEMROOT)
@@ -34,4 +34,5 @@ cat "$FILE" | sed -E "
 	s|^%TMP%|$TMP|;
 	s|^%TEMP%|$TEMP|;
 	s|^%[^%]*%||;
-"|xargs -d'\n' -rI{} cygpath -u {}
+	/^$/d
+"|xargs -d'\n' -rI{} cygpath -u {} |sed 's|^/cygdrive/./|/cygdrive/?/|'

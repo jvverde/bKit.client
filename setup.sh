@@ -14,3 +14,5 @@ do
     mkdir -pv "$SDIR/$DIR" && chown -v $USERID:$GRPID "$SDIR/$DIR"
   }
 done
+echo Compile excludes file
+bash "$SDIR/make-excludes.sh"

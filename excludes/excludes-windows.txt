@@ -51,7 +51,7 @@ Opera/cache/*
 Microsoft SQL Server/**/Update Cache/
 System32/LogFiles/*
 
-System Volume Information
+#System Volume Information
 $RECYCLE.BIN/
 $Recycle.Bin/
 RECYCLER/

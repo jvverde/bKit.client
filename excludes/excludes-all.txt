@@ -28,3 +28,4 @@ CVS/
 *.bochs
 *.blkverify
 *.blkdebug
+*.img

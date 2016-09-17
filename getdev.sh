@@ -9,16 +9,15 @@ die() { echo -e "$@">&2; exit 1; }
 
 UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"
-set -o pipefail
 exists lsblk && {
-	NAME=$(lsblk -lno NAME,UUID|grep -i "\b$UUID\b"|cut -d' ' -f1) || die Device not found
+	NAME=$(lsblk -lno NAME,UUID|grep -i "\b$UUID\b"|cut -d' ' -f1)
 	DEV=${NAME:+/dev/$NAME}
 	[[ -e $DEV ]] || die "'$DEV' does not exists"
 	echo "$DEV"
 }
 exists fsutil &&{
 	DRIVE=($(fsutil fsinfo drives|sed /^$/d|grep -io '[a-z]:\\'|xargs -d'\n' -rI{} sh -c '
-		fsutil fsinfo volumeInfo "$1"|grep -iq "Volume Serial Number\s*:\s*0x$2" && echo $1
+		fsutil fsinfo volumeInfo "$1"|grep -iq "\bVolume Serial Number\s*:\s*0x$2\b" && echo $1 && exit
 	' -- {} "$UUID"))
 	[[ -e $DRIVE ]] || die "'$DRIVE' does not exits"
 	echo "$DRIVE"

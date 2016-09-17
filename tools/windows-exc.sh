@@ -33,6 +33,9 @@ cat "$FILE" | sed -E "
 	s|^%APPDATA%|$APPDATA|;
 	s|^%TMP%|$TMP|;
 	s|^%TEMP%|$TEMP|;
-	s|^%[^%]*%||;
-	/^$/d
-"|xargs -d'\n' -rI{} cygpath -u {} |sed 's|^/cygdrive/./|/cygdrive/?/|'
+	s|^%[^%]*%.*||;
+	/^$/d;
+	s|\\\\|/|g;
+	s#^([a-zA-Z]:|/cygdrive/.)?/##;
+	s|[a-zA-Z]|[\U&\L&]|g;
+"

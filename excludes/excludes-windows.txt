@@ -56,10 +56,10 @@ $RECYCLE.BIN/
 $Recycle.Bin/
 RECYCLER/
 MSOCache/
-pagefile.sys
-hiberfil.sys
-iobw.tst
-swapfile.sys
+#pagefile.sys
+#hiberfil.sys
+#iobw.tst
+#swapfile.sys
 
 Config.Msi/
 #Thumbs.db
@@ -69,3 +69,5 @@ Config.Msi/
 #Cookies/
 #Recent/
 #SendTo/
+
+#C:\Documents and Settings

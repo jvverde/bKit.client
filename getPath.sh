@@ -13,9 +13,13 @@ set -o pipefail
 exists lsblk && {
 	NAME=$(lsblk -lno NAME,UUID|grep -i "\b$UUID\b"|cut -d' ' -f1) || die Device not found
 	DEV=${NAME:+/dev/$NAME}
-	[[ -e $DEV ]] || die $DEV does not exists
+	[[ -e $DEV ]] || die "'$DEV' does not exists"
 	echo "$DEV"
 }
 exists fsutil &&{
-	exists cygpath && BACKUPDIR=$(cygpath "$1") && SDIR=$(cygpath "$SDIR")
+	DRIVE=($(fsutil fsinfo drives|sed /^$/d|grep -io '[a-z]:\\'|xargs -d'\n' -rI{} sh -c '
+		fsutil fsinfo volumeInfo "$1"|grep -iq "Volume Serial Number\s*:\s*0x$2" && echo $1
+	' -- {} "$UUID"))
+	[[ -e $DRIVE ]] || die "'$DRIVE' does not exits"
+	echo "$DRIVE"
 }

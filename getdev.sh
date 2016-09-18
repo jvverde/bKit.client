@@ -10,6 +10,7 @@ die() { echo -e "$@">&2; exit 1; }
 UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"
 exists lsblk && {
+	[[ $UID -eq 0 ]] || exec sudo "$0" "$@"
 	NAME=$(lsblk -lno NAME,UUID|grep -i "\b$UUID\b"|cut -d' ' -f1)
 	DEV=${NAME:+/dev/$NAME}
 	[[ -e $DEV ]] || die "'$DEV' does not exists"

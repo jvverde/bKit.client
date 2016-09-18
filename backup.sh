@@ -180,7 +180,7 @@ backup(){
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 		
 		#if a directory, symlink, device or special
-		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
+		[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
 		
 		#if file only need to be update
 		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
@@ -188,7 +188,7 @@ backup(){
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
 			[[ -e $HASHDB ]] && IFS='|' read HASH SIZE TIME < <(
-				sqlite3 "$HASHDB" "SELECT hash,size,time FROM H WHERE filename='$FILE'"
+				sqlite3 "$HASHDB" "SELECT hash,size,time FROM H WHERE filename=\"$FILE\""
 			)
 			CTIME=$(stat -c "%Y" "$FULLPATH") || echo unable to get stat of file $FULLPATH
 			#check if we need to compute a HASH
@@ -227,7 +227,7 @@ snapshot(){
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
 	do
-		echo Wait for jobs "${list[@]}" to finish
+		echo Wait for ${#list[*]} job to finish
 		wait -n
 	done
 }

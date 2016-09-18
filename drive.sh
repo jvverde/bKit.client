@@ -17,6 +17,7 @@ exists fsutil && {
 	)
 } 2>/dev/null
 exists lsblk && {
+	[[ $UID -eq 0 ]] || exec sudo "$0" "$@"
 	DEV=$1
 	VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}

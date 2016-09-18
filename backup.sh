@@ -1,37 +1,60 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-[[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
-[[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
-
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 
-[[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
-[[ -e $1 ]] || die Cannot find $1
+while [[ $1 =~ ^- ]]
+do
+	KEY="$1" && shift
+	case "$KEY" in	
+		-l|-log|--log)
+			exec 1>"$1" 
+			shift
+		;;
+		-f|--force)
+			FSW='-f'
+		;;
+		-u|--uuid) 
+			BACKUPDIR=$(bash "$SDIR/getdev.sh" "$1")		
+			shift
+		;;
+		-d|--dir) 
+			STARTDIR="$1" && shift
+		;;
+		*)
+			die Unknow	option $KEY
+		;;		
+	esac
+done
 
-BACKUPDIR="$1"
+
+[[ -z $BACKUPDIR ]] && {
+	BACKUPDIR="$1" && shift
+}
+MAPDRIVE="$1"
+
+[[ -n $BACKUPDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
 
 exists cygpath && BACKUPDIR=$(cygpath "$1") && SDIR=$(cygpath "$SDIR")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-[[ $BACKUPDIR == /dev/* ]] && { 
+[[ $BACKUPDIR == /dev/* ]] && {
 	DEV=$BACKUPDIR
-	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
+	MOUNT=$(sudo lsblk -lno MOUNTPOINT $DEV)
 	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
 		mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
 		trap "umount $DEV && rm -rvf $MOUNT" EXIT
 	}
 	ROOT=$MOUNT
-	STARTDIR=""
 } || {
 	MOUNT=$(stat -c%m "$BACKUPDIR")
 	STARTDIR=${BACKUPDIR#$MOUNT}
 	STARTDIR=${STARTDIR#/}	
 	DEV=$(df --output=source "$MOUNT"|tail -1)
 	ROOT=$MOUNT
-	[[ -n $2 ]] && exists cygpath && ROOT=$(cygpath "$2")
+	[[ -n $MAPDRIVE ]] && exists cygpath && ROOT=$(cygpath "$MAPDRIVE")
 }
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
@@ -43,12 +66,13 @@ source "$SDIR/drive.sh" "$DEV"
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
-source $CONF
+source "$CONF"
 
 exists rsync || die Cannot find rsync
 exists sqlite3 || die Cannot find sqlite3
 
 trap '' SIGPIPE
+#echo "backup $BACKUPDIR ($ROOT) in $RVID" && exit
 
 dorsync(){
 	local RETRIES=1000

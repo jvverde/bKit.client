@@ -42,7 +42,7 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
 [[ $BACKUPDIR == /dev/* ]] && {
 	DEV=$BACKUPDIR
-	MOUNT=$(sudo lsblk -lno MOUNTPOINT $DEV)
+	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
 		mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
 		trap "umount $DEV && rm -rvf $MOUNT" EXIT

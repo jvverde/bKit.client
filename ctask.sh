@@ -4,14 +4,15 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
-
-[[ $UID -ne 0 && $OS != cygwin ]] && exec sudo "$0" "$@"
-[[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
+usage(){
+	die "Usage:\n\t$0 [-m|-h|-d|-w [every]]"
+}
+[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
+[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
 	echo I am to going to runas Administrator
-	cygstart --action=runas "$0" "$@"
+	cygstart -w --action=runas /bin/bash bash "$0" "$@" && exit
 }
 echo aqui $2
-exit;
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -33,7 +34,7 @@ do
 			[[ "$1" =~ ^[0-9]+$ ]] && EVERY=$1 && shift
 		;;
 		*)
-			die Unknow	option $KEY
+			echo Unknow	option $KEY && usage
 		;;		
 	esac
 done

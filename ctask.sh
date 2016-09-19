@@ -13,62 +13,44 @@ usage(){
 	echo I am to going to runas Administrator
 	cygAT -w --action=runas /bin/bash bash "$0" "$@" && exit
 }
-ATALL='*'
-MINUTE=ATALL
-HOUR=ATALL
-DAY=ATALL
-MONTH=ATALL
-DAYOFWEEK=ATALL
-let ATMINUTES=$RANDOM%60
-let ATHOUR=$RANDOM%24
-let ATDAYOFWEEK=$RANDOM%7
-let ATDAYOFMONTH=1+$RANDOM%28
-let ATMONTH=1+$RANDOM%12
+ONALL='*'
+MINUTE=ONALL
+HOUR=ONALL
+DAYOFMONTH=ONALL
+MONTH=ONALL
+DAYOFWEEK=ONALL
+let ONMINUTES=$RANDOM%60
+let ONHOURS=$RANDOM%24
+let ONDAYOFWEEK=$RANDOM%7
+let ONDAYOFMONTH=1+$RANDOM%28
+let ONMONTHS=1+$RANDOM%12
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in	
 		-m|--minute)
-			TYPE=MINUTE
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ATMINUTES="$1" && shift && MINUTE=ATMINUTES 
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES 
 		;;
 		-h|--hour)
-			TYPE=HOURLY
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && HOURS=$1 && shift && HOUR=HOURS
-			MINUTE=ATMINUTES
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
+			MINUTE=ONMINUTES
 		;;
 		-d|--day)
-			TYPE=DAILY
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && DAYS=$1 && shift && DAY=DAYS
-			MINUTE=ATMINUTE
-			HOUR=ATHOUR
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
+			MINUTE=ONMINUTES
+			HOUR=ONHOURS
 		;;
 		-w|--week)
-			TYPE=WEEKLY
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && WEEKDAYS=$1 && shift && WEEK=WEEKDAYS
-			MINUTE=ATMINUTE
-			HOUR=ATHOUR
-			DAYOFWEEK=ATDAYOFWEEK
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFWEEK="$1" && shift
+			MINUTE=ONMINUTES
+			HOUR=ONHOURS
+			DAYOFWEEK=ONDAYOFWEEK
 		;;
 		-M|--monthly)
-			TYPE=MONTHLY
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && MONTHS=$1 && shift && MONTH=MONTHS
-			MINUTE=ATMINUTE
-			HOUR=ATHOUR
-			DAYOFWEEK=ATALL
-			DAY=ATDAYOFMONTH
-		;;
-		-sm|--startminute)
-			[[ "$1" =~ ^[0-9]+$ && "$1" -le 59 ]] && ATMINUTE=$1 && shift	
-		;;
-		-sh|--starthour)
-			[[ "$1" =~ ^[0-9]+$ && "$1" -le 23 ]] && ATHOUR=$1 && shift
-		;;
-		-sdow|--startdayofweek)
-			[[ "$1" =~ ^[0-9]+$ && "$1" -le 6 ]] && ATDAYOFWEEK=$1 && shift
-		;;
-		-sdom|--startdayofmonth)
-			[[ "$1" =~ ^[0-9]+$ && "$1" -le 31 ]] && ATDAYOFMONTH=$1 && shift
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
+			MINUTE=ONMINUTES
+			HOUR=ONHOURS
+			DAYOFMONTH=ONDAYOFMONTH
 		;;
 		*)
 			echo Unknow	option $KEY && usage
@@ -83,7 +65,7 @@ IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" $BACKUPPATH 2>/dev/null)
 echo $UUID
 echo $DIR
 
-echo "${!MINUTE} ${!HOUR} ${!DAY} ${!MONTH} ${!DAYOFWEEK}"
+echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK}"
 crontab -l 2>/dev/null > ".tmp.$$.contrab"
 
 rm -f ".tmp.$$.contrab" 

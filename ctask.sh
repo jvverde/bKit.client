@@ -65,7 +65,7 @@ IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" $BACKUPPATH 2>/dev/null)
 echo $UUID
 echo $DIR
 
-echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK}"
+echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR'"
 crontab -l 2>/dev/null > ".tmp.$$.contrab"
 
 rm -f ".tmp.$$.contrab" 

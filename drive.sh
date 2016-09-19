@@ -16,8 +16,8 @@ exists fsutil && {
 		sed -e "s/^$DRIVE:.*- *//" | sed -E 's/[^a-z0-9]/-/gi;s/^$/_/;s/\s/_/g'
 	)
 } 2>/dev/null
-exists lsblk && {
-	[[ $UID -eq 0 ]] || exec sudo "$0" "$@"
+exists lsblk && exec 3>&2 && {
+	[[ $UID -eq 0 ]] || echo $0 must be run as root>&3
 	DEV=$1
 	VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}

@@ -265,7 +265,7 @@ bg_upload_manifest(){
 LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 (
-	flock -n 9 || exit 1
+	flock -n 9 || die Volume $VOLUMESERIALNUMBER is locked
 	 	
 	bg_upload_manifest "$ROOT" "$STARTDIR"
 
@@ -308,6 +308,6 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	) && echo Metadata tar sent to backup
 
 	time snapshot && echo snapshot done
+	echo Backup of $BACKUPDIR done at $(date -R)
 ) 9>"$LOCK" 
  
-echo Backup of $BACKUPDIR done at $(date -R)

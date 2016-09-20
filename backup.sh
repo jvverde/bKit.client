@@ -59,9 +59,10 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
+DRIVE=$MAPDRIVE
 source "$SDIR/drive.sh" "$DEV"
 
-[[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
+[[ $DRIVETYPE =~ Ram.Disk ]] && die This drive is a RAM Disk 
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"

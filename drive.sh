@@ -1,6 +1,6 @@
 exists() { type "$1" >/dev/null 2>&1;}
 exists fsutil && {
-	DRIVE=${1:-$DRIVE}
+	DRIVE=${DRIVE:-$1}
 	DRIVE=${DRIVE%%:*}
 	VOLUMEINFO="$(fsutil fsinfo volumeinfo $DRIVE:\\ | tr -d '\r')" 
 	VOLUMENAME=$(echo -e "$VOLUMEINFO"| awk -F ":" 'toupper($1) ~ /VOLUME NAME/ {print $2}' | 

@@ -11,7 +11,7 @@ UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"
 exists lsblk && {
 	[[ $UID -eq 0 ]] || exec sudo "$0" "$@"
-	NAME=$(lsblk -lno KNAME,UUID|grep -i "\b$UUID\b"|cut -d' ' -f1)
+	NAME=$(lsblk -lno KNAME,UUID|grep -i "\b$UUID\b"|head -n 1|cut -d' ' -f1)
 	DEV=${NAME:+/dev/$NAME}
 	[[ -e $DEV ]] || die "'$DEV' does not exists"
 	echo "$DEV"

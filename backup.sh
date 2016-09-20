@@ -36,7 +36,7 @@ MAPDRIVE="$1"
 
 [[ -n $BACKUPDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
 
-exists cygpath && BACKUPDIR=$(cygpath "$1") && SDIR=$(cygpath "$SDIR")
+exists cygpath && BACKUPDIR=$(cygpath "$BACKUPDIR") && SDIR=$(cygpath "$SDIR")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
@@ -59,9 +59,10 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
+echo DEV=$DEV
 source "$SDIR/drive.sh" "$DEV"
 
-[[ $DRIVETYPE =~ Ram.Disk ]] && die This drive is a RAM Disk 
+[[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk 
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"

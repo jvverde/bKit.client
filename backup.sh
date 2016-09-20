@@ -59,7 +59,6 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
-echo DEV=$DEV
 source "$SDIR/drive.sh" "$DEV"
 
 [[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk 

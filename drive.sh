@@ -1,6 +1,6 @@
 exists() { type "$1" >/dev/null 2>&1;}
 exists fsutil && {
-	DRIVE=${1:-$DRIVE}
+	DRIVE=${DRIVE:-$1}
 	DRIVE=${DRIVE%%:*}
 	VOLUMEINFO="$(fsutil fsinfo volumeinfo $DRIVE:\\ | tr -d '\r')" 
 	VOLUMENAME=$(echo -e "$VOLUMEINFO"| awk -F ":" 'toupper($1) ~ /VOLUME NAME/ {print $2}' | 
@@ -16,7 +16,8 @@ exists fsutil && {
 		sed -e "s/^$DRIVE:.*- *//" | sed -E 's/[^a-z0-9]/-/gi;s/^$/_/;s/\s/_/g'
 	)
 } 2>/dev/null
-exists lsblk && {
+exists lsblk && exec 3>&2 && {
+	[[ $UID -eq 0 ]] || echo $0 must be run as root>&3
 	DEV=$1
 	VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}

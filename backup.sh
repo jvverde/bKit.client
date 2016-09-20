@@ -1,22 +1,46 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-[[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
-[[ $1 == '-f' ]] && FSW='-f' && shift				#get -f option if present and set f switch
-
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 
-[[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
-[[ -e $1 ]] || die Cannot find $1
+while [[ $1 =~ ^- ]]
+do
+	KEY="$1" && shift
+	case "$KEY" in	
+		-l|-log|--log)
+			exec 1>"$1" 
+			shift
+		;;
+		-f|--force)
+			FSW='-f'
+		;;
+		-u|--uuid) 
+			BACKUPDIR=$(bash "$SDIR/getdev.sh" "$1")		
+			shift
+		;;
+		-d|--dir) 
+			STARTDIR="$1" && shift
+		;;
+		*)
+			die Unknow	option $KEY
+		;;		
+	esac
+done
 
-BACKUPDIR="$1"
+
+[[ -z $BACKUPDIR ]] && {
+	BACKUPDIR="$1" && shift
+}
+MAPDRIVE="$1"
+
+[[ -n $BACKUPDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
 
 exists cygpath && BACKUPDIR=$(cygpath "$1") && SDIR=$(cygpath "$SDIR")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-[[ $BACKUPDIR == /dev/* ]] && { 
+[[ $BACKUPDIR == /dev/* ]] && {
 	DEV=$BACKUPDIR
 	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
@@ -24,31 +48,32 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 		trap "umount $DEV && rm -rvf $MOUNT" EXIT
 	}
 	ROOT=$MOUNT
-	STARTDIR=""
 } || {
 	MOUNT=$(stat -c%m "$BACKUPDIR")
 	STARTDIR=${BACKUPDIR#$MOUNT}
 	STARTDIR=${STARTDIR#/}	
 	DEV=$(df --output=source "$MOUNT"|tail -1)
 	ROOT=$MOUNT
-	[[ -n $2 ]] && exists cygpath && ROOT=$(cygpath "$2")
+	[[ -n $MAPDRIVE ]] && exists cygpath && ROOT=$(cygpath "$MAPDRIVE")
 }
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
+DRIVE=$MAPDRIVE
 source "$SDIR/drive.sh" "$DEV"
 
-[[ $DRIVETYPE == *"Ram Disk"* ]] && die This drive is a RAM Disk 
+[[ $DRIVETYPE =~ Ram.Disk ]] && die This drive is a RAM Disk 
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
-source $CONF
+source "$CONF"
 
 exists rsync || die Cannot find rsync
 exists sqlite3 || die Cannot find sqlite3
 
 trap '' SIGPIPE
+#echo "backup $BACKUPDIR ($ROOT) in $RVID" && exit
 
 dorsync(){
 	local RETRIES=1000
@@ -156,7 +181,7 @@ backup(){
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 		
 		#if a directory, symlink, device or special
-		[[ $I =~ ^[c.][dLDS] && $FILE != '.' ]] && postpone_update "$FILE" && continue
+		[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
 		
 		#if file only need to be update
 		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
@@ -164,7 +189,7 @@ backup(){
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
 			[[ -e $HASHDB ]] && IFS='|' read HASH SIZE TIME < <(
-				sqlite3 "$HASHDB" "SELECT hash,size,time FROM H WHERE filename='$FILE'"
+				sqlite3 "$HASHDB" "SELECT hash,size,time FROM H WHERE filename=\"$FILE\""
 			)
 			CTIME=$(stat -c "%Y" "$FULLPATH") || echo unable to get stat of file $FULLPATH
 			#check if we need to compute a HASH
@@ -203,7 +228,7 @@ snapshot(){
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
 	do
-		echo Wait for jobs "${list[@]}" to finish
+		echo Wait for ${#list[*]} job to finish
 		wait -n
 	done
 }

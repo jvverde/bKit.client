@@ -263,46 +263,52 @@ bg_upload_manifest(){
 	)&
 }
 
-bg_upload_manifest "$ROOT" "$STARTDIR"
+LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
-echo Start to backup $BACKUPDIR at $(date -R)
+(
+	flock -n 9 || exit 1
+	 	
+	bg_upload_manifest "$ROOT" "$STARTDIR"
 
-echo Phase 1 - compute ids for new files and backup already server existing files
+	echo Start to backup $BACKUPDIR at $(date -R)
 
-time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
-touch "$ENDFLAG"
-wait4jobs
-rm -fv "$MANIFEST" "$ENDFLAG"
+	echo Phase 1 - compute ids for new files and backup already server existing files
 
-echo Phase 2 - backup everything includind attributes and acls
+	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+	touch "$ENDFLAG"
+	wait4jobs
+	rm -fv "$MANIFEST" "$ENDFLAG"
 
-bg_upload_manifest "$ROOT" "$STARTDIR"
+	echo Phase 2 - backup everything includind attributes and acls
 
-time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
+	bg_upload_manifest "$ROOT" "$STARTDIR"
 
-[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+	time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
 
-touch "$ENDFLAG"
-wait4jobs
-rm -fv "$MANIFEST" "$ENDFLAG"
+	[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+
+	touch "$ENDFLAG"
+	wait4jobs
+	rm -fv "$MANIFEST" "$ENDFLAG"
 
 
-time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
+	time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
-OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
+	OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 
-[[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
-	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
-	SRCDIR=".bkit/$STARTDIR"
-	[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
-	bash "$SDIR/acls.sh" "$BACKUPDIR" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
-	cd "$METADATADIR"
-	PACKDIR=".tar/$STARTDIR"
-	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
-	tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
-	backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata"
-) && echo Metadata tar sent to backup
+	[[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
+		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
+		SRCDIR=".bkit/$STARTDIR"
+		[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
+		bash "$SDIR/acls.sh" "$BACKUPDIR" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
+		cd "$METADATADIR"
+		PACKDIR=".tar/$STARTDIR"
+		[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
+		tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
+		backup "$METADATADIR" "$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata"
+	) && echo Metadata tar sent to backup
 
-time snapshot && echo snapshot done 
+	time snapshot && echo snapshot done
+) 9>"$LOCK" 
  
 echo Backup of $BACKUPDIR done at $(date -R)

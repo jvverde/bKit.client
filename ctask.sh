@@ -29,25 +29,25 @@ do
 	KEY="$1" && shift
 	case "$KEY" in	
 		-m|--minute)
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES 
+			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES 
 		;;
 		-h|--hour)
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
+			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
 			MINUTE=ONMINUTES
 		;;
 		-d|--day)
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
+			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 		;;
 		-w|--week)
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFWEEK="$1" && shift
+			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFWEEK="$1" && shift
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 			DAYOFWEEK=ONDAYOFWEEK
 		;;
 		-M|--monthly)
-			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
+			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 			DAYOFMONTH=ONDAYOFMONTH

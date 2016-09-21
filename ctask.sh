@@ -11,7 +11,7 @@ usage(){
 [[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
 	//https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 	echo I am to going to runas Administrator
-	cygAT -w --action=runas /bin/bash bash "$0" "$@" && exit
+	cygstart -w --action=runas /bin/bash bash "$0" "$@" && exit
 }
 ONALL='*'
 MINUTE=ONALL
@@ -59,12 +59,21 @@ do
 done
 
 
-BACKUPPATH=$1
-IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" $BACKUPPATH 2>/dev/null)
+BACKUPPATH=$(readlink -e "$1")
+NAME=$2
+
+IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
+
+[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
+LOGSDIR=$SDIR/logs$BACKUPPATH
+[[ -d $LOGSDIR ]] || mkdir -p "$LOGSDIR"
 
 {
 	crontab -l 2>/dev/null
-	echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$SDIR/logs/backup-$UUID'"
-} | sort -u | crontab 
+	echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
+} | sort -u | crontab
+
+#show what is scheduled 
+crontab -l
 
 

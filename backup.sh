@@ -109,7 +109,6 @@ FLIST=$RUNDIR/file-list.$$
 HLIST=$RUNDIR/hl-list.$$
 DLIST=$RUNDIR/dir-list.$$
 
-
 set_postpone_files(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"
@@ -164,6 +163,8 @@ update_files(){
 
 MANIFEST=$RUNDIR/manifest.$$
 ENDFLAG=$RUNDIR/endflag.$$
+
+trap "rm -fv '$FLIST' '$HLIST' '$DLIST' '$MANIFEST' '$ENDFLAG'" EXIT
 
 backup(){
 	local BASE=$1

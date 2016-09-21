@@ -9,7 +9,7 @@ usage(){
 }
 [[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
 [[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
-	//https://cygwin.com/ml/cygwin/2015-02/msg00057.html
+	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 	echo I am to going to runas Administrator
 	cygstart -w --action=runas /bin/bash bash "$0" "$@" && exit
 }
@@ -19,6 +19,7 @@ HOUR=ONALL
 DAYOFMONTH=ONALL
 MONTH=ONALL
 DAYOFWEEK=ONALL
+EVERY=1 #for windows only
 let ONMINUTES=$RANDOM%60
 let ONHOURS=$RANDOM%24
 let ONDAYOFWEEK=$RANDOM%7
@@ -29,24 +30,34 @@ do
 	KEY="$1" && shift
 	case "$KEY" in	
 		-m|--minute)
-			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES 
+			SCTYPE=MINUTE
+			[[ $# -gt 1 && (( $1 < 1440 && $1 > 0 )) ]] && EVERY=$1
+			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES
 		;;
 		-h|--hour)
+			SCTYPE=HOURLY
+			[[ $# -gt 1 && (( $1 < 24 && $1 > 0 )) ]] && EVERY=$1
 			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
 			MINUTE=ONMINUTES
 		;;
 		-d|--day)
+			SCTYPE=DAILY
+			[[ $# -gt 1 && (( $1 < 366 && $1 > 0 )) ]] && EVERY=$1
 			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 		;;
 		-w|--week)
+			SCTYPE=WEEKLY
+			[[ $# -gt 1 && (( $1 < 53 && $1 > 0 )) ]] && EVERY=$1
 			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFWEEK="$1" && shift
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 			DAYOFWEEK=ONDAYOFWEEK
 		;;
 		-M|--monthly)
+			SCTYPE=MONTHLY
+			[[ $# -gt 1 && (( $1 < 12 && $1 > 0 )) ]] && EVERY=$1
 			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
@@ -60,20 +71,30 @@ done
 
 
 BACKUPPATH=$(readlink -e "$1")
+exists cygptah && BACKUPPATH=$(cygpath -u "$BACKUPPATH")
 NAME=$2
 
-IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
-
-[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
 LOGSDIR=$SDIR/logs$BACKUPPATH
 [[ -d $LOGSDIR ]] || mkdir -p "$LOGSDIR"
 
-{
-	crontab -l 2>/dev/null
-	echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
-} | sort -u | crontab
+IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
 
-#show what is scheduled 
-crontab -l
+if [[ $OS == cygwin ]]
+then
+	DOSBASH=$(cygpath -w "$BASH")
+	CMD="\"$DOSBASH\" \"$SDIR/backup.sh\"  --uuid \"$UUID\"  --dir \"$DIR\"  --log \"$LOGSDIR/${NAME:-_}-$UUID\""
+	schtasks /CREATE /RU "SYSTEM" /SC $SCTYPE /MO $EVERY /TN "BKIT_${NAME:-_}" /TR "$CMD"
+else
+	[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
+
+	{
+		crontab -l 2>/dev/null
+		echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
+	} | sort -u | crontab
+
+	#show what is scheduled 
+	crontab -l
+fi
+
 
 

@@ -1,14 +1,14 @@
 #!/bin/bash
-
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 die() { echo -e "$@">&2; exit 1; }
+
+[[ $1 =~ ^-{1,2}l(og)? ]] && shift && exec 1>"$1" && shift  #-l|-log|--log option
+
 [[ -e $1 ]] || die "'$1' was does not not exists"
+
 DIR=$(cygpath -u "$(readlink -e "$1")")
 DRIVE=$(cygpath -w "$(stat -c%m "$DIR")")
-
-LOGSDIR="$SDIR/logs"
-[[ -d $LOGSDIR ]] || mkdir -p "$LOGSDIR"
 
 DOSBASH=$(cygpath -w "$BASH")
 
@@ -26,7 +26,8 @@ done
 if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
 then
 	echo Backup shadow copy
-	"$SDIR/3rd-party/shadowspawn/ShadowSpawn.exe" /verbosity=4 $DRIVE $MAPLETTER "$DOSBASH" "'$SDIR/backup.sh'" "'$DIR'" $MAPLETTER
+	SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
+	"$SHADOWSPAN" /verbosity=4 $DRIVE $MAPLETTER "$DOSBASH" "'$SDIR/backup.sh'" "'$DIR'" $MAPLETTER
 else
 	echo Backup directly -- without shadow copy
 	echo bash "%SDIR%backup.sh" "$DIR"

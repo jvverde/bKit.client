@@ -71,19 +71,23 @@ done
 
 
 BACKUPPATH=$(readlink -e "$1")
-exists cygptah && BACKUPPATH=$(cygpath -u "$BACKUPPATH")
+exists cygpath && BACKUPPATH=$(cygpath -u "$BACKUPPATH")
 NAME=$2
 
 LOGSDIR=$SDIR/logs$BACKUPPATH
-[[ -d $LOGSDIR ]] || mkdir -p "$LOGSDIR"
+[[ -d $LOGSDIR ]] || mkdir -pv "$LOGSDIR"
 
 IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
 
 if [[ $OS == cygwin ]]
 then
-	DOSBASH=$(cygpath -w "$BASH")
-	CMD="\"$DOSBASH\" \"$SDIR/backup.sh\"  --uuid \"$UUID\"  --dir \"$DIR\"  --log \"$LOGSDIR/${NAME:-_}-$UUID\""
-	schtasks /CREATE /RU "SYSTEM" /SC $SCTYPE /MO $EVERY /TN "BKIT_${NAME:-_}" /TR "$CMD"
+	DRIVE=$(cygpath -w "$(stat -c%m "$BACKUPPATH")")
+	[[ -z $NAME ]] && NAME=$(FSUTIL  FSINFO VOLUMEINFO $DRIVE|grep -Poi '(?<=Volume Name\s:\s).*')
+	DOSBASH=$(cygpath -w "$BASH").exe
+	LETTER=${DRIVE%%:*}
+	CMD="$DOSBASH '$SDIR/backup.sh'  --uuid '$UUID'  --dir '$DIR'  --log '$LOGSDIR/${NAME:-_}-$UUID'"
+	FLATDIR=${DIR////.}
+	schtasks /CREATE /RU "SYSTEM" /SC $SCTYPE /MO $EVERY /TN "BKIT-${LETTER:-_}-${NAME:-_}-$UUID-$FLATDIR" /TR "$CMD"
 else
 	[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
 

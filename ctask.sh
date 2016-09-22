@@ -30,35 +30,40 @@ do
 	KEY="$1" && shift
 	case "$KEY" in	
 		-m|--minute)
-			SCTYPE=MINUTE
-			[[ $# -gt 1 && (( $1 < 1440 && $1 > 0 )) ]] && EVERY=$1
-			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES
+			SCHTYPE=MINUTE
+			[[ $# -gt 1 ]] || continue
+			(( $1 < 1440 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES
 		;;
 		-h|--hour)
-			SCTYPE=HOURLY
-			[[ $# -gt 1 && (( $1 < 24 && $1 > 0 )) ]] && EVERY=$1
-			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
+			SCHTYPE=HOURLY
+			[[ $# -gt 1 ]] || continue
+			(( $1 < 24 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
 			MINUTE=ONMINUTES
 		;;
 		-d|--day)
-			SCTYPE=DAILY
-			[[ $# -gt 1 && (( $1 < 366 && $1 > 0 )) ]] && EVERY=$1
-			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
+			SCHTYPE=DAILY
+			[[ $# -gt 1 ]] || continue
+			(( $1 < 366 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 		;;
 		-w|--week)
-			SCTYPE=WEEKLY
-			[[ $# -gt 1 && (( $1 < 53 && $1 > 0 )) ]] && EVERY=$1
-			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFWEEK="$1" && shift
+			SCHTYPE=WEEKLY
+			[[ $# -gt 1 ]] || continue
+			(( $1 < 53 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFWEEK="$1" && shift
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 			DAYOFWEEK=ONDAYOFWEEK
 		;;
 		-M|--monthly)
-			SCTYPE=MONTHLY
-			[[ $# -gt 1 && (( $1 < 12 && $1 > 0 )) ]] && EVERY=$1
-			[[ $# -gt 1 && "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
+			SCHTYPE=MONTHLY
+			[[ $# -gt 1 ]] || continue
+			(( $1 < 12 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 			DAYOFMONTH=ONDAYOFMONTH
@@ -74,22 +79,32 @@ BACKUPPATH=$(readlink -e "$1")
 exists cygpath && BACKUPPATH=$(cygpath -u "$BACKUPPATH")
 NAME=$2
 
-LOGSDIR=$SDIR/logs$BACKUPPATH
+LOGSDIR=$SDIR/logs
 [[ -d $LOGSDIR ]] || mkdir -pv "$LOGSDIR"
 
 IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
+
+[[ -n $DIR ]] && FLATDIR=${DIR//[^a-zA-Z0-9_-]/_} || FLATDIR=ROOT
 
 if [[ $OS == cygwin ]]
 then
 	DRIVE=$(cygpath -w "$(stat -c%m "$BACKUPPATH")")
 	[[ -z $NAME ]] && NAME=$(FSUTIL  FSINFO VOLUMEINFO $DRIVE|grep -Poi '(?<=Volume Name\s:\s).*')
-	DOSBASH=$(cygpath -w "$BASH").exe
+	DOSBASH=$(cygpath -w "$BASH")
 	LETTER=${DRIVE%%:*}
-	CMD="$DOSBASH '$SDIR/backup.sh'  --uuid '$UUID'  --dir '$DIR'  --log '$LOGSDIR/${NAME:-_}-$UUID'"
-	FLATDIR=${DIR////.}
-	schtasks /CREATE /RU "SYSTEM" /SC $SCTYPE /MO $EVERY /TN "BKIT-${LETTER:-_}-${NAME:-_}-$UUID-$FLATDIR" /TR "$CMD"
+	TASKDIR="$SDIR/schtasks"
+	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
+	TASKNAME="BKIT-${LETTER:-_}-${NAME:-_}-$UUID-${FLATDIR}"
+	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
+	LOGFILE="$LOGSDIR/${TASKNAME}.log"
+	CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
+	echo $CMD > "$TASKBATCH"
+	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
+	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /TN "$TASKNAME" /TR "$TASCMD"
+	schtasks /QUERY|fgrep BKIT
 else
 	[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
+	LOGFILE="$LOGSDIR/${NAME:-_}-$UUID.${FLATDIR}.log"
 
 	{
 		crontab -l 2>/dev/null

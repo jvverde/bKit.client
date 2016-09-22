@@ -14,7 +14,7 @@ DOSBASH=$(cygpath -w "$BASH")
 
 NTFS=$(FSUTIL FSINFO VOLUMEINFO $DRIVE | fgrep -i "File System Name" | fgrep -oi "NTFS")
 FIXED=$(FSUTIL FSINFO DRIVETYPE $DRIVE | fgrep -oi "Fixed Drive")
-CDRIVES=$(FSUTIL FSINFO DRIVES|sed 's/\r//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*')
+CDRIVES=$(FSUTIL FSINFO DRIVES|sed 's/\r//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*'|tr '[:lower:]' '[:upper:]')
 
 for LETTER in {H..Z} B {D..G} A
 do

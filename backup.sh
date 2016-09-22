@@ -28,7 +28,6 @@ do
 	esac
 done
 
-
 [[ -z $BACKUPDIR ]] && {
 	BACKUPDIR="$1" && shift
 }
@@ -51,7 +50,7 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 	ROOT=$MOUNT
 } || {
 	MOUNT=$(stat -c%m "$BACKUPDIR")
-	STARTDIR=${BACKUPDIR#$MOUNT}
+	[[ -z $STARTDIR ]] && STARTDIR=${BACKUPDIR#$MOUNT}
 	STARTDIR=${STARTDIR#/}	
 	DEV=$(df --output=source "$MOUNT"|tail -1)
 	ROOT=$MOUNT

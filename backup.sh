@@ -22,6 +22,9 @@ do
 		-d|--dir) 
 			STARTDIR="$1" && shift
 		;;
+		-s|--snap) 
+			SNAP=true
+		;;
 		*)
 			die Unknow	option $KEY
 		;;		
@@ -58,6 +61,8 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 }
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
+
+$SNAP && "$SDIR/snap-backup.sh" "$BACKUPDIR" && exit
 
 source "$SDIR/drive.sh" "$DEV"
 

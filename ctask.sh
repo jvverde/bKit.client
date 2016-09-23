@@ -97,7 +97,7 @@ then
 	TASKNAME="BKIT-${LETTER:-_}-${NAME:-_}-$UUID-${FLATDIR}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
 	LOGFILE="$LOGSDIR/${TASKNAME}.log"
-	CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
+	CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --snap --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
 	echo $CMD > "$TASKBATCH"
 	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /TN "$TASKNAME" /TR "$TASCMD"

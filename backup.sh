@@ -62,7 +62,8 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
-$SNAP && "$SDIR/snap-backup.sh" "$BACKUPDIR" && exit
+
+[[ $SNAP == true ]] && "$SDIR/snap-backup.sh" "$BACKUPDIR" && exit
 
 source "$SDIR/drive.sh" "$DEV"
 

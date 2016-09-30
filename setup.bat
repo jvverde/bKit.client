@@ -24,7 +24,7 @@ if not exist %bash% (
 )
 for %%F in ("%bash%") do set dirname=%%~dpF
 
->bash.bat (
+>"%OP%bash.bat" (
   echo ^@echo OFF
   echo :: This file is automatically create by %0. Don't change it
   echo set oldhome=%%HOME%%
@@ -38,4 +38,5 @@ for %%F in ("%bash%") do set dirname=%%~dpF
   echo set SHELL=%%oldshell%%
   echo set HOME=%%oldhome%%
 )
-
+echo Compile excludes file
+call "%OP%bash.bat" "%OP%make-excludes.sh"

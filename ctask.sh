@@ -100,7 +100,8 @@ then
 	CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --snap --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
 	echo $CMD > "$TASKBATCH"
 	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
-	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /TN "$TASKNAME" /TR "$TASCMD"
+	ST=$(A=$(date +%s);let B=$RANDOM%3600; let C=A+B; date -d "1970-01-01 $C sec" +"%H:%M")
+	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST $ST /TN "$TASKNAME" /TR "$TASCMD"
 	schtasks /QUERY|fgrep BKIT
 else
 	[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')

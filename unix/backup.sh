@@ -3,13 +3,16 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"								#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" 2>&1 && shift
 
-BACKUPDIR="$1"
-
 die() { echo -e "$@"; exit 1; }
+
+[[ -d $1 ]] || die Cannot find directory $1
+
+BACKUPDIR=$(readlink -ne "$1")
+
 
 [[ $BACKUPDIR == /dev/* ]] && { 
 
-	DEV=$(readlink -ne $BACKUPDIR)
+	DEV=$BACKUPDIR
 	
 	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 
@@ -19,11 +22,19 @@ die() { echo -e "$@"; exit 1; }
 	} 
 	ROOT=$MOUNT
 	BPATH=""
-} || die mais logo vejo isso
+} || {
+	MOUNT=$(stat -c%m "$BACKUPDIR")
+	ROOT=$MOUNT
+	BPATH=${BACKUPDIR#$ROOT}
+	DEV=$(df --output=source "$ROOT"|tail -1)
+}
+
+echo DEV $DEV
 echo ROOT $ROOT
 echo BAPTH $BPATH
+exit
 
-. $SDIR/drive.sh $DEV
+ $SDIR/drive.sh $DEV
 
 RID="_.$VOLUMESERIALNUMBER.$VOLUMENAME.$DRIVETYPE.$FILESYSTEM"
 CONF="$SDIR/conf/conf.init"

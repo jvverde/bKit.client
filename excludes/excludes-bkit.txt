@@ -1,0 +1,6 @@
+run/*
+cache/*
+cache/**
+logs/*
+tmp/*
+old/*

@@ -14,8 +14,8 @@ exists wmic && {
 	true ${DOMAIN:=local}
 	NAME="$(hostname -s)"
 	true ${NAME:=noname}
-	echo UUID $UUID
-	echo DOMAIN $DOMAIN
-	echo NAME $NAME
+	#echo UUID $UUID
+	#echo DOMAIN $DOMAIN
+	#echo NAME $NAME
 }
 

@@ -1,3 +1,4 @@
+die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 exists fsutil && {
 	DRIVE=${1:-$DRIVE}
@@ -17,7 +18,7 @@ exists fsutil && {
 	)
 } 2>/dev/null
 exists lsblk && exec 3>&2 && {
-	[[ $UID -eq 0 ]] || echo $0 must be run as root>&3
+	[[ $UID -eq 0 ]] || die $0 must be run as root>&3
 	DEV=$1
 	VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 	true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}

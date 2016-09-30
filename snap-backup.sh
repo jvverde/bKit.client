@@ -30,5 +30,5 @@ then
 	"$SHADOWSPAN" /verbosity=4 $DRIVE $MAPLETTER "$DOSBASH" "'$SDIR/backup.sh'" "'$DIR'" $MAPLETTER
 else
 	echo Backup directly -- without shadow copy
-	echo bash "%SDIR%backup.sh" "$DIR"
+	bash "%SDIR%backup.sh" "$DIR"
 fi

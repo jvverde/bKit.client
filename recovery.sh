@@ -17,7 +17,7 @@ DIR=$(get_json path < $RESOURCE )
 ENTRY=$(get_json entry < $RESOURCE)
 
 IFS='.' read -r DRIVE VOLUME NAME DESCRIPTION FS <<< "$DISK"
-DEV=$($SDIR/findDrive.sh $VOLUME) || die Cannot found the volume $VOLUME on this computer
+DEV=$(bash "$SDIR/findDrive.sh" $VOLUME) || die Cannot found the volume $VOLUME on this computer
 [[ -b $DEV ]] && {
   echo i need to mount this
 } || DST=$DEV
@@ -41,5 +41,4 @@ PERM="--acls --owner --group --super --numeric-ids"
 OPTIONS="--delete-delay --delay-updates --force --stats --fuzzy"
 
 EXEC="rsync -rlitzvvhR $PERM $OPTIONS $FMT $PASS $SRC $DST/"
-#$EXEC
 echo $EXEC

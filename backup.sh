@@ -42,7 +42,7 @@ exists cygpath && BACKUPDIR=$(cygpath "$BACKUPDIR") && SDIR=$(cygpath "$SDIR")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-[[ $BACKUPDIR == /dev/* ]] && {
+[[ -b $BACKUPDIR ]] && { #id it is a block device, then check if it is mounted and mount it if not
 	DEV=$BACKUPDIR
 	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 	[[ -n $MOUNT ]] || MOUNT=$(df --output=source,target|tail -n +2|fgrep "$DEV"|sort|head -n 1|awk '{print $2}')

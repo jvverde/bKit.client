@@ -1,4 +1,5 @@
-die() { echo -e "$@">&2; exit 1; }
+#!/bin/bash
+die() { echo -e "$@" >&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 exists fsutil && {
 	DRIVE=${1:-$DRIVE}

@@ -38,5 +38,4 @@ for %%F in ("%bash%") do set dirname=%%~dpF
   echo set SHELL=%%oldshell%%
   echo set HOME=%%oldhome%%
 )
-echo Compile excludes file
-call "%OP%bash.bat" "%OP%make-excludes.sh"
+call "%OP%bash.bat" "%OP%setup.sh"

@@ -7,7 +7,7 @@ exists fsutil && {
   for DRV in $(fsutil fsinfo drives|sed 's/\r//g;s/\\//g' |cut -d' ' -f2-)
   do
     fsutil fsinfo drivetype $DRV|grep -Piq 'Ram\s+Disk' && continue
-    fsutil fsinfo volumeinfo $DRV|grep -Piq '^\s*Volume\s+Serial\s+Number\s*:\s*0x'$UUID'\s*$' || continue
+    fsutil fsinfo volumeinfo "$DRV\\"|grep -Piq '^\s*Volume\s+Serial\s+Number\s*:\s*0x'$UUID'\s*$' || continue
     echo $DRV && exit 0
   done
 }

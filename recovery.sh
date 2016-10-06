@@ -24,14 +24,15 @@ function get_json(){
 	grep -Po '(?<="'$1'":")(?:|.*?[^\\])(?=")'
 }
 
-[[ -e $1 ]] || die "Usage:\n\t$0 resource"
+[[ -e $1 ]] || die "Usage:\n\t${0//\\/\\\\} resource"
 
-RESOURCE=$1
-BACKUP=$(get_json backup < $RESOURCE)
-DISK=$(get_json drive < $RESOURCE)
-COMPUTER=$(get_json computer < $RESOURCE)
-DIR=$(get_json path < $RESOURCE )
-ENTRY=$(get_json entry < $RESOURCE)
+exists cygpath && RESOURCE=$(cygpath "$1") || RESOURCE=$1
+
+BACKUP=$(get_json backup < "$RESOURCE")
+DISK=$(get_json drive < "$RESOURCE")
+COMPUTER=$(get_json computer < "$RESOURCE")
+DIR=$(get_json path < "$RESOURCE" )
+ENTRY=$(get_json entry < "$RESOURCE")
 
 IFS='.' read -r DRIVE VOLUME NAME DESCRIPTION FS <<< "$DISK"
 
@@ -46,7 +47,7 @@ ask "A pasta '$FOLDER' vai ser recuperada a partir do backup efectuado em:\n\t$B
 
 exists cygpath && DST=$(cygpath "$DST")
 
-. computer.sh                                                               #get $DOMAIN, $NAME and $UUID
+. "$SDIR/computer.sh"                                                               #get $DOMAIN, $NAME and $UUID
 THIS=$DOMAIN.$NAME.$UUID
 
 [[ $THIS != $COMPUTER ]] && [[ -n $FORCE ]] && die This is not the same computer; 
@@ -61,12 +62,12 @@ FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--acls --owner --group --super --numeric-ids"
 OPTIONS="--delete-delay --delay-updates --force --stats --fuzzy"
-
-EXEC="rsync -rlitzvvhRP $PERM $OPTIONS $FMT $PASS $SRC $DST/"
-$EXEC && info "A pasta '$FOLDER' foi recuperada com sucesso"
+export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
+rsync -rlitzvvhRP $PERM $OPTIONS $FMT "$SRC" "$DST/" || die "Problemas ao recuperar a pasta '$FOLDER'"
 
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 [[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
-	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUME}
-	
-}
+	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUME}	
+)
+
+info "A pasta '$FOLDER' foi recuperada com sucesso" 

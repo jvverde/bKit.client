@@ -26,7 +26,7 @@ function get_json(){
 
 [[ -e $1 ]] || die "Usage:\n\t${0//\\/\\\\} resource"
 
-exists cygpath && RESOURCE=$(cygpath "$1") || RESOURCE=$1
+exists cygpath && RESOURCE=$(cygpath "$1") && SDIR=$(cygpath "$SDIR") || RESOURCE=$1
 
 BACKUP=$(get_json backup < "$RESOURCE")
 DISK=$(get_json drive < "$RESOURCE")
@@ -59,15 +59,24 @@ CONF="$SDIR/conf/conf.init"
 SRC=$(echo $BACKUPURL/$DISK/.snapshots/$BACKUP/data/./$DIR/$ENTRY|sed s#/././#/./#)       #for cases where DIR=.
 
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
-PASS="--password-file=$SDIR/conf/pass.txt"
+#PASS="--password-file=$SDIR/conf/pass.txt"
 PERM="--acls --owner --group --super --numeric-ids"
 OPTIONS="--delete-delay --delay-updates --force --stats --fuzzy"
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 rsync -rlitzvvhRP $PERM $OPTIONS $FMT "$SRC" "$DST/" || die "Problemas ao recuperar a pasta '$FOLDER'"
 
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
-[[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
-	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUME}	
+[[ $OSTYPE == 'cygwin' && $DISK =~  NTFS ]] && (
+	SRCMETA="$BACKUPURL/$DISK/.snapshots/$BACKUP/metadata/./.tar/"   
+	METADATADIR=$(cygpath "$SDIR/cache/metadata/by-volume/${VOLUME}/")
+	rsync -tizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao recuperar as ACLs"
+	RUN=$SDIR/run/metadata.$$
+	mkdir -pv "$RUN"
+	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/"
+	DRIVE=$(cygpath -w "$DST")
+	DRIVE=${DRIVE:0:1} 
+	find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print0 |
+		LC_ALL='UTF-16' xargs -0rI{} sed -E 's#\+File [A-Z]:#+File '$DRIVE':#i'  {} 
 )
 
 info "A pasta '$FOLDER' foi recuperada com sucesso" 

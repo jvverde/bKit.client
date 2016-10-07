@@ -74,9 +74,21 @@ OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 	mkdir -pv "$RUN"
 	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/"
 	DRIVE=$(cygpath -w "$DST")
-	DRIVE=${DRIVE:0:1} 
+	DRIVE=${DRIVE:0:1}
+	SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
+	while IFS="\0" read FILE
+	do	
+			echo $FILE
+	done < <(find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print0)
+	exit
 	find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print0 |
-		LC_ALL='UTF-16' xargs -0rI{} sed -E 's#\+File [A-Z]:#+File '$DRIVE':#i'  {} 
+		xargs -0rI{} sh -c '
+			iconv -f UTF-16LE -t UTF-8 "$1" | 
+				sed -E "s#\\+File [A-Z]:#+File $2:#i" |
+				iconv  -f UTF-8 -t UTF-16LE > "$1.acl"
+			FILE=$(cygpath -w "$1.acl")
+			"$3" /playfile "$FILE"
+		' -- "{}" $DRIVE $SUBINACL
 )
 
 info "A pasta '$FOLDER' foi recuperada com sucesso" 

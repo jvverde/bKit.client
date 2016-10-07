@@ -66,29 +66,24 @@ export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 rsync -rlitzvvhRP $PERM $OPTIONS $FMT "$SRC" "$DST/" || die "Problemas ao recuperar a pasta '$FOLDER'"
 
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
-[[ $OSTYPE == 'cygwin' && $DISK =~  NTFS ]] && (
+[[ $OSTYPE == 'cygwin' && $DISK =~  NTFS ]] && {
 	SRCMETA="$BACKUPURL/$DISK/.snapshots/$BACKUP/metadata/./.tar/"   
 	METADATADIR=$(cygpath "$SDIR/cache/metadata/by-volume/${VOLUME}/")
-	rsync -tizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao recuperar as ACLs"
+	rsync -tizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao descarregar as ACLs"
 	RUN=$SDIR/run/metadata.$$
-	mkdir -pv "$RUN"
-	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/"
+	mkdir -p "$RUN"
+	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/" || die "Problemaa ao desenpacotar as ACLs"
 	DRIVE=$(cygpath -w "$DST")
-	DRIVE=${DRIVE:0:1}
-	SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
-	while IFS="\0" read FILE
+	SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit) 
+	[[ -f $SUBINACL ]] || die "A aplicação 'subinacl.exe' não foi encontrada"
+	while read FILE
 	do	
-			echo $FILE
-	done < <(find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print0)
-	exit
-	find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print0 |
-		xargs -0rI{} sh -c '
-			iconv -f UTF-16LE -t UTF-8 "$1" | 
-				sed -E "s#\\+File [A-Z]:#+File $2:#i" |
-				iconv  -f UTF-8 -t UTF-16LE > "$1.acl"
-			FILE=$(cygpath -w "$1.acl")
-			"$3" /playfile "$FILE"
-		' -- "{}" $DRIVE $SUBINACL
-)
-
+		iconv -f UTF-16LE -t UTF-8 "$FILE" | 
+			sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
+			iconv  -f UTF-8 -t UTF-16LE > "$FILE.acl"
+		"$SUBINACL" /playfile "$(cygpath -w "$FILE.acl")" || die 'Erro ao aplicar as ACLs'
+	done < <(find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print)
+	rm -rf "$RUN"
+} 
+ 
 info "A pasta '$FOLDER' foi recuperada com sucesso" 

@@ -275,31 +275,31 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 (
 	flock -n 9 || die Volume $VOLUMESERIALNUMBER is locked
 	 	
-	#bg_upload_manifest "$ROOT" "$STARTDIR"
+	bg_upload_manifest "$ROOT" "$STARTDIR"
 
 	echo Start to backup $BACKUPDIR at $(date -R)
 
 	echo Phase 1 - compute ids for new files and backup already server existing files
 
-	#time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
-	#touch "$ENDFLAG"
-	#wait4jobs
+	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+	touch "$ENDFLAG"
+	wait4jobs
 	rm -fv "$MANIFEST" "$ENDFLAG"
 
 	echo Phase 2 - backup everything includind attributes and acls
 
-	#bg_upload_manifest "$ROOT" "$STARTDIR"
+	bg_upload_manifest "$ROOT" "$STARTDIR"
 
-	#time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
+	time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
 
-	#[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+	[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
 
-	#touch "$ENDFLAG"
-	#wait4jobs
+	touch "$ENDFLAG"
+	wait4jobs
 	rm -fv "$MANIFEST" "$ENDFLAG"
 
 
-	#time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
+	time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
 	OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 

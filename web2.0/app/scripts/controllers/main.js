@@ -8,10 +8,13 @@
  * Controller of the bkitApp
  */
 angular.module('bkitApp')
-  .controller('MainCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+  .controller('MainCtrl', ['$scope', 'config',
+    function ($scope, $config) {
+      var self = this;
+
+      self.img = $config.logo.path + $config.logo.name(512, 'png');
+
+      self.dayFormat = $config.calendar.dayFormat;
+      self.firstDayOfWeek = $config.calendar.firstDayOfWeek;
+    }
+  ]);

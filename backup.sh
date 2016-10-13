@@ -109,10 +109,14 @@ dorsync(){
 }
 
 RUNDIR=$SDIR/run
-mkdir -p $RUNDIR
+[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
 FLIST=$RUNDIR/file-list.$$
 HLIST=$RUNDIR/hl-list.$$
 DLIST=$RUNDIR/dir-list.$$
+MANIFEST=$RUNDIR/manifest.$$
+ENDFLAG=$RUNDIR/endflag.$$
+
+trap "rm -fv $RUNDIR/*.$$" EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -120,7 +124,7 @@ set_postpone_files(){
 	exec 97>"$FLIST"
 }
 remove_postpone_files(){
-	rm -rfv "$HLIST" "$DLIST" "$FLIST"
+	rm -f "$HLIST" "$DLIST" "$FLIST"
 }
 postpone_file(){ 
 	(IFS=$'\n' && echo "$*" ) >&97
@@ -166,11 +170,6 @@ update_files(){
 	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $FMT "$@"
 	rm -f "$FILE"
 }
-
-MANIFEST=$RUNDIR/manifest.$$
-ENDFLAG=$RUNDIR/endflag.$$
-
-trap "rm -fv '$FLIST' '$HLIST' '$DLIST' '$MANIFEST' '$ENDFLAG'" EXIT
 
 backup(){
 	local BASE=$1
@@ -251,7 +250,7 @@ bg_upload_manifest(){
 		let LEN=500
 		SEGMENT=$RUNDIR/segment.$$
 		SEGFILES=$RUNDIR/segment-files.$$	
-		while true
+		while [[ -e $MANIFEST ]]
 		do
 			let END=LEN+START-1
 			let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
@@ -266,7 +265,7 @@ bg_upload_manifest(){
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
-		rm -fv "$SEGMENT" "$SEGFILES"
+		rm -f "$SEGMENT" "$SEGFILES"
 	)&
 }
 
@@ -284,7 +283,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
 	touch "$ENDFLAG"
 	wait4jobs
-	rm -fv "$MANIFEST" "$ENDFLAG"
+	rm -f "$MANIFEST" "$ENDFLAG"
 
 	echo Phase 2 - backup everything includind attributes and acls
 
@@ -296,7 +295,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	touch "$ENDFLAG"
 	wait4jobs
-	rm -fv "$MANIFEST" "$ENDFLAG"
+	rm -f "$MANIFEST" "$ENDFLAG"
 
 
 	time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
@@ -317,5 +316,5 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	time snapshot && echo snapshot done
 	echo Backup of $BACKUPDIR done at $(date -R)
-) 9>"$LOCK" 
+) 9>"$LOCK"
  

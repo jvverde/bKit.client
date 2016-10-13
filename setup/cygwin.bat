@@ -10,16 +10,24 @@ for %%i in ("%~dp0..") do set "PARENT=%%~fi"
 
 set MODULES=awk,rsync,xargs,ping,nc,util-linux,ntfsprogs,sqlite3
 
-set ARGS= -B -R %PARENT%\3rd-party\cygwin -d -N -n -X -q -s http://ftp.snt.utwente.nl/pub/software/cygwin/ -P %MODULES%
 
 reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | findstr /i "x86" > NUL && set OSARCH=32BIT || set OSARCH=64BIT
 
-#ver | findstr /IL "5.1." > NUL && set "XP=XP"
-
-if %OSARCH%==32BIT ( 
-	%~dp0\cygwin\setup-x86.exe %ARGS%
-) else ( 
-	%~dp0\cygwin\setup-x86_64.exe %ARGS%
+ver | findstr /IL "5.1." > NUL && set "XP=XP"
+if %XP%==XP (
+	set ARGS= -B -R %PARENT%\3rd-party\cygwin -d -N -n -X -q -L -l %~dp0\cygwin-xp\repo -P %MODULES%
+	if %OSARCH%==32BIT ( 
+		%~dp0\cygwin-xp\setup-x86-2.874.exe %ARGS%
+	) else ( 
+		%~dp0\cygwin-xp\setup-x86_64-2.874.exe %ARGS%
+	)
+) else (
+	set ARGS= -B -R %PARENT%\3rd-party\cygwin -d -N -n -X -q -s http://ftp.snt.utwente.nl/pub/software/cygwin/ -P %MODULES%
+	if %OSARCH%==32BIT ( 
+		%~dp0\cygwin\setup-x86.exe %ARGS%
+	) else ( 
+		%~dp0\cygwin\setup-x86_64.exe %ARGS%
+	)
 )
 
 cd %wim%

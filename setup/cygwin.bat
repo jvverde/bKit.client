@@ -14,6 +14,8 @@ set ARGS= -B -R %PARENT%\3rd-party\cygwin -d -N -n -X -q -s http://ftp.snt.utwen
 
 reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | findstr /i "x86" > NUL && set OSARCH=32BIT || set OSARCH=64BIT
 
+#ver | findstr /IL "5.1." > NUL && set "XP=XP"
+
 if %OSARCH%==32BIT ( 
 	%~dp0\cygwin\setup-x86.exe %ARGS%
 ) else ( 

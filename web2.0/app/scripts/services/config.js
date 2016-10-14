@@ -1,8 +1,14 @@
 'use strict';
 
+/**
+ * @ngdoc service
+ * @name bkitApp.config
+ * @description
+ * # config
+ * Constant in the bkitApp.
+ */
 angular.module('bkitApp')
-  .constants('config', {
-
+  .constant('config', {
     calendar: {
       dayFormat: 'd',
       firstDayOfWeek: 1

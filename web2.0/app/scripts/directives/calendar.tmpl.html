@@ -1,3 +1,16 @@
-<div layout="row" layout-align="center center">
 
+<div layout="row" layout-align="center stretch">
+  <div layout="column">
+
+  </div>
+  <div layout="column">
+    <div layout="row" layout-align="center center">
+      <div class="day" layout="column" ng-repeat="day in week" layout-align="start stretch" ng-click="onDayClick($event)">
+          <header>{{day}}</header>
+      </div>
+    </div>
+  </div>
+  <div layout="column">
+
+  </div>
 </div>

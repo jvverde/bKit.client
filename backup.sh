@@ -111,7 +111,7 @@ DLIST=$RUNDIR/dir-list.$$
 MANIFEST=$RUNDIR/manifest.$$
 ENDFLAG=$RUNDIR/endflag.$$
 
-trap "rm -fv $RUNDIR/*.$$" EXIT
+trap "rm -fv $RUNDIR/*.$$ $RUNDIR/*.$$.*" EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -267,7 +267,10 @@ bg_upload_manifest(){
 LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 (
-	flock -n 9 || die Volume $VOLUMESERIALNUMBER is locked
+	flock -w $((3600*24)) 9 || {
+		rm -fv "$LOCK"
+		die Volume $VOLUMESERIALNUMBER was locked
+	}
 	 	
 	bg_upload_manifest "$ROOT" "$STARTDIR"
 
@@ -312,4 +315,4 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	time snapshot && echo snapshot done
 	echo Backup of $BACKUPDIR done at $(date -R)
 ) 9>"$LOCK"
- 
+

@@ -27,11 +27,11 @@ echo Writing configuration to $INITFILE
 )> "$INITFILE"
 
 PASSFILE=$CONFDIR/pass.txt
-echo $PASS > $PASSFILE
-chmod 600 $PASSFILE
+echo $PASS > "$PASSFILE"
+chmod 600 "$PASSFILE"
 
 type rsync 2>/dev/null 1>&2 || die rsync not found
 
-rsync -rltvvhR --inplace --stats ${CONFDIR}/./ rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
+rsync -rltvvhR --inplace --stats "${CONFDIR}/./" rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1

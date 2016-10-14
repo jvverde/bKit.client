@@ -9,10 +9,12 @@
 angular.module('bkitApp')
   .directive('day', function () {
     return {
-      template: '<div></div>',
+      templateUrl: 'scripts/directives/day.tmpl.html',
       restrict: 'E',
-      link: function postLink(scope, element, attrs) {
-        element.text('this is the day directive');
+      link: function postLink(scope, element, iAttrs) {
+        // console.log('iAttrs', iAttrs);
+        // if (!iAttrs.date) throw new Error('Attr "date" is required for "Day" directive');
+        // scope.date = iAttrs.date.format('DD');
       }
     };
   });

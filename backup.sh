@@ -78,7 +78,6 @@ exists rsync || die Cannot find rsync
 exists sqlite3 || die Cannot find sqlite3
 
 trap '' SIGPIPE
-#echo "backup $BACKUPDIR ($ROOT) in $RVID" && exit
 
 dorsync(){
 	local RETRIES=1000
@@ -95,13 +94,9 @@ dorsync(){
 				sleep $DELAY
 				echo Try again now
 			;;
-			23|24)
-				echo Rsync returns a non null value "'$ret'" but I will ignore it 
-				break
-			;;
 			*)
 				echo Fail to backup. Exit value of rsync is non null: $ret 
-				exit 1
+				break
 			;;
 		esac
 		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break 
@@ -138,15 +133,15 @@ postpone_update(){
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 EXC="--exclude-from=$SDIR/conf/excludes.txt"
-#PASS="--password-file=$SDIR/conf/pass.txt"
-export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 CLEAN="--delete --force --delete-excluded --ignore-non-existing --ignore-existing"
-#CLEAN="--delete --force --delete-excluded"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
 FMT_QUERY3='--out-format=%i|%n'
+
+export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
+[[ -e $SDIR/conf/excludes.txt ]] || bash "$SDIR/make-excludes.sh"
 
 update_hardlinks(){
 	FILE="${HLIST}.sort"

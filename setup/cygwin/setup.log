@@ -1,0 +1,4 @@
+2016/10/04 14:53:25 Starting cygwin install, version 2.876
+2016/10/04 14:53:25 mbox Cygwin Setup: Cygwin is not supported on this Windows version
+2016/10/04 14:53:34 AddAccessAllowedAceEx(, owner) failed: 1337
+2016/10/04 14:53:34 AddAccessAllowedAceEx(, group) failed: 1337

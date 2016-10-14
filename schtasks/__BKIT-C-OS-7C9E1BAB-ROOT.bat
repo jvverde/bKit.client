@@ -1,1 +1,0 @@
-"C:\bkit.me\scripts\client\3rd-party\cygwin\bin\bash.exe" "/cygdrive/c/bkit.me/scripts/client/backup.sh" --snap --uuid "7C9E1BAB" --dir "" --log "/cygdrive/c/bkit.me/scripts/client/logs/BKIT-C-OS-7C9E1BAB-ROOT.log"

@@ -132,7 +132,7 @@ postpone_update(){
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-EXC="--exclude-from=$SDIR/conf/excludes.txt"
+EXC="$SDIR/conf/excludes.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 CLEAN="--delete --force --delete-excluded --ignore-non-existing --ignore-existing"
@@ -146,13 +146,13 @@ export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $FMT "$@"
+	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync --archive --relative --files-from="$FILE" --itemize-changes $EXC $PERM $FMT "$@"
+	dorsync --archive --relative --files-from="$FILE" --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 update_file(){
@@ -162,7 +162,7 @@ update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $FMT "$@"
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 
@@ -171,7 +171,7 @@ backup(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exists || return 1
-	[[ -d $SRC ]] && local HASHDB=$(bash $SDIR/hash.sh -b "$SRC")
+	[[ -d $SRC ]] && local HASHDB=$(bash "$SDIR/hash.sh" -b "$SRC")
 	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
@@ -212,7 +212,7 @@ backup(){
 
 		echo Is something else
 		
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $EXC $FMT_QUERY2 "$SRC" "$DST")
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM --exclude-from="$EXC" $FMT_QUERY2 "$SRC" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
@@ -221,7 +221,7 @@ clean(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	dorsync -riHDR $CLEAN $PERM $FMT $EXC  "$SRC" "$DST" #clean deleted files
+	dorsync -riHDR $CLEAN $PERM $FMT --exclude-from="$EXC"  "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$ROOT/./" "$BACKUPURL/$RVID/@snap"

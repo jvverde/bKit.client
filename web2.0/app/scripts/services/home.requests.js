@@ -68,6 +68,19 @@ angular.module('bkitApp')
     }
 
 
+    self.getBackup = function (computer, drive, bak, path) {
+
+        return $http.get(url('/folder', [computer, drive, bak]))
+        .then(function (res) {
+          return res.data;
+        }, function (err) {
+          console.error('http err', err);
+        }).catch(function (e) {
+          console.error('exception', e);
+        });
+    }
+
+
 
 
   }]);

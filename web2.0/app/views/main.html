@@ -1,9 +1,49 @@
 <div layout="column" layout-align="space-around center">
 
   <div layout="row" layout-align="space-between end">
-    <!--<img src="images/logo/512x512.png" height="200" width="200">-->
-    <calendar>
+    <img src="images/logo/512x512.png" height="200" width="200">
+    <calendar></calendar>
+  </div>
 
-    </calendar>
+  <div layout="row" layout-align="start center">
+    <md-autocomplete
+      md-selected-item="main.selectedComputer"
+      md-search-text="main.computerSearch"
+      md-item-text="pc.name"
+      md-items="pc in main.querySearch(main.computerSearch)"
+      placeholder="Choose a computer">
+
+      <md-item-template>
+        <span md-highlight-text="main.computerSearch" md-highlight-flags="^i">{{pc.name}}</span>
+      </md-item-template>
+      <md-not-found>
+        No states matching "{{main.computerSearch}}" were found.
+        <a ng-click="main.newState(main.computerSearch)">Create a new one!</a>
+      </md-not-found>
+    </md-autocomplete>
+    <md-autocomplete
+      ng-disabled="!main.selectedComputer"
+      md-selected-item="main.selectedDrive"
+      md-search-text="main.driveSearch"
+      md-item-text="drive.id"
+      md-items="drive in main.selectedComputer.drives"
+      placeholder="Choose a drive">
+      <md-item-template>
+        <span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{drive.id}}</span>
+      </md-item-template>
+      <md-not-found>
+        No states matching "{{main.driveSearch}}" were found.
+        <a ng-click="main.newState(main.driveSearch)">Create a new one!</a>
+      </md-not-found>
+    </md-autocomplete>
+  <div>
+
+  <div class="explorer" layout="row" layout-align="center center">
+    <div class="sidebar" layout="column" layout-align="start center">
+
+    </div>
+    <div class="main-panel" layout="column" layout-align="start center">
+
+    </div>
   </div>
 </div>

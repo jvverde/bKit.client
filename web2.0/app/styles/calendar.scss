@@ -1,0 +1,13 @@
+
+.day{
+  width: 100px;
+  height: 100px;
+  padding: 0 5px;
+  border: 1px solid grey;
+  background-color: lightgrey;
+  transition: all 1s linear;
+}
+
+.day:hover{
+  background-color: lightblue;
+}

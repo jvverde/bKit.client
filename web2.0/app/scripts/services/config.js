@@ -22,5 +22,8 @@ angular.module('bkitApp')
 
         return size + 'x' + size + '.' + extension;
       }
+    },
+    server: {
+      url: 'http://10.11.0.135:3000'
     }
   });

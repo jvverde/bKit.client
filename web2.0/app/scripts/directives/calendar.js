@@ -18,7 +18,7 @@ angular.module('bkitApp')
 
         scope.week = [];
 
-        for (var i = 0; i < 7; i++){
+        for (var i = 7; i >= 0; i--){
           var mom = moment().startOf('day');
           scope.week.push(mom.subtract(i, 'days'));
         }

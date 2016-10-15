@@ -11,21 +11,34 @@
 angular
   .module('bkitApp', [
     'ngRoute',
-    'ngSanitize'
+    'ngSanitize',
+    'ngMaterial',
+    'ui.router'
   ])
-  .config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
+  .config(function ($routeProvider, $stateProvider) {
+    $stateProvider
+      .state('home', {
+        name: 'home',
+        url: '/',
         templateUrl: 'views/main.html',
         controller: 'MainCtrl',
-        controllerAs: 'main'
+        controllerAs: 'main',
+        resolve: {
+          computers: ['home.requests', function ($home) {
+            return $home.loadComputers();
+          }]
+        }
       })
-      .when('/about', {
+      .state('about', {
+        name: 'about',
+        url: '/about',
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',
         controllerAs: 'about'
-      })
-      .otherwise({
-        redirectTo: '/'
       });
+
+
+    // $routeProvider.otherwise({
+    //     redirectTo: '/'
+    //   });
   });

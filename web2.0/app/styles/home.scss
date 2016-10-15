@@ -1,0 +1,15 @@
+
+.selectable-row{
+  background-color: rgba(255,255,255, 1);
+  transition: all 0.2s linear
+}
+
+
+.selectable-row:hover{
+  background-color: rgba(0,0,255, 0.25);
+}
+
+.selectable-row:active,
+.selectable-row:focus{
+  background-color: rgba(0,0,255, 0.75);
+}

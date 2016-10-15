@@ -52,14 +52,29 @@
         <a ng-click="main.newState(main.driveSearch)">Create a new one!</a>
       </md-not-found>
     </md-autocomplete>
-  <div>
+  </div>
 
-  <div class="explorer" layout="row" layout-align="center center">
-    <div class="sidebar" layout="column" layout-align="start center">
-
+  <div class="explorer" layout="row" layout-align="start start" layout-fill ng-if="main.explorer">
+    <div class="sidebar" layout="column" layout-align="start start" flex="30">
+      <header>{{main.selectedComputer.id}}</header>
+      <div class="folder selectable-row" ng-repeat="folder in main.explorer.folders" layout="row" layout-align="space-between center" layout-fill>
+        <span>{{folder}}</span>
+        <span layout="row" layout-align="space-between">
+          <md-icon>restore</md-icon>
+        </span>
+      </div>
     </div>
-    <div class="main-panel" layout="column" layout-align="start center">
-
+    <div class="main-panel" layout="column" layout-align="start start" flex="65">
+      <header class="path">{{main.selectedDrive.id}}</header>
+      <div class="file selectable-row" ng-repeat="file in main.explorer.files" layout="row" layout-align="space-between center" layout-fill>
+        <span>{{file}}</span>
+        <span layout="row" layout-align="space-between">
+          <md-icon>file_download</md-icon>
+          <md-icon>visibility</md-icon>
+          <md-icon>restore</md-icon>
+        </span>
+      </div>
+      </div>
     </div>
   </div>
 </div>

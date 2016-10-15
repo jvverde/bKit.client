@@ -16,6 +16,7 @@ angular.module('bkitApp')
       self.querySearch = query;
       self.openExplorer = openExplorer;
 
+
       function query(search) {
         return $filter('filter')(self.computers, search);
       }
@@ -70,7 +71,8 @@ angular.module('bkitApp')
 
         $request.getBackup(computer, drive, bak)
           .then(function (data) {
-            console.log('data', data);
+            self.explorer = data;
+            console.log('explorer', self.explorer);
           });
       }
 

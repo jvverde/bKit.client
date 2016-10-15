@@ -5,8 +5,8 @@
     <calendar></calendar>
   </div>
 
-  <div layout="row" layout-align="start center">
-    <md-autocomplete
+  <div layout="row" layout-align="start center" layout-fill>
+    <md-autocomplete flex="30"
       md-selected-item="main.selectedComputer"
       md-search-text="main.computerSearch"
       md-item-text="pc.name"
@@ -21,7 +21,7 @@
         <a ng-click="main.newState(main.computerSearch)">Create a new one!</a>
       </md-not-found>
     </md-autocomplete>
-    <md-autocomplete
+    <md-autocomplete flex="30"
       ng-disabled="!main.selectedComputer"
       md-selected-item="main.selectedDrive"
       md-search-text="main.driveSearch"
@@ -30,6 +30,22 @@
       placeholder="Choose a drive">
       <md-item-template>
         <span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{drive.id}}</span>
+      </md-item-template>
+      <md-not-found>
+        No states matching "{{main.driveSearch}}" were found.
+        <a ng-click="main.newState(main.driveSearch)">Create a new one!</a>
+      </md-not-found>
+    </md-autocomplete>
+    <md-autocomplete flex="30"
+      ng-disabled="!main.selectedDrive"
+      md-selected-item="main.selectedBackup"
+      md-search-text="main.backupSearch"
+      md-item-text="bak"
+      md-items="bak in main.selectedDrive.backups"
+      md-selected-item-change="main.openExplorer(main.selectedComputer.id, main.selectedDrive.id, main.selectedBackup)"
+      placeholder="Choose a Backup">
+      <md-item-template>
+        <span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{bak}}</span>
       </md-item-template>
       <md-not-found>
         No states matching "{{main.driveSearch}}" were found.

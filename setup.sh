@@ -29,7 +29,7 @@ exists CMD && {
 	CMD /C "$(cygpath -w "$BATCH")"
 	rm -f $BATCH
 	exists zenity || {
-		find "$SDIR" -iname "zenity*.exe" -print0 -quit |xargs -0rt{} CMD /C "{}"
+		find "$SDIR" -iname "zenity*.exe" -print0 -quit |xargs -0rtI{} CMD /C "{}"
 	}
 }
 echo Compile excludes file

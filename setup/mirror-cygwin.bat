@@ -34,5 +34,4 @@ REM http://www.fruitbat.org/Cygwin/timemachine.html
 		"%~dp0\cygwin\setup-x86_64.exe" !PARAMS!
 	)
 )
-
 cd %wim%

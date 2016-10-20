@@ -65,6 +65,8 @@ BACKUPDIR="$ROOT/$STARTDIR"
 
 [[ $SNAP == true ]] && "$SDIR/snap-backup.sh" "$BACKUPDIR" && exit
 
+[[ $SNAP == true ]] && echo "Fail to create a snaphost. I will continue..."
+
 source "$SDIR/drive.sh" "$DEV"
 
 [[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk 

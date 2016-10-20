@@ -6,7 +6,7 @@
   </div>
   <div class="spinner" layout="column" flex="80" scroll-control>
     <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
-      <div class="cell" layout="column" ng-repeat="bak in content | orderBy:'-'" layout-align="start stretch" ng-click="onCellClick($event, bak)" flex>
+      <div class="cell" ng-class="{'selected': $index === selectedCell}" layout="column" ng-repeat="bak in content | orderBy:'-'" layout-align="start stretch" ng-click="handleCellClick($event, $index, bak)" flex>
 
         <header>{{bak.time.format()}}</header>
 

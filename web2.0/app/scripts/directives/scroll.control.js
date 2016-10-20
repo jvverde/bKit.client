@@ -32,6 +32,14 @@ angular.module('bkitApp')
             element[0].scrollLeft += increment;
           } else throw new Error('Unknown direction');
         };
+
+        scope.scrollTo = function (percentage) {
+
+          var width = element[0].clientWidth;
+          var maxScrollValue = scope.overflowedElemWidth - width;
+
+          element[0].scrollLeft = maxScrollValue * percentage;
+        }
       }
     };
   });

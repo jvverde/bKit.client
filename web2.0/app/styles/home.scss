@@ -15,7 +15,7 @@
   background-color: rgba(0,0,255, 0.75);
 }
 
-.pc-box{
+.box{
   width: 150px;
   height: 150px;
   overflow: hidden;
@@ -27,7 +27,7 @@
   transition: all .2s ease-out;
 }
 
-.pc-box:hover{
+.box:hover{
   transform: scale(1.1,1.1);
   background-color: rgba(240,240,240,0.9);
 }

@@ -8,31 +8,43 @@
  * Controller of the bkitApp
  */
 angular.module('bkitApp')
-  .controller('MainCtrl', ['$scope', 'config', '$filter', 'computers', 'home.requests',
-    function ($scope, $config, $filter, $computers, $request) {
+  .controller('MainCtrl', ['$scope', '$filter', '$timeout', 'config', 'computers', 'home.requests',
+    function ($scope, $filter, $timeout, $config, $computers, $request) {
       var self = this;
-      var selectedDay = null;
 
-
+      self.showComputersGrid = true;
+      self.showDrivesGrid = false;
       self.computers = $computers;
-      self.querySearch = query;
-      self.openExplorer = openExplorer;
-      self.onSelectBackup = onSelectBackup;
-      self.processSelection = processSelection;
       self.backups = [];
 
+      self.querySearch = query;
+      self.onSelectBackup = onSelectBackup;
+      self.selectComputer = selectComputer;
+      self.processSelection = processSelection;
 
       function query(search) {
         console.log('query', self.computers);
         return $filter('filter')(self.computers, search);
       }
 
+      function selectComputer(pc) {
+        self.selectedComputer = pc;
+        self.showComputersGrid = false;
+        self.showDrivesGrid = true;
+      }
+
       function processSelection(drive) {
+
+        if (!drive) return;
+        self.showDrivesGrid = false;
         self.selectedDrive = drive;
         self.backups = organizeBackupsByDate(self.selectedComputer, drive);
 
-        self.selectedBackup = self.backups[self.backups.length - 1].id;
-        self.openExplorer(self.selectedComputer.id, drive.id, self.selectedBackup);
+        //we've just updated self.backups so we need to wait for angular's $digest cycle to finish before we can syncronize the selection
+        $timeout(function () {
+          $scope.syncronizeSelection(self.backups[0], 'id');
+        }, 10);
+
       }
 
       function organizeBackupsByDate(computer, drive) {
@@ -73,10 +85,14 @@ angular.module('bkitApp')
       }
 
       function onSelectBackup(event, bak) {
-        self.selectedBackup = bak.id;
+        if (self.selectedBackup && self.selectedBackup.id === bak.id) return;
+
+        self.selectedBackup = bak;
+        openExplorer(bak.computer.id, bak.drive.id, bak.id);
       }
 
       //self.backups = organizeBackupsByDate($computers[0]);
-      //console.log('main ctrl', $computers);
+      //console.log('main ctrl', $scope);
+
     }
   ]);

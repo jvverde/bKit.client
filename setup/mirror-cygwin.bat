@@ -21,10 +21,10 @@ REM http://stackoverflow.com/questions/39479826/cygwin-2-5-2-mirror-getting-the-
 REM http://www.fruitbat.org/Cygwin/timemachine.html
 	if %OSARCH%==32BIT ( 
 		set PARAMS= -B -D -d -N -n -X -q -l "%~dp0\cygwin-old\repo" -P %MODULES% -s ftp://www.fruitbat.org/pub/cygwin/circa/2016/08/30/104223
-		"%~dp0\cygwin-xp\setup-x86-2.874.exe" !PARAMS!
+		"%~dp0\cygwin-old\setup-x86-2.874.exe" !PARAMS!
 	) else ( 
 		set PARAMS= -B -D -d -N -n -X -q -l "%~dp0\cygwin-old\repo" -P %MODULES% -s ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235
-		"%~dp0\cygwin-xp\setup-x86_64-2.874.exe" !PARAMS!
+		"%~dp0\cygwin-old\setup-x86_64-2.874.exe" !PARAMS!
 	)
 ) else (
 	set PARAMS= -B -D -d -N -n -X -q -l "%~dp0\cygwin\repo" -P %MODULES% -s http://mirrors.fe.up.pt/pub/cygwin/

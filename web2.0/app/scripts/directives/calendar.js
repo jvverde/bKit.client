@@ -14,7 +14,7 @@ angular.module('bkitApp')
       link: function postLink(scope, iElement, iAttrs) {
 
         //if (!iAttrs.month || !iAttrs.year) throw new Error('Missing required attributes');
-        scope.onDayClick = scope.$eval(iAttrs.onDaySelect);
+        scope.onCellClick = scope.$eval(iAttrs.onDaySelect);
         scope.$watchCollection(iAttrs.content, function (newArr, old) {
 
           scope.content = scope.$eval(iAttrs.content);

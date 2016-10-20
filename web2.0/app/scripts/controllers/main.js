@@ -17,8 +17,8 @@ angular.module('bkitApp')
       self.computers = $computers;
       self.querySearch = query;
       self.openExplorer = openExplorer;
-      self.onSelectDay = onSelectDay;
-      self.selectComputer = selectComputer;
+      self.onSelectBackup = onSelectBackup;
+      self.processSelection = processSelection;
       self.backups = [];
 
 
@@ -27,24 +27,30 @@ angular.module('bkitApp')
         return $filter('filter')(self.computers, search);
       }
 
-      function organizeBackupsByDate(computer) {
+      function processSelection(drive) {
+        self.selectedDrive = drive;
+        self.backups = organizeBackupsByDate(self.selectedComputer, drive);
+
+        self.selectedBackup = self.backups[self.backups.length - 1].id;
+        self.openExplorer(self.selectedComputer.id, drive.id, self.selectedBackup);
+      }
+
+      function organizeBackupsByDate(computer, drive) {
 
         var backups = [];
 
-        computer.drives.forEach(function (drive) {
-          drive.backups.forEach(function (bak) {
+        drive.backups.forEach(function (bak) {
 
-            var ind;
-            var date = moment(bak.substring(5), 'YYYY.MM.DD-HH.mm.ss'); //TODO all tz
-            var newBak = {
-              computer: computer,
-              drive: drive,
-              time: date,
-              id: bak
-            };
+          var ind;
+          var date = moment(bak.substring(5), 'YYYY.MM.DD-HH.mm.ss'); //TODO all tz
+          var newBak = {
+            computer: computer,
+            drive: drive,
+            time: date,
+            id: bak
+          };
 
-            backups.push(newBak);
-          });
+          backups.push(newBak);
         });
 
         backups.sort(function (first, second) {
@@ -56,39 +62,21 @@ angular.module('bkitApp')
         return backups;
       }
 
-      function selectComputer(pc) {
-        self.selectedComputer = pc;
-        self.backups = organizeBackupsByDate(pc);
-      }
-
       function openExplorer(computer, drive, bak) {
 
         $request.getBackup(computer, drive, bak)
           .then(function (data) {
             self.explorer = data;
+
             console.log('explorer', self.explorer);
           });
       }
 
-      function onSelectDay(event) {
-
-        var day = event.day;
-        var pcs = [];
-
-        day.backups.forEach(function (bak) {
-          var exists = pcs.some(function (pc) {
-            return pc.id === bak.computer.id;
-          });
-
-          if (!exists) pcs.push(bak.computer);
-        });
-
-        self.selectedComputer = null;
-        self.computers = pcs;
-        if (pcs.length === 1) self.selectedComputer = pcs[0];
+      function onSelectBackup(event, bak) {
+        self.selectedBackup = bak.id;
       }
 
       //self.backups = organizeBackupsByDate($computers[0]);
-      console.log('main ctrl', $computers);
+      //console.log('main ctrl', $computers);
     }
   ]);

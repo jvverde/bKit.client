@@ -2,16 +2,23 @@
 
   <div layout="row" layout-align="space-between end">
     <img src="images/logo/512x512.png" height="200" width="200">
-    <calendar content="main.backups" on-day-select="main.onSelectDay" flex></calendar>
+    <calendar content="main.backups" on-day-select="main.onSelectBackup" ng-if="main.backups.length > 0" flex></calendar>
   </div>
 
   <div class="computer-grid"  ng-if="!main.selectedComputer" layout="row" layout-align="center center" layout-wrap>
-    <div class="pc-box" ng-repeat="pc in main.computers" layout="column" layout-align="center center" ng-click="main.selectComputer(pc)">
+    <div class="pc-box" ng-repeat="pc in main.computers" layout="column" layout-align="center center" ng-click="main.selectedComputer = pc">
       <span>{{pc.name}}</span>
     </div>
   </div>
 
-  <div layout="row" ng-if="main.selectedComputer" layout-align="start center" layout-fill>
+  <div class="drives-grid" ng-if="main.selectedComputer && !main.selectedDrive" layout="row" layout-align="center center" layout-wrap>
+    <div class="pc-box" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
+        layout="column" layout-align="center center" >
+      <span>{{drive.id}}</span>
+    </div>
+  </div>
+
+  <div layout="row" ng-if="main.selectedComputer && main.selectedDrive" layout-align="start center" layout-fill>
     <md-autocomplete flex="30"
       md-selected-item="main.selectedComputer"
       md-search-text="main.computerSearch"

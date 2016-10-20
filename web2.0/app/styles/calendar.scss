@@ -1,13 +1,19 @@
-
-.day{
-  width: 100px;
-  height: 100px;
-  padding: 0 5px;
-  border: 1px solid grey;
-  background-color: lightgrey;
-  transition: all 1s linear;
-}
-
-.day:hover{
-  background-color: lightblue;
+.spinner {
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y: visible;
+  .day {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    background-color: white;
+    transition: all 0.2s linear;
+  }
+  .day:hover {
+    background-color: rgba(230, 230, 230, 0.9);
+    transform: scale(1.1, 1.0);
+  }
 }

@@ -7,27 +7,23 @@
  * # calendar
  */
 angular.module('bkitApp')
-  .directive('calendar', function () {
+  .directive('calendar', ['config', function ($config) {
     return {
       templateUrl: 'scripts/directives/calendar.tmpl.html',
       restrict: 'E',
       link: function postLink(scope, iElement, iAttrs) {
 
         //if (!iAttrs.month || !iAttrs.year) throw new Error('Missing required attributes');
+        scope.onDayClick = scope.$eval(iAttrs.onDaySelect);
+        scope.$watchCollection(iAttrs.content, function (newArr, old) {
 
+          scope.content = scope.$eval(iAttrs.content);
+          scope.increment = $config.calendar.cell.width;
+          scope.overflowedElemWidth = scope.content.length * scope.increment;
 
-        scope.week = [];
-
-        for (var i = 7; i >= 0; i--){
-          var mom = moment().startOf('day');
-          scope.week.push(mom.subtract(i, 'days'));
-        }
-
-        console.log('week', scope.week);
-        scope.onDayClick = function (event) {
-          console.log('on click event');
-        };
+          //console.log('content', scope.content);
+        });
 
       }
     };
-  });
+  }]);

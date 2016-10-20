@@ -10,6 +10,24 @@
 }
 
 .selectable-row:active,
-.selectable-row:focus{
+.selectable-row:focus,
+.selectable-row::visited{
   background-color: rgba(0,0,255, 0.75);
+}
+
+.pc-box{
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+
+  border: 1px solid lightgray;
+  margin: .15em;
+  padding: 1em;
+
+  transition: all .2s ease-out;
+}
+
+.pc-box:hover{
+  transform: scale(1.1,1.1);
+  background-color: rgba(240,240,240,0.9);
 }

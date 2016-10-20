@@ -2,37 +2,32 @@
 
   <div layout="row" layout-align="space-between end">
     <img src="images/logo/512x512.png" height="200" width="200">
-    <calendar content="main.backups" on-day-select="main.onSelectBackup" ng-if="main.backups.length > 0" flex></calendar>
+    <calendar content="main.backups" on-cell-click="main.onSelectBackup" ng-show="main.backups.length > 0" flex></calendar>
   </div>
 
-  <div class="computer-grid"  ng-if="!main.selectedComputer" layout="row" layout-align="center center" layout-wrap>
-    <div class="pc-box" ng-repeat="pc in main.computers" layout="column" layout-align="center center" ng-click="main.selectedComputer = pc">
+  <div class="computer-grid"  ng-if="main.showComputersGrid && !main.showDrivesGrid" layout="row" layout-align="center center" layout-wrap>
+    <div class="box" ng-repeat="pc in main.computers" layout="column" layout-align="center center" ng-click="main.selectComputer(pc)">
       <span>{{pc.name}}</span>
     </div>
   </div>
 
-  <div class="drives-grid" ng-if="main.selectedComputer && !main.selectedDrive" layout="row" layout-align="center center" layout-wrap>
-    <div class="pc-box" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
+  <div class="drives-grid" ng-if="!main.showComputersGrid && main.showDrivesGrid" layout="row" layout-align="center center" layout-wrap>
+    <div class="box" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
         layout="column" layout-align="center center" >
       <span>{{drive.id}}</span>
     </div>
   </div>
 
-  <div layout="row" ng-if="main.selectedComputer && main.selectedDrive" layout-align="start center" layout-fill>
+  <div layout="row" ng-if="!main.showComputersGrid && !main.showDrivesGrid" layout-align="space-between center" layout-fill>
     <md-autocomplete flex="30"
       md-selected-item="main.selectedComputer"
       md-search-text="main.computerSearch"
       md-item-text="pc.name"
       md-items="pc in main.querySearch(main.computerSearch)"
+      md-selected-item-change="main.resetDrives()"
       placeholder="Choose a computer">
-
-      <md-item-template>
-        <span md-highlight-text="main.computerSearch" md-highlight-flags="^i">{{pc.name}}</span>
-      </md-item-template>
-      <md-not-found>
-        No states matching "{{main.computerSearch}}" were found.
-        <a ng-click="main.newState(main.computerSearch)">Create a new one!</a>
-      </md-not-found>
+      <md-item-template><span md-highlight-text="main.computerSearch" md-highlight-flags="^i">{{pc.name}}</span></md-item-template>
+      <md-not-found> No computers matching "{{main.computerSearch}}" were found.</md-not-found>
     </md-autocomplete>
     <md-autocomplete flex="30"
       ng-disabled="!main.selectedComputer"
@@ -40,30 +35,21 @@
       md-search-text="main.driveSearch"
       md-item-text="drive.id"
       md-items="drive in main.selectedComputer.drives"
+      md-selected-item-change="main.processSelection(main.selectedDrive)"
       placeholder="Choose a drive">
-      <md-item-template>
-        <span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{drive.id}}</span>
-      </md-item-template>
-      <md-not-found>
-        No states matching "{{main.driveSearch}}" were found.
-        <a ng-click="main.newState(main.driveSearch)">Create a new one!</a>
-      </md-not-found>
+      <md-item-template><span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{drive.id}}</span></md-item-template>
+      <md-not-found>No drives matching "{{main.driveSearch}}" were found.</md-not-found>
     </md-autocomplete>
     <md-autocomplete flex="30"
       ng-disabled="!main.selectedDrive"
       md-selected-item="main.selectedBackup"
       md-search-text="main.backupSearch"
-      md-item-text="bak"
-      md-items="bak in main.selectedDrive.backups"
-      md-selected-item-change="main.openExplorer(main.selectedComputer.id, main.selectedDrive.id, main.selectedBackup)"
+      md-item-text="bak.id"
+      md-items="bak in main.backups"
+      md-selected-item-change="syncronizeSelection(main.selectedBackup, 'id')"
       placeholder="Choose a Backup">
-      <md-item-template>
-        <span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{bak}}</span>
-      </md-item-template>
-      <md-not-found>
-        No states matching "{{main.driveSearch}}" were found.
-        <a ng-click="main.newState(main.driveSearch)">Create a new one!</a>
-      </md-not-found>
+      <md-item-template><span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{bak.id}}</span></md-item-template>
+      <md-not-found> No backups matching "{{main.driveSearch}}" were found.</md-not-found>
     </md-autocomplete>
   </div>
 

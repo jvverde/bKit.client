@@ -11,10 +11,31 @@ angular.module('bkitApp')
     return {
       templateUrl: 'scripts/directives/calendar.tmpl.html',
       restrict: 'E',
+      scope: false,
       link: function postLink(scope, iElement, iAttrs) {
 
         //if (!iAttrs.month || !iAttrs.year) throw new Error('Missing required attributes');
-        scope.onCellClick = scope.$eval(iAttrs.onDaySelect);
+
+        scope.handleCellClick = handleCellClick;
+        scope.syncronizeSelection = syncronizeSelection;
+
+        function handleCellClick(event, index, item) {
+          scope.selectedCell = index;
+          scope.$eval(iAttrs.onCellClick)(event, item);
+        }
+
+        function syncronizeSelection(item, field) {
+
+          if (!item) return;
+          for (var i = 0; i < scope.content.length; i++) {
+            if (scope.content[i][field] === item[field]) {
+              scope.scrollTo(i / scope.content.length);
+              handleCellClick(null, i, item);
+              break;
+            }
+          }
+        }
+
         scope.$watchCollection(iAttrs.content, function (newArr, old) {
 
           scope.content = scope.$eval(iAttrs.content);
@@ -23,7 +44,6 @@ angular.module('bkitApp')
 
           //console.log('content', scope.content);
         });
-
       }
     };
   }]);

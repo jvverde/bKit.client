@@ -10,8 +10,9 @@
 angular.module('bkitApp')
   .constant('config', {
     calendar: {
-      dayFormat: 'd',
-      firstDayOfWeek: 1
+      cell: {
+        width: 100
+      }
     },
     logo: {
       path: 'images/logo/',

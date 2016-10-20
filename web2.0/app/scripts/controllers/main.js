@@ -11,60 +11,54 @@ angular.module('bkitApp')
   .controller('MainCtrl', ['$scope', 'config', '$filter', 'computers', 'home.requests',
     function ($scope, $config, $filter, $computers, $request) {
       var self = this;
+      var selectedDay = null;
+
 
       self.computers = $computers;
       self.querySearch = query;
       self.openExplorer = openExplorer;
+      self.onSelectDay = onSelectDay;
+      self.selectComputer = selectComputer;
+      self.backups = [];
 
 
       function query(search) {
+        console.log('query', self.computers);
         return $filter('filter')(self.computers, search);
       }
 
-      function organizeBackupsByDate(computers) {
+      function organizeBackupsByDate(computer) {
 
-        //var date = moment('2016.09.16-23.35.54', 'YYYY.MM.DD-HH.mm.ss');
+        var backups = [];
 
-        var days = [];
-        computers.forEach(function (computer) {
-          computer.drives.forEach(function (drive) {
-            drive.backups.forEach(function (bak) {
+        computer.drives.forEach(function (drive) {
+          drive.backups.forEach(function (bak) {
 
-              var ind;
-              var date = moment(bak.substring(5), 'YYYY.MM.DD-HH.mm.ss'); //TODO all tz
-              var newBak = {
-                computer: computer,
-                drive: drive,
-                time: date,
-                id: bak
-              };
-              var exists = days.some(function (day, i) {
-                if (day.moment.isSame(date.startOf('day'))) {
-                  ind = i;
-                  return true;
-                }
-              });
+            var ind;
+            var date = moment(bak.substring(5), 'YYYY.MM.DD-HH.mm.ss'); //TODO all tz
+            var newBak = {
+              computer: computer,
+              drive: drive,
+              time: date,
+              id: bak
+            };
 
-              if (exists) {
-                days[ind].backups.push(newBak);
-                days[ind].count++;
-              } else {
-                days.push({
-                  moment: date.startOf('day'),
-                  backups: [newBak],
-                  count: 1
-                });
-              }
-            });
+            backups.push(newBak);
           });
         });
-        days.sort(function (first, second) {
-          if (first.moment.isAfter(second.moment)) {
+
+        backups.sort(function (first, second) {
+          if (first.time.isAfter(second.time)) {
             return -1;
           } else return 1;
         })
-        console.log('days', days);
-        return days;
+
+        return backups;
+      }
+
+      function selectComputer(pc) {
+        self.selectedComputer = pc;
+        self.backups = organizeBackupsByDate(pc);
       }
 
       function openExplorer(computer, drive, bak) {
@@ -76,7 +70,25 @@ angular.module('bkitApp')
           });
       }
 
-      organizeBackupsByDate($computers);
+      function onSelectDay(event) {
+
+        var day = event.day;
+        var pcs = [];
+
+        day.backups.forEach(function (bak) {
+          var exists = pcs.some(function (pc) {
+            return pc.id === bak.computer.id;
+          });
+
+          if (!exists) pcs.push(bak.computer);
+        });
+
+        self.selectedComputer = null;
+        self.computers = pcs;
+        if (pcs.length === 1) self.selectedComputer = pcs[0];
+      }
+
+      //self.backups = organizeBackupsByDate($computers[0]);
       console.log('main ctrl', $computers);
     }
   ]);

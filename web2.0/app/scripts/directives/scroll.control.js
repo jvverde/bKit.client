@@ -16,13 +16,13 @@ angular.module('bkitApp')
         //   console.log('onScroll', this.scrollLeft);
         // });
 
-        element.on('dragstart', function (event) {
-          console.log('onDragStart', event);
-        });
+        // element.on('dragstart', function (event) {
+        //   console.log('onDragStart', event);
+        // });
 
-        element.on('dragend', function (event) {
-          console.log('onDragEnd', event);
-        });
+        // element.on('dragend', function (event) {
+        //   console.log('onDragEnd', event);
+        // });
 
         scope.scroll = function (direction, increment) {
 

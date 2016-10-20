@@ -6,7 +6,7 @@
   </div>
   <div class="spinner" layout="column" flex="80" scroll-control>
     <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
-      <div class="day" layout="column" ng-repeat="bak in content | orderBy:'-'" layout-align="start stretch" ng-click="onDayClick($event, day)" flex>
+      <div class="cell" layout="column" ng-repeat="bak in content | orderBy:'-'" layout-align="start stretch" ng-click="onCellClick($event, bak)" flex>
 
         <header>{{bak.time.format()}}</header>
 

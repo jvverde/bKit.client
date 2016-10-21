@@ -9,10 +9,8 @@
   background-color: rgba(0,0,255, 0.25);
 }
 
-.selectable-row:active,
-.selectable-row:focus,
-.selectable-row::visited,
-.selectable-row.selected{
+
+.folder.selectable-row.selected{
   background-color: rgba(0,0,255, 0.75);
 }
 

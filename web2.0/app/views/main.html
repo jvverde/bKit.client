@@ -74,13 +74,13 @@
 
 
   <script type="text/ng-template" id="fs-tree">
-    <div class="folder selectable-row" ng-class="{'selected': folder.selected}"layout="row" layout-align="space-between center" layout-fill">
+    <div class="folder selectable-row" ng-class="{'selected': folder.selected}" layout="row" layout-align="space-between center" layout-fill">
       <div ng-click="main.loadContent(folder)" flex>
         <md-button class="md-icon-button" ng-if="!folder.opened"><md-icon>folder</md-icon></md-button>
         <md-button class="md-icon-button" ng-if="folder.opened" ng-click="folder.opened = false; $event.stopPropagation();"><md-icon>folder_open</md-icon></md-button>
         <span>{{folder.name}}</span>
       </div>
-      <div layout="row" layout-align="space-between"><md-icon>restore</md-icon></div>
+      <div><md-icon>restore</md-icon></div>
     </div>
     <div ng-if="folder.folders.length > 0 && folder.opened">
         <div ng-repeat="folder in folder.folders" ng-include="'fs-tree'" style="padding-left: 1em;"></div>

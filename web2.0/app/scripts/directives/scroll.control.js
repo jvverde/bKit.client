@@ -12,9 +12,9 @@ angular.module('bkitApp')
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
 
-        // element.on('scroll', function (event) {
-        //   console.log('onScroll', this.scrollLeft);
-        // });
+        element.on('scroll', function (event) {
+           console.log('onScroll', this.scrollLeft);
+         });
 
         // element.on('dragstart', function (event) {
         //   console.log('onDragStart', event);

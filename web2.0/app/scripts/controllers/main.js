@@ -51,9 +51,7 @@ angular.module('bkitApp')
       function onSelectBackup(event, bak) {
         if (self.selectedBackup && self.selectedBackup.id === bak.id) return;
 
-        self.loading = true;
         self.selectedBackup = bak;
-
         loadContent(self.path, bak.computer.id, bak.drive.id, bak.id);
       }
 
@@ -88,8 +86,19 @@ angular.module('bkitApp')
 
         self.currentFolder = folder;
         self.currentFolder.opened = true;
+
+        clearFolderSelection(self.explorer);
         self.currentFolder.selected = true;
 
+      }
+
+      function clearFolderSelection(folder) {
+        folder.selected = false;
+        if (folder.opened) {
+          folder.folders.forEach(function(f) {
+            clearFolderSelection(f);
+          });
+        }
       }
     }
   ]);

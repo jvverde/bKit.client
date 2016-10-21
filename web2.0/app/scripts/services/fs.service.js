@@ -40,7 +40,6 @@ angular.module('bkitApp')
             });
           });
 
-          console.log('fs', root);
           return root;
         });
     }

@@ -24,7 +24,7 @@
       md-search-text="main.computerSearch"
       md-item-text="pc.name"
       md-items="pc in main.querySearch(main.computerSearch)"
-      md-selected-item-change="main.resetDrives()"
+      md-selected-item-change="main.reset()"
       placeholder="Choose a computer">
       <md-item-template><span md-highlight-text="main.computerSearch" md-highlight-flags="^i">{{pc.name}}</span></md-item-template>
       <md-not-found> No computers matching "{{main.computerSearch}}" were found.</md-not-found>
@@ -63,9 +63,9 @@
       <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center" layout-fill>
         <span>{{file}}</span>
         <span layout="row" layout-align="space-between">
-          <md-icon>file_download</md-icon>
-          <md-icon>visibility</md-icon>
-          <md-icon>restore</md-icon>
+          <md-button class="md-icon-button" ng-click="main.download(file)"><md-icon>file_download</md-icon></md-button>
+          <md-button class="md-icon-button" ng-click="main.view(file)"><md-icon>visibility</md-icon></md-button>
+          <md-button class="md-icon-button" ng-click="main.restore(file)"><md-icon>restore</md-icon></md-button>
         </span>
       </div>
       </div>

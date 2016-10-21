@@ -15,7 +15,7 @@ angular.module('bkitApp')
     function url(path, ids) {
 
       if (ids && Array.isArray(ids)) {
-        ids.forEach(function(id) {
+        ids.forEach(function (id) {
           path += '/' + id;
         });
       }
@@ -70,7 +70,7 @@ angular.module('bkitApp')
 
     this.getBackup = function (computer, drive, bak, path) {
 
-        return $http.get(url('/folder', [computer, drive, bak, path]))
+      return $http.get(url('/folder', [computer, drive, bak, path]))
         .then(function (res) {
           return res.data;
         }, function (err) {
@@ -80,7 +80,37 @@ angular.module('bkitApp')
         });
     }
 
+    this.restore = function (path, computer, drive, bak) {
+      return $http.get(url('/bkit', [computer, drive, bak, path]))
+        .then(function (res) {
+          return res;
+        }, function (err) {
+          console.error('http err', err);
+        }).catch(function (e) {
+          console.error('exception', e);
+        });
+    }
 
+    this.view = function (path, computer, drive, bak) {
+      return $http.get(url('/view', [computer, drive, bak, path]))
+        .then(function (res) {
+          return res;
+        }, function (err) {
+          console.error('http err', err);
+        }).catch(function (e) {
+          console.error('exception', e);
+        });
+    }
 
+    this.download = function (path, computer, drive, bak) {
+      return $http.get(url('/download', [computer, drive, bak, path]))
+        .then(function (res) {
+          return res;
+        }, function (err) {
+          console.error('http err', err);
+        }).catch(function (e) {
+          console.error('exception', e);
+        });
+    }
 
   }]);

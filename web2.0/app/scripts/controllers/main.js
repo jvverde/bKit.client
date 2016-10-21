@@ -22,7 +22,12 @@ angular.module('bkitApp')
       self.onSelectBackup = onSelectBackup;
       self.selectComputer = selectComputer;
       self.processSelection = processSelection;
+      self.reset = reset;
+
       self.loadContent = loadContent;
+      self.download = download;
+      self.restore = restore;
+      self.view = view;
 
       function query(search) {
         console.log('query', self.computers);
@@ -33,6 +38,13 @@ angular.module('bkitApp')
         self.selectedComputer = pc;
         self.showComputersGrid = false;
         self.showDrivesGrid = true;
+      }
+
+      function reset() {
+        self.backups = [];
+        self.selectedBackup = null;
+        self.selectedDrive = null;
+        self.explorer = null;
       }
 
       function processSelection(drive) {
@@ -53,6 +65,7 @@ angular.module('bkitApp')
 
         self.selectedBackup = bak;
         loadContent(self.path, bak.computer.id, bak.drive.id, bak.id);
+
       }
 
       function loadContent(obj, computer, drive, bak) {
@@ -66,7 +79,7 @@ angular.module('bkitApp')
           folder = obj;
         }
 
-        if (!folder.opened && folder.folders.length === 0) {
+        if ((!folder.opened && folder.folders.length === 0) || bak) {
           self.loading = true;
           $fs.loadData(
             computer || self.selectedComputer.id,
@@ -99,6 +112,39 @@ angular.module('bkitApp')
             clearFolderSelection(f);
           });
         }
+      }
+
+      function download(file, computer, drive, bak) {
+
+        $request.download(self.path + file,
+          computer || self.selectedComputer.id,
+          drive || self.selectedDrive.id,
+          bak || self.selectedBackup.id)
+          .then(function (res) {
+            console.log('res', res);
+          });
+      }
+
+      function view(file, computer, drive, bak) {
+
+        $request.view(self.path + file,
+          computer || self.selectedComputer.id,
+          drive || self.selectedDrive.id,
+          bak || self.selectedBackup.id)
+          .then(function (res) {
+            console.log('res', res);
+          });
+      }
+
+      function restore(file, computer, drive, bak) {
+
+        $request.restore(self.path + file,
+          computer || self.selectedComputer.id,
+          drive || self.selectedDrive.id,
+          bak || self.selectedBackup.id)
+          .then(function (res) {
+            console.log('res', res);
+          });
       }
     }
   ]);

@@ -33,7 +33,7 @@ angular.module('bkitApp')
       });
     }
 
-    self.loadComputers = function () {
+    this.loadComputers = function () {
       return $http.get(url('/computers'))
         .then(function (res) {
           var computers = mapPairToArray(res.data, 'name', 'id');
@@ -56,7 +56,7 @@ angular.module('bkitApp')
         });
     };
 
-    self.loadDrives = function (computer) {
+    this.loadDrives = function (computer) {
       return $http.get(url('/backups', [computer]))
         .then(function (res) {
           return res.data;
@@ -68,9 +68,9 @@ angular.module('bkitApp')
     }
 
 
-    self.getBackup = function (computer, drive, bak, path) {
+    this.getBackup = function (computer, drive, bak, path) {
 
-        return $http.get(url('/folder', [computer, drive, bak]))
+        return $http.get(url('/folder', [computer, drive, bak, path]))
         .then(function (res) {
           return res.data;
         }, function (err) {

@@ -6,7 +6,7 @@
   </div>
 
   <div class="computer-grid"  ng-if="main.showComputersGrid && !main.showDrivesGrid" layout="row" layout-align="center center" layout-wrap>
-    <div class="box" ng-repeat="pc in main.computers" layout="column" layout-align="center center" ng-click="main.selectComputer(pc)">
+    <div class="box" ng-repeat="pc in main.computers" ng-click="main.selectComputer(pc)" layout="column" layout-align="center center">
       <span>{{pc.name}}</span>
     </div>
   </div>
@@ -54,18 +54,13 @@
   </div>
 
   <div class="explorer" layout="row" layout-align="start start" layout-fill ng-if="main.explorer">
+    <div class="preloader" ng-if="main.loading"></div>
     <div class="sidebar" layout="column" layout-align="start start" flex="30">
-      <header>{{main.selectedComputer.id}}</header>
-      <div class="folder selectable-row" ng-repeat="folder in main.explorer.folders" layout="row" layout-align="space-between center" layout-fill>
-        <span>{{folder}}</span>
-        <span layout="row" layout-align="space-between">
-          <md-icon>restore</md-icon>
-        </span>
-      </div>
+        <div ng-repeat="folder in main.explorer.folders" ng-include="'fs-tree'" style="width: 100%;"></div>
     </div>
     <div class="main-panel" layout="column" layout-align="start start" flex="65">
-      <header class="path">{{main.selectedDrive.id}}</header>
-      <div class="file selectable-row" ng-repeat="file in main.explorer.files" layout="row" layout-align="space-between center" layout-fill>
+
+      <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center" layout-fill>
         <span>{{file}}</span>
         <span layout="row" layout-align="space-between">
           <md-icon>file_download</md-icon>
@@ -76,4 +71,21 @@
       </div>
     </div>
   </div>
+
+
+  <script type="text/ng-template" id="fs-tree">
+    <div class="folder selectable-row" ng-class="{'selected': folder.selected}"layout="row" layout-align="space-between center" layout-fill">
+      <div ng-click="main.loadContent(folder)" flex>
+        <md-button class="md-icon-button" ng-if="!folder.opened"><md-icon>folder</md-icon></md-button>
+        <md-button class="md-icon-button" ng-if="folder.opened" ng-click="folder.opened = false; $event.stopPropagation();"><md-icon>folder_open</md-icon></md-button>
+        <span>{{folder.name}}</span>
+      </div>
+      <div layout="row" layout-align="space-between"><md-icon>restore</md-icon></div>
+    </div>
+    <div ng-if="folder.folders.length > 0 && folder.opened">
+        <div ng-repeat="folder in folder.folders" ng-include="'fs-tree'" style="padding-left: 1em;"></div>
+    </div>
+</script>
+
+
 </div>

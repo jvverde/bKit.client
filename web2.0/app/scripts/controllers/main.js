@@ -12,8 +12,8 @@ angular.module('bkitApp')
     function ($scope, $filter, $timeout, $config, $computers, $request, $transform, $fs) {
       var self = this;
 
-      self.showComputersGrid = true;
-      self.showDrivesGrid = false;
+      // self.showComputersGrid = true;
+      // self.showDrivesGrid = false;
       self.computers = $computers;
       self.backups = [];
       self.path = '';
@@ -36,21 +36,40 @@ angular.module('bkitApp')
 
       function selectComputer(pc) {
         self.selectedComputer = pc;
-        self.showComputersGrid = false;
-        self.showDrivesGrid = true;
+        // self.showComputersGrid = false;
+        // self.showDrivesGrid = true;
       }
 
-      function reset() {
+      function filterComputerNames(computers) {
+
+        computers.forEach(function (pc, ind, arr) {
+          arr[ind].name = $filter('name.display.filter')(pc.name);
+          filterDrivesNames(arr[ind].drives);
+        });
+      }
+      function filterDrivesNames(drives) {
+
+        drives.forEach(function (drive, ind, arr) {
+          arr[ind].name = $filter('name.display.filter')(drive.id);
+        });
+      }
+
+      function reset(pc) {
+
+        self.selectedComputer = pc;
+
         self.backups = [];
         self.selectedBackup = null;
         self.selectedDrive = null;
         self.explorer = null;
+
+
       }
 
       function processSelection(drive) {
 
         if (!drive) return;
-        self.showDrivesGrid = false;
+        // self.showDrivesGrid = false;
         self.selectedDrive = drive;
         self.backups = $transform.backupsByDate(self.selectedComputer, drive);
 
@@ -108,7 +127,7 @@ angular.module('bkitApp')
       function clearFolderSelection(folder) {
         folder.selected = false;
         if (folder.opened) {
-          folder.folders.forEach(function(f) {
+          folder.folders.forEach(function (f) {
             clearFolderSelection(f);
           });
         }
@@ -146,5 +165,7 @@ angular.module('bkitApp')
             console.log('res', res);
           });
       }
+
+      filterComputerNames(self.computers);
     }
   ]);

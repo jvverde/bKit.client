@@ -31,6 +31,17 @@
   background-color: rgba(240,240,240,0.9);
 }
 
+.selected-box {
+  @extend .box;
+  width: 75px;
+  height: 75px;
+  overflow-wrap: break-word;
+}
+
+.selected-box:hover{
+   @extend .box:hover;
+}
+
 .preloader{
   position: absolute;
   width: 100%;

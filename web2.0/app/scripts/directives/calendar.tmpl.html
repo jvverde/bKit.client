@@ -1,19 +1,20 @@
-<div layout="row" layout-align="center stretch">
-  <div layout="column" layout-align="center center" flex="10">
+<div layout="row" layout-align="start stretch" flex>
+  <div layout="column" layout-align="center center" flex>
     <md-button mouse-hold="scroll('left', increment)">
       <md-icon>keyboard_arrow_left</md-icon>
     </md-button>
   </div>
-  <div class="spinner" layout="column" flex="80" scroll-control>
+  <div class="spinner" layout="column" flex="70" scroll-control>
     <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
       <div class="cell" ng-class="{'selected': $index === selectedCell}" layout="column" ng-repeat="bak in content | orderBy:'-'" layout-align="start stretch" ng-click="handleCellClick($event, $index, bak)" flex>
 
-        <header>{{bak.time.format()}}</header>
+        <div>{{bak.time.format('DD-MM')}}</div>
+        <div>{{bak.time.format('HH:mm:ss')}}</div>
 
       </div>
     </div>
   </div>
-  <div layout="column" layout-align="center center" flex="10">
+  <div layout="column" layout-align="center center" flex>
     <md-button mouse-hold="scroll('right', increment)">
       <md-icon>keyboard_arrow_right</md-icon>
     </md-button>

@@ -12,12 +12,14 @@ angular.module('bkitApp')
       templateUrl: 'scripts/directives/calendar.tmpl.html',
       restrict: 'E',
       scope: false,
+      replace: true,
       link: function postLink(scope, iElement, iAttrs) {
 
         //if (!iAttrs.month || !iAttrs.year) throw new Error('Missing required attributes');
 
         scope.handleCellClick = handleCellClick;
         scope.syncronizeSelection = syncronizeSelection;
+        scope.increment = $config.calendar.cell.width / 2;
 
         function handleCellClick(event, index, item) {
           scope.selectedCell = index;
@@ -39,9 +41,7 @@ angular.module('bkitApp')
         scope.$watchCollection(iAttrs.content, function (newArr, old) {
 
           scope.content = scope.$eval(iAttrs.content);
-          scope.increment = $config.calendar.cell.width;
           scope.overflowedElemWidth = scope.content.length * scope.increment;
-
           //console.log('content', scope.content);
         });
       }

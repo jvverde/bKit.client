@@ -1,24 +1,34 @@
 <div layout="column" layout-align="space-around center">
 
-  <div layout="row" layout-align="space-between end">
+  <div layout="row" layout-align="space-between center">
     <img src="images/logo/512x512.png" height="200" width="200">
-    <calendar content="main.backups" on-cell-click="main.onSelectBackup" ng-show="main.backups.length > 0" flex></calendar>
+    <div class="filters" layout="column" layout-align="center stretch" ng-show="main.backups.length > 0" flex>
+      <div class="current-selections" layout="row" layout-align="start center">
+        <div class="selected-box" ng-click="main.reset()" layout="column" layout-align="center center"><span>{{main.selectedComputer.name}}</span></div>
+        <div><md-icon>play_arrow</md-icon></div>
+        <div class="selected-box" ng-click="main.reset(main.selectedComputer)" layout="column" layout-align="center center"><span>{{main.selectedDrive.name}}</span></div>
+        <div><md-icon>play_arrow</md-icon></div>
+        <div class="selected-box" layout="column" layout-align="center center"><span>{{main.selectedBackup.id}}</span></div>
+      </div>
+      <calendar content="main.backups" on-cell-click="main.onSelectBackup"></calendar>
+    </div>
+
   </div>
 
-  <div class="computer-grid"  ng-if="main.showComputersGrid && !main.showDrivesGrid" layout="row" layout-align="center center" layout-wrap>
+  <div class="computer-grid"  ng-if="!main.selectedComputer" layout="row" layout-align="center center" layout-wrap>
     <div class="box" ng-repeat="pc in main.computers" ng-click="main.selectComputer(pc)" layout="column" layout-align="center center">
       <span>{{pc.name}}</span>
     </div>
   </div>
 
-  <div class="drives-grid" ng-if="!main.showComputersGrid && main.showDrivesGrid" layout="row" layout-align="center center" layout-wrap>
+  <div class="drives-grid" ng-if="main.selectedComputer && !main.selectedDrive" layout="row" layout-align="center center" layout-wrap>
     <div class="box" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
         layout="column" layout-align="center center" >
-      <span>{{drive.id}}</span>
+      <span>{{drive.name}}</span>
     </div>
   </div>
 
-  <div layout="row" ng-if="!main.showComputersGrid && !main.showDrivesGrid" layout-align="space-between center" layout-fill>
+  <!--<div layout="row" ng-if="!main.showComputersGrid && !main.showDrivesGrid" layout-align="space-between center" layout-fill>
     <md-autocomplete flex="30"
       md-selected-item="main.selectedComputer"
       md-search-text="main.computerSearch"
@@ -51,7 +61,7 @@
       <md-item-template><span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{bak.id}}</span></md-item-template>
       <md-not-found> No backups matching "{{main.driveSearch}}" were found.</md-not-found>
     </md-autocomplete>
-  </div>
+  </div>-->
 
   <div class="explorer" layout="row" layout-align="start start" layout-fill ng-if="main.explorer">
     <div class="preloader" ng-if="main.loading"></div>

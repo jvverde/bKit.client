@@ -71,11 +71,11 @@
     <div class="main-panel" layout="column" layout-align="start start" flex="65">
 
       <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center" layout-fill>
-        <span>{{file}}</span>
+        <span><a download="file" href="{{main.buildUrl(file, 'bkit')}}">{{file}}</a></span>
         <span layout="row" layout-align="space-between">
-          <md-button class="md-icon-button" ng-click="main.download(file)"><md-icon>file_download</md-icon></md-button>
-          <md-button class="md-icon-button" ng-click="main.view(file)"><md-icon>visibility</md-icon></md-button>
-          <md-button class="md-icon-button" ng-click="main.restore(file)"><md-icon>restore</md-icon></md-button>
+          <md-button class="md-icon-button"><a download="file" href="{{main.buildUrl(file, 'download')}}"><md-icon>file_download</md-icon></a></md-button>
+          <md-button class="md-icon-button"><a target="_blank" href="{{main.buildUrl(file, 'view')}}"><md-icon>visibility</md-icon></a></md-button>
+          <md-button class="md-icon-button"><a download="file" href="{{main.buildUrl(file, 'bkit')}}"><md-icon>restore</md-icon></a></md-button>
         </span>
       </div>
       </div>

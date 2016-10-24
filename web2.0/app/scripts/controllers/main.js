@@ -14,6 +14,7 @@ angular.module('bkitApp')
 
       // self.showComputersGrid = true;
       // self.showDrivesGrid = false;
+
       self.computers = $computers;
       self.backups = [];
       self.path = '';
@@ -25,9 +26,7 @@ angular.module('bkitApp')
       self.reset = reset;
 
       self.loadContent = loadContent;
-      self.download = download;
-      self.restore = restore;
-      self.view = view;
+      self.buildUrl = buildUrl;
 
       function query(search) {
         console.log('query', self.computers);
@@ -71,6 +70,7 @@ angular.module('bkitApp')
         if (!drive) return;
         // self.showDrivesGrid = false;
         self.selectedDrive = drive;
+        console.log('drive', drive);
         self.backups = $transform.backupsByDate(self.selectedComputer, drive);
 
         //we've just updated self.backups so we need to wait for angular's $digest cycle to finish before we can syncronize the selection
@@ -133,37 +133,15 @@ angular.module('bkitApp')
         }
       }
 
-      function download(file, computer, drive, bak) {
 
-        $request.download(self.path + file,
-          computer || self.selectedComputer.id,
-          drive || self.selectedDrive.id,
-          bak || self.selectedBackup.id)
-          .then(function (res) {
-            console.log('res', res);
-          });
-      }
+      function buildUrl(file, action) {
 
-      function view(file, computer, drive, bak) {
-
-        $request.view(self.path + file,
-          computer || self.selectedComputer.id,
-          drive || self.selectedDrive.id,
-          bak || self.selectedBackup.id)
-          .then(function (res) {
-            console.log('res', res);
-          });
-      }
-
-      function restore(file, computer, drive, bak) {
-
-        $request.restore(self.path + file,
-          computer || self.selectedComputer.id,
-          drive || self.selectedDrive.id,
-          bak || self.selectedBackup.id)
-          .then(function (res) {
-            console.log('res', res);
-          });
+        return $request.buildUrl('/' + action, [
+          self.selectedComputer.id,
+          self.selectedDrive.id,
+          self.selectedBackup.id,
+          self.path
+        ]);
       }
 
       filterComputerNames(self.computers);

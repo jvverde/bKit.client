@@ -12,6 +12,7 @@ angular.module('bkitApp')
 
     var self = this;
 
+    this.buildUrl = url;
     function url(path, ids) {
 
       if (ids && Array.isArray(ids)) {

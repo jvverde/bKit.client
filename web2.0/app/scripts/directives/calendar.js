@@ -41,7 +41,7 @@ angular.module('bkitApp')
         scope.$watchCollection(iAttrs.content, function (newArr, old) {
 
           scope.content = scope.$eval(iAttrs.content);
-          scope.overflowedElemWidth = scope.content.length * scope.increment;
+          scope.overflowedElemWidth = scope.content.length * $config.calendar.cell.width;
           //console.log('content', scope.content);
         });
       }

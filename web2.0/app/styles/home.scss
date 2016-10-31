@@ -48,3 +48,34 @@
   height: 100%;
   background-color: rgba(50,50,50,0.25);
 }
+
+.current-selections{
+  margin-left: 40px;
+}
+
+.arrow {
+  position: relative;
+  width: 150px;
+  height: 80px;
+  background-color: lightgray;
+}
+
+.arrow:before,
+.arrow:after {
+  content: "";
+  position: absolute;
+  width: 56.569px;
+  height: 56.569px;
+  transform: rotateZ(45deg);
+  background-color: rgba(250,250,250,1);
+}
+
+.arrow:before {
+  left: -28.284px;
+}
+
+.arrow:after {
+  right: -28.284px;
+  background-color: lightgray;
+  z-index: 1;
+}

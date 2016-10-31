@@ -59,6 +59,11 @@
   width: 150px;
   height: 80px;
   background-color: lightgray;
+  padding-left: 60px;
+
+  span{
+    z-index: 2;
+  }
 }
 
 .arrow:before,

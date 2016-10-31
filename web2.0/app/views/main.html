@@ -4,11 +4,11 @@
     <img src="images/logo/512x512.png" height="200" width="200">
     <div class="filters" layout="column" layout-align="center stretch" ng-show="main.backups.length > 0" flex>
       <div class="current-selections" layout="row" layout-align="start center">
-        <div class="selected-box" ng-click="main.reset()" layout="column" layout-align="center center"><span>{{main.selectedComputer.name}}</span></div>
+        <div class="arrow" ng-click="main.reset()" layout="column" layout-align="center center"><span>{{main.selectedComputer.name}}</span></div>
         <div><md-icon>play_arrow</md-icon></div>
-        <div class="selected-box" ng-click="main.reset(main.selectedComputer)" layout="column" layout-align="center center"><span>{{main.selectedDrive.name}}</span></div>
+        <div class="arrow" ng-click="main.reset(main.selectedComputer)" layout="column" layout-align="center center"><span>{{main.selectedDrive.name}}</span></div>
         <div><md-icon>play_arrow</md-icon></div>
-        <div class="selected-box" layout="column" layout-align="center center"><span>{{main.selectedBackup.id}}</span></div>
+        <div class="arrow" layout="column" layout-align="center center"><span>{{main.selectedBackup.id}}</span></div>
       </div>
       <calendar content="main.backups" on-cell-click="main.onSelectBackup"></calendar>
     </div>
@@ -28,48 +28,13 @@
     </div>
   </div>
 
-  <!--<div layout="row" ng-if="!main.showComputersGrid && !main.showDrivesGrid" layout-align="space-between center" layout-fill>
-    <md-autocomplete flex="30"
-      md-selected-item="main.selectedComputer"
-      md-search-text="main.computerSearch"
-      md-item-text="pc.name"
-      md-items="pc in main.querySearch(main.computerSearch)"
-      md-selected-item-change="main.reset()"
-      placeholder="Choose a computer">
-      <md-item-template><span md-highlight-text="main.computerSearch" md-highlight-flags="^i">{{pc.name}}</span></md-item-template>
-      <md-not-found> No computers matching "{{main.computerSearch}}" were found.</md-not-found>
-    </md-autocomplete>
-    <md-autocomplete flex="30"
-      ng-disabled="!main.selectedComputer"
-      md-selected-item="main.selectedDrive"
-      md-search-text="main.driveSearch"
-      md-item-text="drive.id"
-      md-items="drive in main.selectedComputer.drives"
-      md-selected-item-change="main.processSelection(main.selectedDrive)"
-      placeholder="Choose a drive">
-      <md-item-template><span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{drive.id}}</span></md-item-template>
-      <md-not-found>No drives matching "{{main.driveSearch}}" were found.</md-not-found>
-    </md-autocomplete>
-    <md-autocomplete flex="30"
-      ng-disabled="!main.selectedDrive"
-      md-selected-item="main.selectedBackup"
-      md-search-text="main.backupSearch"
-      md-item-text="bak.id"
-      md-items="bak in main.backups"
-      md-selected-item-change="syncronizeSelection(main.selectedBackup, 'id')"
-      placeholder="Choose a Backup">
-      <md-item-template><span md-highlight-text="main.driveSearch" md-highlight-flags="^i">{{bak.id}}</span></md-item-template>
-      <md-not-found> No backups matching "{{main.driveSearch}}" were found.</md-not-found>
-    </md-autocomplete>
-  </div>-->
-
   <div class="explorer" layout="row" layout-align="start start" layout-fill ng-if="main.explorer">
     <div class="preloader" ng-if="main.loading"></div>
     <div class="sidebar" layout="column" layout-align="start start" flex="30">
         <div ng-repeat="folder in main.explorer.folders" ng-include="'fs-tree'" style="width: 100%;"></div>
     </div>
     <div class="main-panel" layout="column" layout-align="start start" flex="65">
-
+      <div class="no-files-msg" ng-show="main.currentFolder.files.length === 0">No files found</div>
       <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center" layout-fill>
         <span><a download="file" href="{{main.buildUrl(file, 'bkit')}}">{{file}}</a></span>
         <span layout="row" layout-align="space-between">
@@ -90,9 +55,9 @@
         <md-button class="md-icon-button" ng-if="folder.opened" ng-click="folder.opened = false; $event.stopPropagation();"><md-icon>folder_open</md-icon></md-button>
         <span>{{folder.name}}</span>
       </div>
-      <div><md-icon>restore</md-icon></div>
+      <div><a download="file" href="{{main.buildUrl(file, 'bkit')}}"><md-icon>restore</md-icon></a></div>
     </div>
-    <div ng-if="folder.folders.length > 0 && folder.opened">
+    <div ng-if="folder.folders.length > 0 || folder.opened">
         <div ng-repeat="folder in folder.folders" ng-include="'fs-tree'" style="padding-left: 1em;"></div>
     </div>
 </script>

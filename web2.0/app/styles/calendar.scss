@@ -22,3 +22,18 @@
     background-color: rgba(220, 220, 220, 0.9);
   }
 }
+
+
+.calendar{
+
+  .scroll-btn{
+    width: 30px;
+    height: 100px;
+    transition: all 0.2s linear;
+    margin: 0 5px;
+  }
+
+  .scroll-btn:hover{
+    background-color: rgba(230, 230, 230, 0.9);
+  }
+}

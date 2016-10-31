@@ -1,8 +1,6 @@
 <div layout="row" layout-align="start stretch" flex>
-  <div layout="column" layout-align="center center" flex>
-    <md-button mouse-hold="scroll('left', increment)">
+  <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('left', increment)">
       <md-icon>keyboard_arrow_left</md-icon>
-    </md-button>
   </div>
   <div class="spinner" layout="column" flex="70" scroll-control>
     <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
@@ -13,9 +11,7 @@
       </div>
     </div>
   </div>
-  <div layout="column" layout-align="center center" flex>
-    <md-button mouse-hold="scroll('right', increment)">
+  <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('right', increment)">
       <md-icon>keyboard_arrow_right</md-icon>
-    </md-button>
   </div>
 </div>

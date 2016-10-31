@@ -50,7 +50,8 @@
 }
 
 .current-selections{
-  margin-left: 40px;
+  margin: 1em 0 1em 40px;
+
 }
 
 .arrow {
@@ -78,4 +79,24 @@
   right: -28.284px;
   background-color: lightgray;
   z-index: 1;
+}
+.top-header{
+  margin-top: 2em;
+  padding: 0 2em;
+}
+
+.explorer{
+  margin-top: 3em;
+  padding: 0 2em;
+
+  a{
+    text-decoration: none;
+    color: black;
+  }
+
+  .sidebar{
+    margin-right: 1em;
+    padding-right: 1em;
+    border-right: 1px solid lightgrey;
+  }
 }

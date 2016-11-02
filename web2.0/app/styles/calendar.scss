@@ -1,0 +1,39 @@
+.spinner {
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y: visible;
+  .cell {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    padding: 0 5px;
+    border: 1px solid lightgrey;
+    background-color: white;
+    transition: all 0.2s linear;
+  }
+  .cell:hover {
+    background-color: rgba(230, 230, 230, 0.9);
+    transform: scale(1.1, 1.0);
+  }
+
+  .cell.selected,
+  .cell.selected:hover{
+    background-color: rgba(220, 220, 220, 0.9);
+  }
+}
+
+
+.calendar{
+
+  .scroll-btn{
+    width: 30px;
+    height: 100px;
+    transition: all 0.2s linear;
+    margin: 0 5px;
+  }
+
+  .scroll-btn:hover{
+    background-color: rgba(230, 230, 230, 0.9);
+  }
+}

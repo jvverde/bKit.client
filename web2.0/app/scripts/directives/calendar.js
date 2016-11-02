@@ -9,7 +9,7 @@
 angular.module('bkitApp')
   .directive('calendar', ['config', function ($config) {
     return {
-      templateUrl: 'scripts/directives/calendar.tmpl.html',
+      templateUrl: 'views/calendar.tmpl.html',
       restrict: 'E',
       scope: false,
       replace: true,

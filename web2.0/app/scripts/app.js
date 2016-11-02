@@ -15,7 +15,8 @@ angular
     'ngMaterial',
     'ui.router'
   ])
-  .config(function ($routeProvider, $stateProvider) {
+  .config(function ($routeProvider, $stateProvider, $locationProvider) {
+
     $stateProvider
       .state('home', {
         name: 'home',
@@ -28,17 +29,15 @@ angular
             return $home.loadComputers();
           }]
         }
-      })
-      .state('about', {
-        name: 'about',
-        url: '/about',
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl',
-        controllerAs: 'about'
       });
 
+    $routeProvider.otherwise({
+        redirectTo: '/'
+    });
 
-    // $routeProvider.otherwise({
-    //     redirectTo: '/'
-    //   });
+    $locationProvider.html5Mode({
+      enabled: true,
+      requireBase: false
+    });
+
   });

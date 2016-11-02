@@ -39,4 +39,5 @@ angular
       enabled: true,
       requireBase: false
     });
+
   });

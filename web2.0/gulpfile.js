@@ -158,7 +158,13 @@ gulp.task('client:build', ['html', 'styles'], function () {
   var cssFilter = $.filter('**/*.css');
 
   return gulp.src(paths.views.main)
-    .pipe($.useref({searchPath: [yeoman.app, '.tmp']}))
+    .pipe($.useref({
+      searchPath: [yeoman.app, '.tmp'],
+      transformPath: function (filePath) {
+        console.log('file path: ', filePath.replace('../', ''));
+        return filePath.replace('../', '');
+      }
+    }))
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
     .pipe($.uglify())

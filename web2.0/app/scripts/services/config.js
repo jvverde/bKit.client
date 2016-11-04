@@ -25,6 +25,6 @@ angular.module('bkitApp')
       }
     },
     server: {
-      url: 'http://10.11.0.135:3000'
+      url: 'http://localhost:8088'
     }
   });

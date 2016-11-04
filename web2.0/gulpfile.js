@@ -8,7 +8,7 @@ var lazypipe = require('lazypipe');
 var rimraf = require('rimraf');
 var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
-//var Proxy = require('gulp-connect-proxy');
+var proxy = require('http-proxy-middleware');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',
@@ -78,42 +78,44 @@ gulp.task('start:server', function() {
   $.connect.server({
     root: [yeoman.app, '.tmp', '.'],
     livereload: true,
-    // middleware: function (connect, opt) {
-
-    //   opt.route = '/computers';
-    //   var pcProxy = new Proxy(opt);
-    //   opt.route = '/backups';
-    //   var bakProxy = new Proxy(opt);
-    //   opt.route = '/folder';
-    //   var folderProxy = new Proxy(opt);
-    //   opt.route = '/download';
-    //   var downloadProxy = new Proxy(opt);
-    //   opt.route = '/view';
-    //   var viewProxy = new Proxy(opt);
-    //   opt.route = '/bkit';
-    //   var bkitProxy = new Proxy(opt);
-
-    //   return [pcProxy, bakProxy, folderProxy, downloadProxy, viewProxy, bkitProxy];
-    // },
-    // Change this to '0.0.0.0' to access the server from outside.
-    port: 9000
+    port: 9000,
+    middleware: function(connect, opt) {
+      console.log('midleware....')
+      return [
+          proxy('/computers', {
+              target: 'http://10.11.0.135:8088',
+              changeOrigin:true
+          }),
+          proxy('/backups', {
+              target: 'http://10.11.0.135:8088',
+              changeOrigin:true
+          }),
+          proxy('/folder', {
+              target: 'http://10.11.0.135:8088',
+              changeOrigin:true
+          }),          
+          proxy('/download', {
+              target: 'http://10.11.0.135:8088',
+              changeOrigin:true
+          }),          
+          proxy('/view', {
+              target: 'http://10.11.0.135:8088',
+              changeOrigin:true
+          }),          
+          proxy('/bkit', {
+              target: 'http://10.11.0.135:8088',
+              changeOrigin:true
+          }),                    
+      ]
+    }
   });
 });
-
-var cors = function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'headers_you_want_to_accept');
-  next();
-};
 
 gulp.task('start:server:test', function() {
   $.connect.server({
     root: ['test', yeoman.app, '.tmp'],
     livereload: true,
-    port: 9001,
-    middleware: function () {
-      return [cors];
-    }
+    port: 9001
   });
 });
 

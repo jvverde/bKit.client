@@ -8,6 +8,7 @@ var lazypipe = require('lazypipe');
 var rimraf = require('rimraf');
 var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
+var Proxy = require('gulp-connect-proxy');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',
@@ -77,6 +78,23 @@ gulp.task('start:server', function() {
   $.connect.server({
     root: [yeoman.app, '.tmp', '.'],
     livereload: true,
+    middleware: function (connect, opt) {
+
+      opt.route = '/computers';
+      var pcProxy = new Proxy(opt);
+      opt.route = '/backups';
+      var bakProxy = new Proxy(opt);
+      opt.route = '/folder';
+      var folderProxy = new Proxy(opt);
+      opt.route = '/download';
+      var downloadProxy = new Proxy(opt);
+      opt.route = '/view';
+      var viewProxy = new Proxy(opt);
+      opt.route = '/bkit';
+      var bkitProxy = new Proxy(opt);
+
+      return [pcProxy, bakProxy, folderProxy, downloadProxy, viewProxy, bkitProxy];
+    },
     // Change this to '0.0.0.0' to access the server from outside.
     port: 9000
   });

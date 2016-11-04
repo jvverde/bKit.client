@@ -8,7 +8,7 @@ var lazypipe = require('lazypipe');
 var rimraf = require('rimraf');
 var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
-var Proxy = require('gulp-connect-proxy');
+//var Proxy = require('gulp-connect-proxy');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',

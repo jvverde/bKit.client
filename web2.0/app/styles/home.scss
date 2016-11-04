@@ -2,6 +2,7 @@
 .selectable-row{
   transition: all 0.2s linear;
   width: 100%;
+  cursor: pointer;
 }
 
 
@@ -60,7 +61,9 @@
   width: 150px;
   height: 80px;
   background-color: lightgray;
-  padding-left: 60px;
+  padding-left: 50px;
+  margin-right: 1em;
+  cursor: pointer;
 
   span{
     z-index: 2;

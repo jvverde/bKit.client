@@ -15,7 +15,7 @@ angular.module('bkitApp')
       // self.showComputersGrid = true;
       // self.showDrivesGrid = false;
 
-      self.computers = $computers;
+      self.computers = $filter('name.display.filter')($computers);
       self.backups = [];
       self.path = '';
 
@@ -35,23 +35,11 @@ angular.module('bkitApp')
 
       function selectComputer(pc) {
         self.selectedComputer = pc;
-        // self.showComputersGrid = false;
-        // self.showDrivesGrid = true;
+
+        if (pc.drives.length === 1) processSelection(pc.drives[0]);
       }
 
-      function filterComputerNames(computers) {
 
-        computers.forEach(function (pc, ind, arr) {
-          arr[ind].name = $filter('name.display.filter')(pc.name);
-          filterDrivesNames(arr[ind].drives);
-        });
-      }
-      function filterDrivesNames(drives) {
-
-        drives.forEach(function (drive, ind, arr) {
-          arr[ind].name = $filter('name.display.filter')(drive.id);
-        });
-      }
 
       function reset(pc) {
 
@@ -143,7 +131,5 @@ angular.module('bkitApp')
           self.path
         ]);
       }
-
-      filterComputerNames(self.computers);
     }
   ]);

@@ -8,7 +8,7 @@ var lazypipe = require('lazypipe');
 var rimraf = require('rimraf');
 var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
-var Proxy = require('gulp-connect-proxy');
+//var Proxy = require('gulp-connect-proxy');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',
@@ -100,11 +100,20 @@ gulp.task('start:server', function() {
   });
 });
 
+var cors = function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'headers_you_want_to_accept');
+  next();
+};
+
 gulp.task('start:server:test', function() {
   $.connect.server({
     root: ['test', yeoman.app, '.tmp'],
     livereload: true,
-    port: 9001
+    port: 9001,
+    middleware: function () {
+      return [cors];
+    }
   });
 });
 

@@ -5,11 +5,8 @@
     <div class="filters" layout="column" layout-align="center stretch" ng-show="main.backups.length > 0" flex>
       <div class="current-selections" layout="row" layout-align="start center">
         <div class="arrow" ng-click="main.reset()" layout="column" layout-align="center center"><span>Start</span></div>
-        <div><md-icon>play_arrow</md-icon></div>
         <div class="arrow" ng-click="main.reset(main.selectedComputer)" layout="column" layout-align="center center"><span>{{main.selectedComputer.name}}</span></div>
-        <div><md-icon>play_arrow</md-icon></div>
         <div class="arrow" layout="column" layout-align="center center"><span>{{main.selectedDrive.name}}</span></div>
-        <div><md-icon>play_arrow</md-icon></div>
         <div class="arrow" layout="column" layout-align="center center"><span>{{main.selectedBackup.id}}</span></div>
       </div>
       <calendar class="calendar" content="main.backups" on-cell-click="main.onSelectBackup"></calendar>
@@ -30,7 +27,7 @@
     </div>
     <div class="error-message" ng-if="main.selectedComputer.drives.length === 0" layout="column" layout-align="center center">
       <span>No drives have been backed up</span>
-      <span ng-click="main.reset()">Go Back</span>
+      <span ng-click="main.reset()" style="cursor: pointer;">Go Back</span>
     </div>
   </div>
 

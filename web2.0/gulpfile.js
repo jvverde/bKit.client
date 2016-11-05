@@ -98,10 +98,10 @@ gulp.task('start:server', function() {
               target: 'http://10.11.0.135:8088',
               changeOrigin:true
           }),          
-          proxy('/view', {
-              target: 'http://10.11.0.135:8088',
-              changeOrigin:true
-          }),          
+          // proxy('/view', {
+          //     target: 'http://10.11.0.135:8088',
+          //     changeOrigin:true
+          // }),          
           proxy('/bkit', {
               target: 'http://10.11.0.135:8088',
               changeOrigin:true

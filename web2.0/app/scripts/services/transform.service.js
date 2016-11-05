@@ -18,6 +18,7 @@ angular.module('bkitApp')
 
         var ind;
         var date = moment(bak.substring(5), 'YYYY.MM.DD-HH.mm.ss'); //TODO all tz
+        date.utc();
         var newBak = {
           computer: computer,
           drive: drive,

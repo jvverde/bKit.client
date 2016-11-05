@@ -6,8 +6,11 @@
     <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
       <div class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" layout="column" layout-align="center center" flex>
 
-        <span>{{bak.time.format('DD-MM')}} @ {{bak.time.format('HH:mm:ss')}}</span>
-
+        <time>
+          <span class="day">{{bak.time.local().format('dddd')}}</span>
+          <span class="time">{{bak.time.local().format('HH:mm')}}</span>
+          <span class="date">{{bak.time.local().format('YYYY/MM/DD')}}</span>
+        </time>
       </div>
     </div>
   </div>

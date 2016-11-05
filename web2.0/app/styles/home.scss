@@ -61,8 +61,10 @@ $arrowidth: 1em;
 $arrowstrech:2;
 $arrowcolor:lightgray;
 $arrowcolorhover: rgba(230, 230, 230, 0.9);
+$arrowborderradius: 4px;
 
-.breadcrumb { 
+.breadcrumb {
+  //https://css-tricks.com/triangle-breadcrumbs/ 
   list-style: none; 
   overflow: hidden; 
   li { 
@@ -79,6 +81,8 @@ $arrowcolorhover: rgba(230, 230, 230, 0.9);
   }
   li:last-child{
     border-color:$arrowcolor;
+    border-top-right-radius: $arrowborderradius;
+    border-bottom-right-radius: $arrowborderradius;
     padding-right: 1em
   }
   li:not(:last-child) { 
@@ -111,8 +115,12 @@ $arrowcolorhover: rgba(230, 230, 230, 0.9);
       }
     } 
   }
-  li:first-child span{
-    padding-left: 0.5em
+  li:first-child {
+    border-top-left-radius: $arrowborderradius;
+    border-bottom-left-radius: $arrowborderradius;
+    span{
+      padding-left: 0.5em
+    }
   }
 }
 

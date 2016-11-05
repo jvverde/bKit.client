@@ -11,9 +11,15 @@
       </div-->
       <ul class="breadcrumb" layout="row" layout-align="start center">
         <li><span ng-click="main.reset()">Start</span></li>
-        <li><span ng-click="main.reset(main.selectedComputer)">{{main.selectedComputer.name}}</span></li>
-        <li><span>{{main.selectedDrive.name}}</span></li>
-        <li><span>{{main.selectedBackup.id}}</span></li>
+        <li><span ng-click="main.reset(main.selectedComputer)">
+          {{main.selectedComputer.name}}
+        </span></li>
+        <li><span>
+          {{main.selectedDrive.name}}
+        </span></li>
+        <li><span>
+          {{main.selectedBackup.time.local().format('LLLL')}}
+        </span></li>
       </ul>
       <calendar class="calendar" content="main.backups" on-cell-click="main.onSelectBackup"></calendar>
     </div>

@@ -56,39 +56,69 @@
 
 }
 
-.arrow {
-  position: relative;
-  width: 150px;
-  height: 80px;
-  background-color: lightgray;
-  padding-left: 50px;
-  margin-right: 1em;
-  cursor: pointer;
 
-  span{
-    z-index: 2;
+$arrowidth: 1em;
+$arrowstrech:2;
+$arrowcolor:lightgray;
+$arrowcolorhover: rgba(230, 230, 230, 0.9);
+
+.breadcrumb { 
+  list-style: none; 
+  overflow: hidden; 
+  li { 
+    float: left; 
+    background-color: transparent;
+    border-width: 1px;
+    border-style: solid;
+    span {
+      padding: .5em 0 .5em $arrowidth+0.5;
+      position: relative; 
+      display: block;
+      float: left;
+    }  
+  }
+  li:last-child{
+    border-color:$arrowcolor;
+    padding-right: 1em
+  }
+  li:not(:last-child) { 
+    border-color:transparent;
+    background-color: $arrowcolor;                
+    span:after,span:before { 
+      content: ""; 
+      display: block; 
+      width: 0; 
+      height: 0;
+      border-top: $arrowstrech*$arrowidth solid transparent;           /* Go big on the size, and let overflow hide */
+      border-bottom: $arrowstrech*$arrowidth solid transparent;
+      border-left: $arrowidth solid $arrowcolor;
+      position: absolute;
+      top: 50%;
+      margin-top: -$arrowstrech*$arrowidth; 
+      left: 100%;
+      z-index: 2; 
+    }
+    span:before { 
+      border-left-color: white;
+      margin-left: 1px;
+      z-index: 1; 
+    }
+    span:hover{
+      cursor: pointer;
+      background-color: $arrowcolorhover;
+      &:after{
+        border-left-color: $arrowcolorhover;
+      }
+    } 
+  }
+  li:first-child span{
+    padding-left: 0.5em
   }
 }
 
-.arrow:before,
-.arrow:after {
-  content: "";
-  position: absolute;
-  width: 56.569px;
-  height: 56.569px;
-  transform: rotateZ(45deg);
-  background-color: rgba(250,250,250,1);
-}
 
-.arrow:before {
-  left: -28.284px;
-}
 
-.arrow:after {
-  right: -28.284px;
-  background-color: lightgray;
-  z-index: 1;
-}
+
 .top-header{
   margin-top: 2em;
   padding: 0 2em;

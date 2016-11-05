@@ -20,7 +20,6 @@ angular.module('bkitApp')
           path += '/' + id;
         });
       }
-      console.log('aquiiiiiiiiiiiiii')
       return $config.server.url + path;
     }
 

@@ -1,21 +1,87 @@
+$height: 6em;
+$width: 8em;
 .spinner {
   overflow-wrap: break-word;
   overflow-x: hidden;
   overflow-y: visible;
   .cell {
-    width: 100px;
-    height: 100px;
-    min-width: 100px;
-    min-height: 100px;
-    padding: 0 5px;
-    border: 1px solid lightgrey;
+    padding: 2px 5px 7px 5px;
     background-color: white;
     cursor: pointer;
     transition: all 0.2s linear;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    min-width: $width+1;
+    time{
+      //https://www.sitepoint.com/create-calendar-icon-html5-css3/
+      font-size: 1em; /* change size */
+      display: flex;
+      justify-content: center;
+      align-items:center;
+      position: relative;
+      width: $width;
+      height: $height;
+      min-height: 6em;
+      min-width: 8em;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 1px 1px 0 #666, 2px 2px 0 #666, 3px 3px 0 #666, 3px 4px 0 #666, 3px 5px 0 #666, 0 0 0 2px #bbb;
+      overflow: hidden;
+      span{
+        display: block;
+        width: 100%;
+        font-size: 1em;
+        font-weight: bold;
+        font-style: normal;
+        text-align: center;
+        &.day{
+          position: absolute;
+          top: 0;
+          left:0;
+          padding: 0.2em 0;
+          color: #fff;
+          background-color: #fd9f1b;
+          border-bottom: 1px dashed #f37302;
+          box-shadow: 0 2px 0 #fd9f1b;
+        }
+        &.time{
+          letter-spacing: -0.05em;
+          color: #2f2f2f;
+          position: relative;
+          padding: 0.5em 0;
+          &:before,&:after{
+            content: "";
+            display: block;
+            position: absolute;
+            bottom: 0em;
+            width:1.5em;
+            height:1.5em;
+            border-radius:500px;
+            border:2px dashed #bbb;
+            background-color: #444;
+          }
+          &:after {
+            right:0.5em;
+          }
+          &:before{
+            left:0.5em;
+          }
+        }
+        &.date{
+          position: absolute;
+          bottom: 0.3em;
+          left:0;
+          color: #fd9f1b;
+        }
+      }
+    }
   }
   .cell:hover {
     background-color: rgba(230, 230, 230, 0.9);
-    transform: scale(1.1, 1.0);
+    //transform: translateY(-2em);
+    transform: rotateX(45deg);
+    perspective: 500px;
+    z-index: 2;
   }
 
   .cell.selected,
@@ -29,7 +95,7 @@
 
   .scroll-btn{
     width: 30px;
-    height: 100px;
+    height: $height;
     transition: all 0.2s linear;
     margin: 0 5px;
   }

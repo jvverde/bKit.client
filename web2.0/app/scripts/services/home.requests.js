@@ -23,21 +23,35 @@ angular.module('bkitApp')
       return $config.server.url + path;
     }
 
-    function mapPairToArray(obj, key, value) {
+    function mapPairToArray(obj, name, value) {
       return Object.keys(obj).map(function (k) {
 
         var ret = {};
-        ret[key] = k;
+        ret[name] = k;
         ret[value] = obj[k];
 
         return ret;
       });
     }
+    function mapComputerProps(computers){
+      return Object.keys(computers).map(function(k) {
+        var comps = (computers[k] || '').split('.');
+        var uuid = comps.pop();
+        comps.shift();                    //discard name
+        var domain = comps.join('.') 
+        return {
+          name: k,
+          id:  computers[k],
+          uuid: uuid,
+          domain: domain
+        };
+      })
+    }
 
     this.loadComputers = function () {
       return $http.get(url('/computers'))
         .then(function (res) {
-          var computers = mapPairToArray(res.data, 'name', 'id');
+          var computers = mapComputerProps(res.data);
           var promises = [];
 
           computers.forEach(function (pc, ind, arr) {

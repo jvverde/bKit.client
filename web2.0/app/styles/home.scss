@@ -15,16 +15,104 @@
   background-color: rgba(0,0,255, 0.35);
 }
 
+$scale: .15;
+$rackwidth: $scale * 19in;      //Rach width 19in
+$U: $scale * 1.75in;
+$LSIZE: 8pt;                     //Label size
+$drivewitdh: $scale * 5.5in;
+.computer-grid{
+  *{
+    height: initial;  
+  }
+}
+
 .box{
-  width: 150px;
-  height: 150px;
+  width: $rackwidth;
+  height: 4*$U; //4U
   overflow: hidden;
 
   border: 1px solid lightgray;
-  margin: .15em;
-  padding: 1em;
 
   transition: all .2s ease-out;
+
+  background: radial-gradient(black 15%, transparent 16%) 0 0, 
+    radial-gradient(black 15%, transparent 16%) 4px 4px,
+    radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+    radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 4px 5px;
+
+  background-size:8px 8px;
+
+  background-color:#282828;
+
+  padding: $LSIZE 2*$LSIZE;
+  position: relative;
+  margin: 1px 1em;
+  *{
+    font-size: $LSIZE;
+  }
+  &:after,&:before{
+    content: " ";
+    position: absolute;
+    top: 0;
+    width: $LSIZE;
+    height: 100%;
+    background-image:linear-gradient(180deg, hsl(0,0%,78%)  0%, 
+      hsl(0,0%,90%) 47%, 
+      hsl(0,0%,78%) 53%,
+      hsl(0,0%,70%)100%);
+  }
+  &:before{
+    left: 0;
+  }
+  &:after{
+    right: 0;
+  }
+  .name{
+    position: absolute;
+    top: 0;
+    right: $LSIZE+2;
+    padding-left: .5em;
+    padding-right: .5em;
+    background-color: #555;
+    color: #eee;
+  }
+  .uuid{
+    position: absolute;
+    bottom: 0;
+    left: $LSIZE;
+    font-size: 50%;
+    background-color: #555;
+    color: #aaa;
+    &:before{
+      content: "ID:"
+    }
+  }
+  .components{
+    height: 100%;
+    overflow: hidden;
+    .drive{
+      width: $drivewitdh;
+      margin: 0.5px;
+      height: $scale * 1.5in;
+      background-color: #333;
+      border: 1px solid black;
+      color: white
+    }
+    .notused{
+      width: $drivewitdh;
+      height: 4*$U;
+      background: linear-gradient(0deg,  
+        #999 0%,
+        #666 25%,
+        #333 50%,
+        #222 75%,
+        #111 100%);  
+      background-size:10px 10px;
+      background-color: #444;
+      margin: 0.5px;
+      border:2px solid #444;
+    }
+  }
 }
 
 .box:hover{
@@ -124,22 +212,19 @@ $arrowborderradius: 4px;
   }
 }
 
-
-
-
 .top-header{
   margin-top: 2em;
   padding: 0 2em;
   height: auto;
 }
 
-
-
-
 .explorer{
   margin-top: 3em;
   padding: 0 2em;
   height: 65vh;
+  *{
+    height: initial;  
+  }
 
   a{
     text-decoration: none;

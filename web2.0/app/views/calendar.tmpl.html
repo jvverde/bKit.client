@@ -2,9 +2,9 @@
   <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('left', increment)">
       <md-icon>keyboard_arrow_left</md-icon>
   </div>
-  <div class="spinner" layout="column" flex="70" scroll-control>
+  <div class="spinner" layout="column" scroll-control>
     <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
-      <div class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" layout="column" layout-align="center center" flex>
+      <div class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" layout="column" layout-align="center center">
 
         <time>
           <span class="day">{{bak.time.local().format('dddd')}}</span>

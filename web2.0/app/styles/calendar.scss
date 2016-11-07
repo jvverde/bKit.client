@@ -23,7 +23,7 @@ $width: 8em;
       height: $height;
       min-height: 6em;
       min-width: 8em;
-      background-color: #fff;
+      background-color: #c8c8c8;
       border-radius: 5px;
       box-shadow: 1px 1px 0 #666, 2px 2px 0 #666, 3px 3px 0 #666, 3px 4px 0 #666, 3px 5px 0 #666, 0 0 0 2px #bbb;
       overflow: hidden;
@@ -58,7 +58,7 @@ $width: 8em;
             height:1.5em;
             border-radius:500px;
             border:2px dashed #bbb;
-            background-color: #444;
+            background-color: #eee;
           }
           &:after {
             right:0.5em;

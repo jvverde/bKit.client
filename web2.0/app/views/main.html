@@ -1,7 +1,7 @@
 <div layout="column" layout-align="space-around center">
 
   <div class="top-header" layout="row" layout-align="space-between center">
-    <img src="images/logo/512x512.png" height="200" width="200">
+    <img src="images/logo/512x512.png" height="80" width="80">
     <div class="filters" layout="column" layout-align="center stretch" ng-show="main.backups.length > 0" flex>
       <!--div class="current-selections" layout="row" layout-align="start center">
         <div class="arrow" ng-click="main.reset()" layout="column" layout-align="center center"><span>Start</span></div>
@@ -26,7 +26,7 @@
 
   </div>
 
-  <div class="computer-grid"  ng-if="!main.selectedComputer" layout="row" layout-align="center center" layout-wrap>
+  <div class="computer-grid"  ng-if="!main.selectedComputer" layout="column" layout-align="center center" layout-wrap>
     <div class="box" ng-repeat="pc in main.computers" ng-click="main.selectComputer(pc)" layout="column" layout-align="center center">
       <span>{{pc.name}}</span>
     </div>

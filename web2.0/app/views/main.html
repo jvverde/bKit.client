@@ -3,12 +3,6 @@
   <div class="top-header" layout="row" layout-align="space-between center">
     <img src="images/logo/512x512.png" height="80" width="80">
     <div class="filters" layout="column" layout-align="center stretch" ng-show="main.backups.length > 0" flex>
-      <!--div class="current-selections" layout="row" layout-align="start center">
-        <div class="arrow" ng-click="main.reset()" layout="column" layout-align="center center"><span>Start</span></div>
-        <div class="arrow" ng-click="main.reset(main.selectedComputer)" layout="column" layout-align="center center"><span>{{main.selectedComputer.name}}</span></div>
-        <div class="arrow" layout="column" layout-align="center center"><span>{{main.selectedDrive.name}}</span></div>
-        <div class="arrow" layout="column" layout-align="center center"><span>{{main.selectedBackup.id}}</span></div>
-      </div-->
       <ul class="breadcrumb" layout="row" layout-align="start center">
         <li><span ng-click="main.reset()">Start</span></li>
         <li><span ng-click="main.reset(main.selectedComputer)">
@@ -51,7 +45,7 @@
     </div>
   </div>
 
-  <div class="explorer" layout="row" layout-align="start start" layout-fill ng-if="main.explorer">
+  <div class="explorer" layout="row" layout-align="start start" ng-if="main.explorer">
     <div class="preloader" ng-if="main.loading"></div>
     <div class="sidebar" flex="30">
         <div layout="column" layout-align="start start">

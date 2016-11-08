@@ -30,10 +30,10 @@
     <div class="box" ng-repeat="pc in main.computers" ng-click="main.selectComputer(pc)">
       <div class="name">{{pc.name}}</div>
       <div class="uuid">{{pc.uuid}}</div>
+      <!-- <div class="notused"></div> -->
       <div class="components" layout="column" layout-align="end end" layout-wrap>
-        <div class="notused"></div>
         <div class="drive" ng-repeat="drive in pc.drives" ng-click="main.processSelection(drive)"
-          layout="column" layout-align="center center" >
+          layout="column" layout-align="center center">
           {{drive.name}}
         </div>
       </div>

@@ -1,0 +1,66 @@
+<div layout="column" layout-align="space-around center">
+
+  <div class="top-header" layout="row" layout-align="space-between center">
+    <img src="images/logo/512x512.png" height="200" width="200">
+    <div class="filters" layout="column" layout-align="center stretch" ng-show="main.backups.length > 0" flex>
+      <div class="current-selections" layout="row" layout-align="start center">
+        <div class="arrow" ng-click="main.reset()" layout="column" layout-align="center center"><span>{{main.selectedComputer.name}}</span></div>
+        <div><md-icon>play_arrow</md-icon></div>
+        <div class="arrow" ng-click="main.reset(main.selectedComputer)" layout="column" layout-align="center center"><span>{{main.selectedDrive.name}}</span></div>
+        <div><md-icon>play_arrow</md-icon></div>
+        <div class="arrow" layout="column" layout-align="center center"><span>{{main.selectedBackup.id}}</span></div>
+      </div>
+      <calendar class="calendar" content="main.backups" on-cell-click="main.onSelectBackup"></calendar>
+    </div>
+
+  </div>
+
+  <div class="computer-grid"  ng-if="!main.selectedComputer" layout="row" layout-align="center center" layout-wrap>
+    <div class="box" ng-repeat="pc in main.computers" ng-click="main.selectComputer(pc)" layout="column" layout-align="center center">
+      <span>{{pc.name}}</span>
+    </div>
+  </div>
+
+  <div class="drives-grid" ng-if="main.selectedComputer && !main.selectedDrive" layout="row" layout-align="center center" layout-wrap>
+    <div class="box" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
+        layout="column" layout-align="center center" >
+      <span>{{drive.name}}</span>
+    </div>
+  </div>
+
+  <div class="explorer" layout="row" layout-align="start start" layout-fill ng-if="main.explorer">
+    <div class="preloader" ng-if="main.loading"></div>
+    <div class="sidebar" layout="column" layout-align="start start" flex="30">
+        <div ng-repeat="folder in main.explorer.folders" ng-include="'fs-tree'" style="width: 100%;"></div>
+    </div>
+    <div class="main-panel" layout="column" layout-align="start start" flex="65">
+      <div class="no-files-msg" ng-show="main.currentFolder.files.length === 0">No files found</div>
+      <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center" layout-fill>
+        <span><a download="file" href="{{main.buildUrl(file, 'bkit')}}">{{file}}</a></span>
+        <span layout="row" layout-align="space-between">
+          <md-button class="md-icon-button"><a download="file" href="{{main.buildUrl(file, 'download')}}"><md-icon>file_download</md-icon></a></md-button>
+          <md-button class="md-icon-button"><a target="_blank" href="{{main.buildUrl(file, 'view')}}"><md-icon>visibility</md-icon></a></md-button>
+          <md-button class="md-icon-button"><a download="file" href="{{main.buildUrl(file, 'bkit')}}"><md-icon>restore</md-icon></a></md-button>
+        </span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script type="text/ng-template" id="fs-tree">
+    <div class="folder selectable-row" ng-class="{'selected': folder.selected}" layout="row" layout-align="space-between center" layout-fill">
+      <div ng-click="main.loadContent(folder)" flex>
+        <md-button class="md-icon-button" ng-if="!folder.opened"><md-icon>folder</md-icon></md-button>
+        <md-button class="md-icon-button" ng-if="folder.opened" ng-click="folder.opened = false; $event.stopPropagation();"><md-icon>folder_open</md-icon></md-button>
+        <span>{{folder.name}}</span>
+      </div>
+      <div><a download="file" href="{{main.buildUrl(file, 'bkit')}}"><md-icon>restore</md-icon></a></div>
+    </div>
+    <div ng-if="folder.folders.length > 0 || folder.opened">
+        <div ng-repeat="folder in folder.folders" ng-include="'fs-tree'" style="padding-left: 1em;"></div>
+    </div>
+</script>
+
+
+</div>

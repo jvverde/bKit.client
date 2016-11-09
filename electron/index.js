@@ -27,7 +27,7 @@ function createMainWindow() {
 		}
 	});
 
-	win.loadURL(`file://${__dirname}/recovery/index-793acdbac8.html`);
+	win.loadURL(`file://${__dirname}/recovery/index.html`);
 	win.on('closed', onClosed);
 
 	return win;

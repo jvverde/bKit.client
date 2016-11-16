@@ -1,20 +1,18 @@
-<div layout="row" layout-align="start stretch" flex>
-  <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('left', increment)">
+<div>
+<!--   <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('left', increment)">
       <md-icon>keyboard_arrow_left</md-icon>
-  </div>
-  <div class="spinner" layout="column" scroll-control>
-    <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
-      <div class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" layout="column" layout-align="center center">
-
+  </div> -->
+  <div class="spinner accordion horizontal" layout="row" layout-align="start start">
+      <section class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" layout="column" layout-align="start start">
+        <h2 class="spine">{{bak.time.local().format('YYYY/MM/DD')}}</h2>
         <time>
           <span class="day">{{bak.time.local().format('dddd')}}</span>
           <span class="time">{{bak.time.local().format('HH:mm')}}</span>
           <span class="date">{{bak.time.local().format('YYYY/MM/DD')}}</span>
         </time>
-      </div>
-    </div>
+      </section>
   </div>
-  <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('right', increment)">
+<!--   <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('right', increment)">
       <md-icon>keyboard_arrow_right</md-icon>
-  </div>
+  </div> -->
 </div>

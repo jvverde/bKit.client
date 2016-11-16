@@ -47,7 +47,7 @@ angular.module('bkitApp')
         self.backups = $transform.backupsByDate(self.selectedComputer, drive);
 
         //we've just updated self.backups so we need to wait for angular's $digest cycle to finish before we can syncronize the selection
-        $timeout(function () {
+        $scope.syncronizeSelection && $timeout(function () {
           $scope.syncronizeSelection(self.backups[0], 'id');
         }, 10);
       }

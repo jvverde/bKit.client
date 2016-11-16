@@ -26,7 +26,8 @@
       <div class="uuid">{{pc.uuid}}</div>
       <!-- <div class="notused"></div> -->
       <div class="components" layout="column" layout-align="end end" layout-wrap>
-        <div class="drive" ng-repeat="drive in pc.drives" ng-click="main.processSelection(drive)"
+        <div class="drive" ng-repeat="drive in pc.drives|orderBy:'name':true" 
+          ng-click="main.processSelection(drive,pc)"
           layout="column" layout-align="center center">
           {{drive.name}}
         </div>
@@ -34,8 +35,9 @@
     </div>
   </div>
 
-  <div class="drives-grid" ng-if="main.selectedComputer && !main.selectedDrive" layout="row" layout-align="center center" layout-wrap>
-    <div class="box" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
+  <div class="drives-grid box" ng-if="main.selectedComputer && !main.selectedDrive" layout="row" layout-align="end center">
+    <div class="name">{{main.selectedComputer.name}}</div>
+    <div class="drive" ng-repeat="drive in main.selectedComputer.drives" ng-click="main.processSelection(drive)"
         layout="column" layout-align="center center" >
       <span>{{drive.name}}</span>
     </div>
@@ -53,7 +55,7 @@
         </div>
     </div>
     <div class="main-panel" layout="column" layout-align="start start">
-      <div class="no-files-msg" ng-show="main.currentFolder.files.length === 0">No files found</div>
+      <div class="no-files-msg" ng-show="main.currentFolder.files.length === 0"><!-->No files found--></div>
       <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center">
         <span><a download="file" href="{{main.buildUrl(file, 'bkit')}}">{{file}}</a></span>
         <span layout="row" layout-align="space-between center">

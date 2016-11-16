@@ -32,6 +32,35 @@ $drivewitdh: ($rackwidth - 4*$LSIZE)/3;
   height: initial;  
 }
 
+.drive{
+  height: $drivewitdh;
+  margin: 0.5px;
+  width: $scale * 1.5in;
+  background-color: #333;
+  border: 1px solid black;
+  color: #fff;
+  position: relative;
+  &:before{
+    content: "";
+    position: absolute;
+    bottom:3px;
+    left:50%;
+    width: 0;
+    height: 0;
+    border-radius: 50px;
+    border:2px solid green;
+    margin-left: -2px;
+  }
+}
+
+.drives-grid.box{
+  width:auto;
+  min-width: $rackwidth;
+  .drive {
+    @extend .drive;  
+  }
+}
+
 .box{
   width: $rackwidth;
   height: 4*$U; //4U
@@ -71,13 +100,8 @@ $drivewitdh: ($rackwidth - 4*$LSIZE)/3;
     position: absolute;
     top: 0;
     height: 100%;
-    background-image:linear-gradient(180deg, hsl(0,0%,78%)  0%, 
-      hsl(0,0%,85%) 20%, 
-      hsl(0,0%,90%) 47%, 
-      hsl(0,0%,78%) 53%,
-      hsl(0,0%,95%) 80%,
-      hsl(0,0%,70%)100%)
-    ;
+    background-image: radial-gradient(ellipse at center,  #FFF 0%,#DDD 40%,#FFF 100%);
+    background-size: 100% 33%;
     z-index: 5;
   }
   &:before{
@@ -125,24 +149,7 @@ $drivewitdh: ($rackwidth - 4*$LSIZE)/3;
     background-color:#333;
 
     .drive{
-      width: $drivewitdh;
-      margin: 0.5px;
-      height: $scale * 1.5in;
-      background-color: #333;
-      border: 1px solid black;
-      color: #fff;
-      position: relative;
-      &:before{
-        content: "";
-        position: absolute;
-        top:50%;
-        left:2px;
-        width: 0;
-        height: 0;
-        border-radius: 50px;
-        border:2px solid green;
-        margin-top: -2px;
-      }
+      @extend .drive;
     }
   }
   .notused{

@@ -1,90 +1,64 @@
 $height: 6em;
-$width: 12em;
-.spinner {
-  overflow-wrap: break-word;
-  width: auto;
-  &.accordion {
-    width:830px;
+$width: 10em;
+$bgcolor:lightgray;
+$hvcolor: rgba(230, 230, 230, 0.9);
+$aheight: $width*.7;
+
+.accordion {
+  overflow:hidden;
+  overflow-x:auto; 
+  margin:5px 2px 5px 20px;
+  color:#474747;
+  background:#eee;
+  padding:1px 3px; 
+  border-radius: 5px;
+  border:2px solid #ccc; 
+  section{
     overflow:hidden;
-    margin:10px auto;
-    color:#474747;
-    background:#414141;
-    padding:10px; 
-    section{
-      float:left;
-      overflow:hidden;
-      color:#333;
-      cursor:pointer;
-      background: #333;
-      margin:3px;
-      width:3em;
-      height:250px;
-      transition:width 0.2s ease-out;
-      h2{
-        padding:8px 10px;
-        display:block; 
-        font-size:16px; 
-        font-weight:normal;
-        color:#eee; 
-        text-decoration:none;
-        transform: rotate(90deg);
-        width:240px; 
-        position:relative; 
-        left:-100px; 
-        top:120px;
-      }
-      time{
-        visibility: hidden;
-        display: flex;
-      } 
-      &:hover {
-        background:#944;
-      }
-      &.selected{
-        background:#FFF; 
-        padding:10px;
-        width:$width;
-        height:230px;
-        h2{
-          top:0px;
-          left:0;
-          transform: rotate(0deg); 
-        }        
-        &:hover{
-          background:#FFF; 
-        }
-        h2{
-          width:100%;
-          color:#333
-        }
-        time{
-          visibility:visible;
-        }
-      }
+    cursor:pointer;
+    background: $bgcolor;
+    border-radius: 4px;
+    margin:2px;
+    width:3em;
+    min-width: .5em;
+    height:$aheight;
+    padding:1px; 
+    transition:min-width .5s ease-out;
+    h2{
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: $aheight;
+      line-height: 3em;
+      top: -3em;
+      text-align: center;
+      vertical-align: middle;
+      padding:0;
+      font-size: 1em;
+      font-weight: normal;
+      display:block; 
+      position:relative; 
+      transform: rotate(90deg);
+      transform-origin: left bottom;
+      transition:width .5s ease-out, height .5s ease-out;
     }
-  }
-  .cell {
-/*     padding: 2px 5px 7px 5px;
-    background-color: white;
-    cursor: pointer;
-    transition: all 0.2s linear;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    overflow: hidden; */
     time{
       //https://www.sitepoint.com/create-calendar-icon-html5-css3/
-
+      margin:0; 
       font-size: 1em; /* change size */
       display: flex;
       justify-content: center;
       align-items:center;
       position: relative;
-      width: $width;
-      height: $height;
       background-color: #c8c8c8;
       border-radius: 5px;
       box-shadow: 1px 1px 0 #666, 2px 2px 0 #666, 3px 3px 0 #666, 3px 4px 0 #666, 3px 5px 0 #666, 0 0 0 2px #bbb;
-      overflow: hidden;
+      overflow: hidden;        
+      width: 0;
+      height: 0;
+      transform-origin: left bottom;
+      transform:rotateY(90deg);
+      transition:transform 1s;
+      transition-delay: .1s;
       span{
         display: block;
         width: 100%;
@@ -98,9 +72,9 @@ $width: 12em;
           left:0;
           padding: 0.2em 0;
           color: #fff;
-          background-color: #fd9f1b;
+          background-color: #67a9fb;
           border-bottom: 1px dashed #f37302;
-          box-shadow: 0 2px 0 #fd9f1b;
+          box-shadow: 0 2px 0 #67a9fb;
         }
         &.time{
           letter-spacing: -0.05em;
@@ -129,36 +103,27 @@ $width: 12em;
           position: absolute;
           bottom: 0.3em;
           left:0;
-          color: #fd9f1b;
+          color: #2f2f2f;
         }
       }
+    } 
+    &:hover {
+      background:$hvcolor;
     }
-  }
-/*   .cell:hover {
-    background-color: rgba(230, 230, 230, 0.9);
-    //transform: translateY(-2em);
-    transform: rotateX(15deg);
-    perspective: 500px;
-    z-index: 2;
-  }
-
-  .cell.selected,
-  .cell.selected:hover{
-    background-color: rgba(220, 220, 220, 0.9);
-  } */
-}
-
-
-.calendar{
-
-  .scroll-btn{
-    width: 30px;
-    height: $height;
-    transition: all 0.2s linear;
-    margin: 0 5px;
-  }
-
-  .scroll-btn:hover{
-    background-color: rgba(230, 230, 230, 0.9);
+    &.selected{
+      background:#eee; 
+      padding:0.5em 1em;
+      width: auto;
+      min-width: $width + 2;
+      h2{
+        width:0;
+        height:0;
+      }
+      time{
+        width: $width;
+        height: $height;
+        transform:rotateY(0deg);
+      }
+    }
   }
 }

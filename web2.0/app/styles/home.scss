@@ -2,9 +2,64 @@
 .main{
   overflow: hidden;
   height: 100%;
-  *{
-    height: initial;
+  width: 100%;
+  .top-header{
+    margin-top: 1em;
+    padding: 0 2em;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    flex-grow:0;
+    flex-shrink:0;
   }
+  .body{
+    width: 100%;
+    padding: 1em;
+    .explorer{
+      margin: 0em;
+      padding: 0 2em;
+      width: 100%;
+      overflow: hidden;
+      flex:1;
+      position: relative;
+      background-color: #FFE;
+      border-top: 1px solid #EEE;
+      a{
+        text-decoration: none;
+        color: black;
+      }
+
+      .sidebar{
+        position: absolute;
+        left:0;
+        top:0;
+        bottom: 0;
+        right: 75%;
+        margin-right: 1em;
+        padding-right: 1em;
+        border-right: 1px solid lightgrey;
+        overflow: scroll;
+        border-right: 1px solid #ccc;
+      }
+
+      .main-panel{
+        position: absolute;
+        top: 0;
+        right:0;
+        bottom: 0;
+        left:25%;
+        overflow: scroll;
+        .file{
+          overflow: hidden;
+          min-height: 1.5em;
+        }
+      }
+    }
+
+  }
+  * *{
+      height: initial;  
+  }  
 }
 .selectable-row{
   transition: all 0.2s linear;
@@ -264,58 +319,6 @@ $arrowborderradius: 4px;
     border-bottom-left-radius: $arrowborderradius;
     span{
       padding-left: 0.5em
-    }
-  }
-}
-
-.top-header{
-  margin-top: 1em;
-  padding: 0 2em;
-  width: 100%;
-  overflow: hidden;
-  height: auto;
-  *{
-    height: initial;  
-  }
-}
-
-.explorer{
-  margin-top: 3em;
-  padding: 0 2em;
-  width: 100%;
-  overflow: hidden;
-  flex:1;
-  position: relative;
-  background-color: #FFE;
-  border-top: 1px solid #EEE;
-  a{
-    text-decoration: none;
-    color: black;
-  }
-
-  .sidebar{
-    position: absolute;
-    left:0;
-    top:0;
-    bottom: 0;
-    right: 75%;
-    margin-right: 1em;
-    padding-right: 1em;
-    border-right: 1px solid lightgrey;
-    overflow: scroll;
-    border-right: 1px solid #ccc;
-  }
-
-  .main-panel{
-    position: absolute;
-    top: 0;
-    right:0;
-    bottom: 0;
-    left:25%;
-    overflow: scroll;
-    .file{
-      overflow: hidden;
-      min-height: 1.5em;
     }
   }
 }

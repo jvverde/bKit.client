@@ -65,13 +65,41 @@
         </div>
       </div>
       <div class="main-panel" layout="column" layout-align="start start">
-        <div class="no-files-msg" ng-show="main.currentFolder.files.length === 0"><!-->No files found--></div>
+        <div class="no-files-msg" ng-show="main.currentFolder.files.length === 0"> 
+          <!-- no files found -->        
+        </div>
         <div class="file selectable-row" ng-repeat="file in main.currentFolder.files" layout="row" layout-align="space-between center">
-          <span><a download="file" href="{{main.buildUrl(file, 'bkit')}}">{{file}}</a></span>
+          <span>
+            <a download="file" href="{{main.buildUrl(file, 'bkit')}}">
+              {{file.name}}
+            </a>
+          </span>
+          <span>
+            <a download="file" href="{{main.buildUrl(file, 'bkit')}}">
+              {{file.size}}
+            </a>
+          </span>
+          <span>
+            <a download="file" href="{{main.buildUrl(file, 'bkit')}}">
+              {{file.datetime.calendar()}}
+            </a>
+          </span>
           <span layout="row" layout-align="space-between center">
-            <md-button class="md-icon-button"><a download="file" href="{{main.buildUrl(file, 'download')}}"><md-icon>file_download</md-icon></a></md-button>
-            <md-button class="md-icon-button"><a target="_blank" href="{{main.buildUrl(file, 'view')}}"><md-icon>visibility</md-icon></a></md-button>
-            <md-button class="md-icon-button"><a download="file" href="{{main.buildUrl(file, 'bkit')}}"><md-icon>restore</md-icon></a></md-button>
+            <md-button class="md-icon-button">
+              <a download="file" href="{{main.buildUrl(file, 'download')}}">
+                <md-icon>file_download</md-icon>
+              </a>
+            </md-button>
+            <md-button class="md-icon-button">
+              <a target="_blank" href="{{main.buildUrl(file, 'view')}}">
+                <md-icon>visibility</md-icon>
+              </a>
+            </md-button>
+            <md-button class="md-icon-button">
+              <a download="file" href="{{main.buildUrl(file, 'bkit')}}">
+                <md-icon>restore</md-icon>
+              </a>
+            </md-button>
           </span>
         </div>
       </div>

@@ -87,6 +87,9 @@ angular.module('bkitApp')
 
       return $http.get(url('/folder', [computer, drive, bak, path]))
         .then(function (res) {
+          (res.data.files || []).forEach(function(file){
+            file.datetime = moment(1000*file.datetime)
+          })  
           return res.data;
         }, function (err) {
           console.error('http err', err);

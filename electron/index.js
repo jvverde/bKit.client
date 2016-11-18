@@ -9,7 +9,8 @@ let mainWindow;
 let tray = null
 
 function openApp(menuItem, browserWindow, event) {
-	mainWindow = createMainWindow()
+	mainWindow = createMainWindow();
+	mainWindow.server = '192.168.4.3';
 }
 
 function onClosed() {
@@ -26,6 +27,7 @@ function createMainWindow() {
 			webSecurity: false
 		}
 	});
+	//console.log(win);
 
 	win.loadURL(`file://${__dirname}/recovery/index.html`);
 	win.on('closed', onClosed);

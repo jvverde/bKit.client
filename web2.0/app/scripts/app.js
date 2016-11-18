@@ -15,7 +15,7 @@ angular
     'ngMaterial',
     'ui.router'
   ])
-  .config(function ($routeProvider, $stateProvider, $locationProvider) {
+  .config(function ($routeProvider, $stateProvider, $locationProvider, $urlRouterProvider) {
 
     $stateProvider
       .state('home', {
@@ -32,12 +32,9 @@ angular
       });
 
     $routeProvider.otherwise({
-        redirectTo: '/'
+        redirectTo: '/#/'
     });
 
-    $locationProvider.html5Mode({
-      enabled: true,
-      requireBase: false
-    });
-
+    $urlRouterProvider.when('', '/#/');
+    $urlRouterProvider.otherwise('/#/');
   });

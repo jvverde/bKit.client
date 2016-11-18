@@ -23,7 +23,7 @@
 }
 
 $scale: .15;
-$rackwidth: $scale * 19in;      //Rach width 19in
+$rackwidth: $scale * 19in;      //Rack width 19in
 $U: $scale * 1.75in;
 $LSIZE: $U/2.3;                     //Label size
 $drivewitdh: ($rackwidth - 4*$LSIZE)/3;
@@ -219,6 +219,8 @@ $arrowborderradius: 4px;
       position: relative; 
       display: block;
       float: left;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }  
   }
   li:last-child{

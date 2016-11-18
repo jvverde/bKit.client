@@ -8,6 +8,10 @@
   padding: 0.2em 0;
 }
 
+
+body{
+    font-size: 10pt;
+}
 * {
   padding: 0;
   margin: 0;
@@ -17,6 +21,7 @@
 img{
   height: initial;
 }
+
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,

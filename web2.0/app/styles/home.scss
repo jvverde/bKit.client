@@ -52,6 +52,14 @@
         .file{
           overflow: hidden;
           min-height: 1.5em;
+          .size{
+            padding-right: 1em;
+            min-width:7em;
+          }
+          .actions{
+            min-width: 156px; /* 3 * (40+6+6)px <= 3 buttons */
+            max-height: 1.65em;
+          }
         }
       }
     }

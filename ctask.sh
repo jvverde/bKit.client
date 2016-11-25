@@ -33,20 +33,20 @@ do
 		-m|--minute)
 			SCHTYPE=MINUTE
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 1440 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 1440 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES
 		;;
 		-h|--hour)
 			SCHTYPE=HOURLY
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 24 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 24 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
 			MINUTE=ONMINUTES
 		;;
 		-d|--day)
 			SCHTYPE=DAILY
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 366 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 366 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
@@ -63,7 +63,7 @@ do
 		-M|--monthly)
 			SCHTYPE=MONTHLY
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 12 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 12 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
@@ -108,7 +108,7 @@ then
 	done > "$TASKBATCH"
 	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 	ST=$(date -d "$START" +"%H:%M:%S")
-	SD=$(date -d "$START" +"%m/%d/%Y")
+	SD=$(date -d "$START" +"%d/%m/%Y")
 	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 	schtasks /QUERY|fgrep BKIT
 else

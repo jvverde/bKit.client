@@ -1,0 +1,10 @@
+<div class="accordion" layout="row" layout-align="start start">
+    <section class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" >
+      <header class="spine">{{bak.time.local().fromNow(true)}}</header>
+      <article>
+        <time class="day">{{bak.time.local().format('dddd')}}</time>
+        <time class="time">{{bak.time.local().format('HH:mm')}}</time>
+        <time class="date">{{bak.time.local().format('DD-MM-YYYY')}}</time>
+      </article>
+    </section>
+</div>

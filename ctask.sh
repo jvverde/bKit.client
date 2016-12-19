@@ -108,7 +108,14 @@ then
 	done > "$TASKBATCH"
 	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 	ST=$(date -d "$START" +"%H:%M:%S")
-	SD=$(date -d "$START" +"%d/%m/%Y")
+	#SD=$(date -d "$START" +"%d/%m/%Y")
+	#http://www.robvanderwoude.com/datetimentparse.php
+	#schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
+	let FORMAT=$(REG QUERY "HKCU\Control Panel\International"|grep -Pio "(?<=iDate\sREG_SZ\s)\d+")
+	echo $FORMAT
+	(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
+	(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
+	(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
 	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 	schtasks /QUERY|fgrep BKIT
 else

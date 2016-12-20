@@ -20,7 +20,7 @@ CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 . $CONF                                                                     #get configuration parameters
 
-ask "Vai actualizar o bKit com para a versao do servidor no endereço $UPDATERURL\n\nDeseja continuar?" || die 'Asking question'
+ask "Vai actualizar o bKit para a versao actual no servidor ($UPDATERURL)\n\nDeseja continuar?" || die 'Asking question'
 
 rsync -aAHb --dry-run --exclude-from "$SDIR/excludes/excludes-bkit.txt" "$UPDATERURL/" "$SDIR/" || die "Problemas ao actualizar" ||  exit 1
 

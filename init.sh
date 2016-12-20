@@ -25,7 +25,7 @@ echo Writing configuration to $INITFILE
 (
 	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
 	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
-	echo "UPDATERURL=rsync://$USER@$SERVER:$RPORT/bkit-update"
+	echo "UPDATERURL=rsync://admin@$SERVER:$UPORT/bkit-update"
 )> "$INITFILE"
 
 PASSFILE=$CONFDIR/pass.txt

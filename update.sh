@@ -26,6 +26,6 @@ CONF="$SDIR/conf/conf.init"
 
 ask "Vai actualizar o bKit para a versao actual no servidor ($UPDATERURL)\n\nDeseja continuar?" || die 'Asking question'
 
-rsync -aHbi --dry-run --exclude-from "$SDIR/excludes/excludes-bkit.txt" "$UPDATERURL/" "$SDIR/" || die "Problemas ao actualizar" ||  exit 1
+rsync -aHbi --exclude-from "$SDIR/excludes/excludes-bkit.txt" "$UPDATERURL/" "$SDIR/" || die "Problemas ao actualizar" ||  exit 1
 
 info "Actualizaçao feita com com sucesso" 

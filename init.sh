@@ -4,6 +4,7 @@ SECTION=bkit
 PORT=8730
 BPORT=8731
 RPORT=8732
+UPORT=8733
 USER=user
 PASS=us3r
 SERVER="$1"
@@ -24,6 +25,7 @@ echo Writing configuration to $INITFILE
 (
 	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
 	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
+	echo "UPDATERURL=rsync://$USER@$SERVER:$RPORT/bkit-update"
 )> "$INITFILE"
 
 PASSFILE=$CONFDIR/pass.txt

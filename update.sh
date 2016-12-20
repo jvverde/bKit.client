@@ -14,7 +14,11 @@ ask() {
 		return
 	} || echo -e "$@"
 }
-
+info() {
+	exists zenity && {
+		zenity --info --text "$*" 
+	} || echo -e "$@"
+}
 
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
@@ -22,6 +26,6 @@ CONF="$SDIR/conf/conf.init"
 
 ask "Vai actualizar o bKit para a versao actual no servidor ($UPDATERURL)\n\nDeseja continuar?" || die 'Asking question'
 
-rsync -aAHb --dry-run --exclude-from "$SDIR/excludes/excludes-bkit.txt" "$UPDATERURL/" "$SDIR/" || die "Problemas ao actualizar" ||  exit 1
+rsync -aHbi --dry-run --exclude-from "$SDIR/excludes/excludes-bkit.txt" "$UPDATERURL/" "$SDIR/" || die "Problemas ao actualizar" ||  exit 1
 
 info "Actualizaçao feita com com sucesso" 

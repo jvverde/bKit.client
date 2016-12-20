@@ -6,3 +6,7 @@ tmp/*
 old/*
 schtasks/*
 conf/*
+rd-party/*
+not-used-anymore/*
+web
+web2.0

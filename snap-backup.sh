@@ -27,7 +27,7 @@ if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
 then
 	echo Backup shadow copy
 	SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-	"$SHADOWSPAN" /verbosity=4 $DRIVE $MAPLETTER "$DOSBASH" "$SDIR/backup.sh" "$DIR" $MAPLETTER
+	"$SHADOWSPAN" /verbosity=2 $DRIVE $MAPLETTER "$DOSBASH" "$SDIR/backup.sh" "$DIR" $MAPLETTER
 else
 	echo Backup directly -- without shadow copy
 	bash "%SDIR%backup.sh" "$DIR"

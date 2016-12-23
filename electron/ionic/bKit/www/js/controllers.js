@@ -52,5 +52,25 @@ angular.module('starter.controllers', [])
   ];
 })
 
+.controller('ServerCtrl', function($scope, Globals,$timeout,$window) {
+  $scope.server = {
+    address : Globals.serverAddress,
+    port: Globals.serverPort
+  }
+  $scope.globals = Globals;
+  $scope.setServer = function(){
+    Globals.serverAddress = $scope.server.address;
+    Globals.serverPort = $scope.server.port
+    $timeout(function () {
+      $window.location.reload(true);
+    }, 1);
+  }
+})
+
+.controller('BrowseCtrl', function($scope, Globals) {
+  $scope.url = 'http://' + Globals.serverAddress + ':' + Globals.serverPort + '/';
+  console.log($scope.url);
+})
+
 .controller('PlaylistCtrl', function($scope, $stateParams) {
 });

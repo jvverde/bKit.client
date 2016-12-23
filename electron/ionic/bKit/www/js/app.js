@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers'])
+angular.module('bKit', ['ionic', 'starter.controllers','ngStorage'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -22,7 +22,15 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider,$sceDelegateProvider) {
+  $sceDelegateProvider.resourceUrlWhitelist([
+    // Allow same origin resource loads.
+    'self',
+    'http://10.**',
+    // Allow loading from our assets domain.  Notice the difference between * and **.
+    'http://192.168.**'
+  ]);
+
   $stateProvider
 
     .state('app', {
@@ -36,7 +44,8 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     url: '/server',
     views: {
       'menuContent': {
-        templateUrl: 'templates/server.html'
+        templateUrl: 'templates/server.html',
+        controller: 'ServerCtrl'
       }
     }
   })
@@ -45,7 +54,8 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       url: '/browse',
       views: {
         'menuContent': {
-          templateUrl: 'templates/browse.html'
+          templateUrl: 'templates/browse.html',
+           controller: 'BrowseCtrl'
         }
       }
     })

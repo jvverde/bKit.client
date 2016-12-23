@@ -2,7 +2,18 @@
 
 // adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')();
-const {app, Menu, Tray, BrowserWindow} = require('electron')
+const {app, Menu, Tray, BrowserWindow, ipcMain} = require('electron')
+const config = require('electron-json-config');
+console.log('Abri');
+
+ipcMain.on('close-main-window', function () {
+	console.log('quit');
+ //app.quit();
+});
+
+global.sharedObject = {
+  someProperty: 'default value'
+}
 
 // prevent window being garbage collected
 let mainWindow;
@@ -27,7 +38,8 @@ function createMainWindow() {
 		}
 	});
 
-	win.loadURL(`file://${__dirname}/recovery/index.html`);
+	//win.loadURL(`file://${__dirname}/recovery/index.html`);
+	win.loadURL('http://10.11.0.135:8088/');
 	win.on('closed', onClosed);
 
 	return win;

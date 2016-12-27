@@ -11,8 +11,9 @@ ipcMain.on('close-main-window', function () {
  //app.quit();
 });
 
-global.sharedObject = {
-  someProperty: 'default value'
+global.server = {
+  address: '10.1.2.3',
+  port: 8088
 }
 
 // prevent window being garbage collected

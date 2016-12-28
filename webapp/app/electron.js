@@ -47,6 +47,10 @@ function createWindow () {
   console.log('mainWindow opened')
 }
 
+global.server = {
+  address: '10.11.0.135',
+  port:8088
+}
 //app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
@@ -98,3 +102,18 @@ app.on('ready', () => {
   tray.setToolTip('Back me up')
   tray.setContextMenu(contextMenu)
 });
+
+/*const spawn = require('child_process').spawn;
+const ls = spawn('ls', ['-lh', '/usr']);
+
+ls.stdout.on('data', (data) => {
+  console.log(`stdout: ${data}`);
+});
+
+ls.stderr.on('data', (data) => {
+  console.log(`stderr: ${data}`);
+});
+
+ls.on('close', (code) => {
+  console.log(`child process exited with code ${code}`);
+});*/

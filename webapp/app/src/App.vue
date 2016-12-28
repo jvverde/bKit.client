@@ -1,5 +1,4 @@
 <style>
-  @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
   * {
     margin: 0;
@@ -19,7 +18,7 @@
       );
     background-position: center;
     display: flex;
-    font-family: Lato, Helvetica, sans-serif;
+    font-family: Helvetica, sans-serif;
     justify-content: center;
     text-align: center;
   }
@@ -27,14 +26,15 @@
 
 <template>
   <div>
+    <img src="./assets/00-Logotipo/128x128.png">
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-  import store from 'src/vuex/store'
+/*  import store from 'src/vuex/store'
 
   export default {
     store
-  }
+  }*/
 </script>

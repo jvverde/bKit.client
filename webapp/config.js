@@ -17,8 +17,8 @@ let config = {
   // electron-packager options
   // Docs: https://simulatedgreg.gitbooks.io/electron-vue/content/docs/building_your_app.html
   building: {
-    arch: 'x64',
-    asar: true,
+    arch: 'x64,ia32',
+    asar: false,
     dir: path.join(__dirname, 'app'),
     icon: path.join(__dirname, 'app/icons/icon'),
     ignore: /\b(node_modules|src|index\.ejs|icons)\b/,

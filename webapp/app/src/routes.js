@@ -1,7 +1,12 @@
 export default [
   {
     path: '/',
-    name: 'landing-page',
+    name: 'server',
+    component: require('components/Server')
+  },
+  {
+    path: '/help',
+    name: 'help-page',
     component: require('components/LandingPageView')
   },
   {

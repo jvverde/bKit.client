@@ -89,7 +89,7 @@ function exitApp() {
 
 app.on('ready', () => {
   createWindow()
-  tray = new Tray('app/icons/logo/bak.png')
+  tray = new Tray('icons/logo/512x512.png')
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Recovery', type: 'normal', click: openRecovery },
     { label: 'Backup', type: 'normal' },

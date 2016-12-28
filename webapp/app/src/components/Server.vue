@@ -14,16 +14,35 @@
         <td><input v-model="port"></td>
       </tr>
     </table>
+    logs:{{log}}
   </div>
 </template>
 
 <script>
 export default {
   name: 'server',
+  created () {
+    const spawn = require('child_process').spawn
+    const ls = spawn('ls', ['-lh', '.'])
+
+    ls.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`)
+      this.log = `${data}`
+    })
+
+    ls.stderr.on('data', (data) => {
+      console.log(`stderr: ${data}`)
+    })
+
+    ls.on('close', (code) => {
+      console.log(`child process exited with code ${code}`)
+    })
+  },
   data () {
     return {
-      address: '',
-      port: ''
+      address: this.$electron.remote.getGlobal('server').address,
+      port: this.$electron.remote.getGlobal('server').port,
+      log: ''
     }
   },
   computed: {

@@ -4,6 +4,7 @@
   "description": "bKit Web GUI",
   "main": "electron.js",
   "dependencies": {
+    "materialize-css": "^0.97.8",
     "vue": "^2.0.1",
     "vue-electron": "^1.0.0",
     "vue-resource": "^1.0.3",

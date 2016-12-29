@@ -14,11 +14,12 @@ export default [
     name: 'Computers-page',
     component: require('components/Computers')
   },
-  {
+/*  {
     path: '/backups',
     name: 'Backups-page',
     component: require('components/Computers')
-  },  {
+  },*/
+  {
     path: '*',
     redirect: '/'
   }

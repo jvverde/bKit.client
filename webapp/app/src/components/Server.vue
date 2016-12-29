@@ -15,6 +15,7 @@
       </tr>
     </table>
     logs:{{log}}
+    <router-link :to="{ name: 'Computers-page'}">User</router-link>
   </div>
 </template>
 

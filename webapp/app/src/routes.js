@@ -10,9 +10,9 @@ export default [
     component: require('components/LandingPageView')
   },
   {
-    path: '/recovery',
-    name: 'Recovery-page',
-    component: require('components/Recovery/Computers')
+    path: '/computers',
+    name: 'Computers-page',
+    component: require('components/Computers')
   },
   {
     path: '*',

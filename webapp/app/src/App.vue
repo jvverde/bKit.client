@@ -10,23 +10,29 @@
 
   body {
     align-items: center;
-    background:
+/*    background:
       radial-gradient(
         ellipse at center,
         rgba(255, 255, 255, 1) 0%,
         rgba(229, 229, 229, .85) 100%
       );
-    background-position: center;
+    background-position: center;*/
     display: flex;
     font-family: Helvetica, sans-serif;
     justify-content: center;
     text-align: center;
   }
+  header>img{
+    float:left;
+  }
 </style>
 
 <template>
   <div>
-    <img src="./assets/00-Logotipo/128x128.png">
+    <header>
+      <img class="logo" src="./assets/00-Logotipo/64x64.png">
+      <h1>bK<span style="color:#67a9fb">i</span><span style="color:#7fff00">t</span></h1>
+    </header>
     <router-view></router-view>
   </div>
 </template>

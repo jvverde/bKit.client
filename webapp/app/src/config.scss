@@ -1,0 +1,5 @@
+  $scale: .15;
+  $rackwidth: $scale * 19in;      //Rack width 19in
+  $U: $scale * 1.75in;
+  $LSIZE: $U/2.3;                     //Label size
+  $drivewitdh: ($rackwidth - 4*$LSIZE)/3;

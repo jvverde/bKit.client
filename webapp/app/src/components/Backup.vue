@@ -10,29 +10,31 @@
       :location="location">
     </directory> -->
     <div class="accordion">
-      <section class="cell" v-for="(snap, index) in snaps" @click.stop="selectedCell = index"
+      <section class="cell" v-for="(snap, index) in snaps" 
+        @click.stop="select(index)"
         :class="{selected: index === selectedCell}">
-        <header class="spine">{{snap.date.fromNow(true)}}<!-- {{bak.time.local().fromNow(true)}} --></header>
+        <header class="spine">{{snap.date.fromNow(true)}}</header>
         <article>
-          <time class="day"><!-- {{bak.time.local().format('dddd')}} --></time>
-          <time class="time"><!-- {{bak.time.local().format('HH:mm')}} --></time>
-          <time class="date"><!-- {{bak.time.local().format('DD-MM-YYYY')}} --></time>
+          <time class="day">{{snap.date.format('dddd')}}</time>
+          <time class="time">{{snap.date.format('HH:mm')}}</time>
+          <time class="date">{{snap.date.format('DD-MM-YYYY')}}</time>
         </article>
       </section>
     </div>
+    <snapshot :id="selectedSnap" :computer="location.computer" :disk="location.disk" class="snapshot"></snapshot>
   </div>
 </template>
 
 <script>
-  // import Directory from './Directory'
+  import Snapshot from './Backup/Snapshot'
   var moment = require('moment')
   moment.locale('pt')
-  console.log(moment().format('dddd, MMMM Do YYYY, h:mm:ss a'))
 
   export default {
     data () {
       return {
         selectedCell: -1,
+        selectedSnap: null,
         snaps: [],
         location: {}
       }
@@ -40,15 +42,13 @@
     use: {
     },
     filters: {
-      momento: function (v, f) {
-        return v.format(f)
-      }
     },
     components: {
       // Directory
+      Snapshot
     },
     props: [],
-    mounted () {
+    created () {
       this.location = {
         computer: this.$route.params.computer,
         disk: this.$route.params.disk
@@ -59,18 +59,14 @@
         '/' + this.location.disk
       this.$http.jsonp(url).then(
         function (response) {
-          console.log(response.data)
-          // this.$set('snaps', response.data)
           this.snaps = (response.data || []).map(function (snap) {
-            // console.log('+++++++')
-            // console.log(snap)
-            let date = moment.utc(snap.substring(5), 'YYYY.MM.DD-HH.mm.ss')
-            // console.log(date.format())
-            // date.local()
-            // console.log(date.format())
-            // console.log('---------')
-            return {id: snap, date: date.local()}
+            return {
+              id: snap,
+              date: moment.utc(snap.substring(5), 'YYYY.MM.DD-HH.mm.ss')
+                .local()
+            }
           })
+          this.select(this.snaps.length - 1)
         },
         function (response) {
           console.error(response)
@@ -78,8 +74,9 @@
       )
     },
     methods: {
-      toggle () {
-        this.open = !this.open
+      select (index) {
+        this.selectedCell = index
+        this.selectedSnap = this.snaps[index].id
       }
     }
   }

@@ -1,9 +1,8 @@
 <template>
   <div class="backup">
     <!--<icon name="clone" scale=".9"></icon>-->
-    {{location.backup}}
-    {{location.computer}}
-    {{location.disk}}
+    {{computer}}
+    {{disk}}
 <!--     <directory v-if="open"
       :entries="entries"
       path="/"
@@ -21,7 +20,10 @@
         </article>
       </section>
     </div>
-    <snapshot :id="selectedSnap" :computer="location.computer" :disk="location.disk" class="snapshot"></snapshot>
+    <snapshot v-if="typeof selectedSnap === 'string'" :id="selectedSnap"
+      :computer="computer" 
+      :disk="disk" class="snapshot">
+    </snapshot>
   </div>
 </template>
 
@@ -36,7 +38,8 @@
         selectedCell: -1,
         selectedSnap: null,
         snaps: [],
-        location: {}
+        computer: this.$route.params.computer,
+        disk: this.$route.params.disk
       }
     },
     use: {
@@ -49,14 +52,10 @@
     },
     props: [],
     created () {
-      this.location = {
-        computer: this.$route.params.computer,
-        disk: this.$route.params.disk
-      }
       let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/' +
         'backup' +
-        '/' + this.location.computer +
-        '/' + this.location.disk
+        '/' + this.computer +
+        '/' + this.disk
       this.$http.jsonp(url).then(
         function (response) {
           this.snaps = (response.data || []).map(function (snap) {
@@ -75,6 +74,7 @@
     },
     methods: {
       select (index) {
+        console.log(index)
         this.selectedCell = index
         this.selectedSnap = this.snaps[index].id
       }

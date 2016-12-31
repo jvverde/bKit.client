@@ -1,44 +1,61 @@
 <template>
   <div>
-   id:{{id}}
-  </div>  
+    <directory 
+      :entries="entries"
+      path="/"
+      :location="{computer:computer, disk:disk, snapshot:id}">
+    </directory> 
+  </div> 
 </template>
 
 <script>
+  import Directory from './Directory'
+  
   function refresh () {
-    console.log(this.id)
     let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/' +
       'folder' +
       '/' + this.computer +
       '/' + this.disk +
-      '/' + this.id +
-      '/' + this.path
+      '/' + this.id + '/'
     this.$http.jsonp(url).then(
       function (response) {
         console.log(response.data)
+        // this.entries = response.data
+        this.$set(this, 'entries', response.data)
       },
       function (response) {
         console.error(response)
       }
     )
   }
+
+  const requiredString = {
+    type: String,
+    required: true,
+    validator: function (w) {
+      return w.length > 0
+    }
+  }
+
   export default {
-    name: 'directory',
+    name: 'snapshot',
     data () {
       return {
-        folders: [],
-        files: [],
-        path: ''
+        entries: {}
       }
     },
-    props: ['computer', 'disk', 'id'],
+    props: {
+      computer: requiredString,
+      disk: requiredString,
+      id: requiredString
+    },
     components: {
+      Directory
     },
-    created () {
-      console.log('created')
+    created: refresh,
+    watch: {
+      id: refresh
     },
-    mounted: refresh,
-    beforeUpdate: refresh,
     methods: {
 
     }

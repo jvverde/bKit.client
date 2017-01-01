@@ -1,26 +1,28 @@
 <template>
   <div class="backup">
-     <bkitlogo class="logo"></bkitlogo>
-    <!--<icon name="clone" scale=".9"></icon>-->
-    {{computer}}
-    {{disk}}
-<!--     <directory v-if="open"
-      :entries="entries"
-      path="/"
-      :location="location">
-    </directory> -->
-    <div class="accordion">
-      <section class="cell" v-for="(snap, index) in snaps" 
-        @click.stop="select(index)"
-        :class="{selected: index === selectedCell}">
-        <header class="spine">{{snap.date.fromNow(true)}}</header>
-        <article>
-          <time class="day">{{snap.date.format('dddd')}}</time>
-          <time class="time">{{snap.date.format('HH:mm')}}</time>
-          <time class="date">{{snap.date.format('DD-MM-YYYY')}}</time>
-        </article>
-      </section>
-    </div>
+    <header class="top">
+      <bkitlogo class="logo"></bkitlogo>
+      <!--<icon name="clone" scale=".9"></icon>-->
+      {{computer}}
+      {{disk}}
+  <!--     <directory v-if="open"
+        :entries="entries"
+        path="/"
+        :location="location">
+      </directory> -->
+      <div class="accordion">
+        <section class="cell" v-for="(snap, index) in snaps" 
+          @click.stop="select(index)"
+          :class="{selected: index === selectedCell}">
+          <header class="spine">{{snap.date.fromNow(true)}}</header>
+          <article>
+            <time class="day">{{snap.date.format('dddd')}}</time>
+            <time class="time">{{snap.date.format('HH:mm')}}</time>
+            <time class="date">{{snap.date.format('DD-MM-YYYY')}}</time>
+          </article>
+        </section>
+      </div>
+    </header>
     <snapshot v-if="typeof selectedSnap === 'string'" :id="selectedSnap"
       :computer="computer" 
       :disk="disk" class="snapshot">
@@ -90,8 +92,20 @@
   $hvcolor: rgba(230, 230, 230, 0.9);
   $aheight: $width*.7;
   .backup{
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    header.top{
+      flex-shrink: 0;    
+    }
     .logo{
       float:left;
+    }
+    .snapshot{
+      flex-grow:1;
+      overflow: auto;  
     }
   }
 

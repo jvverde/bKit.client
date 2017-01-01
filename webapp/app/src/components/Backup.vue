@@ -1,5 +1,6 @@
 <template>
   <div class="backup">
+     <bkitlogo class="logo"></bkitlogo>
     <!--<icon name="clone" scale=".9"></icon>-->
     {{computer}}
     {{disk}}
@@ -88,6 +89,11 @@
   $bgcolor:lightgray;
   $hvcolor: rgba(230, 230, 230, 0.9);
   $aheight: $width*.7;
+  .backup{
+    .logo{
+      float:left;
+    }
+  }
 
   .accordion {
     display: flex;

@@ -5,11 +5,13 @@ import Router from 'vue-router'
 import 'materialize-css/dist/css/materialize.css'
 import App from './App'
 import routes from './routes'
+import Bkitlogo from './Bkitlogo'
 
 Vue.use(Electron)
 Vue.use(Resource)
 Vue.use(Router)
 Vue.config.debug = true
+Vue.component('bkitlogo', Bkitlogo)
 
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),

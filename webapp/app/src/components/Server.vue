@@ -1,6 +1,7 @@
 <template>
   <div class="server">
-    <h1>Server Identification</h1>
+    <bkitlogo></bkitlogo>
+    <h1>Server Location</h1>
     <table>
       <tr>
         <td>Address:</td>

@@ -1,11 +1,14 @@
 <template>
-  <div class="computers" :class="{onlyone:onlyone}">
-    <div class="computer" v-for="(computer,index) in computers"
-      :class="{selected:computer.selected}" 
-      @click.stop="select(index)">
-      <div class="name">{{computer.name}}</div>
-      <div class="uuid">uuid:{{computer.uuid}}</div>
-      <drives :computer="computer" class="components"></drives>
+  <div class="main">
+    <bkitlogo></bkitlogo>
+    <div class="computers" :class="{onlyone:onlyone}">
+      <div class="computer" v-for="(computer,index) in computers"
+        :class="{selected:computer.selected}" 
+        @click.stop="select(index)">
+        <div class="name">{{computer.name}}</div>
+        <div class="uuid">uuid:{{computer.uuid}}</div>
+        <drives :computer="computer" class="components"></drives>
+      </div>
     </div>
   </div>
 </template>

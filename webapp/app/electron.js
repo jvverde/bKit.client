@@ -65,10 +65,11 @@ app.on('activate', () => {
   }
 })
 
-function createRecoveryWindow() {
+/*function createRecoveryWindow() {
   const win = new BrowserWindow({
     width: 1024,
     height: 768,
+    frame: false,
     webPreferences: {
       webSecurity: false
     }
@@ -81,10 +82,11 @@ function createRecoveryWindow() {
     //win = null
   })
   return win;
-}
+}*/
 
 function openRecovery(menuItem, browserWindow, event) {
-  mainWindow = createRecoveryWindow()
+  //mainWindow = createRecoveryWindow()
+  createWindow()
 }
 
 function exitApp() {

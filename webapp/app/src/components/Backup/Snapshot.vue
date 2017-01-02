@@ -1,5 +1,6 @@
 <template>
   <div>
+    <breadcrumb :computer="computer" :disk="disk" :snap="id"></breadcrumb>
     <directory class="root"
       :entries="entries"
       path="/"
@@ -10,6 +11,7 @@
 
 <script>
   import Directory from './Directory'
+  import Breadcrumb from './Breadcrumb'
   
   function refresh () {
     let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/' +
@@ -17,11 +19,10 @@
       '/' + this.computer +
       '/' + this.disk +
       '/' + this.id + '/'
+    let self = this
     this.$http.jsonp(url).then(
       function (response) {
-        console.log(response.data)
-        // this.entries = response.data
-        this.$set(this, 'entries', response.data)
+        self.$set(self, 'entries', response.data)
       },
       function (response) {
         console.error(response)
@@ -50,7 +51,8 @@
       id: requiredString
     },
     components: {
-      Directory
+      Directory,
+      Breadcrumb
     },
     created: refresh,
     watch: {

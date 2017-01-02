@@ -2,8 +2,6 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      {{computer}}
-      {{disk}}
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps" 
           @click.stop="select(index)"

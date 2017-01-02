@@ -2,6 +2,8 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
+      <breadcrumb :computer="computer" :disk="disk" :snap="selectedSnap">
+      </breadcrumb>
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps" 
           @click.stop="select(index)"
@@ -24,6 +26,8 @@
 
 <script>
   import Snapshot from './Backup/Snapshot'
+  import Breadcrumb from './Backup/Breadcrumb'
+
   var moment = require('moment')
   moment.locale('pt')
 
@@ -43,7 +47,8 @@
     },
     components: {
       // Directory
-      Snapshot
+      Snapshot,
+      Breadcrumb
     },
     props: [],
     created () {

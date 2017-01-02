@@ -1,15 +1,17 @@
 <template>
-  <div>
+  <div class="tree">
     <ul class="directories" v-if="folders.length > 0">
       <li v-for="(folder,index) in folders" @click.stop="toggle(index)">
-        <div>
+        <div class="line">
 	        <div>
-<!-- 		        <icon name="refresh" :spin="true" scale=".9" v-if="isWaiting(index)"></icon>
-		        <icon name="folder-open" scale=".9" v-if="folder.open"></icon>
-		        <icon name="folder" scale=".9" v-else></icon> -->
-		        <span v-if="hasChildren(index)">
-<!-- 		          <icon name="folder-open-o" scale=".9" v-if="folder.open"></icon>
-		          <icon name="folder-o" scale=".9" v-else></icon> -->
+            <span class="icon is-small">
+              <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i>
+              <i class="fa fa-minus-square-o" v-else-if="folder.open"></i>
+              <i class="fa fa-plus-square-o" v-else></i>
+            </span>
+		        <span class="icon is-small" v-if="hasChildren(index)">
+              <i class="fa fa-folder-open-o" v-if="folder.open"></i>  
+              <i class="fa fa-folder-o" v-else></i>  
 		        </span>
 		        <span class="text">{{folder.name}}</span>
 	        </div>
@@ -20,7 +22,7 @@
         </div>
         <directory v-if="folder.open"
           :entries="folder.entries"
-          :path="path + encodeURIComponent(folder.name)"
+          :path="path + encodeURIComponent(folder.name) + '/'"
           :location="location">
         </directory>
       </li>
@@ -30,6 +32,9 @@
         <div>
 	        <div>
 		        <!-- <icon name="file-o" scale=".9" ></icon> -->
+            <span class="icon is-small">
+              <i class="fa fa-file-o"></i>
+            </span>
 		        <a :download="file" class="file" @click.stop=""
 		          :href="getUrl('download',location,path,file)">
 		          <span class="text">{{file}}</span>
@@ -75,36 +80,40 @@
     }
   }
   function getUrl (base, location, path, entry) {
-    let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/'
-    return url + base +
+    return this.url + base +
       '/' + location.computer +
       '/' + location.disk +
       '/' + location.snapshot +
-      path.replace(/\/?$/, '/') + encodeURIComponent(entry || '')
+      path.replace(/\/$/, '') + '/' + encodeURIComponent(entry || '')
   }
   function refresh () {
-    console.log('refresh directory')
-    this.files = this.entries.files
-    this.folders = (this.entries.folders || []).map(function (folder) {
-      return {name: folder, open: false, entries: {}}
-    })
-/*      var self = this
-    this.folders.forEach(function (folder) {
-      var url = getUrl('folder', self.location, self.path, folder.name)
-      self.$http.jsonp(url).then(
-        function (response) {
-          folder.entries = response.data
-        },
-        function (response) {
-          console.error(response)
-        }
-      )
-    })*/
+    try {
+      console.log('refresh directory')
+      this.files = this.entries.files
+      this.folders = (this.entries.folders || []).map(function (folder) {
+        return {name: folder, open: false, entries: {}}
+      })
+      var self = this
+      this.folders.forEach(function (folder) {
+        var url = self.getUrl('folder', self.location, self.path, folder.name)
+        self.$http.jsonp(url).then(
+          function (response) {
+            self.$set(folder, 'entries', response.data || {})
+          },
+          function (response) {
+            console.error(response)
+          }
+        )
+      })
+    } catch (e) {
+      console.error(e)
+    }
   }
   export default {
     name: 'directory',
     data () {
       return {
+        url: 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/',
         folders: [],
         files: []
       }
@@ -139,8 +148,81 @@
   }
 </script>
 
-<style scoped>
-  a.file{
-    color: inherit;
+<style scoped lang="scss">
+  $line-height: 2em;
+  $li-ident: 1.3em;
+  .tree{
+    text-align: left;    
+    width:100%;
+    height: 100%;
+    
+    ul,li{
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      position:relative;
+      &::before{
+        border-width: 0;
+        border-style: dotted;
+        border-color: #777777;
+        position:absolute;
+        display:block;
+        content:"";
+      }
+    }
+    ul{
+      &::before {
+        content:"";
+        top:-.3 * ($line-height / 2);
+        bottom:$line-height / 2;      /*stop at half of last li */
+        left: $li-ident / 4;
+        border-left-width:1px;
+      }
+    }
+    ul.directories + ul.files::before {
+      top:-1 * ($line-height / 2);  
+    }
+    li {
+      padding-left: $li-ident;            /* indentation = .5em */
+      line-height:$line-height;  
+      cursor: pointer;
+      &::before {
+        width: .5 * $li-ident;          /* 50% of indentation */
+        height:0;
+        border-top-width:1px;
+        margin-top:-1px;                  /* border top width */
+        top:$line-height / 2;              
+        left:$li-ident / 4;
+      }
+      div.line {
+        width:100%;
+        box-sizing: border-box;
+        display:flex;
+        flex-wrap:nowrap;
+        justify-content:space-between;
+        &:hover{
+             background:#eeeeee;
+             border-radius:7px;
+             padding-right:7px;
+             padding-left:7px;
+        }
+        *{
+          display:flex;
+          flex-wrap:nowrap;
+          align-items: center;
+          &:not(:first-child):not(a){
+            padding-left: 4px;
+          }
+        } 
+        .text{
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden; 
+        }
+        a{
+          padding-left:5px;
+        }
+      }
+    }
   }
 </style>

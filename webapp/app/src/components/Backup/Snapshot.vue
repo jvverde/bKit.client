@@ -1,11 +1,11 @@
 <template>
   <div>
-    <directory 
+    <directory class="root"
       :entries="entries"
       path="/"
       :location="{computer:computer, disk:disk, snapshot:id}">
     </directory> 
-  </div> 
+  </div>
 </template>
 
 <script>

@@ -17,7 +17,9 @@
 	        </div>
 	        <a @click.stop=""
 	          :href="getUrl('bkit',location,path,folder.name)" title="Recuperar">
-	          <!-- <icon name="undo" scale=".9"  ></icon> -->
+            <span class="icon is-small">
+              <i class="fa fa-history"></i>  
+            </span>
 	        </a>
         </div>
         <directory v-if="folder.open"
@@ -29,9 +31,8 @@
     </ul>
     <ul class="files">
       <li v-for="file in files">
-        <div>
+        <div class="line">
 	        <div>
-		        <!-- <icon name="file-o" scale=".9" ></icon> -->
             <span class="icon is-small">
               <i class="fa fa-file-o"></i>
             </span>
@@ -43,15 +44,21 @@
 	        <div>
 		        <a :download="file" @click.stop=""
 		          :href="getUrl('download',location,path,file)" title="Download">
-		          <!-- <icon name="download" scale=".9" ></icon> -->
+              <span class="icon is-small">
+                <i class="fa fa-download"></i>  
+              </span>
 		        </a>        
 		        <a target="_blank" @click.stop=""
 		          :href="getUrl('view',location,path,file)" title="Ver">
-		          <!-- <icon name="eye" scale=".9" ></icon> -->
+              <span class="icon is-small">
+                <i class="fa fa-eye"></i>  
+              </span>
 		        </a>
 		        <a @click.stop=""
 		          :href="getUrl('bkit',location,path,file)" title="Recuperar">
-		          <!-- <icon name="undo" scale=".9" ></icon> -->
+              <span class="icon is-small">
+                <i class="fa fa-history"></i>  
+              </span>
 		        </a>
 	        </div>
         </div>
@@ -59,94 +66,6 @@
     </ul>
   </div>  
 </template>
-
-<script>
-  const requiredString = {
-    type: String,
-    required: true
-  }
-  const requiredLocation = {
-    type: Object,
-    required: true,
-    validator: function (obj) {
-      return obj.computer && obj.disk && obj.snapshot
-    }
-  }
-  const requiredEntries = {
-    type: Object,
-    required: true,
-    validator: function (obj) {
-      return obj.folders instanceof Array
-    }
-  }
-  function getUrl (base, location, path, entry) {
-    return this.url + base +
-      '/' + location.computer +
-      '/' + location.disk +
-      '/' + location.snapshot +
-      path.replace(/\/$/, '') + '/' + encodeURIComponent(entry || '')
-  }
-  function refresh () {
-    try {
-      console.log('refresh directory')
-      this.files = this.entries.files
-      this.folders = (this.entries.folders || []).map(function (folder) {
-        return {name: folder, open: false, entries: {}}
-      })
-      var self = this
-      this.folders.forEach(function (folder) {
-        var url = self.getUrl('folder', self.location, self.path, folder.name)
-        self.$http.jsonp(url).then(
-          function (response) {
-            self.$set(folder, 'entries', response.data || {})
-          },
-          function (response) {
-            console.error(response)
-          }
-        )
-      })
-    } catch (e) {
-      console.error(e)
-    }
-  }
-  export default {
-    name: 'directory',
-    data () {
-      return {
-        url: 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/',
-        folders: [],
-        files: []
-      }
-    },
-    props: {
-      location: requiredLocation,
-      path: requiredString,
-      entries: requiredEntries
-    },
-    watch: {
-      entries: refresh
-    },
-    components: {
-    },
-    created: refresh,
-    methods: {
-      getUrl: getUrl,
-      toggle (index) {
-        this.folders[index].open = !this.folders[index].open
-      },
-      hasChildren (index) {
-        return this.folders[index].entries.folders &&
-          this.folders[index].entries.folders.length > 0 ||
-          this.folders[index].entries.files &&
-          this.folders[index].entries.files.length > 0
-      },
-      isWaiting (index) {
-        return !('folders' in this.folders[index].entries ||
-          'files' in this.folders[index].entries)
-      }
-    }
-  }
-</script>
 
 <style scoped lang="scss">
   $line-height: 2em;
@@ -203,8 +122,8 @@
         &:hover{
              background:#eeeeee;
              border-radius:7px;
-             padding-right:7px;
-             padding-left:7px;
+             padding-right:1px;
+             padding-left:1px;
         }
         *{
           display:flex;
@@ -221,8 +140,108 @@
         }
         a{
           padding-left:5px;
+          color: inherit;
+          .icon:hover{
+            color: #090;
+          }
+          &:active{
+            border:1px solid red;
+          }
         }
       }
     }
   }
 </style>
+
+<script>
+  const requiredString = {
+    type: String,
+    required: true
+  }
+  const requiredLocation = {
+    type: Object,
+    required: true,
+    validator: function (obj) {
+      return obj.computer && obj.disk && obj.snapshot
+    }
+  }
+  const requiredEntries = {
+    type: Object,
+    required: true,
+    validator: function (obj) {
+      return obj.folders instanceof Array
+    }
+  }
+  function getUrl (base, location, path, entry) {
+    return this.url + base +
+      '/' + location.computer +
+      '/' + location.disk +
+      '/' + location.snapshot +
+      path.replace(/\/$/, '') + '/' + encodeURIComponent(entry || '')
+  }
+  function refresh () {
+    try {
+      console.log('refresh directory')
+      this.files = (this.entries.files || []).sort(function (a, b) {
+        return (a > b) ? 1 : ((b > a) ? -1 : 0)
+      })
+      this.folders = (this.entries.folders || []).map(function (folder) {
+        return {name: folder, open: false, entries: {}}
+      }).sort(function (a, b) {
+        return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
+      })
+      var self = this
+      this.folders.forEach(function (folder) {
+        var url = self.getUrl('folder', self.location, self.path, folder.name)
+        self.$http.jsonp(url).then(
+          function (response) {
+            self.$set(folder, 'entries', response.data || {})
+          },
+          function (response) {
+            console.error(response)
+          }
+        )
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  export default {
+    name: 'directory',
+    data () {
+      return {
+        url: 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/',
+        folders: [],
+        files: []
+      }
+    },
+    props: {
+      location: requiredLocation,
+      path: requiredString,
+      entries: requiredEntries
+    },
+    watch: {
+      entries: refresh
+    },
+    components: {
+    },
+    created: refresh,
+    methods: {
+      getUrl: getUrl,
+      toggle (index) {
+        this.folders[index].open = !this.folders[index].open
+      },
+      hasChildren (index) {
+        return this.folders[index].entries.folders &&
+          this.folders[index].entries.folders.length > 0 ||
+          this.folders[index].entries.files &&
+          this.folders[index].entries.files.length > 0
+      },
+      isWaiting (index) {
+        return !('folders' in this.folders[index].entries ||
+          'files' in this.folders[index].entries)
+      }
+    }
+  }
+</script>
+

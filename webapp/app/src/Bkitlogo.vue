@@ -5,6 +5,7 @@
     justify-content: flex-start;
     align-items: flex-start;
     margin-left: 10px;
+    margin-right: 10px;
     h1{
       display: flex;
       margin: 0;

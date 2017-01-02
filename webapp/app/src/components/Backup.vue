@@ -2,14 +2,8 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      <!--<icon name="clone" scale=".9"></icon>-->
       {{computer}}
       {{disk}}
-  <!--     <directory v-if="open"
-        :entries="entries"
-        path="/"
-        :location="location">
-      </directory> -->
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps" 
           @click.stop="select(index)"
@@ -99,9 +93,9 @@
     flex-direction: column;
     header.top{
       flex-shrink: 0;    
-    }
-    .logo{
-      float:left;
+      .logo{
+        float:left;
+      }
     }
     .snapshot{
       flex-grow:1;

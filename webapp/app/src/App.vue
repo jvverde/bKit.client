@@ -25,9 +25,22 @@
 </template>
 
 <script>
-/*  import store from 'src/vuex/store'
+  import store from 'src/vuex/store'
 
   export default {
-    store
-  }*/
+    store,
+    created: function () {
+      if ('$electron' in this) {
+        let addr = this.$electron.remote.getGlobal('server').address
+        let port = this.$electron.remote.getGlobal('server').port
+        if (typeof addr === 'string' && addr.length > 0) {
+          store.dispatch('setServerAddress', addr)
+        }
+        typeof port === 'string' && (port = 0 | port)
+        if (typeof port === 'number' && port > 0) {
+          store.dispatch('setServerPort', port)
+        }
+      }
+    }
+  }
 </script>

@@ -74,7 +74,6 @@
     },
     methods: {
       select (index) {
-        console.log(index)
         this.selectedCell = index
         this.selectedSnap = this.snaps[index].id
       }

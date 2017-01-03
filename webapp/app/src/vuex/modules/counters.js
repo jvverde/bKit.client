@@ -1,7 +1,7 @@
 import * as types from '../mutation-types'
 
 const state = {
-  main: 0
+  main: 200
 }
 
 const mutations = {

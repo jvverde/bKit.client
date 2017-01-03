@@ -12,7 +12,7 @@
   import Directory from './Directory'
   
   function refresh () {
-    let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/' +
+    let url = this.$store.getters.url +
       'folder' +
       '/' + this.computer +
       '/' + this.disk +

@@ -210,7 +210,7 @@
     name: 'directory',
     data () {
       return {
-        url: 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/',
+        url: this.$store.getters.url,
         folders: [],
         files: []
       }

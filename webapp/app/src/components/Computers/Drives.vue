@@ -27,7 +27,7 @@
     },
     props: ['computer'],
     created () {
-      let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/'
+      let url = this.$store.getters.url
       this.$http.jsonp(url + 'disks/' + this.computer.id).then(
         function (response) {
           console.log(response.data)

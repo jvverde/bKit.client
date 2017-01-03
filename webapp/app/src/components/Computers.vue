@@ -28,7 +28,7 @@
     },
     props: ['name'],
     created () {
-      let url = 'http://' + this.$electron.remote.getGlobal('server').address + ':' + this.$electron.remote.getGlobal('server').port + '/'
+      let url = this.$store.getters.url
       this.$http.jsonp(url + 'computers/').then(
         function (response) {
           this.computers = Object.keys(response.data).map(function (key) {

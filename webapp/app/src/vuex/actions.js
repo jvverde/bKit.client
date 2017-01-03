@@ -9,9 +9,11 @@ export const incrementMain = ({ commit }) => {
 }
 
 export const setServerAddress = ({ commit }, addr) => {
+  console.log('SetServer:' + addr)
   commit(types.SETSERVER, addr)
 }
 
 export const setServerPort = ({ commit }, port) => {
+  console.log('SetServerPort:' + port)
   commit(types.SETPORT, port)
 }

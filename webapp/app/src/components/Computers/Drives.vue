@@ -28,6 +28,8 @@
     props: ['computer'],
     created () {
       let url = this.$store.getters.url
+      console.log('drives')
+      console.log(url)
       this.$http.jsonp(url + 'disks/' + this.computer.id).then(
         function (response) {
           console.log(response.data)

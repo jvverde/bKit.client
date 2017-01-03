@@ -30,7 +30,7 @@
       </li>
     </ul>
     <ul class="files">
-      <li v-for="file in files">
+      <li v-for="file in files2">
         <div class="line">
 	        <div>
             <span class="icon is-small">
@@ -196,6 +196,11 @@
         self.$http.jsonp(url).then(
           function (response) {
             self.$set(folder, 'entries', response.data || {})
+            self.$store.dispatch('setEntry', {
+              path: self.path,
+              entries: response.data
+            })
+            // console.log(self.$store.getters.entries[self.path].files)
           },
           function (response) {
             console.error(response)
@@ -206,6 +211,9 @@
       console.error(e)
     }
   }
+  
+  import { mapGetters } from 'vuex'
+
   export default {
     name: 'directory',
     data () {
@@ -213,6 +221,14 @@
         url: this.$store.getters.url,
         folders: [],
         files: []
+      }
+    },
+    computed: {
+      ...mapGetters({childrens: 'entries'}),
+      files2: function () {
+        console.log(this.path)
+        console.log(this.childrens[this.path].files)
+        return this.childrens[this.path].files
       }
     },
     props: {

@@ -41,10 +41,6 @@
     components: {
     },
     created: function () {
-      console.log('Breadcrumbs')
-      console.log(this.$store.getters.server)
-      console.log(this.$store.getters.port)
-      console.log(this.$store.getters.url)
     },
     methods: {
 

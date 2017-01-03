@@ -1,5 +1,5 @@
 export const mainCounter = state => state.counters.main
-export const server = state => state.server.address
+export const address = state => state.server.address
 export const port = state => state.server.port
 export const url = state => {
   let {address, port} = state.server

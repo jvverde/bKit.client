@@ -1,4 +1,3 @@
-export const mainCounter = state => state.counters.main
 export const address = state => state.server.address
 export const port = state => state.server.port
 export const url = state => {

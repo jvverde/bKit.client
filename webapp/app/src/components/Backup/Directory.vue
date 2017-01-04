@@ -22,9 +22,7 @@
             </span>
 	        </a>
         </div>
-        <directory v-if="folder.open"
-          :path="path + encodeURIComponent(folder.name) + '/'"
-          :location="location">
+        <directory v-if="folder.open" :location="folder.childrensLocation">
         </directory>
       </li>
     </ul>
@@ -176,14 +174,6 @@
         files: []
       }
     },
-/*    computed: {
-      ...mapGetters({childrens: 'entries'}),
-      files2: function () {
-        console.log(this.path)
-        console.log(this.childrens[this.path].files)
-        return this.childrens[this.path].files
-      }
-    },*/
     props: {
       location: requiredLocation
     },
@@ -195,6 +185,7 @@
     components: {
     },
     created () {
+      console.log('created dir for', this.location.path)
       this.refresh()
     },
     methods: {
@@ -211,18 +202,21 @@
       },
       refresh () {
         try {
-          console.log('refresh directory')
+          console.log('refresh directory', this.location.path)
           var url = this.getUrl('folder')
-          let self = this
           this.$http.jsonp(url).then(
             function (response) {
               let files = (response.data.files || []).sort(order)
               let folders = (response.data.folders || []).map(folder => ({
                 name: folder,
-                open: false
+                childrensLocation: Object.assign({}, this.location, {
+                  path: this.location.path + encodeURIComponent(folder) + '/'
+                }),
+                open: (this.folders.find(e => e.name === folder) || {})
+                  .open === true
               })).sort(order)
-              self.$set(self, 'files', files)
-              self.$set(self, 'folders', folders)
+              this.$set(this, 'files', files)
+              this.$set(this, 'folders', folders)
             },
             function (response) {
               console.error(response)

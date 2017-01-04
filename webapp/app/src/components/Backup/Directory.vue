@@ -5,57 +5,56 @@
         <div class="line">
 	        <div>
             <span class="icon is-small">
-              <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i>
-              <i class="fa fa-minus-square-o" v-else-if="folder.open"></i>
+              <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
+              <i class="fa fa-minus-square-o" v-if="folder.open"></i>
               <i class="fa fa-plus-square-o" v-else></i>
             </span>
-		        <span class="icon is-small" v-if="hasChildren(index)">
+		        <span class="icon is-small">
               <i class="fa fa-folder-open-o" v-if="folder.open"></i>  
               <i class="fa fa-folder-o" v-else></i>  
 		        </span>
 		        <span class="text">{{folder.name}}</span>
 	        </div>
 	        <a @click.stop=""
-	          :href="getUrl('bkit',location,path,folder.name)" title="Recuperar">
+	          :href="getUrl('bkit',folder.name)" title="Recuperar">
             <span class="icon is-small">
               <i class="fa fa-history"></i>  
             </span>
 	        </a>
         </div>
         <directory v-if="folder.open"
-          :entries="folder.entries"
           :path="path + encodeURIComponent(folder.name) + '/'"
           :location="location">
         </directory>
       </li>
     </ul>
     <ul class="files">
-      <li v-for="file in files2">
+      <li v-for="file in files">
         <div class="line">
 	        <div>
             <span class="icon is-small">
               <i class="fa fa-file-o"></i>
             </span>
 		        <a :download="file" class="file" @click.stop=""
-		          :href="getUrl('download',location,path,file)">
+		          :href="getUrl('download',file)">
 		          <span class="text">{{file}}</span>
 		        </a>
 	        </div>
 	        <div>
 		        <a :download="file" @click.stop=""
-		          :href="getUrl('download',location,path,file)" title="Download">
+		          :href="getUrl('download',file)" title="Download">
               <span class="icon is-small">
                 <i class="fa fa-download"></i>  
               </span>
 		        </a>        
 		        <a target="_blank" @click.stop=""
-		          :href="getUrl('view',location,path,file)" title="Ver">
+		          :href="getUrl('view',file)" title="Ver">
               <span class="icon is-small">
                 <i class="fa fa-eye"></i>  
               </span>
 		        </a>
 		        <a @click.stop=""
-		          :href="getUrl('bkit',location,path,file)" title="Recuperar">
+		          :href="getUrl('bkit',file)" title="Recuperar">
               <span class="icon is-small">
                 <i class="fa fa-history"></i>  
               </span>
@@ -154,65 +153,19 @@
 </style>
 
 <script>
-  const requiredString = {
-    type: String,
-    required: true
-  }
   const requiredLocation = {
     type: Object,
     required: true,
     validator: function (obj) {
-      return obj.computer && obj.disk && obj.snapshot
+      return obj.computer && obj.disk && obj.snapshot && obj.path &&
+        obj.path.match(/^\//) && obj.path.match(/\/$/)
     }
   }
-  const requiredEntries = {
-    type: Object,
-    required: true,
-    validator: function (obj) {
-      return obj.folders instanceof Array
-    }
-  }
-  function getUrl (base, location, path, entry) {
-    return this.url + base +
-      '/' + location.computer +
-      '/' + location.disk +
-      '/' + location.snapshot +
-      path.replace(/\/$/, '') + '/' + encodeURIComponent(entry || '')
-  }
-  function refresh () {
-    try {
-      console.log('refresh directory')
-      this.files = (this.entries.files || []).sort(function (a, b) {
-        return (a > b) ? 1 : ((b > a) ? -1 : 0)
-      })
-      this.folders = (this.entries.folders || []).map(function (folder) {
-        return {name: folder, open: false, entries: {}}
-      }).sort(function (a, b) {
-        return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
-      })
-      var self = this
-      this.folders.forEach(function (folder) {
-        var url = self.getUrl('folder', self.location, self.path, folder.name)
-        self.$http.jsonp(url).then(
-          function (response) {
-            self.$set(folder, 'entries', response.data || {})
-            self.$store.dispatch('setEntry', {
-              path: self.path,
-              entries: response.data
-            })
-            // console.log(self.$store.getters.entries[self.path].files)
-          },
-          function (response) {
-            console.error(response)
-          }
-        )
-      })
-    } catch (e) {
-      console.error(e)
-    }
+  function order (a, b) {
+    return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
   }
   
-  import { mapGetters } from 'vuex'
+  /* import { mapGetters } from 'vuex' */
 
   export default {
     name: 'directory',
@@ -223,39 +176,61 @@
         files: []
       }
     },
-    computed: {
+/*    computed: {
       ...mapGetters({childrens: 'entries'}),
       files2: function () {
         console.log(this.path)
         console.log(this.childrens[this.path].files)
         return this.childrens[this.path].files
       }
-    },
+    },*/
     props: {
-      location: requiredLocation,
-      path: requiredString,
-      entries: requiredEntries
+      location: requiredLocation
     },
     watch: {
-      entries: refresh
+      location () {
+        this.refresh()
+      }
     },
     components: {
     },
-    created: refresh,
+    created () {
+      this.refresh()
+    },
     methods: {
-      getUrl: getUrl,
+      getUrl (base, entry) {
+        return this.url + base +
+          '/' + this.location.computer +
+          '/' + this.location.disk +
+          '/' + this.location.snapshot +
+          this.location.path +
+          encodeURIComponent(entry || '')
+      },
       toggle (index) {
         this.folders[index].open = !this.folders[index].open
       },
-      hasChildren (index) {
-        return this.folders[index].entries.folders &&
-          this.folders[index].entries.folders.length > 0 ||
-          this.folders[index].entries.files &&
-          this.folders[index].entries.files.length > 0
-      },
-      isWaiting (index) {
-        return !('folders' in this.folders[index].entries ||
-          'files' in this.folders[index].entries)
+      refresh () {
+        try {
+          console.log('refresh directory')
+          var url = this.getUrl('folder')
+          let self = this
+          this.$http.jsonp(url).then(
+            function (response) {
+              let files = (response.data.files || []).sort(order)
+              let folders = (response.data.folders || []).map(folder => ({
+                name: folder,
+                open: false
+              })).sort(order)
+              self.$set(self, 'files', files)
+              self.$set(self, 'folders', folders)
+            },
+            function (response) {
+              console.error(response)
+            }
+          )
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   }

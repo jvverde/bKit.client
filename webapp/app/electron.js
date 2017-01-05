@@ -6,6 +6,7 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const Tray = electron.Tray
 const Menu = electron.Menu
+const ipcMain = electron.ipcMain
 
 let mainWindow
 let config = {}
@@ -65,12 +66,19 @@ function createWindow () {
       if (state === 'completed') {
         console.log(`Download successfully: ${item.getFilename()} in ${item.getSavePath()}`)
         console.log(`${item.getMimeType()}`)
+        consoles[0].receiver.send(consoles[0].channel, `${item.getSavePath()}`)
       } else {
         console.log(`Download failed: ${state}`)
       }
     })
   })
 }
+let consoles = []
+ipcMain.on('register', (event, arg) => {
+  consoles.push({receiver:event.sender, channel: arg})
+  console.log(consoles)
+  event.sender.send('register', 'done register ' + arg)
+})
 
 global.server = {
   address: '10.11.0.135',

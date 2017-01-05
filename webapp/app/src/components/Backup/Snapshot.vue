@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <directory class="root"
-      :location="{computer:computer, disk:disk, snapshot:id, path:'/'}">
-    </directory> 
-  </div>
+  <directory class="root"
+    :location="{computer:computer, disk:disk, snapshot:id, path:'/'}">
+  </directory> 
 </template>
 
 <script>

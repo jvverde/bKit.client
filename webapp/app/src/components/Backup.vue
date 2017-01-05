@@ -21,12 +21,16 @@
       :computer="computer" 
       :disk="disk" class="snapshot">
     </snapshot>
+    <footer class="bottom">
+      <console></console>
+    </footer>
   </div>
 </template>
 
 <script>
   import Snapshot from './Backup/Snapshot'
   import Breadcrumb from './Backup/Breadcrumb'
+  import Console from './Console'
 
   var moment = require('moment')
   moment.locale('pt')
@@ -48,7 +52,8 @@
     components: {
       // Directory
       Snapshot,
-      Breadcrumb
+      Breadcrumb,
+      Console
     },
     props: [],
     created () {
@@ -102,6 +107,9 @@
     .snapshot{
       flex-grow:1;
       overflow: auto;  
+    }
+    footer.bottom{
+      flex-shrink: 0;  
     }
   }
 

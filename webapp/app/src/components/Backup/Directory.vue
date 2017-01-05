@@ -15,12 +15,13 @@
 		        </span>
 		        <span class="text">{{folder.name}}</span>
 	        </div>
-	        <a @click.stop=""
+<!-- 	        <a @click.stop=""
 	          :href="getUrl('bkit',folder.name)" title="Recuperar">
             <span class="icon is-small">
               <i class="fa fa-history"></i>  
             </span>
-	        </a>
+	        </a> -->
+          <recovery :url="getUrl('bkit',folder.name)"></recovery>
         </div>
         <directory v-if="folder.open" :location="folder.childrensLocation">
         </directory>
@@ -151,6 +152,8 @@
 </style>
 
 <script>
+  import Recovery from './Recovery/Recovery'
+
   const requiredLocation = {
     type: Object,
     required: true,
@@ -183,6 +186,7 @@
       }
     },
     components: {
+      Recovery
     },
     created () {
       console.log('created dir for', this.location.path)

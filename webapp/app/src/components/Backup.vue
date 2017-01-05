@@ -122,32 +122,34 @@
       cursor:pointer;
       background: $bgcolor;
       border-radius: 4px;
-      margin:2px;
-      width:3em;
-      min-width: .5em;
+      margin: 2px;
+      width: 3em;
+      min-width: 1em;
       height:$aheight;
-      padding:1px; 
+      padding: 1px; 
       transition:min-width .2s ease-out;
+      position: relative;
+      font-size: 8pt;
       header{
         white-space: nowrap;
         text-overflow: ellipsis;
         width: $aheight;
-        line-height: 3em;
-        top: -3em;
-        text-align: center;
+        line-height: 1em;
+        text-align: left;
         vertical-align: middle;
         padding:0;
-        font-size: 1em;
+        left:-$aheight/2;
+        top: $aheight/2;
+        margin-left: 50%;
         font-weight: normal;
         display:block; 
-        position:relative; 
-        transform: rotate(90deg);
-        transform-origin: left bottom;
+        position:absolute; 
+        transform: rotate(90deg); 
+        transform-origin: 50% 50%;
       }
       article{
         //https://www.sitepoint.com/create-calendar-icon-html5-css3/
         margin:0; 
-        font-size: 1em; /* change size */
         display: flex;
         justify-content: center;
         align-items:center;
@@ -158,7 +160,7 @@
         overflow: hidden;        
         width: 0;
         height: 0;
-        top: 100%;
+        top: 110%;
         transition:top .5s linear;
         transition-delay: .2s;
         time{
@@ -220,6 +222,7 @@
         header{
           width:0;
           height:0;
+          opacity: 0;
         }
         article{
           width: $width;

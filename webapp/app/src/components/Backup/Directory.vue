@@ -52,12 +52,13 @@
                 <i class="fa fa-eye"></i>  
               </span>
 		        </a>
-		        <a @click.stop=""
+<!-- 		        <a @click.stop=""
 		          :href="getUrl('bkit',file)" title="Recuperar">
               <span class="icon is-small">
                 <i class="fa fa-history"></i>  
               </span>
-		        </a>
+		        </a> -->
+            <recovery :url="getUrl('bkit',file)"></recovery>
 	        </div>
         </div>
       </li>      

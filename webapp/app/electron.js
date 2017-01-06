@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow
 const Tray = electron.Tray
 const Menu = electron.Menu
 const ipcMain = electron.ipcMain
+const shell = electron.shell
 
 let mainWindow
 let config = {}
@@ -66,11 +67,23 @@ function createWindow () {
       if (state === 'completed') {
         console.log(`Download successfully: ${item.getFilename()} in ${item.getSavePath()}`)
         console.log(`${item.getMimeType()}`)
-        consoles[0].receiver.send(consoles[0].channel, `${item.getSavePath()}`)
+        consoles[0].receiver.send(consoles[0].channel, {
+          type: 'download',
+          fullpath: `${item.getSavePath()}`,
+          filename: `${item.getFilename()}`,
+          mimetype: `${item.getMimeType()}`,
+          disposition: `${item.getContentDisposition()}`
+        })
       } else {
         console.log(`Download failed: ${state}`)
       }
     })
+  })
+
+  mainWindow.webContents.on('new-window', function(event, url) {
+    event.preventDefault()
+    console.log("Handing off to O/S: "+url)
+    shell.openExternal(url)
   })
 }
 let consoles = []

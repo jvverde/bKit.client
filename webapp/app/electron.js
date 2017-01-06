@@ -76,8 +76,7 @@ function createWindow () {
 let consoles = []
 ipcMain.on('register', (event, arg) => {
   consoles.push({receiver:event.sender, channel: arg})
-  console.log(consoles)
-  event.sender.send('register', 'done register ' + arg)
+  event.sender.send(arg, 'done register done for channel' + arg)
 })
 
 global.server = {

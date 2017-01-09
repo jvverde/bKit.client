@@ -30,24 +30,28 @@
     <ul class="files">
       <li v-for="file in files">
         <div class="line">
-	        <div>
+	        <div class="props">
             <span class="icon is-small">
               <i class="fa fa-file-o"></i>
             </span>
 		        <a :download="file" class="file" @click.stop=""
-		          :href="getUrl('download',file)">
-		          <span class="text">{{file}}</span>
+		          :href="getUrl('download',file.name)">
+              <span class="text name">{{file.name}}</span>
+              <span>
+                <formatedsize :value="file.size"></formatedsize>
+                <formateddate :value="file.datetime"></formateddate>
+              </span>
 		        </a>
 	        </div>
 	        <div>
 		        <a :download="file" @click.stop=""
-		          :href="getUrl('download',file)" title="Download">
+		          :href="getUrl('download',file.name)" title="Download">
               <span class="icon is-small">
                 <i class="fa fa-download"></i>  
               </span>
 		        </a>        
 		        <a target="_blank" @click.stop=""
-		          :href="getUrl('view',file)" title="Ver">
+		          :href="getUrl('view',file.name)" title="Ver">
               <span class="icon is-small">
                 <i class="fa fa-eye"></i>  
               </span>
@@ -58,7 +62,7 @@
                 <i class="fa fa-history"></i>  
               </span>
 		        </a> -->
-            <recovery :url="getUrl('bkit',file)"></recovery>
+            <recovery :url="getUrl('bkit',file.name)"></recovery>
 	        </div>
         </div>
       </li>      
@@ -147,6 +151,16 @@
             border:1px solid red;
           }
         }
+        .props{
+          display: flex;
+          justify-content:space-between;
+          flex-grow:2;
+          a{
+            flex-grow:2;
+            display: flex;
+            justify-content:space-between;
+          }
+        }
       }
     }
   }
@@ -154,6 +168,8 @@
 
 <script>
   import Recovery from './Recovery/Recovery'
+  import Formateddate from './Recovery/Formateddate'
+  import Formatedsize from './Recovery/Formatedsize'
 
   const requiredLocation = {
     type: Object,
@@ -187,7 +203,9 @@
       }
     },
     components: {
-      Recovery
+      Recovery,
+      Formateddate,
+      Formatedsize
     },
     created () {
       console.log('created dir for', this.location.path)

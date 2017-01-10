@@ -19,14 +19,6 @@ angular.module('bkitApp')
       self.backups = [];
       self.path = '';
 
-      self.querySearch = query;
-      self.onSelectBackup = onSelectBackup;
-      self.selectComputer = selectComputer;
-      self.processSelection = processSelection;
-      self.reset = reset;
-
-      self.loadContent = loadContent;
-      self.buildUrl = buildUrl;
 
       function query(search) {
         console.log('query', self.computers);
@@ -35,34 +27,27 @@ angular.module('bkitApp')
 
       function selectComputer(pc) {
         self.selectedComputer = pc;
-
         if (pc.drives.length === 1) processSelection(pc.drives[0]);
       }
 
-
-
       function reset(pc) {
-
         self.selectedComputer = pc;
-
         self.backups = [];
         self.selectedBackup = null;
         self.selectedDrive = null;
         self.explorer = null;
-
-
       }
 
-      function processSelection(drive) {
-
+      function processSelection(drive,pc) {
         if (!drive) return;
+        self.selectedComputer = pc || self.selectedComputer;
         // self.showDrivesGrid = false;
         self.selectedDrive = drive;
         console.log('drive', drive);
         self.backups = $transform.backupsByDate(self.selectedComputer, drive);
 
         //we've just updated self.backups so we need to wait for angular's $digest cycle to finish before we can syncronize the selection
-        $timeout(function () {
+        $scope.syncronizeSelection && $timeout(function () {
           $scope.syncronizeSelection(self.backups[0], 'id');
         }, 10);
       }
@@ -72,11 +57,9 @@ angular.module('bkitApp')
 
         self.selectedBackup = bak;
         loadContent(self.path, bak.computer.id, bak.drive.id, bak.id);
-
       }
 
       function loadContent(obj, computer, drive, bak) {
-
         var folder;
         if (typeof obj === 'string') { //it's a path
           self.path = obj;
@@ -103,13 +86,10 @@ angular.module('bkitApp')
       }
 
       function openFolder(folder) {
-
         self.currentFolder = folder;
         self.currentFolder.opened = true;
-
         clearFolderSelection(self.explorer);
         self.currentFolder.selected = true;
-
       }
 
       function clearFolderSelection(folder) {
@@ -121,9 +101,7 @@ angular.module('bkitApp')
         }
       }
 
-
       function buildUrl(file, action) {
-
         return $request.buildUrl('/' + action, [
           self.selectedComputer.id,
           self.selectedDrive.id,
@@ -131,5 +109,15 @@ angular.module('bkitApp')
           self.path
         ]);
       }
+
+      self.querySearch = query;
+      self.onSelectBackup = onSelectBackup;
+      self.selectComputer = selectComputer;
+      self.processSelection = processSelection;
+      self.reset = reset;
+
+      self.loadContent = loadContent;
+      self.buildUrl = buildUrl;
+
     }
   ]);

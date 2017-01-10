@@ -20,6 +20,7 @@ DAYOFMONTH=ONALL
 MONTH=ONALL
 DAYOFWEEK=ONALL
 EVERY=1 #for windows only
+START=$(date -u)
 let ONMINUTES=$RANDOM%60
 let ONHOURS=$RANDOM%24
 let ONDAYOFWEEK=$RANDOM%7
@@ -32,20 +33,20 @@ do
 		-m|--minute)
 			SCHTYPE=MINUTE
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 1440 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 1440 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMINUTES="$1" && shift && MINUTE=ONMINUTES
 		;;
 		-h|--hour)
 			SCHTYPE=HOURLY
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 24 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 24 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONHOURS="$1" && shift && HOUR=ONHOURS
 			MINUTE=ONMINUTES
 		;;
 		-d|--day)
 			SCHTYPE=DAILY
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 366 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 366 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONDAYOFMONTH="$1" && shift && DAYOFMONTH=ONDAYOFMONTH
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
@@ -62,11 +63,17 @@ do
 		-M|--monthly)
 			SCHTYPE=MONTHLY
 			[[ $# -gt 1 ]] || continue
-			(( $1 < 12 && $1 > 0 )) && EVERY=$1
+			[[ "$1" =~ ^[0-9,*/-]+$ ]] && (( $1 < 12 && $1 > 0 )) && EVERY=$1
 			[[ "$1" =~ ^[0-9,*/-]+$ ]] && ONMONTHS=$1 && shift && MONTH=ONMONTHS
 			MINUTE=ONMINUTES
 			HOUR=ONHOURS
 			DAYOFMONTH=ONDAYOFMONTH
+		;;
+		-n|--name)
+			NAME="$1" && shift
+		;;
+		-s|--start)
+			START=$(date -d "$1" -u) && shift || die Wrong date format
 		;;
 		*)
 			echo Unknow	option $KEY && usage
@@ -75,33 +82,40 @@ do
 done
 
 
-BACKUPPATH=$(readlink -e "$1")
-exists cygpath && BACKUPPATH=$(cygpath -u "$BACKUPPATH")
-NAME=$2
-
 LOGSDIR=$SDIR/logs
 [[ -d $LOGSDIR ]] || mkdir -pv "$LOGSDIR"
 
-IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
 
 [[ -n $DIR ]] && FLATDIR=${DIR//[^a-zA-Z0-9_-]/_} || FLATDIR=ROOT
 
 if [[ $OS == cygwin ]]
 then
-	DRIVE=$(cygpath -w "$(stat -c%m "$BACKUPPATH")")
-	[[ -z $NAME ]] && NAME=$(FSUTIL  FSINFO VOLUMEINFO $DRIVE|grep -Poi '(?<=Volume Name\s:\s).*')
 	DOSBASH=$(cygpath -w "$BASH")
-	LETTER=${DRIVE%%:*}
 	TASKDIR="$SDIR/schtasks"
 	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
-	TASKNAME="BKIT-${LETTER:-_}-${NAME:-_}-$UUID-${FLATDIR}"
+	TASKNAME="BKIT-${NAME:-$(date +%Y-%m-%dT%H-%M-%S)}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
-	LOGFILE="$LOGSDIR/${TASKNAME}.log"
-	CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --snap --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
-	echo $CMD > "$TASKBATCH"
+	[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
+	for BACKUPDIR in "$@"
+	do
+		BACKUPPATH=$(cygpath -u "$(readlink -e "$BACKUPDIR")")
+		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
+		LOGFILE=$LOGSDIR/$TASKNAME.$UUID.$(echo $DIR|md5sum|awk '{print $1}').log
+		CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --snap --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
+		echo REM Backup $(cygpath -w "$BACKUPDIR") "($BACKUPPATH)"
+		echo REM Logs in $LOGFILE
+		echo $CMD 
+	done > "$TASKBATCH"
 	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
-	ST=$(A=$(date +%s);let B=$RANDOM%3600; let C=A+B; date -d "1970-01-01 $C sec" +"%H:%M")
-	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST $ST /TN "$TASKNAME" /TR "$TASCMD"
+	ST=$(date -d "$START" +"%H:%M:%S")
+	#SD=$(date -d "$START" +"%d/%m/%Y")
+	#http://www.robvanderwoude.com/datetimentparse.php
+	#schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
+	let FORMAT=$(REG QUERY "HKCU\Control Panel\International"|fgrep -i "iDate"|grep -Po "\d")
+	(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
+	(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
+	(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
+	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 	schtasks /QUERY|fgrep BKIT
 else
 	[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')

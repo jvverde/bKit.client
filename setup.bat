@@ -14,11 +14,12 @@ if not exist "%OP%3rd-party\shadowspawn\" mkdir "%OP%3rd-party\shadowspawn"
 if not exist "%OP%run\" mkdir "%OP%run"
 if not exist "%OP%cache\" mkdir "%OP%cache"
 
-call %OP%setup\subinacl.bat
-call %OP%setup\cygwin.bat
-call %OP%setup\shadowspawn.bat
+call "%OP%setup\subinacl.bat"
+call "%OP%setup\cygwin.bat"
+call "%OP%setup\shadowspawn.bat"
+
 set bash=%OP%3rd-party\cygwin\bin\bash.exe
-if not exist %bash% (
+if not exist "%bash%" (
 	echo bash.exe not found 
 	exit /b
 )
@@ -30,10 +31,10 @@ for %%F in ("%bash%") do set dirname=%%~dpF
   echo set oldhome=%%HOME%%
   echo set oldshell=%%SHELL%%
   echo set oldpath=%%path%%
-  echo set path=%dirname%;%%path%%
+  echo set path="%dirname%";%%path%%
   echo set HOME=/home/user
   echo set SHELL=/bin/bash
-  echo call %bash% %%*
+  echo call "%bash%" %%*
   echo set path=%%oldpath%%
   echo set SHELL=%%oldshell%%
   echo set HOME=%%oldhome%%

@@ -31,7 +31,7 @@ angular.module('bkitApp')
           if (!item) return;
           for (var i = 0; i < scope.content.length; i++) {
             if (scope.content[i][field] === item[field]) {
-              scope.scrollTo(1 - i / scope.content.length);
+              //scope.scrollTo(1 - i / scope.content.length);
               handleCellClick(null, scope.content.length -1 -i, item);
               break;
             }

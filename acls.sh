@@ -27,13 +27,13 @@ acldir(){
 	local WSPATH=$(cygpath -w "$1")
 	local WACLSFILE=$(cygpath -w "$2")	
 	local WSIDSFILE=$(cygpath -w "$3")
-	$SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="WSIDSFILE" /file "$WSPATH"
+	"$SUBINACL" /noverbose /output="$WACLSFILE" /dumpcachedsids="$WSIDSFILE" /file "$WSPATH"
 }
 aclfiles(){
 	local WSPATH=$(cygpath -w "$1")
 	local WACLSFILE=$(cygpath -w "$2")	
 	local WSIDSFILE=$(cygpath -w "$3")
-	$SUBINACL /noverbose /output="$WACLSFILE" /dumpcachedsids="WSIDSFILE" /file "$WSPATH\\*"
+	"$SUBINACL" /noverbose /output="$WACLSFILE" /dumpcachedsids="$WSIDSFILE" /file "$WSPATH\\*"
 }
 
 THISFLAG="$ACLSDIR/.this.flag.f"

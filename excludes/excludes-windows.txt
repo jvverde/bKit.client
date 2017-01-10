@@ -51,15 +51,16 @@ Opera/cache/*
 Microsoft SQL Server/**/Update Cache/*
 #System32/LogFiles/*
 
-#System Volume Information
+System Volume Information
+System Volume Information/catalog.wci/*
 $RECYCLE.BIN/
 $Recycle.Bin/
 RECYCLER/
 MSOCache/
-#pagefile.sys
-#hiberfil.sys
-#iobw.tst
-#swapfile.sys
+pagefile.sys
+hiberfil.sys
+iobw.tst
+swapfile.sys
 
 Config.Msi/
 #Thumbs.db

@@ -14,7 +14,7 @@ DOSBASH=$(cygpath -w "$BASH")
 
 NTFS=$(FSUTIL FSINFO VOLUMEINFO $DRIVE | fgrep -i "File System Name" | fgrep -oi "NTFS")
 FIXED=$(FSUTIL FSINFO DRIVETYPE $DRIVE | fgrep -oi "Fixed Drive")
-CDRIVES=$(FSUTIL FSINFO DRIVES|sed 's/\r//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*'|tr '[:lower:]' '[:upper:]')
+CDRIVES=$(FSUTIL FSINFO DRIVES|sed 'N;s/\n//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*'|tr '[:lower:]' '[:upper:]')
 
 for LETTER in {H..Z} B {D..G} A
 do
@@ -27,7 +27,7 @@ if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
 then
 	echo Backup shadow copy
 	SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-	"$SHADOWSPAN" /verbosity=4 $DRIVE $MAPLETTER "$DOSBASH" "'$SDIR/backup.sh'" "'$DIR'" $MAPLETTER
+	"$SHADOWSPAN" /verbosity=2 $DRIVE $MAPLETTER "$DOSBASH" "$SDIR/backup.sh" "$DIR" $MAPLETTER
 else
 	echo Backup directly -- without shadow copy
 	bash "%SDIR%backup.sh" "$DIR"

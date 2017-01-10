@@ -1,17 +1,10 @@
-<div layout="row" layout-align="start stretch" flex>
-  <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('left', increment)">
-      <md-icon>keyboard_arrow_left</md-icon>
-  </div>
-  <div class="spinner" layout="column" flex="70" scroll-control>
-    <div layout="row" layout-align="end center" ng-style="{'min-width': overflowedElemWidth + 'px'}">
-      <div class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" layout="column" layout-align="center center" flex>
-
-        <span>{{bak.time.format('DD-MM')}} @ {{bak.time.format('HH:mm:ss')}}</span>
-
-      </div>
-    </div>
-  </div>
-  <div class="scroll-btn" layout="column" layout-align="center center" mouse-hold="scroll('right', increment)">
-      <md-icon>keyboard_arrow_right</md-icon>
-  </div>
+<div class="accordion" layout="row" layout-align="start start">
+    <section class="cell" ng-class="{'selected': $index === selectedCell}" ng-repeat="bak in content | orderBy:'-'" ng-click="handleCellClick($event, $index, bak)" >
+      <header class="spine">{{bak.time.local().fromNow(true)}}</header>
+      <article>
+        <time class="day">{{bak.time.local().format('dddd')}}</time>
+        <time class="time">{{bak.time.local().format('HH:mm')}}</time>
+        <time class="date">{{bak.time.local().format('DD-MM-YYYY')}}</time>
+      </article>
+    </section>
 </div>

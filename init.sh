@@ -4,6 +4,7 @@ SECTION=bkit
 PORT=8730
 BPORT=8731
 RPORT=8732
+UPORT=8733
 USER=user
 PASS=us3r
 SERVER="$1"
@@ -24,14 +25,15 @@ echo Writing configuration to $INITFILE
 (
 	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
 	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
+	echo "UPDATERURL=rsync://admin@$SERVER:$UPORT/bkit-update"
 )> "$INITFILE"
 
 PASSFILE=$CONFDIR/pass.txt
-echo $PASS > $PASSFILE
-chmod 600 $PASSFILE
+echo $PASS > "$PASSFILE"
+chmod 600 "$PASSFILE"
 
 type rsync 2>/dev/null 1>&2 || die rsync not found
 
-rsync -rltvvhR --inplace --stats ${CONFDIR}/./ rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
+rsync -rltvvhR --inplace --stats "${CONFDIR}/./" rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1

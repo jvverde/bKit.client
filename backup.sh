@@ -65,6 +65,8 @@ BACKUPDIR="$ROOT/$STARTDIR"
 
 [[ $SNAP == true ]] && "$SDIR/snap-backup.sh" "$BACKUPDIR" && exit
 
+[[ $SNAP == true ]] && echo "Fail to create a snaphost. I will continue..."
+
 source "$SDIR/drive.sh" "$DEV"
 
 [[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk 
@@ -78,13 +80,12 @@ exists rsync || die Cannot find rsync
 exists sqlite3 || die Cannot find sqlite3
 
 trap '' SIGPIPE
-#echo "backup $BACKUPDIR ($ROOT) in $RVID" && exit
 
 dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync --one-file-system "$@" 2>&1 
+		rsync --one-file-system --compress "$@" 2>&1 
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -95,13 +96,9 @@ dorsync(){
 				sleep $DELAY
 				echo Try again now
 			;;
-			23|24)
-				echo Rsync returns a non null value "'$ret'" but I will ignore it 
-				break
-			;;
 			*)
 				echo Fail to backup. Exit value of rsync is non null: $ret 
-				exit 1
+				break
 			;;
 		esac
 		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break 
@@ -109,10 +106,14 @@ dorsync(){
 }
 
 RUNDIR=$SDIR/run
-mkdir -p $RUNDIR
+[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
 FLIST=$RUNDIR/file-list.$$
 HLIST=$RUNDIR/hl-list.$$
 DLIST=$RUNDIR/dir-list.$$
+MANIFEST=$RUNDIR/manifest.$$
+ENDFLAG=$RUNDIR/endflag.$$
+
+trap "rm -fv $RUNDIR/*.$$ $RUNDIR/*.$$.*" EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -120,7 +121,7 @@ set_postpone_files(){
 	exec 97>"$FLIST"
 }
 remove_postpone_files(){
-	rm -rfv "$HLIST" "$DLIST" "$FLIST"
+	rm -f "$HLIST" "$DLIST" "$FLIST"
 }
 postpone_file(){ 
 	(IFS=$'\n' && echo "$*" ) >&97
@@ -133,50 +134,46 @@ postpone_update(){
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-EXC="--exclude-from=$SDIR/conf/excludes.txt"
-PASS="--password-file=$SDIR/conf/pass.txt"
+EXC="$SDIR/conf/excludes.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 CLEAN="--delete --force --delete-excluded --ignore-non-existing --ignore-existing"
-#CLEAN="--delete --force --delete-excluded"
 FMT_QUERY='--out-format=%i|%n|%L|/%f'
 FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
 FMT_QUERY3='--out-format=%i|%n'
 
+export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
+[[ -e $SDIR/conf/excludes.txt ]] || bash "$SDIR/make-excludes.sh"
+
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync --archive --relative --files-from="$FILE" --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	dorsync --archive --relative --files-from="$FILE" --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 update_file(){
-	dorsync -tiz --inplace $PERM $PASS $FMT "$@"
+	dorsync -tiz --inplace $PERM $FMT "$@"
 }
 update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $EXC $PERM $PASS $FMT "$@"
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
-
-MANIFEST=$RUNDIR/manifest.$$
-ENDFLAG=$RUNDIR/endflag.$$
-
-trap "rm -fv '$FLIST' '$HLIST' '$DLIST' '$MANIFEST' '$ENDFLAG'" EXIT
 
 backup(){
 	local BASE=$1
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exists || return 1
-	[[ -d $SRC ]] && local HASHDB=$(bash $SDIR/hash.sh -b "$SRC")
+	[[ -d $SRC ]] && local HASHDB=$(bash "$SDIR/hash.sh" -b "$SRC")
 	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
@@ -217,7 +214,7 @@ backup(){
 
 		echo Is something else
 		
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $PASS $EXC $FMT_QUERY2 "$SRC" "$DST")
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM --exclude-from="$EXC" $FMT_QUERY2 "$SRC" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
@@ -226,10 +223,10 @@ clean(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	dorsync -riHDR $CLEAN $PERM $PASS $FMT $EXC  "$SRC" "$DST" #clean deleted files
+	dorsync -riHDR $CLEAN $PERM $FMT --exclude-from="$EXC"  "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
-	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing $PASS "$ROOT/./" "$BACKUPURL/$RVID/@snap"
+	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$ROOT/./" "$BACKUPURL/$RVID/@snap"
 }
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
@@ -250,7 +247,7 @@ bg_upload_manifest(){
 		let LEN=500
 		SEGMENT=$RUNDIR/segment.$$
 		SEGFILES=$RUNDIR/segment-files.$$	
-		while true
+		while [[ -e $MANIFEST ]]
 		do
 			let END=LEN+START-1
 			let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
@@ -265,40 +262,43 @@ bg_upload_manifest(){
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
-		rm -fv "$SEGMENT" "$SEGFILES"
+		rm -f "$SEGMENT" "$SEGFILES"
 	)&
 }
 
 LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 (
-	flock -n 9 || die Volume $VOLUMESERIALNUMBER is locked
+	flock -w $((3600*24)) 9 || {
+		rm -fv "$LOCK"
+		die Volume $VOLUMESERIALNUMBER was locked
+	}
 	 	
-	#bg_upload_manifest "$ROOT" "$STARTDIR"
+	bg_upload_manifest "$ROOT" "$STARTDIR"
 
 	echo Start to backup $BACKUPDIR at $(date -R)
 
 	echo Phase 1 - compute ids for new files and backup already server existing files
 
-	#time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
-	#touch "$ENDFLAG"
-	#wait4jobs
-	rm -fv "$MANIFEST" "$ENDFLAG"
+	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+	touch "$ENDFLAG"
+	wait4jobs
+	rm -f "$MANIFEST" "$ENDFLAG"
 
 	echo Phase 2 - backup everything includind attributes and acls
 
-	#bg_upload_manifest "$ROOT" "$STARTDIR"
+	bg_upload_manifest "$ROOT" "$STARTDIR"
 
-	#time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
+	time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
 
-	#[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+	[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
 
-	#touch "$ENDFLAG"
-	#wait4jobs
-	rm -fv "$MANIFEST" "$ENDFLAG"
+	touch "$ENDFLAG"
+	wait4jobs
+	rm -f "$MANIFEST" "$ENDFLAG"
 
 
-	#time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
+	time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
 	OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 
@@ -316,5 +316,5 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	time snapshot && echo snapshot done
 	echo Backup of $BACKUPDIR done at $(date -R)
-) 9>"$LOCK" 
- 
+) 9>"$LOCK"
+

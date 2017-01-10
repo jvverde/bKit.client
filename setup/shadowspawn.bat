@@ -19,7 +19,7 @@ set "KEY=1D5E3C0FEDA1E123187686FED06E995A"
 if %OSARCH%==x64 set "KEY=1926E8D15D0BCE53481466615F760A7F" 
 set "STRING=HKLM\SOFTWARE\Classes\Installer\Products\%KEY%"
 set "VCR=%SDIR%shadowspawn\vcredist-2010_%OSARCH%.exe"
-reg Query %STRING% | findstr /IL "10.0.40219" > NUL || call %VCR%
+reg Query %STRING% | findstr /IL "10.0.40219" > NUL || call "%VCR%"
 
 popd
 exit /b
@@ -38,3 +38,6 @@ if exist %vbs% del /f /q %vbs%
 >>%vbs% echo Set objShell = Nothing
 cscript //nologo %vbs%
 if exist %vbs% del /f /q %vbs%
+
+
+

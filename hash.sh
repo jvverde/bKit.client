@@ -33,7 +33,7 @@ mkdir -p "$WD"
 
 EXC=$( 
 	[[ -n $EXCUDELIST ]] || EXCUDELIST="$SDIR/conf/excludes.txt"
-	[[ -f $EXCUDELIST ]] && cat $EXCUDELIST|
+	[[ -f $EXCUDELIST ]] && cat "$EXCUDELIST"|
 	sed -E '/^#/d;/^\s*$/d;s/ /?/g'|
 	sed -E "
 		/^[^/]*$/{s%%-name '&'%p;d}									

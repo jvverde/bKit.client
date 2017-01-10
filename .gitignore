@@ -1,7 +1,9 @@
 3rd-party/*
-!3rd-party/subinacl
 cache/*
 logs/*
 run/*
 conf/*
+tmp/
+schtasks/*
 bash.bat
+*~

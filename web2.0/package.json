@@ -31,5 +31,9 @@
   },
   "engines": {
     "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "http-proxy-middleware": "^0.17.2",
+    "replace": "^0.3.0"
   }
 }

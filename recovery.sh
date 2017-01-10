@@ -72,7 +72,7 @@ OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 	rsync -tizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao descarregar as ACLs"
 	RUN=$SDIR/run/metadata.$$
 	mkdir -p "$RUN"
-	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/" || die "Problemaa ao desenpacotar as ACLs"
+	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/" || die "Problema ao desenpacotar as ACLs"
 	DRIVE=$(cygpath -w "$DST")
 	SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit) 
 	[[ -f $SUBINACL ]] || die "A aplicação 'subinacl.exe' não foi encontrada"

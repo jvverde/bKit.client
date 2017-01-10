@@ -21,7 +21,8 @@ let mainWindow;
 let tray = null
 
 function openApp(menuItem, browserWindow, event) {
-	mainWindow = createMainWindow()
+	mainWindow = createMainWindow();
+	mainWindow.server = '192.168.4.3';
 }
 
 function onClosed() {

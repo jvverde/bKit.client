@@ -4,12 +4,15 @@
       <div>{{download.filename}}</div>
       <div>
         <span class="icon is-small" @click.prevent="openFile(index)">
-          <i class="fa fa-eye"></i>  
+          <i class="fa fa-eye"></i>
         </span>
          <span class="icon is-small" @click.prevent="showFolder(index)">
-          <i class="fa fa-folder-o"></i>  
-        </span> 
-      </div>    
+          <i class="fa fa-folder-o"></i>
+        </span>
+        <span class="icon is-small" @click.prevent="run(index)">
+          <i class="fa fa-cogs"></i>
+        </span>
+      </div>
     </li>
   </ul>
 </template>
@@ -31,21 +34,6 @@ export default {
     shell
   },
   created () {
-    const spawn = require('child_process').spawn
-    const ls = spawn('ls', ['-lh', '.'])
-
-    ls.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`)
-      this.logs = `${data}`.split(/\n/)
-    })
-
-    ls.stderr.on('data', (data) => {
-      console.log(`stderr: ${data}`)
-    })
-
-    ls.on('close', (code) => {
-      console.log(`child process exited with code ${code}`)
-    })
     ipcRenderer.on('console', (event, arg) => {
       console.log('Received', arg)
       if (arg instanceof Object && arg.type === 'download') {
@@ -54,16 +42,35 @@ export default {
     })
     ipcRenderer.send('register', 'console')
   },
+
   methods: {
     openFile (index) {
       shell.openItem(this.downloads[index].fullpath)
     },
     showFolder (index) {
       shell.showItemInFolder(this.downloads[index].fullpath)
+    },
+    run (index) {
+      const spawn = require('child_process').spawn
+      const ls = spawn('bash.bat', ['recovery.sh', this.downloads[index].fullpath], {cwd: '..'})
+
+      ls.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`)
+        this.logs = `${data}`.split(/\n/)
+      })
+
+      ls.stderr.on('data', (data) => {
+        console.log(`stderr: ${data}`)
+      })
+
+      ls.on('close', (code) => {
+        console.log(`child process exited with code ${code}`)
+      })
     }
   },
   destroyed () {
-    ipcRenderer.removeAllListeners('console')
+    console.log('destroy')
+    // ipcRenderer.removeAllListeners('console')
   }
 }
 </script>

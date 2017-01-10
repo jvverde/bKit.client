@@ -12,8 +12,11 @@ set batchName=%~n1
 set "vbsGetPrivileges=%~dp0\run\OEgetPriv_%batchName%.vbs"
 
 set "ARGS=%*"
-set "ARGS=!ARGS:*%1=!"
-set "ARGS=!ARGS:"=""!"
+::remove first argument (the script)
+set "ARGS=!ARGS:*%1=!" 					 
+::replace any occurrence of " by ""
+set "ARGS=!ARGS:"=""!"					
+::expand script to fullpathname
 set "script=""%~f1"""
 
 > "%vbsGetPrivileges%" (

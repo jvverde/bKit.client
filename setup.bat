@@ -17,25 +17,4 @@ if not exist "%OP%cache\" mkdir "%OP%cache"
 call %OP%setup\subinacl.bat
 call %OP%setup\cygwin.bat
 call %OP%setup\shadowspawn.bat
-set bash=%OP%3rd-party\cygwin\bin\bash.exe
-if not exist %bash% (
-	echo bash.exe not found 
-	exit /b
-)
-for %%F in ("%bash%") do set dirname=%%~dpF
-
->"%OP%bash.bat" (
-  echo ^@echo OFF
-  echo :: This file is automatically create by %0. Don't change it
-  echo set oldhome=%%HOME%%
-  echo set oldshell=%%SHELL%%
-  echo set oldpath=%%path%%
-  echo set path=%dirname%;%%path%%
-  echo set HOME=/home/user
-  echo set SHELL=/bin/bash
-  echo call %bash% %%*
-  echo set path=%%oldpath%%
-  echo set SHELL=%%oldshell%%
-  echo set HOME=%%oldhome%%
-)
 call "%OP%bash.bat" "%OP%setup.sh"

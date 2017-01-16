@@ -150,6 +150,8 @@ app.on('ready', () => {
   tray.setContextMenu(contextMenu)
 });
 
+// console.log('Path:',app.getAppPath());
+
 /*const spawn = require('child_process').spawn;
 const ls = spawn('ls', ['-lh', '/usr']);
 

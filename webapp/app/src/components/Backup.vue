@@ -5,7 +5,7 @@
       <breadcrumb :computer="computer" :disk="disk" :snap="selectedSnap">
       </breadcrumb>
       <div class="accordion">
-        <section class="cell" v-for="(snap, index) in snaps" 
+        <section class="cell" v-for="(snap, index) in snaps"
           @click.stop="select(index)"
           :class="{selected: index === selectedCell}">
           <header class="spine">{{snap.date.fromNow(true)}}</header>
@@ -18,7 +18,7 @@
       </div>
     </header>
     <snapshot v-if="typeof selectedSnap === 'string'" :id="selectedSnap"
-      :computer="computer" 
+      :computer="computer"
       :disk="disk" class="snapshot">
     </snapshot>
     <footer class="bottom">
@@ -99,17 +99,17 @@
     display: flex;
     flex-direction: column;
     header.top{
-      flex-shrink: 0;    
+      flex-shrink: 0;
       .logo{
         float:left;
       }
     }
     .snapshot{
       flex-grow:1;
-      overflow: auto;  
+      overflow: auto;
     }
     footer.bottom{
-      flex-shrink: 0;  
+      flex-shrink: 0;
     }
   }
 
@@ -118,13 +118,13 @@
     justify-content: flex-start;
     align-items: center;
     overflow:hidden;
-    overflow-x:auto; 
+    overflow-x:auto;
     margin:5px 2px 5px 20px;
     color:#474747;
     background:#eee;
-    padding:1px 3px; 
+    padding:1px 3px;
     border-radius: 5px;
-    border:2px solid #ccc; 
+    border:2px solid #ccc;
     section{
       overflow:hidden;
       cursor:pointer;
@@ -134,7 +134,7 @@
       width: 3em;
       min-width: 1em;
       height:$aheight;
-      padding: 1px; 
+      padding: 1px;
       transition:min-width .2s ease-out;
       position: relative;
       font-size: 8pt;
@@ -150,14 +150,14 @@
         top: $aheight/2;
         margin-left: 50%;
         font-weight: normal;
-        display:block; 
-        position:absolute; 
-        transform: rotate(90deg); 
+        display:block;
+        position:absolute;
+        transform: rotate(90deg);
         transform-origin: 50% 50%;
       }
       article{
         //https://www.sitepoint.com/create-calendar-icon-html5-css3/
-        margin:0; 
+        margin:0;
         display: flex;
         justify-content: center;
         align-items:center;
@@ -165,7 +165,7 @@
         background-color: #c8c8c8;
         border-radius: 5px;
         box-shadow: 1px 1px 0 #666, 2px 2px 0 #666, 3px 3px 0 #666, 3px 4px 0 #666, 3px 5px 0 #666, 0 0 0 2px #bbb;
-        overflow: hidden;        
+        overflow: hidden;
         width: 0;
         height: 0;
         top: 110%;
@@ -218,12 +218,12 @@
             color: #2f2f2f;
           }
         }
-      } 
+      }
       &:hover {
         background:$hvcolor;
       }
       &.selected{
-        background:#eee; 
+        background:#eee;
         padding:0.5em 1em;
         width: auto;
         min-width: $width + 2;

@@ -19,11 +19,14 @@
 
 <script>
 const {ipcRenderer, shell} = require('electron')
-
+const net = require('net')
+const path = require('path')
+let server = null
 export default {
   name: 'console',
   data () {
     return {
+      dialogVisible: true,
       logs: [],
       listener: null,
       downloads: []
@@ -39,20 +42,52 @@ export default {
       if (arg instanceof Object && arg.type === 'download') {
         this.downloads.push(arg)
       }
+      if (arg.type === 'download' && arg.mimetype === 'application/bkit') {
+        this.$confirm('Aplly recovery. Continue?', 'Warning', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Recovery completed'
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Recovery canceled'
+          })
+        })
+      }
     })
     ipcRenderer.send('register', 'console')
+    server = net.createServer(function (stream) {
+      console.log('client connected')
+      stream.on('data', function (c) {
+        console.log('data from pipe:', c.toString())
+        stream.end('Hello\r\n')
+      })
+      stream.on('end', function () {
+        console.log('end')
+      // server.close()
+      })
+    })
+    .listen(9876, 'localhost', () => {
+      console.log('server bound')
+    })
   },
-
   methods: {
     openFile (index) {
-      shell.openItem(this.downloads[index].fullpath)
+      // shell.openItem(this.downloads[index].fullpath)
     },
     showFolder (index) {
       shell.showItemInFolder(this.downloads[index].fullpath)
     },
     run (index) {
+      console.log(path.dirname(process.mainModule.filename))
+      console.log(path.dirname(__dirname))
       const spawn = require('child_process').spawn
-      const ls = spawn('bash.bat', ['recovery.sh', this.downloads[index].fullpath], {cwd: '..'})
+      const ls = spawn('sudo.bat', ['./recovery.sh', this.downloads[index].fullpath], {cwd: '..'})
 
       ls.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`)
@@ -69,6 +104,7 @@ export default {
     }
   },
   destroyed () {
+    server.close()
     console.log('destroy')
     // ipcRenderer.removeAllListeners('console')
   }

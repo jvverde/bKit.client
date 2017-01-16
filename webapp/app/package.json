@@ -4,7 +4,7 @@
   "description": "bKit Web GUI",
   "main": "electron.js",
   "dependencies": {
-    "bulma": "^0.2.3",
+    "element-ui": "^1.1.4",
     "font-awesome": "^4.7.0",
     "moment": "^2.17.1",
     "vue": "^2.0.1",

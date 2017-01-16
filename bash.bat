@@ -2,7 +2,7 @@
 set oldhome=%HOME%
 set oldshell=%SHELL%
 set oldpath=%path%
-set path="%~dp03rd-party\cygwin\bin\bash.exe";%path%
+set path="%~dp03rd-party\cygwin\bin";%path%
 set HOME=/home/user
 set SHELL=/bin/bash
 pushd "%~dp0"

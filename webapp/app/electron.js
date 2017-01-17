@@ -48,10 +48,11 @@ function createWindow () {
 
   console.log('mainWindow opened')
 
+  let tmp = process.env.tmp || process.env.tmp || '/tmp'
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     // Set the save path, making Electron not to prompt a save dialog.
-    //item.setSavePath('/tmp/save.pdf')
-
+    let tmp = app.getPath('downloads') || process.env.tmp || process.env.tmp || '/tmp'
+    item.setSavePath(`${tmp}/${item.getFilename()}`)
     item.on('updated', (event, state) => {
       if (state === 'interrupted') {
         console.log('Download is interrupted but can be resumed')

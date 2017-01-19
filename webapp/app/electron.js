@@ -83,7 +83,7 @@ function createWindow () {
 
   mainWindow.webContents.on('new-window', function(event, url) {
     event.preventDefault()
-    console.log("Handing off to O/S: "+url)
+    console.log("Handing off to O/S: " + url)
     shell.openExternal(url)
   })
 }

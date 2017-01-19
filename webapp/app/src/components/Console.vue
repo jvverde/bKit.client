@@ -14,25 +14,30 @@
         </span>
       </div>
     </li>
+    <li>
+      <recovery :resource="resource"></recovery>
+    </li>
   </ul>
 </template>
 
 <script>
+import Recovery from './Dialogs/Recovery'
 const {ipcRenderer, shell} = require('electron')
 const net = require('net')
 const path = require('path')
+const fs = require('fs')
 let server = null
 export default {
   name: 'console',
   data () {
     return {
-      dialogVisible: true,
+      resource: null,
       logs: [],
-      listener: null,
       downloads: []
     }
   },
   components: {
+    Recovery,
     ipcRenderer,
     shell
   },
@@ -43,20 +48,19 @@ export default {
         this.downloads.push(arg)
       }
       if (arg.type === 'download' && arg.mimetype === 'application/bkit') {
-        this.$confirm('Aplly recovery. Continue?', 'Warning', {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          this.$message({
-            type: 'success',
-            message: 'Recovery completed'
+        try {
+          let file = fs.readFileSync(arg.fullpath)
+          this.resource = JSON.parse(file)
+        } catch (err) {
+          this.$notify.error({
+            title: `File:${arg.filename}`,
+            message: `Error: ${err}`
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: 'Recovery canceled'
-          })
+        }
+      } else if (arg.type === 'download') {
+        this.$notify.info({
+          title: arg.filename,
+          message: 'Download completed'
         })
       }
     })

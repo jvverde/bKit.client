@@ -13,9 +13,9 @@ set "vbsGetPrivileges=%~dp0\run\OEgetPriv_%batchName%_%RANDOM%.vbs"
 
 set "ARGS=%*"
 ::remove first argument (the script)
-set "ARGS=!ARGS:*%1=!" 					 
+set "ARGS=!ARGS:*%1=!"
 ::replace any occurrence of " by ""
-set "ARGS=!ARGS:"=""!"					
+set "ARGS=!ARGS:"=""!"
 ::expand script to fullpathname
 set "script=""%~f1"""
 

@@ -51,6 +51,7 @@ export default {
         try {
           let file = fs.readFileSync(arg.fullpath)
           this.resource = JSON.parse(file)
+          this.resource.downloadLocation = arg.fullpath
         } catch (err) {
           this.$notify.error({
             title: `File:${arg.filename}`,

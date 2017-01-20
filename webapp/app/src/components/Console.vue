@@ -23,10 +23,8 @@
 <script>
 import Recovery from './Dialogs/Recovery'
 const {ipcRenderer, shell} = require('electron')
-const net = require('net')
 const path = require('path')
 const fs = require('fs')
-let server = null
 export default {
   name: 'console',
   data () {
@@ -66,20 +64,6 @@ export default {
       }
     })
     ipcRenderer.send('register', 'console')
-    server = net.createServer(function (stream) {
-      console.log('client connected')
-      stream.on('data', function (c) {
-        console.log('data from pipe:', c.toString())
-        stream.end('Hello\r\n')
-      })
-      stream.on('end', function () {
-        console.log('end')
-      // server.close()
-      })
-    })
-    .listen(9876, 'localhost', () => {
-      console.log('server bound')
-    })
   },
   methods: {
     openFile (index) {
@@ -109,7 +93,6 @@ export default {
     }
   },
   destroyed () {
-    server.close()
     console.log('destroy')
     // ipcRenderer.removeAllListeners('console')
   }

@@ -46,7 +46,7 @@ function createWindow () {
     mainWindow = null
   })
 
-  console.log('mainWindow opened')
+  console.log('The mainWindow is open')
 
   let tmp = process.env.tmp || process.env.tmp || '/tmp'
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
@@ -91,6 +91,10 @@ let consoles = []
 ipcMain.on('register', (event, arg) => {
   consoles.push({receiver:event.sender, channel: arg})
   event.sender.send(arg, 'done register done for channel' + arg)
+})
+
+ipcMain.on('debug', (event, arg) => {
+  mainWindow.webContents.openDevTools()
 })
 
 global.server = {
@@ -141,6 +145,7 @@ function exitApp() {
 
 app.on('ready', () => {
   createWindow()
+  console.log('on ready')
   tray = new Tray('icons/logo/512x512.png')
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Recovery', type: 'normal', click: openRecovery },
@@ -149,6 +154,7 @@ app.on('ready', () => {
   ])
   tray.setToolTip('Back me up')
   tray.setContextMenu(contextMenu)
+  console.log('ready')
 });
 
 // console.log('Path:',app.getAppPath());

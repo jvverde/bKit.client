@@ -17,23 +17,31 @@
     justify-content: center;
     text-align: center;
   }
-  .message {
-    border-radius: 5px;
-  }
-  .message.warning {
-    background-color: #F5F5DC; /* https://en.wikipedia.org/wiki/Category:Shades_of_yellow */
-  }
-  .message.error {
-    background-color: #F9CCCA; /* https://en.wikipedia.org/wiki/Shades_of_pink */
+</style>
+<style lang="scss" scoped>
+  .opendebug {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+    &:hover{
+      cursor: help;
+    }
   }
 </style>
 
 <template>
-  <router-view></router-view>
+  <div>
+    <span @click="debug" class="opendebug">.</span>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
   import store from 'src/vuex/store'
+  const {ipcRenderer} = require('electron')
 
   export default {
     store,
@@ -48,6 +56,12 @@
         if (typeof port === 'number' && port > 0) {
           store.dispatch('setServerPort', port)
         }
+      }
+    },
+    methods: {
+      debug () {
+        console.log('open debug window')
+        ipcRenderer.send('debug', 'on')
       }
     }
   }

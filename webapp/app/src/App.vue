@@ -6,7 +6,7 @@
   }
 
   html,
-  body { 
+  body {
     height:100%;
     width: 100%;
     overflow: hidden;
@@ -17,7 +17,15 @@
     justify-content: center;
     text-align: center;
   }
-
+  .message {
+    border-radius: 5px;
+  }
+  .message.warning {
+    background-color: #F5F5DC; /* https://en.wikipedia.org/wiki/Category:Shades_of_yellow */
+  }
+  .message.error {
+    background-color: #F9CCCA; /* https://en.wikipedia.org/wiki/Shades_of_pink */
+  }
 </style>
 
 <template>

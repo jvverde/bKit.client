@@ -10,11 +10,13 @@ exists fsutil && {
     fsutil fsinfo volumeinfo "$DRV\\"|grep -Piq '^\s*Volume\s+Serial\s+Number\s*:\s*0x'$UUID'\s*$' || continue
     echo $DRV && exit 0
   done
+  exit 2
 }
-exists lsblk && exec 3>&2 &&{
+exists lsblk && exec 3>&2 &&{ #this need more testing
   [[ $UID -eq 0 ]] || die $0 must be run as root>&3
   MOUNT=$(lsblk -Pno UUID,MOUNTPOINT|fgrep "UUID=\"$UUID\""|grep -Po '(?<=MOUNTPOINT=")([^"]|\\")*(?=")')
   [[ -z $MOUNT ]] && MOUNT="/dev/$(lsblk -Pno UUID,KNAME|fgrep "UUID=\"$UUID\""|grep -Po '(?<=KNAME=")([^"]|\\")*(?=")')"
   echo $MOUNT && exit 0
+  exit 2
 } #2>/dev/null
-exit 1
+die neither found fsutil nor lsblk

@@ -6,7 +6,7 @@
   }
 
   html,
-  body {
+  body{
     height:100%;
     width: 100%;
     overflow: hidden;
@@ -18,7 +18,13 @@
     text-align: center;
   }
 </style>
+
 <style lang="scss" scoped>
+  .main {
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+  }
   .opendebug {
     font-size: 8pt;
     position: absolute;
@@ -33,7 +39,7 @@
 </style>
 
 <template>
-  <div>
+  <div class="main">
     <span @click="debug" class="opendebug">.</span>
     <router-view></router-view>
   </div>

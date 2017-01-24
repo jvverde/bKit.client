@@ -4,14 +4,14 @@
       <router-link :to="{name: 'Backups-page', params: {
           computer: computer.id,
           disk:drive.id
-      }}">
+      }}" class="link">
         {{drive.name}}
       </router-link>
       <div class="help">
-        <div>Label: {{drive.label}}</div>
-        <div>FS: {{drive.fs}}</div>
-        <div>Type: {{drive.type}}</div>
-        <div>ID: {{drive.uuid}}</div>
+        <span>Label: {{drive.label}}</span>
+        <span>FS: {{drive.fs}}</span>
+        <span>Type: {{drive.type}}</span>
+        <span>ID: {{drive.uuid}}</span>
       </div>
     </div>
   </div>
@@ -72,7 +72,7 @@
       width: $scale * 1.5in;
       background-color: #333;
       border: 1px solid black;
-      color: #fff;
+      color: #CCC;
       position: relative;
       &:before{
         content: "";
@@ -88,8 +88,8 @@
       .help{
         display: none;
         position: absolute;
-        right:0;
-        bottom: 0;
+        right: 1px;
+        bottom: 1px;
         z-index: 5;
         max-width:12em;
         font-size: 8pt;
@@ -97,8 +97,7 @@
         background-color: rgba(128,128,128,0.3);
         border-radius: 5px;
         padding: 2px;
-        div{
-          width: 100%;
+        span{
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden;
@@ -110,6 +109,17 @@
         flex-direction: column;
         justify-content: flex-end;
         align-items: flex-start;
+      }
+      .link {
+        text-decoration: none;
+        color: inherit;
+        width: 100%;
+        height: 100%;
+        display:block;
+        &:hover{
+          color: #CCC;
+          background-color: rgba(128,128,128,0.5);
+        }
       }
     }
   }

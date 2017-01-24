@@ -13,9 +13,12 @@
   }
 
   body {
-    font-family: Helvetica, sans-serif;
+    font-family: Helvetica, Verdana, Arial, sans-serif;
     justify-content: center;
     text-align: center;
+  }
+  a {
+    text-decoration: none;
   }
 </style>
 
@@ -24,6 +27,8 @@
     height:100%;
     width: 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .opendebug {
     font-size: 8pt;

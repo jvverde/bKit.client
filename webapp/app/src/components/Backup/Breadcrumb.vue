@@ -89,8 +89,8 @@
         padding-right: $arrowidth;
         position: relative;
         >*{
-          padding-bottom: .1em;
-          padding-top: .1em;
+          padding-bottom: 5px;
+          padding-top: 5px;
           padding-left: .5em;
           white-space: nowrap;
           text-overflow: ellipsis;
@@ -139,9 +139,13 @@
       }
     }
     li:last-child{
-      border-top-right-radius: $arrowborderradius;
-      border-bottom-right-radius: $arrowborderradius;
-      padding-right: 1em
+      padding-right: 1em;
+      :hover, span * {
+        background-color: transparent;
+      }
+      :after, :before {
+        display: none;
+      }
     }
   }
 </style>

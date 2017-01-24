@@ -6,7 +6,7 @@
   }
 
   html,
-  body { 
+  body{
     height:100%;
     width: 100%;
     overflow: hidden;
@@ -17,15 +17,37 @@
     justify-content: center;
     text-align: center;
   }
+</style>
 
+<style lang="scss" scoped>
+  .main {
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  .opendebug {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+    &:hover{
+      cursor: help;
+    }
+  }
 </style>
 
 <template>
-  <router-view></router-view>
+  <div class="main">
+    <span @click="debug" class="opendebug">.</span>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
   import store from 'src/vuex/store'
+  const {ipcRenderer} = require('electron')
 
   export default {
     store,
@@ -40,6 +62,12 @@
         if (typeof port === 'number' && port > 0) {
           store.dispatch('setServerPort', port)
         }
+      }
+    },
+    methods: {
+      debug () {
+        console.log('open debug window')
+        ipcRenderer.send('debug', 'on')
       }
     }
   }

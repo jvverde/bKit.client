@@ -1,0 +1,441 @@
+2016/10/18 17:07:09 Starting cygwin install, version 2.874
+2016/10/18 17:07:09 User has backup/restore rights
+2016/10/18 17:07:09 io_stream_cygfile: fopen(/etc/setup/setup.rc) failed 2 No such file or directory
+2016/10/18 17:07:09 Current Directory: E:\tmp\
+2016/10/18 17:07:09 Could not open service McShield for query, start and stop. McAfee may not be installed, or we don't have access.
+2016/10/18 17:07:09 Selected local directory: E:\tmp
+2016/10/18 17:07:09 net: Direct
+Cached mirror list unavailable
+get_url_to_membuf http://cygwin.com/mirrors.lst
+getUrlToStream http://cygwin.com/mirrors.lst
+2016/10/18 17:07:09 site: ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/
+get_url_to_membuf ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/setup.xz.sig
+getUrlToStream ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/setup.xz.sig
+ftp > 220 ProFTPD 1.3.3e Server (whitefang.fruitbat.org) [::ffff:173.228.5.242]
+ftp > 331 Anonymous login ok, send your complete email address as your password
+ftp > 230- Welcome anonymous, to the whitefang.fruitbat.org FTP server!
+ftp >   There are currently 9 connections active (max 20)
+ftp >   This a private server running on a low-bandwidth link. Be Kind!
+ftp >   If you are using Cygwin Setup use the '-X' option.
+ftp >   See: http://www.fruitbat.org/Cygwin/timemachine.html
+ftp > 230 Anonymous access granted, restrictions apply
+ftp > 200 Type set to I
+ftp > 227 Entering Passive Mode (173,228,5,242,155,82).
+ftp > 550 /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/setup.xz.sig: No such file or directory
+getUrlToStream failed!
+get_url_to_membuf failed!
+get_url_to_membuf ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/setup.xz
+getUrlToStream ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/setup.xz
+ftp > 227 Entering Passive Mode (173,228,5,242,231,15).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/setup.xz (1791472 bytes)
+ftp > 226 Transfer complete
+compress_xz::bid_xz: success: 48
+compress_xz::bid_xz: success: 48
+2016/10/18 17:08:31 io_stream_cygfile: fopen(/etc/setup/installed.db) failed 2 No such file or directory
+2016/10/18 17:08:32 io_stream_cygfile: fopen(/etc/setup/timestamp) failed 2 No such file or directory
+.ini setup_version is 2.874, our setup_version is 2.874
+Added manual package nc
+Added manual package ping
+Added manual package rsync
+Added manual package sqlite3
+Added manual package util-linux
+2016/10/18 17:08:35 Adding required dependency bzip2: Selecting version 1.0.6-2 for installation.
+2016/10/18 17:08:35 Adding required dependency ca-certificates: Selecting version 2.9-1 for installation.
+2016/10/18 17:08:35 Adding required dependency groff: Selecting version 1.22.3-1 for installation.
+2016/10/18 17:08:35 Adding required dependency less: Selecting version 481-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libargp: Selecting version 20110921-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libattr1: Selecting version 2.4.46-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libblkid1: Selecting version 2.25.2-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libbz2_1: Selecting version 1.0.6-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libffi6: Selecting version 3.2.1-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libgcc1: Selecting version 5.4.0-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libgdbm4: Selecting version 1.11-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libgmp10: Selecting version 6.1.1-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libiconv: Selecting version 1.14-3 for installation.
+2016/10/18 17:08:35 Adding required dependency libiconv2: Selecting version 1.14-3 for installation.
+2016/10/18 17:08:35 Adding required dependency libintl8: Selecting version 0.19.7-1 for installation.
+2016/10/18 17:08:35 Adding required dependency liblzma5: Selecting version 5.2.2-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libmpfr4: Selecting version 3.1.4-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libncursesw10: Selecting version 6.0-7.20160806 for installation.
+2016/10/18 17:08:35 Adding required dependency libp11-kit0: Selecting version 0.22.1-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libpcre1: Selecting version 8.39-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libpipeline1: Selecting version 1.4.0-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libpopt-common: Selecting version 1.16-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libpopt0: Selecting version 1.16-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libsmartcols1: Selecting version 2.25.2-2 for installation.
+2016/10/18 17:08:35 Adding required dependency libsqlite3_0: Selecting version 3.14.1-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libssp0: Selecting version 5.4.0-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libstdc++6: Selecting version 5.4.0-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libtasn1_6: Selecting version 4.9-1 for installation.
+2016/10/18 17:08:35 Adding required dependency libuuid1: Selecting version 2.25.2-2 for installation.
+2016/10/18 17:08:35 Adding required dependency p11-kit: Selecting version 0.22.1-1 for installation.
+2016/10/18 17:08:35 Adding required dependency p11-kit-trust: Selecting version 0.22.1-1 for installation.
+2016/10/18 17:08:35 Adding required dependency sqlite3-vfslog: Selecting version 3.14.1-1 for installation.
+2016/10/18 17:08:35 Adding required dependency xz: Selecting version 5.2.2-1 for installation.
+2016/10/18 17:08:35 Adding required dependency zlib0: Selecting version 1.2.8-3 for installation.
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/_autorebase/_autorebase-001004-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/_autorebase/_autorebase-001004-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,223,60).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/_autorebase/_autorebase-001004-1.tar.xz (4212 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:09:05 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/_autorebase/_autorebase-001004-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/alternatives/alternatives-1.3.30c-10.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/alternatives/alternatives-1.3.30c-10.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,156,148).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/alternatives/alternatives-1.3.30c-10.tar.bz2 (73505 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:09:37 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/alternatives/alternatives-1.3.30c-10.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/base-cygwin/base-cygwin-3.8-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/base-cygwin/base-cygwin-3.8-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,195,145).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/base-cygwin/base-cygwin-3.8-1.tar.xz (1248 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:10:07 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/base-cygwin/base-cygwin-3.8-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/base-files/base-files-4.2-4.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/base-files/base-files-4.2-4.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,135,211).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/base-files/base-files-4.2-4.tar.xz (44664 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:10:39 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/base-files/base-files-4.2-4.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/bash/bash-4.3.46-7.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/bash/bash-4.3.46-7.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,139,251).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/bash/bash-4.3.46-7.tar.xz (1406648 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:11:33 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/bash/bash-4.3.46-7.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/bzip2/bzip2-1.0.6-2.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/bzip2/bzip2-1.0.6-2.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,206,223).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/bzip2/bzip2-1.0.6-2.tar.bz2 (44878 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:12:04 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/bzip2/bzip2-1.0.6-2.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/ca-certificates/ca-certificates-2.9-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/ca-certificates/ca-certificates-2.9-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,130,64).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/ca-certificates/ca-certificates-2.9-1.tar.xz (385560 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:12:38 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/ca-certificates/ca-certificates-2.9-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/coreutils/coreutils-8.25-3.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/coreutils/coreutils-8.25-3.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,222,125).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/coreutils/coreutils-8.25-3.tar.xz (2627416 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:14:51 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/coreutils/coreutils-8.25-3.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/cygutils/cygutils-1.4.15-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/cygutils/cygutils-1.4.15-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,176,131).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/cygutils/cygutils-1.4.15-2.tar.xz (75320 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:15:24 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/cygutils/cygutils-1.4.15-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/cygwin/cygwin-2.5.2-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/cygwin/cygwin-2.5.2-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,212,250).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/cygwin/cygwin-2.5.2-1.tar.xz (2850336 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:17:52 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/cygwin/cygwin-2.5.2-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/dash/dash-0.5.8-3.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/dash/dash-0.5.8-3.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,213,181).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/dash/dash-0.5.8-3.tar.xz (75616 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:18:24 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/dash/dash-0.5.8-3.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/editrights/editrights-1.03-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/editrights/editrights-1.03-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,225,157).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/editrights/editrights-1.03-1.tar.xz (6992 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:18:55 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/editrights/editrights-1.03-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/file/file-5.25-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/file/file-5.25-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,218,198).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/file/file-5.25-1.tar.xz (404604 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:19:31 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/file/file-5.25-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/findutils/findutils-4.6.0-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/findutils/findutils-4.6.0-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,175,103).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/findutils/findutils-4.6.0-1.tar.xz (629012 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:20:09 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/findutils/findutils-4.6.0-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gawk/gawk-4.1.4-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gawk/gawk-4.1.4-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,140,85).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gawk/gawk-4.1.4-1.tar.xz (1045928 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:20:50 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gawk/gawk-4.1.4-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/getent/getent-2.18.90-4.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/getent/getent-2.18.90-4.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,183,64).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/getent/getent-2.18.90-4.tar.xz (17404 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:21:21 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/getent/getent-2.18.90-4.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/grep/grep-2.25-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/grep/grep-2.25-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,224,101).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/grep/grep-2.25-1.tar.xz (344328 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:21:56 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/grep/grep-2.25-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/groff/groff-1.22.3-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/groff/groff-1.22.3-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,200,63).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/groff/groff-1.22.3-1.tar.xz (2613848 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:24:09 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/groff/groff-1.22.3-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gzip/gzip-1.8-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gzip/gzip-1.8-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,192,154).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gzip/gzip-1.8-1.tar.xz (130748 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:24:41 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gzip/gzip-1.8-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/hostname/hostname-3.13-1.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/hostname/hostname-3.13-1.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,227,48).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/hostname/hostname-3.13-1.tar.bz2 (14024 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:25:12 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/hostname/hostname-3.13-1.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/texinfo/info/info-6.1-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/texinfo/info/info-6.1-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,175,97).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/texinfo/info/info-6.1-2.tar.xz (448976 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:25:50 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/texinfo/info/info-6.1-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ipc-utils/ipc-utils-1.0-2.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ipc-utils/ipc-utils-1.0-2.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,203,74).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ipc-utils/ipc-utils-1.0-2.tar.bz2 (13046 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:26:21 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ipc-utils/ipc-utils-1.0-2.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/less/less-481-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/less/less-481-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,190,148).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/less/less-481-1.tar.xz (110276 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:26:54 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/less/less-481-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libargp/libargp-20110921-2.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libargp/libargp-20110921-2.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,190,98).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libargp/libargp-20110921-2.tar.bz2 (44478 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:27:27 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libargp/libargp-20110921-2.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/attr/libattr1/libattr1-2.4.46-1.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/attr/libattr1/libattr1-2.4.46-1.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,159,220).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/attr/libattr1/libattr1-2.4.46-1.tar.bz2 (6842 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:27:57 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/attr/libattr1/libattr1-2.4.46-1.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/libblkid1/libblkid1-2.25.2-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/libblkid1/libblkid1-2.25.2-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,203,102).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/libblkid1/libblkid1-2.25.2-2.tar.xz (76656 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:28:30 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/libblkid1/libblkid1-2.25.2-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/bzip2/libbz2_1/libbz2_1-1.0.6-2.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/bzip2/libbz2_1/libbz2_1-1.0.6-2.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,224,96).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/bzip2/libbz2_1/libbz2_1-1.0.6-2.tar.bz2 (28944 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:29:01 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/bzip2/libbz2_1/libbz2_1-1.0.6-2.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libffi/libffi6/libffi6-3.2.1-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libffi/libffi6/libffi6-3.2.1-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,228,93).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libffi/libffi6/libffi6-3.2.1-2.tar.xz (61516 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:29:34 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libffi/libffi6/libffi6-3.2.1-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gcc/libgcc1/libgcc1-5.4.0-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gcc/libgcc1/libgcc1-5.4.0-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,202,101).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gcc/libgcc1/libgcc1-5.4.0-1.tar.xz (27412 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:30:06 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gcc/libgcc1/libgcc1-5.4.0-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gdbm/libgdbm4/libgdbm4-1.11-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gdbm/libgdbm4/libgdbm4-1.11-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,167,29).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gdbm/libgdbm4/libgdbm4-1.11-1.tar.xz (19708 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:30:37 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gdbm/libgdbm4/libgdbm4-1.11-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gmp/libgmp10/libgmp10-6.1.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gmp/libgmp10/libgmp10-6.1.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,197,185).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gmp/libgmp10/libgmp10-6.1.1-1.tar.xz (223756 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:31:11 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gmp/libgmp10/libgmp10-6.1.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libiconv/libiconv-1.14-3.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libiconv/libiconv-1.14-3.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,178,81).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libiconv/libiconv-1.14-3.tar.xz (100544 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:31:43 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libiconv/libiconv-1.14-3.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libiconv/libiconv2/libiconv2-1.14-3.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libiconv/libiconv2/libiconv2-1.14-3.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,171,191).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libiconv/libiconv2/libiconv2-1.14-3.tar.xz (541304 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:32:19 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libiconv/libiconv2/libiconv2-1.14-3.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gettext/libintl8/libintl8-0.19.7-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gettext/libintl8/libintl8-0.19.7-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,167,245).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gettext/libintl8/libintl8-0.19.7-1.tar.xz (16564 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:32:50 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gettext/libintl8/libintl8-0.19.7-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/xz/liblzma5/liblzma5-5.2.2-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/xz/liblzma5/liblzma5-5.2.2-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,190,41).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/xz/liblzma5/liblzma5-5.2.2-1.tar.xz (66832 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:33:21 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/xz/liblzma5/liblzma5-5.2.2-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/mpfr/libmpfr4/libmpfr4-3.1.4-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/mpfr/libmpfr4/libmpfr4-3.1.4-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,143,132).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/mpfr/libmpfr4/libmpfr4-3.1.4-1.tar.xz (144700 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:33:55 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/mpfr/libmpfr4/libmpfr4-3.1.4-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ncurses/libncursesw10/libncursesw10-6.0-7.20160806.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ncurses/libncursesw10/libncursesw10-6.0-7.20160806.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,236,116).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ncurses/libncursesw10/libncursesw10-6.0-7.20160806.tar.xz (176376 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:34:27 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ncurses/libncursesw10/libncursesw10-6.0-7.20160806.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/openssl/libopenssl100/libopenssl100-1.0.2h-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/openssl/libopenssl100/libopenssl100-1.0.2h-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,187,139).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/openssl/libopenssl100/libopenssl100-1.0.2h-1.tar.xz (1042224 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:35:07 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/openssl/libopenssl100/libopenssl100-1.0.2h-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/p11-kit/libp11-kit0/libp11-kit0-0.22.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/p11-kit/libp11-kit0/libp11-kit0-0.22.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,220,113).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/p11-kit/libp11-kit0/libp11-kit0-0.22.1-1.tar.xz (87564 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:35:40 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/p11-kit/libp11-kit0/libp11-kit0-0.22.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/pcre/libpcre1/libpcre1-8.39-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/pcre/libpcre1/libpcre1-8.39-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,192,12).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/pcre/libpcre1/libpcre1-8.39-1.tar.xz (146484 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:36:12 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/pcre/libpcre1/libpcre1-8.39-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libpipeline/libpipeline1/libpipeline1-1.4.0-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libpipeline/libpipeline1/libpipeline1-1.4.0-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,221,9).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libpipeline/libpipeline1/libpipeline1-1.4.0-1.tar.xz (15816 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:36:44 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libpipeline/libpipeline1/libpipeline1-1.4.0-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/popt/libpopt-common/libpopt-common-1.16-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/popt/libpopt-common/libpopt-common-1.16-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,180,52).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/popt/libpopt-common/libpopt-common-1.16-2.tar.xz (19024 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:37:15 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/popt/libpopt-common/libpopt-common-1.16-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/popt/libpopt0/libpopt0-1.16-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/popt/libpopt0/libpopt0-1.16-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,150,163).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/popt/libpopt0/libpopt0-1.16-2.tar.xz (18336 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:37:47 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/popt/libpopt0/libpopt0-1.16-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/readline/libreadline7/libreadline7-6.3.8-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/readline/libreadline7/libreadline7-6.3.8-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,153,233).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/readline/libreadline7/libreadline7-6.3.8-1.tar.xz (89916 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:38:18 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/readline/libreadline7/libreadline7-6.3.8-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/libsmartcols1/libsmartcols1-2.25.2-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/libsmartcols1/libsmartcols1-2.25.2-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,135,35).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/libsmartcols1/libsmartcols1-2.25.2-2.tar.xz (36932 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:38:49 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/libsmartcols1/libsmartcols1-2.25.2-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sqlite3/libsqlite3_0/libsqlite3_0-3.14.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sqlite3/libsqlite3_0/libsqlite3_0-3.14.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,133,88).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sqlite3/libsqlite3_0/libsqlite3_0-3.14.1-1.tar.xz (458972 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:39:26 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sqlite3/libsqlite3_0/libsqlite3_0-3.14.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gcc/libssp0/libssp0-5.4.0-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gcc/libssp0/libssp0-5.4.0-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,223,101).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gcc/libssp0/libssp0-5.4.0-1.tar.xz (3592 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:39:57 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gcc/libssp0/libssp0-5.4.0-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gcc/libstdc++6/libstdc++6-5.4.0-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gcc/libstdc++6/libstdc++6-5.4.0-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,141,31).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/gcc/libstdc++6/libstdc++6-5.4.0-1.tar.xz (280264 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:40:32 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/gcc/libstdc++6/libstdc++6-5.4.0-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libtasn1/libtasn1_6/libtasn1_6-4.9-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libtasn1/libtasn1_6/libtasn1_6-4.9-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,180,51).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/libtasn1/libtasn1_6/libtasn1_6-4.9-1.tar.xz (28812 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:41:03 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/libtasn1/libtasn1_6/libtasn1_6-4.9-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/libuuid1/libuuid1-2.25.2-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/libuuid1/libuuid1-2.25.2-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,195,239).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/libuuid1/libuuid1-2.25.2-2.tar.xz (5572 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:41:34 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/libuuid1/libuuid1-2.25.2-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/login/login-1.11-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/login/login-1.11-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,150,246).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/login/login-1.11-1.tar.xz (16772 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:42:06 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/login/login-1.11-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/man-db/man-db-2.7.5-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/man-db/man-db-2.7.5-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,180,80).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/man-db/man-db-2.7.5-1.tar.xz (761388 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:42:47 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/man-db/man-db-2.7.5-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/mintty/mintty-2.4.3-0.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/mintty/mintty-2.4.3-0.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,236,150).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/mintty/mintty-2.4.3-0.tar.xz (171232 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:43:20 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/mintty/mintty-2.4.3-0.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/nc/nc-1.107-4.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/nc/nc-1.107-4.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,160,222).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/nc/nc-1.107-4.tar.bz2 (17895 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:43:52 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/nc/nc-1.107-4.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ncurses/ncurses-6.0-7.20160806.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ncurses/ncurses-6.0-7.20160806.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,159,229).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ncurses/ncurses-6.0-7.20160806.tar.xz (267296 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:44:26 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ncurses/ncurses-6.0-7.20160806.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/openssl/openssl-1.0.2h-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/openssl/openssl-1.0.2h-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,228,233).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/openssl/openssl-1.0.2h-1.tar.xz (579492 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:45:04 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/openssl/openssl-1.0.2h-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/p11-kit/p11-kit-0.22.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/p11-kit/p11-kit-0.22.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,200,52).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/p11-kit/p11-kit-0.22.1-1.tar.xz (73440 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:45:36 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/p11-kit/p11-kit-0.22.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/p11-kit/p11-kit-trust/p11-kit-trust-0.22.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/p11-kit/p11-kit-trust/p11-kit-trust-0.22.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,152,129).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/p11-kit/p11-kit-trust/p11-kit-trust-0.22.1-1.tar.xz (64664 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:46:08 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/p11-kit/p11-kit-trust/p11-kit-trust-0.22.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ping/ping-1.0.2-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ping/ping-1.0.2-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,190,243).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ping/ping-1.0.2-1.tar.xz (8192 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:46:40 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ping/ping-1.0.2-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/rebase/rebase-4.4.2-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/rebase/rebase-4.4.2-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,162,39).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/rebase/rebase-4.4.2-1.tar.xz (228124 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:47:14 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/rebase/rebase-4.4.2-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/rsync/rsync-3.1.2-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/rsync/rsync-3.1.2-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,162,233).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/rsync/rsync-3.1.2-1.tar.xz (658072 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:47:55 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/rsync/rsync-3.1.2-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/run/run-1.3.4-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/run/run-1.3.4-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,173,31).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/run/run-1.3.4-2.tar.xz (34492 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:48:27 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/run/run-1.3.4-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sed/sed-4.2.2-3.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sed/sed-4.2.2-3.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,205,20).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sed/sed-4.2.2-3.tar.bz2 (262417 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:49:01 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sed/sed-4.2.2-3.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sqlite3/sqlite3-3.14.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sqlite3/sqlite3-3.14.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,234,145).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sqlite3/sqlite3-3.14.1-1.tar.xz (56632 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:49:33 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sqlite3/sqlite3-3.14.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sqlite3/sqlite3-vfslog/sqlite3-vfslog-3.14.1-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sqlite3/sqlite3-vfslog/sqlite3-vfslog-3.14.1-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,194,139).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/sqlite3/sqlite3-vfslog/sqlite3-vfslog-3.14.1-1.tar.xz (5432 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:50:04 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/sqlite3/sqlite3-vfslog/sqlite3-vfslog-3.14.1-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/tar/tar-1.28-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/tar/tar-1.28-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,235,230).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/tar/tar-1.28-1.tar.xz (828908 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:50:58 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/tar/tar-1.28-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ncurses/terminfo/terminfo-6.0-7.20160806.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ncurses/terminfo/terminfo-6.0-7.20160806.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,133,166).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/ncurses/terminfo/terminfo-6.0-7.20160806.tar.xz (66328 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:51:31 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/ncurses/terminfo/terminfo-6.0-7.20160806.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/tzdata/tzdata-2016f-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/tzdata/tzdata-2016f-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,234,96).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/noarch/release/tzdata/tzdata-2016f-1.tar.xz (168676 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:52:08 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/noarch/release/tzdata/tzdata-2016f-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/util-linux-2.25.2-2.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/util-linux-2.25.2-2.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,219,49).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/util-linux/util-linux-2.25.2-2.tar.xz (1190420 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:53:06 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/util-linux/util-linux-2.25.2-2.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/vim/vim-minimal/vim-minimal-7.4.2181-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/vim/vim-minimal/vim-minimal-7.4.2181-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,222,69).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/vim/vim-minimal/vim-minimal-7.4.2181-1.tar.xz (478652 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:53:49 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/vim/vim-minimal/vim-minimal-7.4.2181-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/which/which-2.20-2.tar.bz2 E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/which/which-2.20-2.tar.bz2.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,187,30).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/which/which-2.20-2.tar.bz2 (31847 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:54:22 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/which/which-2.20-2.tar.bz2
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/xz/xz-5.2.2-1.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/xz/xz-5.2.2-1.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,134,150).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/xz/xz-5.2.2-1.tar.xz (238484 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:54:59 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/xz/xz-5.2.2-1.tar.xz
+get_url_to_file ftp://www.fruitbat.org/pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/zlib/zlib0/zlib0-1.2.8-3.tar.xz E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/zlib/zlib0/zlib0-1.2.8-3.tar.xz.tmp
+ftp > 227 Entering Passive Mode (173,228,5,242,168,15).
+ftp > 150 Opening BINARY mode data connection for /pub/cygwin/circa/64bit/2016/08/30/104235/x86_64/release/zlib/zlib0/zlib0-1.2.8-3.tar.xz (38820 bytes)
+ftp > 226 Transfer complete
+2016/10/18 17:55:33 Downloaded E:\tmp/ftp%3a%2f%2fwww.fruitbat.org%2fpub%2fcygwin%2fcirca%2f64bit%2f2016%2f08%2f30%2f104235%2f/x86_64/release/zlib/zlib0/zlib0-1.2.8-3.tar.xz
+2016/10/18 17:55:33 Ending cygwin install

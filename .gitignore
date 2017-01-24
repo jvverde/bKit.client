@@ -3,7 +3,12 @@ cache/*
 logs/*
 run/*
 conf/*
+<<<<<<< HEAD
 tmp/
 schtasks/*
 bash.bat
 *~
+=======
+schtasks/*
+old
+>>>>>>> 37b7d784ae1a5b6fc8f8abde5a4d795754857507

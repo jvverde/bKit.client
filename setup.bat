@@ -14,6 +14,7 @@ if not exist "%OP%3rd-party\shadowspawn\" mkdir "%OP%3rd-party\shadowspawn"
 if not exist "%OP%run\" mkdir "%OP%run"
 if not exist "%OP%cache\" mkdir "%OP%cache"
 
+<<<<<<< HEAD
 call "%OP%setup\subinacl.bat"
 call "%OP%setup\cygwin.bat"
 call "%OP%setup\shadowspawn.bat"
@@ -39,4 +40,9 @@ for %%F in ("%bash%") do set dirname=%%~dpF
   echo set SHELL=%%oldshell%%
   echo set HOME=%%oldhome%%
 )
+=======
+call %OP%setup\subinacl.bat
+call %OP%setup\cygwin.bat
+call %OP%setup\shadowspawn.bat
+>>>>>>> 37b7d784ae1a5b6fc8f8abde5a4d795754857507
 call "%OP%bash.bat" "%OP%setup.sh"

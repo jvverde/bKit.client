@@ -46,12 +46,13 @@ function createWindow () {
     mainWindow = null
   })
 
-  console.log('mainWindow opened')
+  console.log('The mainWindow is open')
 
+  let tmp = process.env.tmp || process.env.tmp || '/tmp'
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     // Set the save path, making Electron not to prompt a save dialog.
-    //item.setSavePath('/tmp/save.pdf')
-
+    let tmp = app.getPath('downloads') || process.env.tmp || process.env.tmp || '/tmp'
+    item.setSavePath(`${tmp}/${item.getFilename()}`)
     item.on('updated', (event, state) => {
       if (state === 'interrupted') {
         console.log('Download is interrupted but can be resumed')
@@ -82,7 +83,7 @@ function createWindow () {
 
   mainWindow.webContents.on('new-window', function(event, url) {
     event.preventDefault()
-    console.log("Handing off to O/S: "+url)
+    console.log("Handing off to O/S: " + url)
     shell.openExternal(url)
   })
 }
@@ -90,6 +91,10 @@ let consoles = []
 ipcMain.on('register', (event, arg) => {
   consoles.push({receiver:event.sender, channel: arg})
   event.sender.send(arg, 'done register done for channel' + arg)
+})
+
+ipcMain.on('debug', (event, arg) => {
+  mainWindow.webContents.openDevTools()
 })
 
 global.server = {
@@ -140,6 +145,7 @@ function exitApp() {
 
 app.on('ready', () => {
   createWindow()
+  console.log('on ready')
   tray = new Tray('icons/logo/512x512.png')
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Recovery', type: 'normal', click: openRecovery },
@@ -148,7 +154,10 @@ app.on('ready', () => {
   ])
   tray.setToolTip('Back me up')
   tray.setContextMenu(contextMenu)
+  console.log('ready')
 });
+
+// console.log('Path:',app.getAppPath());
 
 /*const spawn = require('child_process').spawn;
 const ls = spawn('ls', ['-lh', '/usr']);

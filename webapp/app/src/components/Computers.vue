@@ -66,7 +66,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    align-content: center;
+    align-content: flex-start;
     width:100%;
     height: 100%;
     overflow: auto;

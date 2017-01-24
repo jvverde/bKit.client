@@ -3,7 +3,7 @@
     <bkitlogo></bkitlogo>
     <div class="computers" :class="{onlyone:onlyone}">
       <div class="computer" v-for="(computer,index) in computers"
-        :class="{selected:computer.selected}" 
+        :class="{selected:computer.selected}"
         @click.stop="select(index)">
         <div class="name">{{computer.name}}</div>
         <div class="uuid">uuid:{{computer.uuid}}</div>
@@ -63,9 +63,13 @@
   .computers{
     display: flex;
     flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    align-content: center;
     width:100%;
+    height: 100%;
+    overflow: auto;
     &.onlyone .computer.selected{
       width: 100%;
     }
@@ -85,7 +89,7 @@
 
       transition: all .2s ease-out;
 
-      background: radial-gradient(black 15%, transparent 16%) 0 0, 
+      background: radial-gradient(black 15%, transparent 16%) 0 0,
         radial-gradient(black 15%, transparent 16%) 4px 4px,
         radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
         radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 4px 5px
@@ -101,7 +105,7 @@
       padding-left: 1.5*$LSIZE;
       padding-right: $LSIZE;
       padding-bottom: 1.1*$LSIZE;
-      margin: 2px 10px; 
+      margin: 2px 10px;
       box-sizing: border-box;
       *{
         font-size: 8pt;
@@ -129,7 +133,7 @@
         content: "O";
       }
       .name, .uuid{
-        position: absolute;    
+        position: absolute;
         max-height: $LSIZE;
         background-color: #aaa;
         color: #000;
@@ -158,8 +162,8 @@
         height: 100%;
         overflow: hidden;
         border:2px solid #555;
-        background: radial-gradient(ellipse at center,  #444 0%,#111 90%,#000 100%);  
-        background-size: 3px 3px;  
+        background: radial-gradient(ellipse at center,  #444 0%,#111 90%,#000 100%);
+        background-size: 3px 3px;
 
         background-color:#333;
       }

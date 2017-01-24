@@ -2,39 +2,56 @@
   <ul class="breadcrumb">
     <li>
       <span>
-       <router-link to="/">Start</router-link>
+       <router-link to="/" class="icon is-small"><i class="fa fa-home"></i></router-link>
       </span>
     </li>
     <li>
       <span>
-        <router-link to="/computers">{{computer}}</router-link>
+        <router-link to="/computers" class="icon is-small"><i class="fa fa-desktop"></i> {{computerName}}</router-link>
       </span>
     </li>
     <li>
       <span>
-        <router-link :to="{ 
+        <router-link :to="{
           name: 'Backups-page',
-          params: { 
+          params: {
             computer: computer,
-            disk:disk 
-          }}">
-          {{disk}}
+            disk:disk
+          }}"  class="icon is-small">
+          <i class="fa fa-hdd-o"></i> {{diskName}}
         </router-link>
       </span>
     </li>
     <li>
       <span>
-        <a>{{snap}}</a>
+        <a class="icon is-small"><i class="fa fa-calendar"></i> {{snapDate}}</a>
       </span>
     </li>
   </ul>
 </template>
 
 <script>
+  var moment = require('moment')
+  moment.locale('pt')
+
   export default {
     name: 'breadcrumb',
     data () {
       return {
+      }
+    },
+    computed: {
+      computerName () {
+        return this.computer.split('.').reverse()[1]
+      },
+      diskName () {
+        const comps = this.disk.split('.')
+        comps[0] = comps[0] === '_' ? '' : `${comps[0]}:`
+        comps[2] = comps[2] === '_' ? '' : `(${comps[2]})`
+        return `${comps[0]} ${comps[2]} `
+      },
+      snapDate () {
+        return moment.utc(this.snap.substring(5), 'YYYY.MM.DD-HH.mm.ss').local().format('DD-MM-YYYY HH:mm')
       }
     },
     props: ['computer', 'disk', 'snap'],
@@ -56,12 +73,12 @@
   $arrowborderradius: 4px;
 
   ul.breadcrumb {
-    list-style: none; 
+    list-style: none;
     margin-left: $arrowidth;
     display: flex;
     flex-wrap:wrap;
     font-size: 8pt;
-    li { 
+    li {
       border-left: 1px solid transparent;
       display: block;
       margin-top:1px;
@@ -70,7 +87,7 @@
       span {
         padding-left: $arrowidth;
         padding-right: $arrowidth;
-        position: relative; 
+        position: relative;
         >*{
           padding-bottom: .1em;
           padding-top: .1em;
@@ -79,12 +96,15 @@
           text-overflow: ellipsis;
           color: inherit;
           display: inline-block;
-          background-color: $arrowcolor;             
+          background-color: $arrowcolor;
         }
-        &:after,&:before { 
-          content: ""; 
-          display: block; 
-          width: 0; 
+        a{
+          text-decoration: none;
+        }
+        &:after,&:before {
+          content: "";
+          display: block;
+          width: 0;
           height: 0;
           border-top: $arrowstrech*$arrowidth solid transparent;
           /* Go big on the size, and let overflow hide */
@@ -92,31 +112,31 @@
           border-left: $arrowidth solid $arrowcolor;
           position: absolute;
           top: 50%;
-          margin-top: -$arrowstrech*$arrowidth; 
+          margin-top: -$arrowstrech*$arrowidth;
           z-index: 2;
         }
         &:after{
-          right: 0;        
+          right: 0;
         }
         &:before {
           left: 0;
           border-color: $arrowcolor;
           border-left-color: transparent;
-          z-index: 1; 
+          z-index: 1;
         }
         &:hover{
           &:before{
-            border-color: $arrowcolorhover;  
+            border-color: $arrowcolorhover;
             border-left-color: transparent;
           }
           &:after{
             border-left-color: $arrowcolorhover;
           }
           a{
-            background-color: $arrowcolorhover;  
+            background-color: $arrowcolorhover;
           }
-        } 
-      } 
+        }
+      }
     }
     li:last-child{
       border-top-right-radius: $arrowborderradius;

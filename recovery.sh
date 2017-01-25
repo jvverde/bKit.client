@@ -9,7 +9,7 @@ die() {
 	exit 1
 }
 ask() {
-	[[ -n $SILENT ]] && return
+	[[ $YES ]] && return
 	exists zenity && {
 		zenity --question --title "Pedido de Recuperaçao de Dados" --text "$*"
 		return
@@ -36,8 +36,8 @@ do
 		-f|--force)
 			FORCE=true
 		;;
-		-s|--silent)
-			SILENT=true
+		-y|--yes)
+			YES=true
 		;;
 		*)
 			die Unknow option $KEY
@@ -81,10 +81,12 @@ exists cygpath && DST=$(cygpath "$DST")
 THIS=$DOMAIN.$NAME.$UUID
 
 [[ $THIS != $COMPUTER ]] && [[ -z $FORCE ]] && die This is not the same computer;
-
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 . $CONF                                                                     #get configuration parameters
+
+#Change backupurl for cases where we want to force a backup/migrate for from different computer
+BACKUPURL="${BACKUPURL%/*}/$COMPUTER"
 
 SRC=$(echo $BACKUPURL/$DISK/.snapshots/$BACKUP/data/./$DIR/$ENTRY|sed s#/././#/./#)       #for cases where DIR=.
 
@@ -96,7 +98,7 @@ export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 rsync -rlitzvvhRP $PERM $OPTIONS $FMT "$SRC" "$DST/" || die "Problemas ao recuperar a pasta '$FOLDER'"
 
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
-[[ $OSTYPE == 'cygwin' && $DISK =~  NTFS && -n ${BASE+x}]] && {
+[[ $OSTYPE == 'cygwin' && $DISK =~  NTFS && -n ${BASE+x} ]] && {
 	SRCMETA="$BACKUPURL/$DISK/.snapshots/$BACKUP/metadata/./.tar/"
 	METADATADIR=$(cygpath "$SDIR/cache/metadata/by-volume/${VOLUME}/")
 	[[ -d $METADATADIR ]] || mkdir -pv $METADATADIR

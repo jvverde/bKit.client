@@ -9,6 +9,7 @@ die() {
 	exit 1
 }
 ask() {
+	[[ -n $SILENT ]] && return
 	exists zenity && {
 		zenity --question --title "Pedido de Recuperaçao de Dados" --text "$*"
 		return
@@ -24,10 +25,31 @@ function get_json(){
 	grep -Po '(?<="'$1'":")(?:|.*?[^\\])(?=")'
 }
 
+while [[ $1 =~ ^- ]]
+do
+	KEY="$1" && shift
+	case "$KEY" in
+		-l|-log|--log)
+			exec 1>"$1"
+			shift
+		;;
+		-f|--force)
+			FORCE=true
+		;;
+		-s|--silent)
+			SILENT=true
+		;;
+		*)
+			die Unknow option $KEY
+		;;
+	esac
+done
+
 [[ -e $1 ]] || die "Usage:\n\t${0//\\/\\\\} resource"
 
 DST=$2
 
+#DST must be null or must exists
 [[ -z $DST || -e $DST ]] || die "$DST doesn't exists"
 
 exists cygpath && RESOURCE=$(cygpath "$1") && SDIR=$(cygpath "$SDIR") || RESOURCE=$1

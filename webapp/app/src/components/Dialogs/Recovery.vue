@@ -8,10 +8,15 @@
           <a href="" @click.prevent="selectLocation">{{location}}</a>
         </span>
       </h3>
+      <div v-if="myid !== computerId">
+        <div class="alert">Please notice: You are in a different computer</div>
+        <div v-if="location === path">Are you really sure that you want to import and overwrite you local data?</div>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button-group>
           <el-button @click="isVisible = false">Cancel</el-button>
-          <el-button type="success" @click="recovery">Continue</el-button>
+          <el-button v-if="myid !== computerId" type="warning" @click="recovery">Import</el-button>
+          <el-button v-else type="primary" @click="recovery">Continue</el-button>
         </el-button-group>
       </span>
     </el-dialog>
@@ -35,7 +40,15 @@ export default {
       stdout: '',
       stderr: '',
       location: undefined,
-      computerName: ''
+      myself: this.$store.getters.computer || {}
+    }
+  },
+  computed: {
+    myid () {
+      return this.myself.id
+    },
+    computerId () {
+      return this.resource.computer
     }
   },
   props: ['resource'],
@@ -51,17 +64,6 @@ export default {
           duration: 0
         })
       }
-    })
-    const fd = spawn('bash.bat', ['./getComputerName.sh', volID], {cwd: '..'})
-    fd.stdout.on('data', (data) => {
-      this.computerName = `${data}`
-    })
-    fd.stderr.on('data', (msg) => {
-      this.$notify.error({
-        title: 'Error',
-        message: `${msg}`,
-        customClass: 'message error'
-      })
     })
   },
   watch: {
@@ -91,7 +93,7 @@ export default {
           this.$notify.info({
             title: 'Volume not found on this computer',
             message: 'You can still recovery it but you must choose an alternate location',
-            duration: 1000,
+            duration: 2000,
             onClose: () => {
               const folder = this.selectDestination()
               if (folder) {
@@ -117,10 +119,10 @@ export default {
       // this.isVisible = true
       console.log('Location:', this.location)
     },
-    recovery () {
+    recovery (force) {
       this.isVisible = false
       const dst = this.location === this.path ? '' : this.location || ''
-      const fd = spawn('bash.bat', ['./recovery.sh', this.resource.downloadLocation, dst], {cwd: '..'})
+      const fd = spawn('bash.bat', ['./recovery.sh', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
       const now = (new Date()).toString()
       this.stdout += `\n-------- Start recovery ${this.path} at ${now} --------\n`
       this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`
@@ -181,6 +183,9 @@ export default {
   }
   .message.error {
     background-color: #F9CCCA; /* https://en.wikipedia.org/wiki/Shades_of_pink */
+  }
+  .alert {
+    color: #DE3163;
   }
 </style>
 

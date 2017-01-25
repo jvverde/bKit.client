@@ -1,5 +1,6 @@
 #!/bin/bash
+SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
-. computer.sh
+. "$SDIR/computer.sh"
 
-echo "$NAME.$DOMAIN.$UUID"
+echo "$DOMAIN.$NAME.$UUID"

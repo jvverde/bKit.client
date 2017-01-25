@@ -53,6 +53,7 @@
 <script>
   import store from 'src/vuex/store'
   const {ipcRenderer} = require('electron')
+  const {spawn} = require('child_process')
 
   export default {
     store,
@@ -68,6 +69,18 @@
           store.dispatch('setServerPort', port)
         }
       }
+      const fd = spawn('bash.bat', ['./getComputerName.sh'], {cwd: '..'})
+      fd.stdout.on('data', (data) => {
+        const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
+        store.dispatch('setComputerName', name)
+      })
+      fd.stderr.on('data', (msg) => {
+        this.$notify.error({
+          title: 'Error',
+          message: `${msg}`,
+          customClass: 'message error'
+        })
+      })
     },
     methods: {
       debug () {

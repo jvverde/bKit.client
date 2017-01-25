@@ -3,7 +3,7 @@
     <bkitlogo></bkitlogo>
     <div class="computers" :class="{onlyone:onlyone}">
       <div class="computer" v-for="(computer,index) in computers"
-        :class="{selected:computer.selected}"
+        :class="{selected:computer.selected, myself:computer.myself}"
         @click.stop="select(index)">
         <div class="name">{{computer.name}}</div>
         <div class="uuid">uuid:{{computer.uuid}}</div>
@@ -28,14 +28,15 @@
     },
     props: ['name'],
     created () {
-      let url = this.$store.getters.url
+      const url = this.$store.getters.url
+      const myself = this.$store.getters.computer
       this.$http.jsonp(url + 'computers/').then(
         function (response) {
           this.computers = Object.keys(response.data).map(function (key) {
-            let id = response.data[key]
-            let uuid = ((id || '').split('.') || []).pop()
-            let name = (key.split('.') || []).shift()
-            return {name: name, id: id, uuid: uuid}
+            const id = response.data[key]
+            const uuid = ((id || '').split('.') || []).pop()
+            const name = (key.split('.') || []).shift()
+            return {name: name, id: id, uuid: uuid, myself: id === myself.id}
           }).sort(function (a, b) {
             return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
           })
@@ -47,7 +48,7 @@
     },
     methods: {
       select (index) {
-        let computer = this.computers[index]
+        const computer = this.computers[index]
         if (computer.selected) {
           this.onlyone = computer.selected = false
         } else {
@@ -146,6 +147,9 @@
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
         text-align: center;
+      }
+      &.myself .name{
+        color:#006400; /* dark geeen x11 */
       }
       .uuid{
         position: absolute;

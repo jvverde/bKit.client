@@ -29,7 +29,7 @@ export default {
   name: 'console',
   data () {
     return {
-      resource: null,
+      resource: {},
       logs: [],
       downloads: []
     }

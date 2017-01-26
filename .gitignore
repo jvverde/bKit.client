@@ -6,3 +6,4 @@ run/*
 conf/*
 schtasks/*
 old
+bkit-*

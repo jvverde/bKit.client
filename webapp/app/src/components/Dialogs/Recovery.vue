@@ -32,6 +32,10 @@
 <script>
 const path = require('path')
 const {spawn, exec} = require('child_process')
+const os = require('os')
+const platform = os.platform()
+const BASH = platform === 'win32' ? 'bash.bat' : 'bash'
+
 export default {
   data () {
     return {
@@ -55,7 +59,7 @@ export default {
   components: {
   },
   created () {
-    exec('NET SESSION', (err) => {
+    platform === 'win32' && exec('NET SESSION', (err) => {
       if (err) {
         this.$notify.warning({
           title: 'Missing privilegies',
@@ -70,7 +74,7 @@ export default {
     resource: function (resource) {
       resource = resource || {}
       let [letter, volID] = (resource.drive || '').split(/\./)
-      const fd = spawn('bash.bat', ['./findDrive.sh', volID], {cwd: '..'})
+      const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
 
       fd.stdout.on('data', (data) => {
         let drive = `${data}`.replace(/\r?\n.*$/, '')
@@ -119,10 +123,10 @@ export default {
       // this.isVisible = true
       console.log('Location:', this.location)
     },
-    recovery (force) {
+    recovery () {
       this.isVisible = false
       const dst = this.location === this.path ? '' : this.location || ''
-      const fd = spawn('bash.bat', ['./recovery.sh', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
+      const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
       const now = (new Date()).toString()
       this.stdout += `\n-------- Start recovery ${this.path} at ${now} --------\n`
       this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`

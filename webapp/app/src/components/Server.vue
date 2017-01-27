@@ -23,7 +23,6 @@
 export default {
   name: 'server',
   created () {
-
   },
   data () {
     return {
@@ -65,9 +64,9 @@ export default {
     color: rgb(50, 174, 110);
     text-decoration: none;
   }
-  
-  a:hover { 
-    color: rgb(40, 56, 76); 
+
+  a:hover {
+    color: rgb(40, 56, 76);
   }
 
   .server{

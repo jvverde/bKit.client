@@ -7,3 +7,7 @@ export const setServerAddress = ({ commit }, addr) => {
 export const setServerPort = ({ commit }, port) => {
   commit(types.SETPORT, port)
 }
+
+export const setComputerName = ({ commit }, name) => {
+  commit(types.SETCOMPUTERNAME, name)
+}

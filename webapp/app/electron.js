@@ -8,6 +8,8 @@ const Tray = electron.Tray
 const Menu = electron.Menu
 const ipcMain = electron.ipcMain
 const shell = electron.shell
+const clipboard = electron.clipboard
+const fs = require('fs')
 
 let mainWindow
 let config = {}
@@ -21,10 +23,12 @@ if (process.env.NODE_ENV === 'development') {
   config.url = `file://${__dirname}/dist/index.html`
 }
 
+
+const userdata = app.getPath('userData') + '/bKit'
+fs.existsSync(userdata) || fs.mkdirSync(userdata)
+console.log('userdata:', userdata)
+
 function createWindow () {
-  /**
-   * Initial window options
-   */
   mainWindow = new BrowserWindow({
     height: 800,
     width: 1200
@@ -46,7 +50,7 @@ function createWindow () {
     mainWindow = null
   })
 
-  console.log('The mainWindow is open')
+  console.log('The mainWindow is now open')
 
   let tmp = process.env.tmp || process.env.tmp || '/tmp'
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
@@ -146,7 +150,8 @@ function exitApp() {
 app.on('ready', () => {
   createWindow()
   console.log('on ready')
-  tray = new Tray('icons/logo/512x512.png')
+  const image = clipboard.readImage()
+  tray = new Tray(image)
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Recovery', type: 'normal', click: openRecovery },
     { label: 'Backup', type: 'normal' },
@@ -154,7 +159,7 @@ app.on('ready', () => {
   ])
   tray.setToolTip('Back me up')
   tray.setContextMenu(contextMenu)
-  console.log('ready')
+  console.log('I am ready')
 });
 
 // console.log('Path:',app.getAppPath());

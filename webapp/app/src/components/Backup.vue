@@ -2,7 +2,7 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      <breadcrumb :computer="computer" :disk="disk" :snap="selectedSnap">
+      <breadcrumb :computer="computer" :disk="disk" :snap="selectedSnap || ''">
       </breadcrumb>
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps"

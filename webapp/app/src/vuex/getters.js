@@ -10,3 +10,5 @@ export const url = state => {
     return '/'
   }
 }
+export const computer = state => state.computer
+export const server = state => state.server

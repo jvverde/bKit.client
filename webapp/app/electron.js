@@ -24,14 +24,35 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 
-const userdata = app.getPath('userData') + '/bKit'
+const userdata = path.join(app.getPath('userData'), 'bKit')
+
 fs.existsSync(userdata) || fs.mkdirSync(userdata)
-console.log('userdata:', userdata)
+
+const settingsFile = path.resolve(userdata,'settings.json')
+global.settings = {
+  window: {
+    width: 1200,
+    height: 800
+  },
+  server: {
+    address: '10.11.0.135',
+    port:8088
+  }
+}
+
+if (fs.existsSync(settingsFile)) {
+  try {
+    const file = fs.readFileSync(settingsFile)
+    Object.assign(global.settings, JSON.parse(file))
+  } catch (e) {
+    console.error('Error:', e)
+  }
+}
 
 function createWindow () {
   mainWindow = new BrowserWindow({
-    height: 800,
-    width: 1200
+    height: global.settings.window.height,
+    width: global.settings.window.width
   })
 
   mainWindow.loadURL(config.url)
@@ -90,6 +111,11 @@ function createWindow () {
     console.log("Handing off to O/S: " + url)
     shell.openExternal(url)
   })
+  mainWindow.on('resize', (e) => {
+    const [w, h] = mainWindow.getSize()
+    global.settings.window.height = h
+    global.settings.window.width = w
+  })
 }
 let consoles = []
 ipcMain.on('register', (event, arg) => {
@@ -101,10 +127,6 @@ ipcMain.on('debug', (event, arg) => {
   mainWindow.webContents.openDevTools()
 })
 
-global.server = {
-  address: '10.11.0.135',
-  port:8088
-}
 //app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
@@ -116,6 +138,15 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
+  }
+})
+
+app.on('before-quit', () => {
+  try {
+    const json = JSON.stringify(global.settings)
+    fs.writeFileSync(settingsFile, json, 'utf8')
+  } catch (e) {
+    console.error(e)
   }
 })
 

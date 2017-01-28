@@ -54,22 +54,12 @@
   import store from 'src/vuex/store'
   const {ipcRenderer} = require('electron')
   const {spawn} = require('child_process')
+  const BASH = require('os').platform() === 'win32' ? 'bash.bat' : 'bash'
 
   export default {
     store,
     created: function () {
-      if ('$electron' in this) {
-        let addr = this.$electron.remote.getGlobal('server').address
-        let port = this.$electron.remote.getGlobal('server').port
-        if (typeof addr === 'string' && addr.length > 0) {
-          store.dispatch('setServerAddress', addr)
-        }
-        typeof port === 'string' && (port = 0 | port)
-        if (typeof port === 'number' && port > 0) {
-          store.dispatch('setServerPort', port)
-        }
-      }
-      const fd = spawn('bash.bat', ['./getComputerName.sh'], {cwd: '..'})
+      const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: '..'})
       fd.stdout.on('data', (data) => {
         const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
         store.dispatch('setComputerName', name)

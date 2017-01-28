@@ -5,17 +5,17 @@
     <table>
       <tr>
         <td>Address:</td>
-        <td><input v-model="address"></td>
-        <td rowspan="2" class="go">
-          <a :href="url">Go</a>
-        </td>
+        <td><input v-model="address" placeholder="Server IP or Name address"></td>
       </tr>
       <tr>
         <td>Port:</td>
-        <td><input v-model="port"></td>
+        <td><input v-model="port" type="numeric" min="80" max="65535" placeholder="Port number"></td>
       </tr>
     </table>
-    <router-link :to="{ name: 'Computers-page'}">User</router-link>
+    <router-link :to="{name: 'Computers-page'}" v-if="isValid">
+      <el-button type="success" @click="store">Go</el-button>
+    </router-link>
+    <el-button v-else type="primary" @click="">Save</el-button>
   </div>
 </template>
 
@@ -23,22 +23,43 @@
 export default {
   name: 'server',
   created () {
-  },
-  data () {
-    return {
-      address: this.$electron.remote.getGlobal('server').address,
-      port: this.$electron.remote.getGlobal('server').port
+    try {
+      this.$store.dispatch('setServerAddress', this.$electron.remote.getGlobal('settings').server.address)
+      this.$store.dispatch('setServerPort', this.$electron.remote.getGlobal('settings').server.port)
+    } catch (e) {
+      console.error(e)
     }
   },
   computed: {
-    url: function () {
-      return 'http://' + this.address + ':' + this.port
+    address: {
+      get () {
+        return this.$store.state.server.address
+      },
+      set (value) {
+        this.$store.dispatch('setServerAddress', value)
+      }
+    },
+    port: {
+      get () {
+        return this.$store.state.server.port
+      },
+      set (value) {
+        this.$store.dispatch('setServerPort', value)
+      }
+    },
+    isValid () {
+      console.log('IsValid')
+      return this.$store.state.server.address !== '' && this.$store.state.server.port > 0 && this.$store.state.server.port < 65536
     }
   },
   methods: {
-    go (event) {
-      console.log(event.target.tagName)
-      console.log('Hello ' + this.address)
+    store () {
+      try {
+        this.$electron.remote.getGlobal('settings').server.address = this.address
+        this.$electron.remote.getGlobal('settings').server.port = this.port
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 }
@@ -73,9 +94,5 @@ export default {
     display:flex;
     flex-direction: column;
     align-items: center;
-  }
-  .go{
-    padding-left:.5em;
-    font-size:150%;
   }
 </style>

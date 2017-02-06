@@ -1,23 +1,27 @@
 <template>
-  <ul class="console">
-    <li v-for="(download,index) in downloads">
-      <div>{{download.filename}}</div>
-      <div>
-        <span class="icon is-small" @click.prevent="openFile(index)">
-          <i class="fa fa-eye"></i>
-        </span>
-         <span class="icon is-small" @click.prevent="showFolder(index)">
-          <i class="fa fa-folder-o"></i>
-        </span>
-        <span class="icon is-small" @click.prevent="run(index)">
-          <i class="fa fa-cogs"></i>
-        </span>
-      </div>
-    </li>
-    <li>
+  <el-tabs type="card" class="console">
+    <el-tab-pane label="Downloads">
+      <ul>
+        <li v-for="(download,index) in downloads">
+          <div>{{download.filename}}</div>
+          <div>
+            <span class="icon is-small" @click.prevent="openFile(index)">
+              <i class="fa fa-eye"></i>
+            </span>
+             <span class="icon is-small" @click.prevent="showFolder(index)">
+              <i class="fa fa-folder-o"></i>
+            </span>
+            <span class="icon is-small" @click.prevent="run(index)">
+              <i class="fa fa-cogs"></i>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </el-tab-pane>
+    <el-tab-pane label="Console">
       <recovery :resource="resource"></recovery>
-    </li>
-  </ul>
+    </el-tab-pane>
+  </el-tabs>
 </template>
 
 <script>

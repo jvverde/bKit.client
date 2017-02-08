@@ -1,9 +1,9 @@
 <template>
   <el-tabs type="card" class="console">
-    <el-tab-pane label="Downloads" v-if="downloads[0]" class="panel">
+    <el-tab-pane label="Downloads" class="panel">
       <downloads></downloads>
     </el-tab-pane>
-    <el-tab-pane label="Recovery" v-if="resource.downloadLocation" class="panel">
+    <el-tab-pane label="Recovery" class="panel">
       <recovery :resource="resource"></recovery>
     </el-tab-pane>
   </el-tabs>

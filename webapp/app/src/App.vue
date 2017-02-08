@@ -59,24 +59,40 @@
   export default {
     store,
     created: function () {
-      const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: '..'})
-      fd.stdout.on('data', (data) => {
-        const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
-        store.dispatch('setComputerName', name)
-      })
-      fd.stderr.on('data', (msg) => {
-        this.$notify.error({
-          title: 'Error',
-          message: `${msg}`,
-          customClass: 'message error'
+      ipcRenderer.send('clear', '')
+      try {
+        this.$store.dispatch('setServerAddress', this.$electron.remote.getGlobal('settings').server.address)
+        this.$store.dispatch('setServerPort', this.$electron.remote.getGlobal('settings').server.port)
+      } catch (e) {
+        console.error(e)
+      }
+      try {
+        const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: '..'})
+        fd.stdout.on('data', (data) => {
+          const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
+          store.dispatch('setComputerName', name)
         })
-      })
+        fd.stderr.on('data', (msg) => {
+          this.$notify.error({
+            title: 'Error',
+            message: `${msg}`,
+            customClass: 'message error'
+          })
+        })
+      } catch (e) {
+        console.error(e)
+      }
     },
     methods: {
       debug () {
         console.log('open debug window')
         ipcRenderer.send('debug', 'on')
       }
+    },
+    destroy () {
+      // console.log('Destroy App')
+      // ipcRenderer.send('clear', '')
+      // ipcRenderer.removeAllListeners()
     }
   }
 </script>

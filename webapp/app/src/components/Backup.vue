@@ -61,7 +61,7 @@
         'backup' +
         '/' + this.computer +
         '/' + this.disk
-      this.$http.jsonp(url).then(
+      this.$http.get(url).then(
         function (response) {
           this.snaps = (response.data || []).map(function (snap) {
             return {

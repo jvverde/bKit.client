@@ -79,6 +79,7 @@ function createWindow () {
   let tmp = process.env.tmp || process.env.tmp || '/tmp'
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     // Set the save path, making Electron not to prompt a save dialog.
+    console.log('on download')
     let tmp = app.getPath('downloads') || process.env.tmp || process.env.tmp || '/tmp'
     item.setSavePath(`${tmp}/${item.getFilename()}`)
     item.on('updated', (event, state) => {
@@ -94,10 +95,10 @@ function createWindow () {
     })
     item.once('done', (event, state) => {
       if (state === 'completed') {
-        console.log(`Download successfully: ${item.getFilename()} in ${item.getSavePath()}`)
+        console.log(`Download successfully: ${item.getFilename()} in path ${item.getSavePath()}`)
         console.log(`${item.getMimeType()}`)
-        consoles.forEach( (console) => {
-          console.receiver.send(console.channel, {
+        downloadListeners.forEach( (listener) => {
+          listener.receiver.send(listener.channel, {
             type: 'download',
             fullpath: `${item.getSavePath()}`,
             filename: `${item.getFilename()}`,
@@ -121,13 +122,21 @@ function createWindow () {
     global.settings.window.height = h
     global.settings.window.width = w
   })
+  mainWindow.onbeforeunload = (e) => {
+    console.log('before unload')
+    downloadListeners = []
+    e.returnValue = false
+  }
 }
-let consoles = []
+let downloadListeners = []
 ipcMain.on('register', (event, arg) => {
-  consoles.push({receiver:event.sender, channel: arg})
+  downloadListeners.find(x => x.channel === arg) || downloadListeners.push({receiver:event.sender, channel: arg})
   event.sender.send(arg, 'done register done for channel:' + arg)
 })
-
+ipcMain.on('clear', () => {
+  console.log('clear')
+  downloadListeners = []
+})
 ipcMain.on('debug', (event, arg) => {
   mainWindow.webContents.openDevTools()
 })

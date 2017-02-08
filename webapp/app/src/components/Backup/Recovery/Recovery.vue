@@ -1,11 +1,8 @@
 <template>
-  <a @click.stop=""
+  <a
     :href="url" title="Recuperar">
-    <span class="icon is-small" v-if="electron">
-      <i class="fa fa-history"></i>  
-    </span>    
-    <span class="icon is-small" v-else>
-      <i class="fa fa-history"></i>  
+    <span class="icon is-small">
+      <i class="fa fa-history"></i>
     </span>
   </a>
 </template>

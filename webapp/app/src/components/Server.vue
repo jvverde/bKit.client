@@ -22,14 +22,6 @@
 <script>
 export default {
   name: 'server',
-  mounted () {
-    try {
-      this.$store.dispatch('setServerAddress', this.$electron.remote.getGlobal('settings').server.address)
-      this.$store.dispatch('setServerPort', this.$electron.remote.getGlobal('settings').server.port)
-    } catch (e) {
-      console.error(e)
-    }
-  },
   computed: {
     address: {
       get () {

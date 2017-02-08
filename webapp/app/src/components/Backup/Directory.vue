@@ -10,18 +10,16 @@
               <i class="fa fa-plus-square-o" v-else></i>
             </span>
 		        <span class="icon is-small">
-              <i class="fa fa-folder-open-o" v-if="folder.open"></i>  
-              <i class="fa fa-folder-o" v-else></i>  
+              <i class="fa fa-folder-open-o" v-if="folder.open"></i>
+              <i class="fa fa-folder-o" v-else></i>
 		        </span>
 		        <span class="text">{{folder.name}}</span>
 	        </div>
-<!-- 	        <a @click.stop=""
-	          :href="getUrl('bkit',folder.name)" title="Recuperar">
+          <a :href="getUrl('bkit',folder.name)" title="Recovery" @click.stop="">
             <span class="icon is-small">
-              <i class="fa fa-history"></i>  
+              <i class="fa fa-history"></i>
             </span>
-	        </a> -->
-          <recovery :url="getUrl('bkit',folder.name)"></recovery>
+          </a>
         </div>
         <directory v-if="folder.open" :location="folder.childrensLocation">
         </directory>
@@ -47,37 +45,35 @@
 		        <a :download="file" @click.stop=""
 		          :href="getUrl('download',file.name)" title="Download">
               <span class="icon is-small">
-                <i class="fa fa-download"></i>  
-              </span>
-		        </a>        
-		        <a target="_blank" @click.stop=""
-		          :href="getUrl('view',file.name)" title="Ver">
-              <span class="icon is-small">
-                <i class="fa fa-eye"></i>  
+                <i class="fa fa-download"></i>
               </span>
 		        </a>
-<!-- 		        <a @click.stop=""
-		          :href="getUrl('bkit',file)" title="Recuperar">
+		        <a target="_blank" @click.stop=""
+		          :href="getUrl('view',file.name)" title="View">
               <span class="icon is-small">
-                <i class="fa fa-history"></i>  
+                <i class="fa fa-eye"></i>
               </span>
-		        </a> -->
-            <recovery :url="getUrl('bkit',file.name)"></recovery>
+		        </a>
+            <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop="">
+              <span class="icon is-small">
+                <i class="fa fa-history"></i>
+              </span>
+            </a>
 	        </div>
         </div>
-      </li>      
+      </li>
     </ul>
-  </div>  
+  </div>
 </template>
 
 <style scoped lang="scss">
   $line-height: 2em;
   $li-ident: 1.3em;
   .tree{
-    text-align: left;    
+    text-align: left;
     width:100%;
     height: 100%;
-    
+
     ul,li{
       padding: 0;
       margin: 0;
@@ -102,18 +98,18 @@
       }
     }
     ul.directories + ul.files::before {
-      top:-1 * ($line-height / 2);  
+      top:-1 * ($line-height / 2);
     }
     li {
       padding-left: $li-ident;            /* indentation = .5em */
-      line-height:$line-height;  
+      line-height:$line-height;
       cursor: pointer;
       &::before {
         width: .5 * $li-ident;          /* 50% of indentation */
         height:0;
         border-top-width:1px;
         margin-top:-1px;                  /* border top width */
-        top:$line-height / 2;              
+        top:$line-height / 2;
         left:$li-ident / 4;
       }
       div.line {
@@ -135,11 +131,11 @@
           &:not(:first-child):not(a){
             padding-left: 4px;
           }
-        } 
+        }
         .text{
           text-overflow: ellipsis;
           white-space: nowrap;
-          overflow: hidden; 
+          overflow: hidden;
         }
         a{
           padding-left:5px;
@@ -167,7 +163,6 @@
 </style>
 
 <script>
-  import Recovery from './Recovery/Recovery'
   import Formateddate from './Recovery/Formateddate'
   import Formatedsize from './Recovery/Formatedsize'
 
@@ -182,7 +177,7 @@
   function order (a, b) {
     return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
   }
-  
+
   /* import { mapGetters } from 'vuex' */
 
   export default {
@@ -203,7 +198,6 @@
       }
     },
     components: {
-      Recovery,
       Formateddate,
       Formatedsize
     },

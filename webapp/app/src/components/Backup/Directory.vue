@@ -26,40 +26,38 @@
       </li>
     </ul>
     <ul class="files">
-      <li v-for="file in files">
-        <div class="line">
-	        <div class="props">
-            <span class="icon is-small">
-              <i class="fa fa-file-o"></i>
+      <li v-for="file in files" class="line">
+        <div class="props">
+          <span class="icon is-small">
+            <i class="fa fa-file-o"></i>
+          </span>
+	        <a :download="file" class="file" @click.stop=""
+	          :href="getUrl('download',file.name)">
+            <span class="text name">{{file.name}}</span>
+            <span>
+              <formatedsize :value="file.size"></formatedsize>
+              <formateddate :value="file.datetime"></formateddate>
             </span>
-		        <a :download="file" class="file" @click.stop=""
-		          :href="getUrl('download',file.name)">
-              <span class="text name">{{file.name}}</span>
-              <span>
-                <formatedsize :value="file.size"></formatedsize>
-                <formateddate :value="file.datetime"></formateddate>
-              </span>
-		        </a>
-	        </div>
-	        <div>
-		        <a :download="file" @click.stop=""
-		          :href="getUrl('download',file.name)" title="Download">
-              <span class="icon is-small">
-                <i class="fa fa-download"></i>
-              </span>
-		        </a>
-		        <a target="_blank" @click.stop=""
-		          :href="getUrl('view',file.name)" title="View">
-              <span class="icon is-small">
-                <i class="fa fa-eye"></i>
-              </span>
-		        </a>
-            <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop="">
-              <span class="icon is-small">
-                <i class="fa fa-history"></i>
-              </span>
-            </a>
-	        </div>
+	        </a>
+        </div>
+        <div class="links">
+	        <a :download="file" @click.stop=""
+	          :href="getUrl('download',file.name)" title="Download">
+            <span class="icon is-small">
+              <i class="fa fa-download"></i>
+            </span>
+	        </a>
+	        <a target="_blank" @click.stop=""
+	          :href="getUrl('view',file.name)" title="View">
+            <span class="icon is-small">
+              <i class="fa fa-eye"></i>
+            </span>
+	        </a>
+          <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop="">
+            <span class="icon is-small">
+              <i class="fa fa-history"></i>
+            </span>
+          </a>
         </div>
       </li>
     </ul>
@@ -112,7 +110,7 @@
         top:$line-height / 2;
         left:$li-ident / 4;
       }
-      div.line {
+      .line {
         width:100%;
         box-sizing: border-box;
         display:flex;
@@ -128,6 +126,9 @@
           display:flex;
           flex-wrap:nowrap;
           align-items: center;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
           &:not(:first-child):not(a){
             padding-left: 4px;
           }
@@ -151,10 +152,8 @@
           display: flex;
           justify-content:space-between;
           flex-grow:2;
-          a{
+          .name{
             flex-grow:2;
-            display: flex;
-            justify-content:space-between;
           }
         }
       }

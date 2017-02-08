@@ -1,7 +1,7 @@
 export default [
   {
     path: '/',
-    name: 'server',
+    name: 'home',
     component: require('components/Server')
   },
   {

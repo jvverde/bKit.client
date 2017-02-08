@@ -52,7 +52,10 @@ if (fs.existsSync(settingsFile)) {
 function createWindow () {
   mainWindow = new BrowserWindow({
     height: global.settings.window.height,
-    width: global.settings.window.width
+    width: global.settings.window.width,
+    webPreferences: {
+      webSecurity: false
+    }
   })
 
   mainWindow.loadURL(config.url)
@@ -93,12 +96,14 @@ function createWindow () {
       if (state === 'completed') {
         console.log(`Download successfully: ${item.getFilename()} in ${item.getSavePath()}`)
         console.log(`${item.getMimeType()}`)
-        consoles[0].receiver.send(consoles[0].channel, {
-          type: 'download',
-          fullpath: `${item.getSavePath()}`,
-          filename: `${item.getFilename()}`,
-          mimetype: `${item.getMimeType()}`,
-          disposition: `${item.getContentDisposition()}`
+        consoles.forEach( (console) => {
+          console.receiver.send(console.channel, {
+            type: 'download',
+            fullpath: `${item.getSavePath()}`,
+            filename: `${item.getFilename()}`,
+            mimetype: `${item.getMimeType()}`,
+            disposition: `${item.getContentDisposition()}`
+          })
         })
       } else {
         console.log(`Download failed: ${state}`)
@@ -120,7 +125,7 @@ function createWindow () {
 let consoles = []
 ipcMain.on('register', (event, arg) => {
   consoles.push({receiver:event.sender, channel: arg})
-  event.sender.send(arg, 'done register done for channel' + arg)
+  event.sender.send(arg, 'done register done for channel:' + arg)
 })
 
 ipcMain.on('debug', (event, arg) => {

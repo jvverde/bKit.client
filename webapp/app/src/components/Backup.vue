@@ -110,6 +110,12 @@
     }
     footer.bottom{
       flex-shrink: 0;
+      padding-top:1px;
+      margin-top: 1px;
+      border-top: 1px solid #600;
+      width: 100%;
+      overflow-y: auto;
+      max-height: 30%;
     }
   }
 

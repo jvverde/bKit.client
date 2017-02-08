@@ -30,7 +30,7 @@
     created () {
       const url = this.$store.getters.url
       const myself = this.$store.getters.computer
-      this.$http.jsonp(url + 'computers/').then(
+      this.$http.get(url + 'computers/').then(
         function (response) {
           this.computers = Object.keys(response.data).map(function (key) {
             const id = response.data[key]
@@ -40,11 +40,21 @@
           }).sort(function (a, b) {
             return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
           })
-        },
-        function (response) {
-          console.error(response)
+          try { // ok, update (last) server port and address
+            this.$electron.remote.getGlobal('settings').server.address = this.$store.getters.address
+            this.$electron.remote.getGlobal('settings').server.port = this.$store.getters.port
+          } catch (e) {
+            console.error('Setting globals address', e)
+          }
         }
-      )
+      ).catch(function erro (err) {
+        this.$notify.error({
+          title: err.statusText || 'Error',
+          message: err.body || err,
+          customClass: 'message error'
+        })
+        this.$router.push({name: 'home'})
+      })
     },
     methods: {
       select (index) {

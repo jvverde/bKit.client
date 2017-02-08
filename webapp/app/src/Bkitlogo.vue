@@ -12,7 +12,7 @@
       margin-top: -10px;
       font-size: 2em;
     }
-  }  
+  }
 </style>
 
 <template>

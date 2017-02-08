@@ -13,16 +13,16 @@
       </tr>
     </table>
     <router-link :to="{name: 'Computers-page'}" v-if="isValid">
-      <el-button type="success" @click="store">Go</el-button>
+      <el-button type="success">Go</el-button>
     </router-link>
-    <el-button v-else type="primary" @click="">Save</el-button>
+    <el-button disabled v-else>Go</el-button>
   </div>
 </template>
 
 <script>
 export default {
   name: 'server',
-  created () {
+  mounted () {
     try {
       this.$store.dispatch('setServerAddress', this.$electron.remote.getGlobal('settings').server.address)
       this.$store.dispatch('setServerPort', this.$electron.remote.getGlobal('settings').server.port)
@@ -48,19 +48,10 @@ export default {
       }
     },
     isValid () {
-      console.log('IsValid')
       return this.$store.state.server.address !== '' && this.$store.state.server.port > 0 && this.$store.state.server.port < 65536
     }
   },
   methods: {
-    store () {
-      try {
-        this.$electron.remote.getGlobal('settings').server.address = this.address
-        this.$electron.remote.getGlobal('settings').server.port = this.port
-      } catch (e) {
-        console.error(e)
-      }
-    }
   }
 }
 </script>

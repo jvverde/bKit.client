@@ -1,5 +1,5 @@
 <template>
-  <span>{{size}}</span>
+  <span class="size">{{size}}</span>
 </template>
 
 <script>
@@ -13,7 +13,7 @@
     }
     return n.toFixed(n >= 10 || l === 0 ? 0 : 1) + ' ' + units[l]
   }
-  
+
   export default {
     name: 'formatedsize',
     data () {
@@ -27,5 +27,11 @@
 </script>
 
 <style scoped>
-
+  span.size{
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: .2em;
+    padding-right: .2em;
+  }
 </style>

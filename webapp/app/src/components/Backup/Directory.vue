@@ -3,7 +3,7 @@
     <ul class="directories" v-if="folders.length > 0">
       <li v-for="(folder,index) in folders" @click.stop="toggle(index)">
         <div class="line">
-	        <div>
+	        <div class="props">
             <span class="icon is-small">
               <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
               <i class="fa fa-minus-square-o" v-if="folder.open"></i>
@@ -13,9 +13,9 @@
               <i class="fa fa-folder-open-o" v-if="folder.open"></i>
               <i class="fa fa-folder-o" v-else></i>
 		        </span>
-		        <span class="text">{{folder.name}}</span>
+		        <span class="name">{{folder.name}}</span>
 	        </div>
-          <a :href="getUrl('bkit',folder.name)" title="Recovery" @click.stop="">
+          <a :href="getUrl('bkit',folder.name)" title="Recovery" @click.stop="" class="links">
             <span class="icon is-small">
               <i class="fa fa-history"></i>
             </span>
@@ -26,18 +26,16 @@
       </li>
     </ul>
     <ul class="files">
-      <li v-for="file in files" class="line">
+      <li v-for="file in files">
         <div class="props">
           <span class="icon is-small">
             <i class="fa fa-file-o"></i>
           </span>
 	        <a :download="file" class="file" @click.stop=""
 	          :href="getUrl('download',file.name)">
-            <span class="text name">{{file.name}}</span>
-            <span>
-              <formatedsize :value="file.size"></formatedsize>
-              <formateddate :value="file.datetime"></formateddate>
-            </span>
+            <span class="name">{{file.name}}</span>
+            <formatedsize :value="file.size"></formatedsize>
+            <formateddate :value="file.datetime"></formateddate>
 	        </a>
         </div>
         <div class="links">
@@ -86,22 +84,30 @@
         content:"";
       }
     }
-    ul{
-      &::before {
+    ul::before {
         content:"";
         top:-.3 * ($line-height / 2);
         bottom:$line-height / 2;      /*stop at half of last li */
         left: $li-ident / 4;
         border-left-width:1px;
-      }
     }
     ul.directories + ul.files::before {
       top:-1 * ($line-height / 2);
+    }
+    ul.files li, ul.directories .line{
+      display:flex;
+      &:hover{
+        background:#eeeeee;
+        background-color:rgba(128,128,128,.2);
+        border-radius:6px;
+      }
     }
     li {
       padding-left: $li-ident;            /* indentation = .5em */
       line-height:$line-height;
       cursor: pointer;
+      width:100%;
+      box-sizing: border-box;
       &::before {
         width: .5 * $li-ident;          /* 50% of indentation */
         height:0;
@@ -110,52 +116,42 @@
         top:$line-height / 2;
         left:$li-ident / 4;
       }
-      .line {
-        width:100%;
-        box-sizing: border-box;
-        display:flex;
-        flex-wrap:nowrap;
-        justify-content:space-between;
-        &:hover{
-             background:#eeeeee;
-             border-radius:7px;
-             padding-right:1px;
-             padding-left:1px;
+      a{
+        color: inherit;
+        .icon:hover{
+          color: #090;
         }
-        *{
-          display:flex;
-          flex-wrap:nowrap;
-          align-items: center;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-          &:not(:first-child):not(a){
-            padding-left: 4px;
-          }
+        &:active{
+          border:1px solid red;
         }
-        .text{
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-        }
-        a{
-          padding-left:5px;
-          color: inherit;
-          .icon:hover{
-            color: #090;
-          }
-          &:active{
-            border:1px solid red;
-          }
-        }
-        .props{
-          display: flex;
-          justify-content:space-between;
+      }
+      *{
+        flex-grow: 0;
+        overflow: hidden;
+      }
+      .props{
+        flex-grow:2;
+        display: flex;
+        .file{
           flex-grow:2;
+          display: flex;
           .name{
             flex-grow:2;
+            flex-shrink: 0;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right:3px;
+            padding-left:3px;
           }
         }
+        .icon{
+          padding-right:1px;
+          padding-left:1px;
+        }
+      }
+      .links{
+        flex-shrink: 0;
       }
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <span>{{datetime}}</span>
+  <span class="datetime">{{datetime}}</span>
 </template>
 
 <script>
@@ -20,5 +20,11 @@
 </script>
 
 <style scoped>
-
+  span.datetime{
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: .2em;
+    padding-right: .2em;
+  }
 </style>

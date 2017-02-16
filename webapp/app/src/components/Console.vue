@@ -1,7 +1,6 @@
 <template>
   <div class="console">
       <downloads></downloads>
-      <!--recovery :resource="resource"></recovery-->
   </div>
 </template>
 

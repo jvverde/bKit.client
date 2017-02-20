@@ -2,6 +2,7 @@
   <div class="main">
     <bkitlogo></bkitlogo>
     <div class="computers" :class="{onlyone:onlyone}">
+      <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
       <div class="computer" v-for="(computer,index) in computers"
         :class="{selected:computer.selected, myself:computer.myself}"
         @click.stop="select(index)">

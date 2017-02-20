@@ -86,13 +86,25 @@
     }
     ul::before {
         content:"";
-        top:-.3 * ($line-height / 2);
-        bottom:$line-height / 2;      /*stop at half of last li */
+        top:-1 * ($line-height / 2);
+        bottom: $line-height / 2;      /*stop at half of last li */
         left: $li-ident / 4;
         border-left-width:1px;
     }
-    ul.directories + ul.files::before {
-      top:-1 * ($line-height / 2);
+    .line + .tree {                   /* first subtree border-left start on .6 * top */
+      overflow: visible;
+      ul:first-child{
+        overflow: visible;
+        &::before{
+          top:-.6 * ($line-height / 2);
+        }
+      }
+    }
+    ul.directories + ul.files {     /*first file after directores, border-left start on top*/
+      overflow: visible;
+      &::before{
+        top:-1 * ($line-height / 2);
+      }
     }
     ul.files li, ul.directories .line{
       display:flex;
@@ -125,7 +137,7 @@
           border:1px solid red;
         }
       }
-      *{
+      * {
         flex-grow: 0;
         overflow: hidden;
       }

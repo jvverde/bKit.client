@@ -91,7 +91,7 @@
         left: $li-ident / 4;
         border-left-width:1px;
     }
-    .line + .tree {                   /* first subtree border-left start on .6 * top */
+    .line + .tree {                   /*in first subtree the border-left start on .6 * top */
       overflow: visible;
       ul:first-child{
         overflow: visible;
@@ -100,11 +100,8 @@
         }
       }
     }
-    ul.directories + ul.files {     /*first file after directores, border-left start on top*/
+    ul.directories + ul.files {     /*in first file, after directores, the border-left should be visible outside*/
       overflow: visible;
-      &::before{
-        top:-1 * ($line-height / 2);
-      }
     }
     ul.files li, ul.directories .line{
       display:flex;

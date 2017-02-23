@@ -206,7 +206,6 @@
       Formatedsize
     },
     created () {
-      console.log('created dir for', this.location.path)
       this.refresh()
     },
     methods: {
@@ -223,7 +222,6 @@
       },
       refresh () {
         try {
-          console.log('refresh directory', this.location.path)
           var url = this.getUrl('folder')
           this.$http.jsonp(url).then(
             function (response) {

@@ -32,6 +32,6 @@ export default {
     text-align: left;
     margin: 2px;
     padding: 2px;
-    background-color: #EEE;
+    background-color: gainsboro;
   }
 </style>

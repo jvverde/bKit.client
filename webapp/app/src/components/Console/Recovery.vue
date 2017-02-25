@@ -133,10 +133,12 @@ export default {
       this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`
       fd.stdout.on('data', (data) => {
         this.stdout += `${data}`
+        this.stdout = this.stdout.substr(-10000)
       })
 
       fd.stderr.on('data', (data) => {
         this.stderr += `${data}`
+        this.stderr = this.stderr.substr(-10000)
       })
 
       fd.on('close', (code) => {

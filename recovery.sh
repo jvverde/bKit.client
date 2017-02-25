@@ -70,7 +70,7 @@ IFS='.' read -r DRIVE VOLUME NAME DESCRIPTION FS <<< "$DISK"
 }
 
 BACKUPDATE=$(echo $BACKUP|sed -E 's/.+([0-9]{4}).([0-9]{2}).([0-9]{2})-([0-9]{2}).([0-9]{2}).([0-9]{2})/\1-\2-\3T\4:\5:\6 GMT/g'| xargs -I{} date -d "{}" )
-FOLDER="$BASE/$DIR/$ENTRY"
+FOLDER=$(readlink -mn "$BASE/$DIR/$ENTRY")
 ask "A pasta '$FOLDER' vai ser recuperada a partir do backup efectuado em:\n\t$BACKUPDATE\n\nDeseja continuar?" || exit 1
 
 [[ -n $DST ]] || DST=$BASE
@@ -88,7 +88,7 @@ CONF="$SDIR/conf/conf.init"
 #Change backupurl for cases where we want to force a backup/migrate for from different computer
 BACKUPURL="${BACKUPURL%/*}/$COMPUTER"
 
-SRC=$(echo $BACKUPURL/$DISK/.snapshots/$BACKUP/data/./$DIR/$ENTRY|sed s#/././#/./#)       #for cases where DIR=.
+SRC=$(echo $BACKUPURL/$DISK/.snapshots/$BACKUP/data/./$DIR/$ENTRY|sed s#/\\./\\./#/./#g)       #for cases where DIR=.
 
 FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
 #PASS="--password-file=$SDIR/conf/pass.txt"
@@ -99,23 +99,29 @@ rsync -rlitzvvhRP $PERM $OPTIONS $FMT "$SRC" "$DST/" || die "Problemas ao recupe
 
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 [[ $OSTYPE == 'cygwin' && $DISK =~  NTFS && -n ${BASE+x} ]] && {
+	info "A descarregar as ACLs"
 	SRCMETA="$BACKUPURL/$DISK/.snapshots/$BACKUP/metadata/./.tar/"
 	METADATADIR=$(cygpath "$SDIR/cache/metadata/by-volume/${VOLUME}/")
 	[[ -d $METADATADIR ]] || mkdir -pv $METADATADIR
 	rsync -tizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao descarregar as ACLs"
 	RUN=$SDIR/run/metadata.$$
 	mkdir -p "$RUN"
-	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" ".bkit/$DIR/" || die "Problema ao desenpacotar as ACLs"
+	TARDIR=.bkit/$DIR
+	[[ -d $FOLDER ]] && TARDIR=$TARDIR/$ENTRY
+	TARDIR=${TARDIR//\/.\//\/}					#repacle any sequence of "/./" by "/"
+	info "A desempacotar as ACLs"
+	tar --extract --verbose --directory "$RUN" --file "$METADATADIR/.tar/dir.tar" "$TARDIR" || die "Problema ao desempacotar as ACLs"
 	DRIVE=$(cygpath -w "$DST")
 	SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 	[[ -f $SUBINACL ]] || die "A aplicação 'subinacl.exe' não foi encontrada"
 	while read FILE
 	do
+		info "A aplicar as ACLs presentes em $FILE"
 		iconv -f UTF-16LE -t UTF-8 "$FILE" |
 			sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
 			iconv  -f UTF-8 -t UTF-16LE > "$FILE.acl"
 		"$SUBINACL" /playfile "$(cygpath -w "$FILE.acl")" || die 'Erro ao aplicar as ACLs'
-	done < <(find "$RUN/.bkit/$DIR" -type f -name '.bkit.acls.f' -print)
+	done < <(find "$RUN/$TARDIR" -type f \( -name '.bkit.acls.f' -o -name '.bkit.this.acls.f' \) -print)
 	rm -rf "$RUN"
 }
 

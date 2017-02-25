@@ -164,6 +164,17 @@
       }
     }
   }
+  .downloading{
+    animation: down 1s infinite;
+  }
+  @keyframes down {
+    0%{
+      transform: translateY(0);
+    }
+    100%{
+      transform: translateY(200%);
+    }
+  }
 </style>
 
 <script>

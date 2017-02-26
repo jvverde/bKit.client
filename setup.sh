@@ -6,7 +6,7 @@ OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 SDIR="$(dirname "$(readlink -f "$0")")"               #Full DIR
 exists apt-get && {
 	apt-get update
-	apt-get install -y sqlite3 zenity
+	apt-get install -y sqlite3
 }
 
 [[ $UID -eq 0 ]] && U=$(who am i | awk '{print $1}')
@@ -28,9 +28,6 @@ exists CMD && {
 	}> "$BATCH"
 	CMD /C "$(cygpath -w "$BATCH")"
 	rm -f $BATCH
-	exists zenity || {
-		find "$SDIR/setup" -iname "zenity*.exe" -print -quit |sh -c 'read FILE;EXE=$(cygpath -w "$FILE");CMD /C "$EXE"'
-	}
 }
 echo Compile excludes file
 bash "$SDIR/make-excludes.sh"

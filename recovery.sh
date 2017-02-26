@@ -4,21 +4,15 @@ SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
 
 exists() { type "$1" >/dev/null 2>&1;}
 die() {
-	exists zenity && zenity --error --title "Backup Recovery" --text "$*"
 	echo -e "$@" >&2
 	exit 1
 }
 ask() {
 	[[ $YES ]] && return
-	exists zenity && {
-		zenity --question --title "Pedido de Recuperaçao de Dados" --text "$*"
-		return
-	} || echo -e "$@"
+	echo -e "$@"
 }
 info() {
-	exists zenity && {
-		zenity --info --text "$*"
-	} || echo -e "$@"
+	echo -e "$@"
 }
 
 function get_json(){

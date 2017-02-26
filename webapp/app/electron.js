@@ -9,9 +9,19 @@ const Menu = electron.Menu
 const ipcMain = electron.ipcMain
 const shell = electron.shell
 const clipboard = electron.clipboard
+const dialog = electron.dialog
 const fs = require('fs')
-const parentDir = path.resolve(process.cwd(), '..')
-const BASH = require('os').platform() === 'win32' ? `${parentDir}\\bash.bat` : 'bash'
+const {spawnSync} = require('child_process')
+const platform = require('os').platform()
+
+if (platform === 'win32') {
+  const parentDir = path.resolve(process.cwd(), '..')
+  const bash = path.resolve(parentDir,'3rd-party','cygwin','bin','bash.exe')
+  if (!fs.existsSync(bash)){
+    const setup = `${parentDir}/setup.bat`
+    const fd = spawnSync('CMD', ['/C',setup], {cwd: parentDir})
+  }
+}
 
 
 let mainWindow

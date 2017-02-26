@@ -55,7 +55,9 @@
   import store from 'src/vuex/store'
   const {ipcRenderer} = require('electron')
   const {spawn} = require('child_process')
-  const BASH = require('os').platform() === 'win32' ? 'bash.bat' : 'bash'
+  const path = require('path')
+  const parentDir = path.resolve(process.cwd(), '..')
+  const BASH = require('os').platform() === 'win32' ? `${parentDir}\\bash.bat` : 'bash'
 
   export default {
     store,
@@ -68,15 +70,16 @@
         console.error(e)
       }
       try {
-        const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: '..'})
+        console.log(BASH)
+        const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: parentDir})
         fd.stdout.on('data', (data) => {
           const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
           store.dispatch('setComputerName', name)
         })
         fd.stderr.on('data', (msg) => {
           this.$notify.error({
-            title: 'Error',
-            message: `${msg}`,
+            title: 'Error in App doing ./getComputerName',
+            message: `${BASH}:${msg}`,
             customClass: 'message error'
           })
         })

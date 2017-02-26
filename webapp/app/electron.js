@@ -10,6 +10,9 @@ const ipcMain = electron.ipcMain
 const shell = electron.shell
 const clipboard = electron.clipboard
 const fs = require('fs')
+const parentDir = path.resolve(process.cwd(), '..')
+const BASH = require('os').platform() === 'win32' ? `${parentDir}\\bash.bat` : 'bash'
+
 
 let mainWindow
 let config = {}

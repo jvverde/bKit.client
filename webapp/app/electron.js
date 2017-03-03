@@ -30,12 +30,11 @@ let tray = null
 
 if (process.env.NODE_ENV === 'development') {
   config = require('../config')
-  config.url = `http://localhost:${config.port}`
+  config.url = `http://localhost:${config.port}/`
 } else {
   config.devtron = false
   config.url = `file://${__dirname}/dist/index.html`
 }
-
 
 const userdata = path.join(app.getPath('userData'), 'bKit')
 
@@ -48,7 +47,7 @@ global.settings = {
     height: 800
   },
   server: {
-    address: '10.11.0.135',
+    address: '',
     port:8088
   }
 }
@@ -154,8 +153,6 @@ ipcMain.on('debug', (event, arg) => {
   mainWindow.webContents.openDevTools()
 })
 
-//app.on('ready', createWindow)
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -177,27 +174,8 @@ app.on('before-quit', () => {
   }
 })
 
-/*function createRecoveryWindow() {
-  const win = new BrowserWindow({
-    width: 1024,
-    height: 768,
-    frame: false,
-    webPreferences: {
-      webSecurity: false
-    }
-  });
-  //win.loadURL(`file://${__dirname}/recovery/index.html`);
-  //win.loadURL(`file://${__dirname}/ionic/bKit/www/index.html`);
-  //win.webContents.openDevTools();
-  win.loadURL('file://10.11.0.135:8088/');
-  win.on('closed', () => {
-    //win = null
-  })
-  return win;
-}*/
 
 function openRecovery(menuItem, browserWindow, event) {
-  //mainWindow = createRecoveryWindow()
   createWindow()
 }
 
@@ -207,7 +185,6 @@ function exitApp() {
 
 app.on('ready', () => {
   createWindow()
-  console.log('on ready')
   const image = clipboard.readImage()
   tray = new Tray(image)
   const contextMenu = Menu.buildFromTemplate([
@@ -220,19 +197,3 @@ app.on('ready', () => {
   console.log('I am ready')
 });
 
-// console.log('Path:',app.getAppPath());
-
-/*const spawn = require('child_process').spawn;
-const ls = spawn('ls', ['-lh', '/usr']);
-
-ls.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`);
-});
-
-ls.stderr.on('data', (data) => {
-  console.log(`stderr: ${data}`);
-});
-
-ls.on('close', (code) => {
-  console.log(`child process exited with code ${code}`);
-});*/

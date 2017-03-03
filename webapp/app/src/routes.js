@@ -5,6 +5,11 @@ export default [
     component: require('components/Server')
   },
   {
+    path: '/init',
+    name: 'Init-page',
+    component: require('components/Console/Init')
+  },
+  {
     path: '/computers',
     name: 'Computers-page',
     component: require('components/Computers')

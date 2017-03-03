@@ -48,6 +48,9 @@ export default {
   mounted () {
     console.log('mounted')
     ipcRenderer.send('register', 'download')
+  },
+  destroy () {
+    ipcRenderer.removeAllListeners('download')
   }
 }
 </script>

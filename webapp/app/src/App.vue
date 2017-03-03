@@ -21,6 +21,24 @@
   a {
     text-decoration: none;
   }
+
+  .message {
+    border-radius: 5px;
+    font-size: 10px;
+    * {
+      white-space: pre-line;
+    }
+  }
+  .message.warning {
+    background-color: #F5F5DC; /* https://en.wikipedia.org/wiki/Category:Shades_of_yellow */
+  }
+  .message.error {
+    background-color: #F9CCCA; /* https://en.wikipedia.org/wiki/Shades_of_pink */
+  }
+  .alert {
+    color: #DE3163;
+  }
+
 </style>
 
 <style lang="scss" scoped>

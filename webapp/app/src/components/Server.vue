@@ -16,6 +16,9 @@
       <el-button type="success">Go</el-button>
     </router-link>
     <el-button disabled v-else>Go</el-button>
+    <router-link :to="{name: 'Init-page'}" v-if="isValid">
+      Init Backup server
+    </router-link>
   </div>
 </template>
 

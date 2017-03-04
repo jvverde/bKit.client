@@ -8,10 +8,13 @@ UPORT=8733
 USER=user
 PASS=us3r
 SERVER="$1"
+
 die() { echo -e "$@">&2; exit 1; }
+exists() { type "$1" >/dev/null 2>&1;}
+
 [[ -z $SERVER ]] && die "Usage:\n\t$0 server-address"
 echo Contacting the server ... please wait!
-type nc 2>/dev/null 1>&2 && { nc -z $SERVER $PORT || die Server $SERVER not found;}
+exists nc && { nc -z $SERVER $PORT 2>&1 || die Server $SERVER not found;}
 
 source "$DIR/computer.sh"
 
@@ -20,8 +23,10 @@ mkdir -p "$CONFDIR"
 
 
 INITFILE=$CONFDIR/conf.init
+INITPATH=$INITFILE
+exists cygpath && INITPATH=$(cygpath -w "$INITFILE")
 
-echo Writing configuration to $INITFILE
+echo Writing configuration to $INITPATH
 (
 	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
 	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
@@ -32,10 +37,18 @@ PASSFILE=$CONFDIR/pass.txt
 echo $PASS > "$PASSFILE"
 chmod 600 "$PASSFILE"
 
-type rsync 2>/dev/null 1>&2 || die rsync not found
+exists rsync || die rsync not found
 
 export RSYNC_PASSWORD="4dm1n"
+FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
-rsync -rltvvhR --inplace --stats "${CONFDIR}/./" rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
+rsync -rltvhR $FMT --inplace --stats "${CONFDIR}/./" rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1
+
+
+echo This is the content of init file in $INITPATH
+echo '##########################'
+cat "$INITFILE"
+echo '##########################'
+echo "Backup server setup successfully!"

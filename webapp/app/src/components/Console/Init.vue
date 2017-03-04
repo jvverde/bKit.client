@@ -1,7 +1,11 @@
 <template>
   <div class="init">
     <bkitlogo></bkitlogo>
-    <h2>Set backup server to {{address}}</h2>
+    <h2>Set {{address}} as the Backup Server</h2>
+    <el-button-group class="buttons">
+      <el-button type="primary" @click="goback" icon="arrow-left">Return</el-button>
+      <el-button type="primary" @click="init">Set <i class="el-icon-upload2"></el-button>
+    </el-button-group>
     <section>
       <div class="stdout">
         {{stdout}}
@@ -10,10 +14,6 @@
         {{stderr}}
       </div>
     </section>
-    <el-button-group>
-      <el-button type="primary" @click="goback">Return</el-button>
-      <el-button type="primary" @click="init">Init</el-button>
-    </el-button-group>
   </div>
 </template>
 
@@ -34,7 +34,6 @@ export default {
   },
   mounted () {
     console.log('init console')
-    this.isVisible = true
   },
   methods: {
     goback () {
@@ -42,10 +41,10 @@ export default {
     },
     init () {
       this.isVisible = false
-      const fd = spawn(BASH, ['./init.sh'], {cwd: parentDir})
+      const fd = spawn(BASH, ['./init.sh', this.address], {cwd: parentDir})
       const now = (new Date()).toString()
-      this.stdout += `\n-------- Start recovery ${this.path} at ${now} --------\n`
-      this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`
+      this.stdout += `\n-------- Start init script at ${now} --------\n`
+      this.stderr += `\n-------- Start init script at ${now} --------\n`
       fd.stdout.on('data', (data) => {
         this.stdout += `${data}`
         this.stdout = this.stdout.substr(-10000)
@@ -60,8 +59,8 @@ export default {
         code = 0 | code
         if (code === 0) {
           this.$notify.success({
-            title: 'Init done',
-            message: 'Successfully'
+            title: 'Backup Server',
+            message: 'Set successfully'
           })
         } else {
           this.$notify.warning({
@@ -81,7 +80,7 @@ export default {
 
 <style scoped lang="scss">
   .init {
-    display:flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     >*{
@@ -98,12 +97,16 @@ export default {
         font-family: monospace;
         white-space: pre-line;
         background-color: silver;
+      }
+      .stdout {
         color: darkgreen;
-        padding: 2px;
       }
       .stderr{
         color: darkred;
       }
+    }
+    .buttons {
+      margin: .5em;
     }
   }
 </style>

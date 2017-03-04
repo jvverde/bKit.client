@@ -13,11 +13,11 @@
       </tr>
     </table>
     <router-link :to="{name: 'Computers-page'}" v-if="isValid">
-      <el-button type="success">Go</el-button>
+      <el-button type="primary">Go</el-button>
     </router-link>
     <el-button disabled v-else>Go</el-button>
-    <router-link :to="{name: 'Init-page'}" v-if="isValid">
-      Init Backup server
+    <router-link :to="{name: 'Init-page'}" v-if="isValid" class="set">
+      Set {{address}} as the Backup Server
     </router-link>
   </div>
 </template>
@@ -53,32 +53,23 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  h1, h2 {
-    font-weight: normal;
-  }
-
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
-
-  a {
-    color: rgb(50, 174, 110);
-    text-decoration: none;
-  }
-
-  a:hover {
-    color: rgb(40, 56, 76);
-  }
-
   .server{
     display:flex;
     flex-direction: column;
     align-items: center;
+    h1, h2 {
+      font-weight: normal;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:hover {
+      color: rgb(40, 56, 76);
+    }
+    .set{
+      position: absolute;
+      bottom: 1em;
+      right: 1em;
+    }
   }
 </style>

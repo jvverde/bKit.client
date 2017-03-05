@@ -1,10 +1,10 @@
 3rd-party/*
-cache/*
-logs/*
-run/*
-conf/*
+cache/
+logs/
+run/
+conf/
 tmp/
-schtasks/*
+schtasks/
 *~
 old
 not-used-anymore/

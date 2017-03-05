@@ -36,11 +36,9 @@ if (process.env.NODE_ENV === 'development') {
   config.url = `file://${__dirname}/dist/index.html`
 }
 
-const userdata = path.join(app.getPath('userData'), 'bKit')
+const settingsDir = path.join(app.getPath('settingsDir'), 'bKit')
 
-fs.existsSync(userdata) || fs.mkdirSync(userdata)
-
-const settingsFile = path.resolve(userdata,'settings.json')
+const settingsFile = path.resolve(settingsDir,'settings.json')
 global.settings = {
   window: {
     width: 1200,
@@ -167,6 +165,7 @@ app.on('activate', () => {
 
 app.on('before-quit', () => {
   try {
+    fs.existsSync(settingsDir) || fs.mkdirSync(settingsDir)
     const json = JSON.stringify(global.settings)
     fs.writeFileSync(settingsFile, json, 'utf8')
   } catch (e) {

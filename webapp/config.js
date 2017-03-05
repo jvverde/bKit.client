@@ -29,7 +29,6 @@ let config = {
     platform: process.env.PLATFORM_TARGET || 'all'
   }
 }
-
 config.building.name = config.name
 
 module.exports = config

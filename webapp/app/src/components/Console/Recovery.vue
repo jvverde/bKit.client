@@ -35,8 +35,8 @@
 const path = require('path')
 const {spawn, exec} = require('child_process')
 const os = require('os')
-const platform = os.platform()
-const BASH = platform === 'win32' ? 'bash.bat' : 'bash'
+const parentDir = path.resolve(process.cwd(), '..')
+const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 
 export default {
   data () {
@@ -127,7 +127,7 @@ export default {
     recovery () {
       this.isVisible = false
       const dst = this.location === this.path ? '' : this.location || ''
-      const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
+      const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: {cwd: '..'}})
       const now = (new Date()).toString()
       this.stdout += `\n-------- Start recovery ${this.path} at ${now} --------\n`
       this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`

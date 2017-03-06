@@ -177,16 +177,17 @@ app.on('ready', () => {
     const parentDir = path.resolve(process.cwd(), '..')
     const bash = path.join(parentDir,'3rd-party','cygwin','bin','bash.exe')
     if (!fs.existsSync(bash)){
-      dialog.showMessageBox({
+      const answer = dialog.showMessageBox({
         title: 'bKit setup',
         message:'The 3rd-party tools are missing',
         icon: image,
-        buttons: ['Install'],
-        function (response) {
-          const setup = path.join(parentDir, 'setup.bat')
-          const fd = spawnSync(setup, [], {cwd: parentDir, shell: true})
-        }
+        type: 'question',
+        buttons: ['Later', 'Install']
       })
+      if (answer === 1){
+        console.log('Run setup')
+        const fd = spawnSync('setup.bat', [], {cwd: ".."})
+      }
     }
   }
   createWindow()

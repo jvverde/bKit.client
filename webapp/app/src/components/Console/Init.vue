@@ -20,9 +20,8 @@
 <script>
 const path = require('path')
 const {spawn} = require('child_process')
-const platform = require('os').platform()
 const parentDir = path.resolve(process.cwd(), '..')
-const BASH = platform === 'win32' ? `${parentDir}\\bash.bat` : 'bash'
+const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 
 export default {
   data () {
@@ -41,7 +40,7 @@ export default {
     },
     init () {
       this.isVisible = false
-      const fd = spawn(BASH, ['./init.sh', this.address], {cwd: parentDir})
+      const fd = spawn(BASH, ['./init.sh', this.address], {cwd: '..')
       const now = (new Date()).toString()
       this.stdout += `\n-------- Start init script at ${now} --------\n`
       this.stderr += `\n-------- Start init script at ${now} --------\n`

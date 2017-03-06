@@ -12,17 +12,6 @@ const clipboard = electron.clipboard
 const dialog = electron.dialog
 const fs = require('fs')
 const {spawnSync} = require('child_process')
-const platform = require('os').platform()
-
-if (platform === 'win32') {
-  const parentDir = path.resolve(process.cwd(), '..')
-  const bash = path.resolve(parentDir,'3rd-party','cygwin','bin','bash.exe')
-  if (!fs.existsSync(bash)){
-    const setup = `${parentDir}/setup.bat`
-    const fd = spawnSync('CMD', ['/C',setup], {cwd: parentDir})
-  }
-}
-
 
 let mainWindow
 let config = {}
@@ -183,8 +172,24 @@ function exitApp() {
 }
 
 app.on('ready', () => {
-  createWindow()
   const image = clipboard.readImage()
+  if (process.platform === 'win32') {
+    const parentDir = path.resolve(process.cwd(), '..')
+    const bash = path.join(parentDir,'3rd-party','cygwin','bin','bash.exe')
+    if (!fs.existsSync(bash)){
+      dialog.showMessageBox({
+        title: 'bKit setup',
+        message:'The 3rd-party tools are missing',
+        icon: image,
+        buttons: ['Install'],
+        function (response) {
+          const setup = `${parentDir}/setup.bat`
+          const fd = spawnSync('CMD', ['/C',setup], {cwd: parentDir})
+        }
+      })
+    }
+  }
+  createWindow()
   tray = new Tray(image)
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Recovery', type: 'normal', click: openRecovery },

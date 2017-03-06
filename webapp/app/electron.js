@@ -183,8 +183,8 @@ app.on('ready', () => {
         icon: image,
         buttons: ['Install'],
         function (response) {
-          const setup = `${parentDir}/setup.bat`
-          const fd = spawnSync('CMD', ['/C',setup], {cwd: parentDir})
+          const setup = path.join(parentDir, 'setup.bat')
+          const fd = spawnSync(setup, [], {cwd: parentDir, shell: true})
         }
       })
     }

@@ -20,7 +20,7 @@ let config = {
     arch: 'x64,ia32',
     asar: true,
     dir: path.join(__dirname, 'app'),
-    icon: path.join(__dirname, 'app/icons/256x256_transp'),
+    icon: path.join(__dirname, 'icons/logo/64x64'),
     ignore: /\b(node_modules|src|index\.ejs|icons)\b/,
     // ignore: /\b(node_modules\/(?!electron|electron-download|extract-zip)|src|index\.ejs|icons)\b/,
     // ignore: /\b(node_modules\/(?!conf|dot-prop|electron-config|env-paths|find-up|is-obj|minimist|mkdirp|path-exists|pinkie|pinkie-promise|pkg-up).*|src|index\.ejs|icons)\b/,

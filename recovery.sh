@@ -75,9 +75,9 @@ exists cygpath && DST=$(cygpath "$DST")
 THIS=$DOMAIN.$NAME.$UUID
 
 [[ $THIS != $COMPUTER ]] && [[ -z $FORCE ]] && die This is not the same computer;
-CONF="$SDIR/conf/conf.init"
+CONF=$SDIR/conf/conf.init
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
-. $CONF                                                                     #get configuration parameters
+. "$CONF"                                                                     #get configuration parameters
 
 #Change backupurl for cases where we want to force a backup/migrate for from different computer
 BACKUPURL="${BACKUPURL%/*}/$COMPUTER"

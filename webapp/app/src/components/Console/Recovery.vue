@@ -61,11 +61,11 @@ export default {
   components: {
   },
   created () {
-    platform === 'win32' && exec('NET SESSION', (err) => {
+    process.platform === 'win32' && exec('NET SESSION', (err) => {
       if (err) {
         this.$notify.warning({
           title: 'Missing privilegies',
-          message: 'You should run as Administrator',
+          message: 'You should run as Administrator in order to have full access',
           customClass: 'message warning',
           duration: 0
         })

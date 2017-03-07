@@ -186,7 +186,10 @@ app.on('ready', () => {
       })
       if (answer === 1){
         console.log('Run setup')
-        const fd = spawnSync('setup.bat', [], {cwd: ".."})
+        const fd = spawnSync('setup.bat', [], {cwd: '..'})
+        console.log('status:', fd.status)
+        console.log('signal=', fd.signal)
+        console.log('pid=', fd.pid)
       }
     }
   }

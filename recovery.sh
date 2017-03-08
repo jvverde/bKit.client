@@ -97,7 +97,7 @@ OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 	SRCMETA="$BACKUPURL/$DISK/.snapshots/$BACKUP/metadata/./.tar/"
 	METADATADIR=$(cygpath "$SDIR/cache/metadata/by-volume/${VOLUME}/")
 	[[ -d $METADATADIR ]] || mkdir -pv $METADATADIR
-	rsync -tizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao descarregar as ACLs"
+	rsync -rtizR $PERM $FMT "$SRCMETA" "$METADATADIR" || die "Problema ao descarregar as ACLs"
 	RUN=$SDIR/run/metadata.$$
 	mkdir -p "$RUN"
 	TARDIR=.bkit/$DIR

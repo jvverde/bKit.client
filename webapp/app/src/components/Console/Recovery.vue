@@ -127,7 +127,7 @@ export default {
     recovery () {
       this.isVisible = false
       const dst = this.location === this.path ? '' : this.location || ''
-      const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: {cwd: '..'}})
+      const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
       const now = (new Date()).toString()
       this.stdout += `\n-------- Start recovery ${this.path} at ${now} --------\n`
       this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`

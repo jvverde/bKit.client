@@ -40,7 +40,7 @@ export default {
     },
     init () {
       this.isVisible = false
-      const fd = spawn(BASH, ['./init.sh', this.address], {cwd: '..')
+      const fd = spawn(BASH, ['./init.sh', this.address], {cwd: '..'})
       const now = (new Date()).toString()
       this.stdout += `\n-------- Start init script at ${now} --------\n`
       this.stderr += `\n-------- Start init script at ${now} --------\n`

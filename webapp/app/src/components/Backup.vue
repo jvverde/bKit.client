@@ -106,7 +106,8 @@
     }
     .snapshot{
       flex-grow:1;
-      overflow: auto;
+      overflow: hidden;
+      height: 100%;
     }
     footer.bottom{
       flex-shrink: 0;

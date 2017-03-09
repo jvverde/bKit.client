@@ -1,183 +1,108 @@
 <template>
-  <div class="tree">
-    <ul class="directories" v-if="folders.length > 0" @click.stop="select()">
-      <li v-for="(folder,index) in folders">
-        <div class="line">
-	        <div class="props">
-            <span class="icon is-small" @click.stop="toggle(index)">
-              <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
-              <i class="fa fa-minus-square-o" v-if="folder.open"></i>
-              <i class="fa fa-plus-square-o" v-else></i>
-            </span>
-		        <span class="icon is-small">
-              <i class="fa fa-folder-open-o" v-if="folder.open"></i>
-              <i class="fa fa-folder-o" v-else></i>
-		        </span>
-		        <span class="name">{{folder.name}}</span>
-	        </div>
-          <a :href="getUrl('bkit',folder.name)" title="Recovery" @click.stop="" class="links">
-            <span class="icon is-small">
-              <i class="fa fa-history"></i>
-            </span>
-          </a>
-        </div>
-        <directory v-if="folder.open" :location="folder.childrensLocation">
-        </directory>
-      </li>
-    </ul>
-    <ul class="files" :class="{selected: isSelected}">
-      <li v-for="file in files">
+  <ul class="directories">
+    <li v-for="(folder,index) in folders" @click.stop="select(folder)">
+      <header class="line">
         <div class="props">
-          <span class="icon is-small">
-            <i class="fa fa-file-o"></i>
+          <span class="icon is-small" @click.stop="toggle(index)">
+            <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
+            <i class="fa fa-minus-square-o" v-if="folder.open"></i>
+            <i class="fa fa-plus-square-o" v-else></i>
           </span>
-	        <a :download="file" class="file" @click.stop=""
-	          :href="getUrl('download',file.name)">
-            <span class="name">{{file.name}}</span>
-            <formatedsize :value="file.size"></formatedsize>
-            <formateddate :value="file.datetime"></formateddate>
-	        </a>
+	        <span class="icon is-small">
+            <i class="fa fa-folder-open-o" v-if="folder.open"></i>
+            <i class="fa fa-folder-o" v-else></i>
+	        </span>
+	        <span class="name">{{folder.name}}</span>
         </div>
-        <div class="links">
-	        <a :download="file" @click.stop=""
-	          :href="getUrl('download',file.name)" title="Download">
-            <span class="icon is-small">
-              <i class="fa fa-download"></i>
-            </span>
-	        </a>
-	        <a target="_blank" @click.stop=""
-	          :href="getUrl('view',file.name)" title="View">
-            <span class="icon is-small">
-              <i class="fa fa-eye"></i>
-            </span>
-	        </a>
-          <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop="">
-            <span class="icon is-small">
-              <i class="fa fa-history"></i>
-            </span>
-          </a>
-        </div>
-      </li>
-    </ul>
-  </div>
+        <a :href="getUrl('bkit',folder.name)" title="Recovery" @click.stop="" class="links">
+          <span class="icon is-small">
+            <i class="fa fa-history"></i>
+          </span>
+        </a>
+      </header>
+      <directory v-if="folder.open" :location="folder.childrensLocation" v-on:select="bubbling">
+      </directory>
+    </li>
+  </ul>
 </template>
 
 <style scoped lang="scss">
   $line-height: 2em;
   $li-ident: 1.3em;
-  .tree{
-    text-align: left;
-    width:100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    ul,li{
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      position:relative;
-      &::before{
+  ul.directories{
+    list-style: none;
+    position:relative;
+    li {
+      display: flex;
+      flex-direction: column;
+      padding-left: $li-ident;            /* indentation = .5em */
+      line-height:$line-height;
+      cursor: pointer;
+      box-sizing: border-box;
+      position: relative;
+      &::before, &::after {
         border-width: 0;
         border-style: dotted;
         border-color: #777777;
         position:absolute;
         display:block;
         content:"";
-      }
-    }
-    .files.selected {
-      background-color: red;
-    }
-    ul::before {
-        content:"";
-        top:-1 * ($line-height / 2);
-        bottom: $line-height / 2;      /*stop at half of last li */
-        left: $li-ident / 4;
-        border-left-width:1px;
-    }
-    .line + .tree {                   /*in first subtree the border-left start on .6 * top */
-      overflow: visible;
-      ul:first-child{
-        overflow: visible;
-        &::before{
-          top:-.6 * ($line-height / 2);
-        }
-      }
-    }
-    ul.directories + ul.files {     /*in first file, after directores, the border-left should be visible outside*/
-      overflow: visible;
-    }
-    ul.files li, ul.directories .line{
-      display:flex;
-      &:hover{
-        background:#eeeeee;
-        background-color:rgba(128,128,128,.2);
-        border-radius:6px;
-      }
-    }
-    li {
-      padding-left: $li-ident;            /* indentation = .5em */
-      line-height:$line-height;
-      cursor: pointer;
-      width:100%;
-      box-sizing: border-box;
-      &::before {
-        width: .5 * $li-ident;          /* 50% of indentation */
-        height:0;
-        border-top-width:1px;
-        margin-top:-1px;                  /* border top width */
-        top:$line-height / 2;
         left:$li-ident / 4;
       }
-      a{
-        color: inherit;
-        .icon:hover{
-          color: #090;
-        }
-        &:active{
-          border:1px solid red;
-        }
+      &::before{
+        width: .5 * $li-ident;          /* 50% of indentation */
+        height: 0;
+        border-top-width:1px;
+        margin-top:-1px;
+        margin-left: 3px;
+        top:$line-height / 2;
       }
-      * {
-        flex-grow: 0;
-        overflow: hidden;
+      &::after{
+        width: 0;
+        top: 0;
+        bottom: 1px;
+        border-left-width:1px;
       }
-      .props{
-        flex-grow:2;
+      &:last-child::after{
+        bottom: $line-height / 2;
+      }
+      &:first-child::after{
+        top: - $line-height / 4;
+      }
+      header.line{
         display: flex;
-        .file{
-          flex-grow:2;
+        width: 100%;
+        .links{
+          flex-shrink: 0;
+          margin-right: 3px;
+          margin-left: 1px;
+        }
+        .props{
+          flex-grow: 1;
           display: flex;
-          .name{
-            flex-grow:2;
+          overflow: hidden;
+          .icon{
+            padding-right:1px;
+            padding-left:1px;
             flex-shrink: 0;
-            display: inline-block;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding-right:3px;
-            padding-left:3px;
+          }
+          .file{
+            flex-grow: 1;
+            display: flex;
+            * {
+              display: inline-block;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .name{
+              flex-shrink: 0;
+              flex-grow: 1;
+              padding-right:3px;
+              padding-left:3px;
+            }
           }
         }
-        .icon{
-          padding-right:1px;
-          padding-left:1px;
-        }
       }
-      .links{
-        flex-shrink: 0;
-      }
-    }
-  }
-  .downloading{
-    animation: down 1s infinite;
-  }
-  @keyframes down {
-    0%{
-      transform: translateY(0);
-    }
-    100%{
-      transform: translateY(200%);
     }
   }
 </style>
@@ -206,8 +131,7 @@
       return {
         url: this.$store.getters.url,
         folders: [],
-        files: [],
-        showfiles: true
+        files: []
       }
     },
     props: {
@@ -242,12 +166,11 @@
       toggle (index) {
         this.folders[index].open = !this.folders[index].open
       },
-      select (index) {
-        this.$store.dispatch('setPath', this.location.path)
-        console.log(this.isSelected)
-        console.log(this.location.path)
-        console.log(this.$store.getters.path)
-        console.log(this.$store.state.files.path)
+      bubbling (location) {
+        this.$emit('select', location)
+      },
+      select (folder) {
+        this.bubbling(folder.childrensLocation)
       },
       refresh () {
         try {

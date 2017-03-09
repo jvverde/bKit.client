@@ -1,10 +1,10 @@
 <template>
   <div class="tree">
-    <ul class="directories" v-if="folders.length > 0">
-      <li v-for="(folder,index) in folders" @click.stop="toggle(index)">
+    <ul class="directories" v-if="folders.length > 0" @click.stop="select()">
+      <li v-for="(folder,index) in folders">
         <div class="line">
 	        <div class="props">
-            <span class="icon is-small">
+            <span class="icon is-small" @click.stop="toggle(index)">
               <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
               <i class="fa fa-minus-square-o" v-if="folder.open"></i>
               <i class="fa fa-plus-square-o" v-else></i>
@@ -25,7 +25,7 @@
         </directory>
       </li>
     </ul>
-    <ul class="files">
+    <ul class="files" :class="{selected: isSelected}">
       <li v-for="file in files">
         <div class="props">
           <span class="icon is-small">
@@ -69,7 +69,9 @@
     text-align: left;
     width:100%;
     height: 100%;
-
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     ul,li{
       padding: 0;
       margin: 0;
@@ -83,6 +85,9 @@
         display:block;
         content:"";
       }
+    }
+    .files.selected {
+      background-color: red;
     }
     ul::before {
         content:"";
@@ -201,11 +206,17 @@
       return {
         url: this.$store.getters.url,
         folders: [],
-        files: []
+        files: [],
+        showfiles: true
       }
     },
     props: {
       location: requiredLocation
+    },
+    computed: {
+      isSelected () {
+        return this.location.path === this.$store.getters.path
+      }
     },
     watch: {
       location () {
@@ -230,6 +241,13 @@
       },
       toggle (index) {
         this.folders[index].open = !this.folders[index].open
+      },
+      select (index) {
+        this.$store.dispatch('setPath', this.location.path)
+        console.log(this.isSelected)
+        console.log(this.location.path)
+        console.log(this.$store.getters.path)
+        console.log(this.$store.state.files.path)
       },
       refresh () {
         try {

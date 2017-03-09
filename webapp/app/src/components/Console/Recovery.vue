@@ -34,8 +34,6 @@
 <script>
 const path = require('path')
 const {spawn, exec} = require('child_process')
-const os = require('os')
-const parentDir = path.resolve(process.cwd(), '..')
 const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 
 export default {

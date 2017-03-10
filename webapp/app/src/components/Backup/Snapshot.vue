@@ -40,9 +40,7 @@
     computed: {
       diskName () {
         const comps = this.disk.split('.')
-        comps[0] = comps[0] === '_' ? '' : `${comps[0]}:`
-        comps[2] = comps[2] === '_' ? '' : `(${comps[2]})`
-        return `${comps[0]} ${comps[2]} `
+        return comps[2] === '_' ? comps[0] : ${comps[2]} + ($comps[0] === '_' ? '' : `(${comps[0]})`)
       }
     },
     components: {

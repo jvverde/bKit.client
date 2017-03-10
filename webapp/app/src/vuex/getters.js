@@ -12,4 +12,4 @@ export const url = state => {
 }
 export const computer = state => state.computer
 export const server = state => state.server
-export const path = state => state.files.path
+export const location = state => state.files.location

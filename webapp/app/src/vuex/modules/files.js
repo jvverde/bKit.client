@@ -1,12 +1,12 @@
 import * as types from '../mutation-types'
 
 const state = {
-  path: '/'
+  location: {}
 }
 
 const mutations = {
-  [types.SETPATH] (state, path) {
-    state.path = path
+  [types.SETLOCATION] (state, location) {
+    state.location = location
   }
 }
 

@@ -19,6 +19,6 @@ export const setComputerName = ({ commit }, name) => {
   commit(types.SETCOMPUTERNAME, name)
 }
 
-export const setPath = ({ commit }, path) => {
-  commit(types.SETPATH, path)
+export const setLocation = ({ commit }, location) => {
+  commit(types.SETLOCATION, location)
 }

@@ -1,8 +1,11 @@
 <template>
   <section class="snapshot">
-    <directory class="tree" v-on:select="select"
-      :location="rootLocation" v-if="rootLocation.path">
-    </directory>
+    <aside class="tree" >
+      <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
+      <directory v-on:select="select"
+        :location="rootLocation" v-if="rootLocation.path">
+      </directory>
+    </aside>
     <files class="content" :location="currentLocation" v-if="currentLocation.path">
     </files>
   </section>
@@ -34,6 +37,14 @@
       disk: requiredString,
       id: requiredString
     },
+    computed: {
+      diskName () {
+        const comps = this.disk.split('.')
+        comps[0] = comps[0] === '_' ? '' : `${comps[0]}:`
+        comps[2] = comps[2] === '_' ? '' : `(${comps[2]})`
+        return `${comps[0]} ${comps[2]} `
+      }
+    },
     components: {
       Directory,
       Files
@@ -49,18 +60,22 @@
     methods: {
       select (location) {
         this.currentLocation = location
-        console.log(location.path)
       }
     }
   }
 </script>
 
 <style lang="scss">
+  @import "../../config.scss";
   .snapshot {
     width:100%;
     height: 100%;
     display: flex;
     text-align: left;
+    .root:hover{
+      background-color: $li-hover;
+      cursor: pointer;
+    }
     .content {
       flex-grow:1;
       overflow: auto;
@@ -68,7 +83,7 @@
     }
     .tree{
       overflow: auto;
-      border-right:1px solid turquoise;
+      border-right:1px solid $bkit-color;
     }
     a{
       color: inherit;

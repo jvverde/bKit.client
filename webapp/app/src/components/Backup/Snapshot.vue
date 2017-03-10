@@ -2,11 +2,11 @@
   <section class="snapshot">
     <aside class="tree" >
       <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
-      <directory v-on:select="select"
-        :location="rootLocation" v-if="rootLocation.path">
+      <directory :location="rootLocation" v-if="rootLocation.path">
       </directory>
     </aside>
-    <files class="content" :location="currentLocation" v-if="currentLocation.path">
+    <files class="content" :location="currentLocation" 
+      v-if="currentLocation.path">
     </files>
   </section>
 </template>
@@ -28,7 +28,6 @@
     data () {
       return {
         rootLocation: {},
-        currentLocation: {},
         currentFiles: []
       }
     },
@@ -40,7 +39,12 @@
     computed: {
       diskName () {
         const comps = this.disk.split('.')
-        return comps[2] === '_' ? comps[0] : ${comps[2]} + ($comps[0] === '_' ? '' : `(${comps[0]})`)
+        return comps[2] === '_' ? comps[0] : comps[2] + (
+          comps[0] === '_' ? '' : ` (${comps[0]}:)`
+        )
+      },
+      currentLocation () {
+        return this.$store.getters.location
       }
     },
     components: {
@@ -54,10 +58,11 @@
         snapshot: this.id,
         path: '/'
       }
+      this.select(this.rootLocation)
     },
     methods: {
       select (location) {
-        this.currentLocation = location
+        this.$store.dispatch('setLocation', location)
       }
     }
   }

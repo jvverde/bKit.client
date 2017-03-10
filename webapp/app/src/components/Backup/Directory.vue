@@ -7,9 +7,14 @@
       <header class="line" :class="{selected:currentPath === folder.location.path}">
         <div class="props">
           <span class="icon is-small">
-            <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
-            <i class="fa fa-minus-square-o" v-if="folder.open" @click.stop="folder.open=false"></i>
-            <i class="fa fa-plus-square-o" v-else  @click.stop="folder.open=true"></i>
+            <i class="fa fa-minus-square-o close" 
+              v-if="folder.open" 
+              @click.stop="folder.open=false">
+            </i>
+            <i class="fa fa-plus-square-o open" 
+              v-else  
+              @click.stop="folder.open=true">
+            </i>
           </span>
 	        <span class="icon is-small">
             <i class="fa fa-folder-open-o" v-if="folder.open"></i>
@@ -23,7 +28,7 @@
           </span>
         </a>
       </header>
-      <directory v-if="folder.open" :location="folder.location" v-on:select="bubbling">
+      <directory v-if="folder.open" :location="folder.location">
       </directory>
     </li>
   </ul>
@@ -39,7 +44,6 @@
       flex-direction: column;
       padding-left: $li-ident;            /* indentation = .5em */
       line-height:$line-height;
-      cursor: pointer;
       box-sizing: border-box;
       position: relative;
       &::before, &::after {
@@ -79,6 +83,7 @@
         display: flex;
         width: 100%;
         border-radius:4px;
+        cursor: pointer;
         .links{
           flex-shrink: 0;
           margin-right: 3px;
@@ -107,6 +112,12 @@
               padding-right:3px;
               padding-left:3px;
             }
+          }
+          .open{
+            cursor:zoom-in
+          }
+          .close{
+            cursor: zoom-out
           }
         }
       }
@@ -177,16 +188,9 @@
           this.location.path +
           encodeURIComponent(entry || '')
       },
-      toggle (folder) {
-        folder.open = !folder.open
-      },
-      bubbling (location) {
-        this.$emit('select', location)
-      },
       select (folder) {
         this.$store.dispatch('setLocation', folder.location)
-        this.bubbling(folder.location)
-        folder.open = true
+        folder.open = !folder.open
       },
       refresh () {
         try {

@@ -49,6 +49,11 @@
     },
     filters: {
     },
+    computed: {
+      currentLocation () {
+        return this.$store.getters.location
+      }
+    },
     components: {
       // Directory
       Snapshot,
@@ -81,6 +86,9 @@
       select (index) {
         this.selectedCell = index
         this.selectedSnap = this.snaps[index].id
+        this.$store.dispatch('setLocation',
+          Object.assign({}, this.currentLocation, {snapshot: this.selectedSnap})
+        )
       }
     }
   }

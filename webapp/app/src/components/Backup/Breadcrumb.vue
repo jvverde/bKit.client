@@ -24,7 +24,14 @@
     </li>
     <li>
       <span>
-        <a class="icon is-small"><i class="fa fa-calendar"></i> {{snapDate}}</a>
+        <a class="icon is-small" @click.stop="selectPath('/')">
+          <i class="fa fa-calendar"></i> {{snapDate}}
+        </a>
+      </span>
+    </li>
+    <li v-for="step in steps">
+      <span>
+        <a @click.stop="selectPath(step.path)">{{step.value}}</a>
       </span>
     </li>
   </ul>
@@ -52,6 +59,19 @@
       },
       snapDate () {
         return moment.utc(this.snap.substring(5), 'YYYY.MM.DD-HH.mm.ss').local().format('DD-MM-YYYY HH:mm')
+      },
+      currentLocation () {
+        return this.$store.getters.location
+      },
+      steps () {
+        const steps = (this.currentLocation.path || '').split('/')
+        steps.shift()
+        let fullpath = '/'
+        const obj = steps.map(e => {
+          fullpath += e + '/'
+          return {value: e, path: fullpath}
+        })
+        return obj
       }
     },
     props: ['computer', 'disk', 'snap'],
@@ -60,7 +80,11 @@
     created: function () {
     },
     methods: {
-
+      selectPath (path) {
+        this.$store.dispatch('setLocation',
+          Object.assign({}, this.currentLocation, {path: path})
+        )
+      }
     }
   }
 </script>
@@ -100,6 +124,7 @@
         }
         a{
           text-decoration: none;
+          cursor: pointer;
         }
         &:after,&:before {
           content: "";

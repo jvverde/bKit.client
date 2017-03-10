@@ -1,7 +1,10 @@
 <template>
   <ul class="directories">
+    <li v-if="loading">
+        <i class="fa fa-refresh fa-spin fa-fw"></i> Loading...
+    </li>
     <li v-for="(folder,index) in folders" @click.stop="select(folder)">
-      <header class="line">
+      <header class="line" :class="{selected:currentPath === folder.location.path}">
         <div class="props">
           <span class="icon is-small" @click.stop="toggle(index)">
             <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
@@ -20,15 +23,14 @@
           </span>
         </a>
       </header>
-      <directory v-if="folder.open" :location="folder.childrensLocation" v-on:select="bubbling">
+      <directory v-if="folder.open" :location="folder.location" v-on:select="bubbling">
       </directory>
     </li>
   </ul>
 </template>
 
 <style scoped lang="scss">
-  $line-height: 2em;
-  $li-ident: 1.3em;
+  @import "../../config.scss";
   ul.directories{
     list-style: none;
     position:relative;
@@ -63,15 +65,20 @@
         bottom: 1px;
         border-left-width:1px;
       }
-      &:last-child::after{
-        bottom: $line-height / 2;
-      }
-      &:first-child::after{
+      &:first-child::after{ // first line must start a little bit closer to the parent
         top: - $line-height / 4;
+      }
+      &:last-child::after{ // last line should stop at middle
+        bottom: auto; //disable bottom
+        height: $line-height / 2;
+      }
+      &:last-child:first-child::after{ //just to correct shift to top on first line
+        height: $line-height / 2 + $line-height / 4;
       }
       header.line{
         display: flex;
         width: 100%;
+        border-radius:4px;
         .links{
           flex-shrink: 0;
           margin-right: 3px;
@@ -103,6 +110,12 @@
           }
         }
       }
+      header.line.selected{
+        background-color: $li-selected;
+      }
+      header.line:hover{
+        background-color: $li-hover;
+      }
     }
   }
 </style>
@@ -131,15 +144,16 @@
       return {
         url: this.$store.getters.url,
         folders: [],
-        files: []
+        files: [],
+        loading: true
       }
     },
     props: {
       location: requiredLocation
     },
     computed: {
-      isSelected () {
-        return this.location.path === this.$store.getters.path
+      currentPath () {
+        return this.$store.getters.path
       }
     },
     watch: {
@@ -170,30 +184,37 @@
         this.$emit('select', location)
       },
       select (folder) {
-        this.bubbling(folder.childrensLocation)
+        this.$store.dispatch('setPath', folder.location.path)
+        this.bubbling(folder.location)
       },
       refresh () {
         try {
           var url = this.getUrl('folder')
+          this.loading = true
           this.$http.jsonp(url).then(
             function (response) {
               let files = (response.data.files || []).sort(order)
               let folders = (response.data.folders || []).map(folder => ({
                 name: folder,
-                childrensLocation: Object.assign({}, this.location, {
+                location: Object.assign({}, this.location, {
                   path: this.location.path + encodeURIComponent(folder) + '/'
                 }),
                 open: (this.folders.find(e => e.name === folder) || {})
                   .open === true
               })).sort(order)
-              this.$set(this, 'files', files)
-              this.$set(this, 'folders', folders)
+              this.$nextTick(() => {
+                this.loading = false
+                this.files = files
+                this.folders = folders
+              })
             },
             function (response) {
+              this.loading = false
               console.error(response)
             }
           )
         } catch (e) {
+          this.loading = false
           console.error(e)
         }
       }

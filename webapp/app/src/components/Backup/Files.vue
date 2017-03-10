@@ -36,17 +36,20 @@
 </template>
 
 <style scoped lang="scss">
+  @import "../../config.scss";
   ul.files {
     list-style: none;
     overflow: auto;
     li:hover{
       background:#eeeeee;
-      background-color:rgba(128,128,128,.2);
+      background-color: $li-hover;
       border-radius:6px;
     }
     li {
       cursor: pointer;
       display: flex;
+      padding-left: 2px;
+      line-height:$line-height;
       .links{
         flex-shrink: 0;
         margin-right: 3px;
@@ -128,19 +131,15 @@
       },
       refresh () {
         try {
-          var url = this.getUrl('folder')
-          console.log('refresh', url)
-          this.$http.jsonp(url).then(
-            function (response) {
-              let files = (response.data.files || []).sort(order)
-              this.$nextTick(() => {
-                this.files = files
-              })
-            },
-            function (response) {
-              console.error(response)
-            }
-          )
+          const url = this.getUrl('folder')
+          this.$http.jsonp(url).then((response) => {
+            let files = (response.data.files || []).sort(order)
+            this.$nextTick(() => {
+              this.files = files
+            })
+          }, (error) => {
+            console.error(error)
+          })
         } catch (e) {
           console.error(e)
         }

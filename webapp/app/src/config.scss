@@ -5,5 +5,6 @@ $LSIZE: $U/2.3;                     //Label size
 $drivewitdh: ($rackwidth - 4*$LSIZE)/3;
 $line-height: 2em;
 $li-ident: 1.3em;
-$li-hover: rgba(48,213,200,.4); // turquoise
-$li-selected: rgba(48,213,200,.3);
+$bkit-color: #67a9fb;
+$li-hover: rgba($bkit-color,.3);
+$li-selected: rgba($bkit-color,.2);

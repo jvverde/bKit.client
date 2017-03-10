@@ -6,10 +6,10 @@
     <li v-for="(folder,index) in folders" @click.stop="select(folder)">
       <header class="line" :class="{selected:currentPath === folder.location.path}">
         <div class="props">
-          <span class="icon is-small" @click.stop="toggle(index)">
+          <span class="icon is-small">
             <!-- <i class="fa fa-spinner fa-spin" v-if="isWaiting(index)"></i> -->
-            <i class="fa fa-minus-square-o" v-if="folder.open"></i>
-            <i class="fa fa-plus-square-o" v-else></i>
+            <i class="fa fa-minus-square-o" v-if="folder.open" @click.stop="folder.open=false"></i>
+            <i class="fa fa-plus-square-o" v-else  @click.stop="folder.open=true"></i>
           </span>
 	        <span class="icon is-small">
             <i class="fa fa-folder-open-o" v-if="folder.open"></i>
@@ -65,7 +65,7 @@
         bottom: 1px;
         border-left-width:1px;
       }
-      &:first-child::after{ // first line must start a little bit closer to the parent
+      li:first-child::after{ // first line must start a little bit closer to the parent, except the top one
         top: - $line-height / 4;
       }
       &:last-child::after{ // last line should stop at middle
@@ -153,7 +153,7 @@
     },
     computed: {
       currentPath () {
-        return this.$store.getters.path
+        return this.$store.getters.location.path
       }
     },
     watch: {
@@ -177,42 +177,40 @@
           this.location.path +
           encodeURIComponent(entry || '')
       },
-      toggle (index) {
-        this.folders[index].open = !this.folders[index].open
+      toggle (folder) {
+        folder.open = !folder.open
       },
       bubbling (location) {
         this.$emit('select', location)
       },
       select (folder) {
-        this.$store.dispatch('setPath', folder.location.path)
+        this.$store.dispatch('setLocation', folder.location)
         this.bubbling(folder.location)
+        folder.open = true
       },
       refresh () {
         try {
           var url = this.getUrl('folder')
           this.loading = true
-          this.$http.jsonp(url).then(
-            function (response) {
-              let files = (response.data.files || []).sort(order)
-              let folders = (response.data.folders || []).map(folder => ({
-                name: folder,
-                location: Object.assign({}, this.location, {
-                  path: this.location.path + encodeURIComponent(folder) + '/'
-                }),
-                open: (this.folders.find(e => e.name === folder) || {})
-                  .open === true
-              })).sort(order)
-              this.$nextTick(() => {
-                this.loading = false
-                this.files = files
-                this.folders = folders
-              })
-            },
-            function (response) {
+          this.$http.jsonp(url).then((response) => {
+            let files = (response.data.files || []).sort(order)
+            let folders = (response.data.folders || []).map(folder => ({
+              name: folder,
+              location: Object.assign({}, this.location, {
+                path: this.location.path + encodeURIComponent(folder) + '/'
+              }),
+              open: (this.folders.find(e => e.name === folder) || {})
+                .open === true
+            })).sort(order)
+            this.$nextTick(() => {
               this.loading = false
-              console.error(response)
-            }
-          )
+              this.files = files
+              this.folders = folders
+            })
+          }, (response) => {
+            this.loading = false
+            console.error(response)
+          })
         } catch (e) {
           this.loading = false
           console.error(e)

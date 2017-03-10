@@ -28,10 +28,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  @import "../config.scss";
   .console{
     text-align: left;
     margin: 2px;
     padding: 2px;
     background-color: gainsboro;
+    border: 1px solid $bkit-color;
   }
 </style>

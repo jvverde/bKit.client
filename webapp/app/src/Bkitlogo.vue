@@ -1,4 +1,5 @@
 <style scoped lang="scss">
+  @import "./config.scss";
   header{
     display: flex;
     flex-direction:column;
@@ -12,13 +13,16 @@
       margin-top: -10px;
       font-size: 2em;
     }
+    .i{
+      color:$bkit-color
+    }
   }
 </style>
 
 <template>
   <header>
     <img class="logo" src="./assets/00-Logotipo/64x64.png">
-    <h1>bK<span style="color:#67a9fb">i</span><span style="color:#7fff00">t</span></h1>
+    <h1>bK<span class="i">i</span>t</h1>
   </header>
 </template>
 

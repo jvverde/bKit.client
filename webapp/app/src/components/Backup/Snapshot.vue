@@ -68,7 +68,7 @@
     }
     .tree{
       overflow: auto;
-      border-right:1px solid black;
+      border-right:1px solid turquoise;
     }
     a{
       color: inherit;

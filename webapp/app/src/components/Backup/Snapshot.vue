@@ -52,7 +52,7 @@
       Files
     },
     mounted () {
-      this.rootLocation = this.currentLocation = {
+      this.rootLocation = {
         computer: this.computer,
         disk: this.disk,
         snapshot: this.id,

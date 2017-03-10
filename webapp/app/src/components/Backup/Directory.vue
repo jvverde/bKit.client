@@ -195,6 +195,7 @@
       refresh () {
         try {
           var url = this.getUrl('folder')
+          console.log(url)
           this.loading = true
           this.$http.jsonp(url).then((response) => {
             let files = (response.data.files || []).sort(order)

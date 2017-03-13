@@ -2,14 +2,14 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      <breadcrumb :computer="rootLocation.computer" :disk="rootLocation.disk" 
-        :snap="selectedSnap || ''">
-      </breadcrumb>
+      <breadcrumb></breadcrumb>
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps"
           @click.stop="select(index)"
-          :class="{selected: index === selectedCell}">
-          <header class="spine">{{snap.date.fromNow(true)}}</header>
+          :class="{selected: snap.id === currentSnap}">
+          <header class="spine" :title="snap.date.format('DD-MM-YYYY HH:mm')">
+            {{snap.date.fromNow(true)}}
+          </header>
           <article>
             <time class="day">{{snap.date.format('dddd')}}</time>
             <time class="time">{{snap.date.format('HH:mm')}}</time>
@@ -38,8 +38,7 @@
   export default {
     data () {
       return {
-        selectedCell: -1,
-        selectedSnap: null,
+        currentSnap: null,
         snaps: []
       }
     },
@@ -55,13 +54,12 @@
         return {
           computer: this.$route.params.computer,
           disk: this.$route.params.disk,
-          snapshot: this.selectedSnap,
+          snapshot: this.currentSnap,
           path: '/'
         }
       }
     },
     components: {
-      // Directory
       Snapshot,
       Breadcrumb,
       Console
@@ -90,10 +88,9 @@
     },
     methods: {
       select (index) {
-        this.selectedCell = index
-        this.selectedSnap = this.snaps[index].id
+        this.currentSnap = this.snaps[index].id
         this.$store.dispatch('setLocation',
-          Object.assign({}, this.currentLocation, {snapshot: this.selectedSnap})
+          Object.assign({}, this.currentLocation, {snapshot: this.currentSnap})
         )
       }
     }

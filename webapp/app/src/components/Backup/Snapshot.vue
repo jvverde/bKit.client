@@ -39,7 +39,6 @@
       Files
     },
     mounted () {
-      console.log('mounted snapshot')
       this.select(this.rootLocation)
     },
     methods: {

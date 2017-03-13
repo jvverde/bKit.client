@@ -5,12 +5,12 @@
        <router-link to="/" class="icon is-small"><i class="fa fa-home"></i></router-link>
       </span>
     </li>
-    <li>
+    <li v-if="computerName">
       <span>
         <router-link to="/computers" class="icon is-small"><i class="fa fa-desktop"></i> {{computerName}}</router-link>
       </span>
     </li>
-    <li>
+    <li v-if="computer && disk">
       <span>
         <router-link :to="{
           name: 'Backups-page',
@@ -22,7 +22,7 @@
         </router-link>
       </span>
     </li>
-    <li>
+    <li v-if="snapDate">
       <span>
         <a class="icon is-small" @click.stop="selectPath('/')">
           <i class="fa fa-calendar"></i> {{snapDate}}
@@ -48,6 +48,15 @@
       }
     },
     computed: {
+      currentLocation () {
+        return this.$store.getters.location || {}
+      },
+      computer () {
+        return this.currentLocation.computer || ''
+      },
+      disk () {
+        return this.currentLocation.disk || ''
+      },
       computerName () {
         return this.computer.split('.').reverse()[1]
       },
@@ -58,13 +67,12 @@
         return `${comps[0]} ${comps[2]} `
       },
       snapDate () {
-        return moment.utc(this.snap.substring(5), 'YYYY.MM.DD-HH.mm.ss').local().format('DD-MM-YYYY HH:mm')
-      },
-      currentLocation () {
-        return this.$store.getters.location
+        const snap = this.currentLocation.snapshot || ''
+        return moment.utc(snap.substring(5), 'YYYY.MM.DD-HH.mm.ss').local().format('DD-MM-YYYY HH:mm')
       },
       steps () {
-        const steps = (this.currentLocation.path || '').split('/')
+        const path = this.currentLocation.path || ''
+        const steps = path.split('/')
         steps.shift()
         let fullpath = '/'
         const obj = steps.map(e => {
@@ -74,7 +82,7 @@
         return obj
       }
     },
-    props: ['computer', 'disk', 'snap'],
+    props: [],
     components: {
     },
     created: function () {

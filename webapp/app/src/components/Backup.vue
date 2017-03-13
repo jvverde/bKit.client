@@ -2,7 +2,8 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      <breadcrumb :computer="computer" :disk="disk" :snap="selectedSnap || ''">
+      <breadcrumb :computer="rootLocation.computer" :disk="rootLocation.disk" 
+        :snap="selectedSnap || ''">
       </breadcrumb>
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps"
@@ -17,9 +18,8 @@
         </section>
       </div>
     </header>
-    <snapshot v-if="typeof selectedSnap === 'string'" :id="selectedSnap"
-      :computer="computer"
-      :disk="disk" class="snapshot">
+    <snapshot v-if="rootLocation.snapshot !== null"
+      :rootLocation="rootLocation" class="snapshot">
     </snapshot>
     <footer class="bottom">
       <console></console>
@@ -40,9 +40,7 @@
       return {
         selectedCell: -1,
         selectedSnap: null,
-        snaps: [],
-        computer: this.$route.params.computer,
-        disk: this.$route.params.disk
+        snaps: []
       }
     },
     use: {
@@ -52,6 +50,14 @@
     computed: {
       currentLocation () {
         return this.$store.getters.location
+      },
+      rootLocation () {
+        return {
+          computer: this.$route.params.computer,
+          disk: this.$route.params.disk,
+          snapshot: this.selectedSnap,
+          path: '/'
+        }
       }
     },
     components: {
@@ -64,8 +70,8 @@
     created () {
       let url = this.$store.getters.url +
         'backup' +
-        '/' + this.computer +
-        '/' + this.disk
+        '/' + this.rootLocation.computer +
+        '/' + this.rootLocation.disk
       this.$http.get(url).then(
         function (response) {
           this.snaps = (response.data || []).map(function (snap) {

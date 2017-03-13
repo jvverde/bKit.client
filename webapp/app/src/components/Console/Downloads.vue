@@ -19,7 +19,6 @@ export default {
     Resource
   },
   created () {
-    console.log('created')
     ipcRenderer.on('download', (event, arg) => {
       if (arg instanceof Object && arg.type === 'download') {
         this.downloads.find(x => x.fullpath === arg.fullpath) || this.downloads.push(arg)
@@ -27,7 +26,6 @@ export default {
           title: arg.filename,
           message: 'Download completed'
         })
-        console.log(arg.mimetype)
         if (arg.mimetype === 'application/bkit') {
           let download = this.downloads.find(x => x.fullpath === arg.fullpath)
           try {
@@ -46,7 +44,6 @@ export default {
     })
   },
   mounted () {
-    console.log('mounted')
     ipcRenderer.send('register', 'download')
   },
   destroy () {

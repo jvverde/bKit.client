@@ -40,6 +40,7 @@ global.settings = {
 }
 
 if (fs.existsSync(settingsFile)) {
+  console.log('Read setting from', settingsFile)
   try {
     const file = fs.readFileSync(settingsFile)
     Object.assign(global.settings, JSON.parse(file))

@@ -72,23 +72,31 @@
 <script>
   import store from 'src/vuex/store'
   const {ipcRenderer} = require('electron')
-  const {spawn} = require('child_process')
+  const {spawnSync} = require('child_process')
   const path = require('path')
   const parentDir = path.resolve(process.cwd(), '..')
-  const BASH = require('os').platform() === 'win32' ? `${parentDir}\\bash.bat` : 'bash'
+  const BASH = require('os').platform() === 'win32' ? 'bash.bat' : 'bash'
 
   export default {
     store,
     created: function () {
       ipcRenderer.send('clear', '')
       try {
-        this.$store.dispatch('setServerAddress', this.$electron.remote.getGlobal('settings').server.address)
+        let addr = this.$electron.remote.getGlobal('settings').server.address
+        if (addr == '') {
+          console.log('Find server')
+          const fd = spawnSync(BASH, ['./getBackupAddr.sh'], {cwd: '..'})
+          fd.stdout.on('data', (data) => {
+            addr = (`${data}` || '').replace(/(\n|\r)+$/, '')
+          })
+        }
+        this.$store.dispatch('setServerAddress', addr)
         this.$store.dispatch('setServerPort', this.$electron.remote.getGlobal('settings').server.port)
       } catch (e) {
         console.error(e)
       }
       try {
-        const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: parentDir})
+        const fd = spawnSync(BASH, ['./getComputerName.sh'], {cwd: '..'})
         fd.stdout.on('data', (data) => {
           const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
           store.dispatch('setComputerName', name)

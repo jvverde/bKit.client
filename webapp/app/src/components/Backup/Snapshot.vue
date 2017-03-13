@@ -2,7 +2,7 @@
   <section class="snapshot">
     <aside class="tree" >
       <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
-      <directory :location="rootLocation" v-if="rootLocation.path">
+      <directory :location="rootLocation">
       </directory>
     </aside>
     <files class="content" :location="currentLocation" 
@@ -15,30 +15,17 @@
   import Directory from './Directory'
   import Files from './Files'
 
-  const requiredString = {
-    type: String,
-    required: true,
-    validator: function (w) {
-      return w.length > 0
-    }
-  }
-
   export default {
     name: 'snapshot',
     data () {
       return {
-        rootLocation: {},
         currentFiles: []
       }
     },
-    props: {
-      computer: requiredString,
-      disk: requiredString,
-      id: requiredString
-    },
+    props: ['rootLocation'],
     computed: {
       diskName () {
-        const comps = this.disk.split('.')
+        const comps = this.rootLocation.disk.split('.')
         return comps[2] === '_' ? comps[0] : comps[2] + (
           comps[0] === '_' ? '' : ` (${comps[0]}:)`
         )
@@ -52,12 +39,7 @@
       Files
     },
     mounted () {
-      this.rootLocation = {
-        computer: this.computer,
-        disk: this.disk,
-        snapshot: this.id,
-        path: '/'
-      }
+      console.log('mounted snapshot')
       this.select(this.rootLocation)
     },
     methods: {

@@ -88,7 +88,6 @@
         console.error(e)
       }
       try {
-        console.log(BASH)
         const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: parentDir})
         fd.stdout.on('data', (data) => {
           const name = (`${data}` || '').replace(/(\n|\r)+$/, '')

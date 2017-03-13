@@ -20,6 +20,11 @@ export default [
     component: require('components/Backup')
   },
   {
+    path: '/local/disks',
+    name: 'Local-disks',
+    component: require('components/Local/Disks')
+  },
+  {
     path: '*',
     redirect: '/'
   }

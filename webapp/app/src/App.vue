@@ -72,9 +72,7 @@
 <script>
   import store from 'src/vuex/store'
   const {ipcRenderer} = require('electron')
-  const {spawnSync} = require('child_process')
-  const path = require('path')
-  const parentDir = path.resolve(process.cwd(), '..')
+  const {spawn} = require('child_process')
   const BASH = require('os').platform() === 'win32' ? 'bash.bat' : 'bash'
 
   export default {
@@ -82,24 +80,30 @@
     created: function () {
       ipcRenderer.send('clear', '')
       try {
-        let addr = this.$electron.remote.getGlobal('settings').server.address
-        if (addr == '') {
-          console.log('Find server')
-          const fd = spawnSync(BASH, ['./getBackupAddr.sh'], {cwd: '..'})
+        const addr = this.$electron.remote.getGlobal('settings').server.address || ''
+        const port = this.$electron.remote.getGlobal('settings').server.port
+        store.dispatch('setServerAddress', addr)
+        store.dispatch('setServerPort', port)
+        if (addr === '') {  // last resource to find a server
+          console.log('Find a server')
+          const fd = spawn(BASH, ['./getBackupAddr.sh'], {cwd: '..'})
           fd.stdout.on('data', (data) => {
-            addr = (`${data}` || '').replace(/(\n|\r)+$/, '')
+            const a = (`${data}` || '').replace(/(\n|\r)+$/, '')
+            this.$nextTick(() => {
+              store.dispatch('setServerAddress', a)
+            })
           })
         }
-        this.$store.dispatch('setServerAddress', addr)
-        this.$store.dispatch('setServerPort', this.$electron.remote.getGlobal('settings').server.port)
       } catch (e) {
         console.error(e)
       }
       try {
-        const fd = spawnSync(BASH, ['./getComputerName.sh'], {cwd: '..'})
+        const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: '..'})
         fd.stdout.on('data', (data) => {
           const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
-          store.dispatch('setComputerName', name)
+          this.$nextTick(() => {
+            store.dispatch('setComputerName', name)
+          })
         })
         fd.stderr.on('data', (msg) => {
           this.$notify.error({

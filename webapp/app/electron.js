@@ -27,7 +27,8 @@ if (process.env.NODE_ENV === 'development') {
 
 const settingsDir = path.join(app.getPath('userData'), 'bKit')
 
-const settingsFile = `${settingsDir}\\settings.json`
+const settingsFile = path.join(settingsDir, 'settings.json')
+
 global.settings = {
   window: {
     width: 1200,

@@ -1,6 +1,6 @@
 <template>
   <ul class="subtree">
-    <directory v-for="d in directories" :entry="{path:d.path, name: d.name, parentSelected: parentSelected}"></directory>
+    <directory v-for="d in directories" :entry="{path:d.path, name: d.name}" :parentSelected="parentSelected"></directory>
     <li v-for="file in files" class="file">
       <span>{{file.name}}</span>
     </li>
@@ -61,7 +61,7 @@
 </script>
 
 <style scoped lang="scss">
-  ul.subtree{
+  .subtree{
     padding-left: 1em;
     list-style: none;
   }

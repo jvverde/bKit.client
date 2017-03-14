@@ -1,5 +1,5 @@
 <template>
-    <li class="dir" :class="{closed:!open}">
+    <li class="dir">
       <div class="header">
         <span class="icon is-small">
           <i class="fa"
@@ -14,7 +14,7 @@
           {{entry.name}}
         </span>
       </div>
-      <subtree :path="entry.path" :open="open" :parentSelected="isSelected"></subtree>
+      <subtree :path="entry.path" :open="open" :parentSelected="isSelected" :class="{closed:!open}" class="subtree"></subtree>
     </li>
 </template>
 
@@ -48,14 +48,15 @@
     },
     methods: {
       select () {
-        this.selected = !this.selected
+        if (this.selected === null) this.selected = !this.parentSelected
+        else this.selected = !this.selected
       }
     }
   }
 </script>
 
 <style scoped lang="scss">
-  ul.dir.closed{
+  .subtree.closed{
     display: none;
   }
 </style>

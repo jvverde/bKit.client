@@ -17,7 +17,7 @@
             {{d.name}}
           </span>
         </div>
-        <directory :path="d.name" :open="d.open"></directory>
+        <subtree :path="d.name" :open="d.open" :parentSelected="false"></subtree>
       </li>
     </ul>
   </div>
@@ -45,7 +45,7 @@
 </style>
 
 <script>
-  import Directory from './Directory'
+  import Subtree from './Subtree'
   const {spawn} = require('child_process')
   const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
   const path = require('path')
@@ -69,7 +69,7 @@
     watch: {
     },
     components: {
-      Directory
+      Subtree
     },
     created () {
       this.refresh()

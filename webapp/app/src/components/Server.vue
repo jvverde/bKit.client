@@ -2,6 +2,7 @@
   <div class="server">
     <bkitlogo></bkitlogo>
     <h1>Server Location</h1>
+    <router-link to="/local/disks" style="position:absolute;right:0;top:0">...</router-link>
     <table>
       <tr>
         <td>Address:</td>

@@ -50,7 +50,6 @@
     methods: {
       refresh () {
         if (this.open) {
-          console.log('refresh', this.path)
           const entries = fs.readdirSync(this.path).map(e => {
             const fullpath = path.join(this.path, e)
             const older = this.directories.find(e => e.path === fullpath) || {}

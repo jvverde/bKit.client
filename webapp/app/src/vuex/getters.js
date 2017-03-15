@@ -14,5 +14,5 @@ export const computer = state => state.computer
 export const server = state => state.server
 export const location = state => state.files.location
 
-export const backupIncludes = state => state.backuplists.includes
-export const backupExcludes = state => state.backuplists.excludes
+export const backupIncludes = state => state.backuplists.include
+export const backupExcludes = state => state.backuplists.exclude

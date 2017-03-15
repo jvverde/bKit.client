@@ -1,6 +1,10 @@
 <template>
   <ul class="subtree">
-    <directory v-for="d in directories" :entry="{path:d.path, name: d.name}" :parentSelected="parentSelected"></directory>
+    <directory v-for="(d, index) in directories"
+      v-on:subDirSelect="subDirSelect"
+      ref="subdirs"
+      :entry="{path:d.path, name: d.name, index: index}" :parentSelected="parentSelected">
+    </directory>
     <li v-for="file in files" class="file">
       <span>{{file.name}}</span>
     </li>
@@ -55,6 +59,12 @@
           this.directories = entries.filter(e => e.directory).sort(order)
           this.files = entries.filter(e => !e.directory).sort(order)
         }
+      },
+      subDirSelect () { // called every time a sub dir is (un)selected
+        const subdirs = this.$refs.subdirs
+        if (subdirs.every(e => e.triState === true)) return this.$emit('subTreeSelect', true)
+        if (subdirs.every(e => e.triState === false)) return this.$emit('subTreeSelect', false)
+        this.$emit('subTreeSelect', null)
       }
     }
   }

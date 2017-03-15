@@ -22,3 +22,13 @@ export const setComputerName = ({ commit }, name) => {
 export const setLocation = ({ commit }, location) => {
   commit(types.SETLOCATION, location)
 }
+
+export const incBackupDir = ({ commit }, dir) => {
+  commit(types.INCBACKUPDIR, dir)
+}
+export const excBackupDir = ({ commit }, dir) => {
+  commit(types.EXCBACKUPDIR, dir)
+}
+export const rmBackupDir = ({ commit }, dir) => {
+  commit(types.RMBACKUPDIR, dir)
+}

@@ -1,7 +1,12 @@
 export default [
   {
     path: '/',
-    name: 'home',
+    name: 'Home-page',
+    component: require('components/Home')
+  },
+  {
+    path: '/server',
+    name: 'Setserver-page',
     component: require('components/Server')
   },
   {

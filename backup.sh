@@ -31,7 +31,7 @@ do
 	esac
 done
 
-[[ -z $BACKUPDIR ]] && {
+[[ -z $BACKUPDIR ]] && { #if backup dir is not previous defined (through --uuid option)
 	BACKUPDIR="$1" && shift
 }
 MAPDRIVE="$1"

@@ -16,9 +16,9 @@
 
   export default {
     name: 'formatedsize',
-    data () {
-      return {
-        size: niceBytes(this.value)
+    computed: {
+      size () {
+        return niceBytes(this.value)
       }
     },
     props: ['value']

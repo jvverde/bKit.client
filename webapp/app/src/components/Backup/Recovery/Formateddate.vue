@@ -8,9 +8,9 @@
 
   export default {
     name: 'formateddate',
-    data () {
-      return {
-        datetime: moment.utc(1000 * this.value).local()
+    computed: {
+      datetime () {
+        return moment.utc(1000 * this.value).local()
           .format('DD-MM-YYYY HH:mm:ss')
       }
     },

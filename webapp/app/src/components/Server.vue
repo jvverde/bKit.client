@@ -1,25 +1,33 @@
 <template>
   <div class="server">
-    <bkitlogo></bkitlogo>
-    <h1>Server Location</h1>
-    <router-link to="/local/disks" style="position:absolute;right:0;top:0">...</router-link>
-    <table>
-      <tr>
-        <td>Address:</td>
-        <td><input v-model="address" placeholder="Server IP or Name address"></td>
-      </tr>
-      <tr>
-        <td>Port:</td>
-        <td><input v-model="port" type="numeric" min="80" max="65535" placeholder="Port number"></td>
-      </tr>
-    </table>
-    <router-link :to="{name: 'Computers-page'}" v-if="isValid">
-      <el-button type="primary">Go</el-button>
-    </router-link>
-    <el-button disabled v-else>Go</el-button>
-    <router-link :to="{name: 'Init-page'}" v-if="isValid" class="set">
-      Set {{address}} as the Backup Server
-    </router-link>
+    <header class="top">
+      <bkitlogo class="logo"></bkitlogo>
+      <ul class="breadcrumb">
+        <li>
+          <span>
+           <router-link to="/" class="icon is-small"><i class="fa fa-home">Home</i></router-link>
+          </span>
+        </li>
+      </ul>
+    </header>
+    <section>
+      <h1>Server Location</h1>
+      <table>
+        <tr>
+          <td>Address:</td>
+          <td><input v-model="address" placeholder="Server IP or Name address"></td>
+        </tr>
+        <tr>
+          <td>Port:</td>
+          <td><input v-model="port" type="numeric" min="80" max="65535" placeholder="Port number"></td>
+        </tr>
+      </table>
+      <el-button-group class="buttons">
+        <el-button type="primary" @click.stop="goback" icon="arrow-left">Return</el-button>
+        <el-button type="primary" @click.stop="go"
+          :disabled="!isValid">Go <i class="el-icon-arrow-right el-icon-righ"></i></el-button>
+      </el-button-group>
+    </section>
   </div>
 </template>
 
@@ -48,29 +56,49 @@ export default {
     }
   },
   methods: {
+    goback () {
+      this.$router.back()
+    },
+    go () {
+      this.$router.push({ path: '/computers' })
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  @import "../breadcrumb.scss";
   .server{
     display:flex;
     flex-direction: column;
-    align-items: center;
-    h1, h2 {
-      font-weight: normal;
+    header.top{
+      flex-shrink:0;
+      .logo{
+        float:left;
+      }
     }
-    a {
-      text-decoration: none;
-    }
-    a:hover {
-      color: rgb(40, 56, 76);
-    }
-    .set{
-      position: absolute;
-      bottom: 1em;
-      right: 1em;
-    }
+    section{
+      display:flex;
+      flex-direction: column;
+      align-self: center;
+      h1, h2 {
+        font-weight: normal;
+      }
+      a {
+        text-decoration: none;
+      }
+      a:hover {
+        color: rgb(40, 56, 76);
+      }
+      .set{
+        position: absolute;
+        bottom: 1em;
+        right: 1em;
+      }
+      .buttons{
+        align-self:flex-end;
+      }
+    } 
   }
 </style>

@@ -50,13 +50,17 @@
     methods: {
       refresh () {
         if (this.open) {
-          const entries = fs.readdirSync(this.path).map(e => {
-            const fullpath = path.join(this.path, e)
-            const older = this.directories.find(e => e.path === fullpath) || {}
-            return Object.assign({}, older, {name: e, path: fullpath, directory: isDirectory(fullpath)})
-          })
-          this.directories = entries.filter(e => e.directory).sort(order)
-          this.files = entries.filter(e => !e.directory).sort(order)
+          try {
+            const entries = fs.readdirSync(this.path).map(e => {
+              const fullpath = path.join(this.path, e)
+              const older = this.directories.find(e => e.path === fullpath) || {}
+              return Object.assign({}, older, {name: e, path: fullpath, directory: isDirectory(fullpath)})
+            })
+            this.directories = entries.filter(e => e.directory).sort(order)
+            this.files = entries.filter(e => !e.directory).sort(order)
+          } catch (e) {
+            console.warn(e)
+          }
         }
       },
       subDirSelect () { // called every time a sub dir is (un)selected

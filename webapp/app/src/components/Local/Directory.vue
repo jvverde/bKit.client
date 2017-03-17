@@ -61,7 +61,6 @@
         })
       },
       selected () {
-        console.log(this.entry.path, 'selected change to', this.selected)
         if (this.selected === true) {
           this.$store.dispatch('incBackupDir', this.entry.path)
         } else if (this.selected === false) {
@@ -69,8 +68,6 @@
         } else if (this.selected === null) {
           this.$store.dispatch('rmBackupDir', this.entry.path)
         }
-        console.log(this.$store.getters.backupIncludes)
-        console.log(this.$store.getters.backupExcludes)
       }
     },
     created () {

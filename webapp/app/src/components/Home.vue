@@ -21,7 +21,8 @@ export default {
         {name: 'Backup', ref: '/local/disks'},
         {name: 'Recovery', ref: '/computers'},
         {name: 'Server', ref: '/server'},
-        {name: 'Init', ref: '/init'}
+        {name: 'Init', ref: '/init'},
+        {name: 'Update', ref: '/update'}
       ]
     }
   },
@@ -50,9 +51,6 @@ export default {
     display: flex;
     flex-direction: column;
     flex-grow:1;
-    .logo {
-      flex-shrink:0
-    }
     h1{
       overflow: hidden;
       flex-shrink:10000;
@@ -69,7 +67,7 @@ export default {
         align-items: center; 
         justify-content: center; 
         min-height: 3em;
-        border-radius: 10px;
+        border-radius: 20px;
         border: 1px solid $bkit-color;
         margin: 1px;
       }

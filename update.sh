@@ -14,6 +14,6 @@ CONF="$SDIR/conf/conf.init"
 
 #ask "Vai actualizar o bKit para a versao actual no servidor ($UPDATERURL)\n\nDeseja continuar?" || die 'Asking question'
 export RSYNC_PASSWORD="4dm1n"
-rsync -aRb --backup-dir=".backups/$(date +"%c")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$UPDATERSRC" . || die "Problemas ao actualizar" 
+rsync -acRb --backup-dir=".backups/$(date +"%c")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$UPDATERSRC" . || die "Problemas ao actualizar" 
 
 echo "Actualizaçao feita com com sucesso"

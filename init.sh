@@ -26,11 +26,16 @@ INITFILE=$CONFDIR/conf.init
 INITPATH=$INITFILE
 exists cygpath && INITPATH=$(cygpath -w "$INITFILE")
 
+OS=$(uname -o|tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')
+[[ $ARCH == x86_64 ]] && ARCH=x64 || ARCH=ia32
+[[ $OS == cygwin ]] && OS=win32 || OS=linux
+
 echo Writing configuration to $INITPATH
 (
 	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
 	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
-	echo "UPDATERURL=rsync://admin@$SERVER:$UPORT/bkit-update"
+	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
 )> "$INITFILE"
 
 PASSFILE=$CONFDIR/pass.txt

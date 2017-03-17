@@ -1,0 +1,5 @@
+- *.vbs
+- *.log
+- *.full
+- cygwi*/*.log
+- cygwi*/*.full

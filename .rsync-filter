@@ -1,0 +1,14 @@
+- /3rd-party
+- /cache
+- /logs
+- /run
+- /conf
+- /tmp
+- /schtasks
+- *~
+- /old
+- /not-used-anymore
+- /.backups
+- /.vscode
+- /webapp
+- /gui

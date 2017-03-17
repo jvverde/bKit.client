@@ -11,6 +11,7 @@ exists fsutil && {
   exit 0
 }
 exists lsblk && exec 3>&2 &&{
-
+  df --output=target -x tmpfs -x devtmpfs |tail -n +2
+  exit 0
 }
 die neither found fsutil nor lsblk

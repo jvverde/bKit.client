@@ -2,6 +2,7 @@
   @import "./config.scss";
   header{
     display: flex;
+    flex-shrink:0;
     flex-direction:column;
     justify-content: flex-start;
     align-items: flex-start;

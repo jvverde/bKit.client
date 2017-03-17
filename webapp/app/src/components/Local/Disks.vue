@@ -1,6 +1,9 @@
 <template>
   <div class="main local">
-    <bkitlogo class="logo"></bkitlogo>
+    <header class="top">
+      <bkitlogo class="logo"></bkitlogo>
+      <breadcrumb></breadcrumb>
+    </header>
     <ul class="disks">
       <li v-if="loading">
           <i class="fa fa-refresh fa-spin fa-fw"></i> Loading...
@@ -28,13 +31,17 @@
     display: flex;
     flex-direction: column;
     text-align:left;
-    .logo {
+    header.top{
       flex-shrink: 0;
+      .logo{
+        float:left;
+      }
     }
     ul.disks{
       overflow: auto;
       list-style: none;
       position:relative;
+      margin-left: 1em;
       li.disk{
         display: flex;
         flex-direction: column;
@@ -45,6 +52,7 @@
 </style>
 
 <script>
+  import Breadcrumb from './Breadcrumb'
   import Subtree from './Subtree'
   const {spawn} = require('child_process')
   const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
@@ -69,7 +77,8 @@
     watch: {
     },
     components: {
-      Subtree
+      Subtree,
+      Breadcrumb
     },
     created () {
       this.refresh()

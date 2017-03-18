@@ -4,6 +4,10 @@
       <bkitlogo class="logo"></bkitlogo>
       <breadcrumb></breadcrumb>
     </header>
+    <section>
+      <span>Backup Now</span>
+      <span>Create a backup Job</span>
+    </section>
     <ul class="disks">
       <li v-if="loading">
           <i class="fa fa-refresh fa-spin fa-fw"></i> Loading...

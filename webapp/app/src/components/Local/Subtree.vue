@@ -6,6 +6,15 @@
       :entry="{path:d.path, name: d.name, index: index}" :parentSelected="parentSelected">
     </directory>
     <li v-for="file in files" class="file">
+      <span class="icon is-small">
+        <i class="fa"
+          :class="{
+            'fa-square-o': !file.selected,
+            'fa-check-square-o': file.selected
+          }"
+          @click.stop="toggle(file)"> </i>
+        <i class="fa fa-file-o"> </i>
+      </span>
       <span>{{file.name}}</span>
     </li>
   </ul>
@@ -42,6 +51,34 @@
     watch: {
       open () {
         this.refresh()
+      },
+      parentSelected () {
+        this.files.forEach(e => {
+          e.selected = this.parentSelected
+        })
+      }
+    },
+    computed: {
+      subdirs () {
+        return this.$refs.subdirs || []
+      },
+      isDirsAll () {
+        return this.subdirs.every(e => e.triState === true)
+      },
+      isDirsClear () {
+        return this.subdirs.every(e => e.triState === false)
+      },
+      isFilesAll () {
+        return this.files.every(e => e.selected === true)
+      },
+      isFilesClear () {
+        return this.files.every(e => e.selected === false)
+      },
+      isAllSelected () {
+        return this.isFilesAll && this.isDirsAll
+      },
+      isAllUnselected () {
+        return this.isFilesClear && this.isDirsClear
       }
     },
     created () {
@@ -58,16 +95,20 @@
             })
             this.directories = entries.filter(e => e.directory).sort(order)
             this.files = entries.filter(e => !e.directory).sort(order)
+              .map(e => Object.assign(e, {selected: this.parentSelected}))
           } catch (e) {
             console.warn(e)
           }
         }
       },
       subDirSelect () { // called every time a sub dir is (un)selected
-        const subdirs = this.$refs.subdirs
-        if (subdirs.every(e => e.triState === true)) return this.$emit('subTreeSelect', true)
-        if (subdirs.every(e => e.triState === false)) return this.$emit('subTreeSelect', false)
+        if (this.isAllSelected) return this.$emit('subTreeSelect', true)
+        if (this.isAllUnselected) return this.$emit('subTreeSelect', false)
         this.$emit('subTreeSelect', null)
+      },
+      toggle (file) {
+        file.selected = !file.selected
+        this.subDirSelect()
       }
     }
   }
@@ -77,5 +118,8 @@
   .subtree{
     padding-left: 1em;
     list-style: none;
+    .file{
+      margin-left: 1em;
+    }
   }
 </style>

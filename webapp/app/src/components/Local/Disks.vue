@@ -8,61 +8,21 @@
       <li v-if="loading">
           <i class="fa fa-refresh fa-spin fa-fw"></i> Loading...
       </li>
-      <li v-for="d in drives" class="disk">
-        <div class="header">
-          <span class="icon is-small">
-            <i class="fa"
-              :class="{'fa-plus-square-o':!d.open,'fa-minus-square-o':d.open}"
-              @click.stop="d.open = !d.open"> </i>
-            <i class="fa fa-folder-o"> </i>
-          </span>
-          <span>
-            {{d.name}}
-          </span>
-        </div>
-        <subtree :path="d.name" :open="d.open" :parentSelected="false"></subtree>
-      </li>
+      <disk v-for="d in drives" :name="d"></disk>
     </ul>
   </div>
 </template>
 
-<style scoped lang="scss">
-  .main.local{
-    display: flex;
-    flex-direction: column;
-    text-align:left;
-    header.top{
-      flex-shrink: 0;
-      .logo{
-        float:left;
-      }
-    }
-    ul.disks{
-      overflow: auto;
-      list-style: none;
-      position:relative;
-      margin-left: 1em;
-      li.disk{
-        display: flex;
-        flex-direction: column;
-      }
-
-    }
-  }
-</style>
-
 <script>
   import Breadcrumb from './Breadcrumb'
-  import Subtree from './Subtree'
+  import Disk from './Disk'
   const {spawn} = require('child_process')
   const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
   const path = require('path')
 
-/*
   function order (a, b) {
-    return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
+    return (a > b) ? 1 : ((b > a) ? -1 : 0)
   }
-*/
   export default {
     name: 'disks',
     data () {
@@ -70,14 +30,8 @@
         drives: []
       }
     },
-    props: {
-    },
-    computed: {
-    },
-    watch: {
-    },
     components: {
-      Subtree,
+      Disk,
       Breadcrumb
     },
     created () {
@@ -102,9 +56,7 @@
             const drives = output.replace(/\n$/, '').split(/\n/)
             console.log('drives:', drives)
             this.$nextTick(() => {
-              this.drives = drives.map((e, i) => {
-                return {name: path.join(e, '/'), open: (this.drives[i] || {}).open}
-              })
+              this.drives = drives.sort(order).map(e => path.join(e, '/'))
               this.loading = false
             })
           })
@@ -117,3 +69,22 @@
   }
 </script>
 
+<style scoped lang="scss">
+  .main.local{
+    display: flex;
+    flex-direction: column;
+    text-align:left;
+    header.top{
+      flex-shrink: 0;
+      .logo{
+        float:left;
+      }
+    }
+    ul.disks{
+      overflow: auto;
+      list-style: none;
+      position:relative;
+      margin-left: 1em;
+    }
+  }
+</style>

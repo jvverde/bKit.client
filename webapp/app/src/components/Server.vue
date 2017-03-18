@@ -25,7 +25,7 @@
       <el-button-group class="buttons">
         <el-button type="primary" @click.stop="goback" icon="arrow-left">Return</el-button>
         <el-button type="primary" @click.stop="go"
-          :disabled="!isValid">Go <i class="el-icon-arrow-right el-icon-righ"></i></el-button>
+          :disabled="!isValid">Go <i class="el-icon-arrow-right el-icon-right"></i></el-button>
       </el-button-group>
     </section>
   </div>

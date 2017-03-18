@@ -11,4 +11,4 @@ die() {
 DATE=$1
 rsync -acR --out-format="%p|%t|%o|%i|%b|%l|%f" ".backups/$DATE/./" . || die "Problemas ao actualizar" 
 
-echo "Actualizaçao feita com com sucesso"
+echo "Actualização feita com com sucesso"

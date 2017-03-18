@@ -10,6 +10,11 @@ export default [
     component: require('components/Server')
   },
   {
+    path: '/update',
+    name: 'Update-page',
+    component: require('components/Update')
+  },
+  {
     path: '/init',
     name: 'Init-page',
     component: require('components/Console/Init')

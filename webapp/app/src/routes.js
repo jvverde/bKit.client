@@ -35,6 +35,11 @@ export default [
     component: require('components/Local/Disks')
   },
   {
+    path: '/job',
+    name: 'Job-page',
+    component: require('components/Local/Job')
+  },
+  {
     path: '*',
     redirect: '/'
   }

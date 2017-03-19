@@ -1,71 +1,9 @@
-<style lang="scss">
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html,
-  body{
-    height:100%;
-    width: 100%;
-    overflow: hidden;
-  }
-
-  body {
-    font-family: Helvetica, Verdana, Arial, sans-serif;
-    justify-content: center;
-    text-align: center;
-  }
-  a {
-    text-decoration: none;
-  }
-
-  .message {
-    border-radius: 5px;
-    font-size: 10px;
-    * {
-      white-space: pre-line;
-    }
-  }
-  .message.warning {
-    background-color: #F5F5DC; /* https://en.wikipedia.org/wiki/Category:Shades_of_yellow */
-  }
-  .message.error {
-    background-color: #F9CCCA; /* https://en.wikipedia.org/wiki/Shades_of_pink */
-  }
-  .alert {
-    color: #DE3163;
-  }
-
-</style>
-
-<style lang="scss" scoped>
-  .main {
-    height:100%;
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  .opendebug {
-    font-size: 8pt;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    z-index: 10;
-    opacity: 0;
-    &:hover{
-      cursor: help;
-    }
-  }
-</style>
-
 <template>
   <div class="main">
     <span @click="debug" class="opendebug">.</span>
-    <router-view></router-view>
+    <keep-alive>
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -129,3 +67,67 @@
     }
   }
 </script>
+
+<style lang="scss">
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html,
+  body{
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+    justify-content: center;
+    text-align: center;
+  }
+  a {
+    text-decoration: none;
+  }
+
+  .message {
+    border-radius: 5px;
+    font-size: 10px;
+    * {
+      white-space: pre-line;
+    }
+  }
+  .message.warning {
+    background-color: #F5F5DC; /* https://en.wikipedia.org/wiki/Category:Shades_of_yellow */
+  }
+  .message.error {
+    background-color: #F9CCCA; /* https://en.wikipedia.org/wiki/Shades_of_pink */
+  }
+  .alert {
+    color: #DE3163;
+  }
+
+</style>
+
+<style lang="scss" scoped>
+  .main {
+    height:100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .opendebug {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    opacity: 0;
+    &:hover{
+      cursor: help;
+    }
+  }
+</style>

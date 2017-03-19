@@ -70,21 +70,17 @@
         'backup' +
         '/' + this.rootLocation.computer +
         '/' + this.rootLocation.disk
-      this.$http.get(url).then(
-        function (response) {
-          this.snaps = (response.data || []).map(function (snap) {
-            return {
-              id: snap,
-              date: moment.utc(snap.substring(5), 'YYYY.MM.DD-HH.mm.ss')
-                .local()
-            }
-          })
-          this.select(this.snaps.length - 1)
-        },
-        function (response) {
-          console.error(response)
-        }
-      )
+      this.$http.get(url).then(response => {
+        this.snaps = (response.data || []).map(snap => {
+          return {
+            id: snap,
+            date: moment.utc(snap.substring(5), 'YYYY.MM.DD-HH.mm.ss').local()
+          }
+        })
+        this.select(this.snaps.length - 1)
+      }, response => {
+        console.error(response)
+      })
     },
     methods: {
       select (index) {

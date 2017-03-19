@@ -1,6 +1,6 @@
 <template>
   <section class="snapshot">
-    <aside class="tree" >
+    <aside class="tree" v-if="rootLocation.disk">
       <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
       <directory :location="rootLocation">
       </directory>
@@ -25,7 +25,7 @@
     props: ['rootLocation'],
     computed: {
       diskName () {
-        const comps = this.rootLocation.disk.split('.')
+        const comps = (this.rootLocation.disk || '').split('.')
         return comps[2] === '_' ? comps[0] : comps[2] + (
           comps[0] === '_' ? '' : ` (${comps[0]}:)`
         )

@@ -6,7 +6,7 @@
     </header>
     <section>
       <span>Backup Now</span>
-      <span>Create a backup Job</span>
+      <router-link to="/job">Create a backup Job</router-link>
     </section>
     <ul class="disks">
       <li v-if="loading">

@@ -34,6 +34,99 @@
   </ul>
 </template>
 
+<script>
+  import Formateddate from './Recovery/Formateddate'
+  import Formatedsize from './Recovery/Formatedsize'
+
+  const requiredLocation = {
+    type: Object,
+    required: true,
+    validator: function (obj) {
+      return obj.computer && obj.disk && obj.snapshot && obj.path &&
+        obj.path.match(/^\//) && obj.path.match(/\/$/)
+    }
+  }
+  function order (a, b) {
+    return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
+  }
+
+  /* import { mapGetters } from 'vuex' */
+
+  export default {
+    name: 'directory',
+    data () {
+      return {
+        url: this.$store.getters.url,
+        folders: [],
+        files: [],
+        loading: true
+      }
+    },
+    props: {
+      location: requiredLocation
+    },
+    computed: {
+      currentPath () {
+        return this.$store.getters.location.path
+      }
+    },
+    watch: {
+      location () {
+        this.refresh()
+      }
+    },
+    components: {
+      Formateddate,
+      Formatedsize
+    },
+    created () {
+      this.refresh()
+    },
+    methods: {
+      getUrl (base, entry) {
+        return this.url + base +
+          '/' + this.location.computer +
+          '/' + this.location.disk +
+          '/' + this.location.snapshot +
+          this.location.path +
+          encodeURIComponent(entry || '')
+      },
+      select (folder) {
+        this.$store.dispatch('setLocation', folder.location)
+        folder.open = !folder.open
+      },
+      refresh () {
+        try {
+          var url = this.getUrl('folder')
+          this.loading = true
+          this.$http.jsonp(url).then((response) => {
+            let files = (response.data.files || []).sort(order)
+            let folders = (response.data.folders || []).map(folder => ({
+              name: folder,
+              location: Object.assign({}, this.location, {
+                path: this.location.path + encodeURIComponent(folder) + '/'
+              }),
+              open: (this.folders.find(e => e.name === folder) || {})
+                .open === true
+            })).sort(order)
+            this.$nextTick(() => {
+              this.loading = false
+              this.files = files
+              this.folders = folders
+            })
+          }, (response) => {
+            this.loading = false
+            console.error(response)
+          })
+        } catch (e) {
+          this.loading = false
+          console.error(e)
+        }
+      }
+    }
+  }
+</script>
+
 <style scoped lang="scss">
   @import "../../config.scss";
   ul.directories{
@@ -130,97 +223,3 @@
     }
   }
 </style>
-
-<script>
-  import Formateddate from './Recovery/Formateddate'
-  import Formatedsize from './Recovery/Formatedsize'
-
-  const requiredLocation = {
-    type: Object,
-    required: true,
-    validator: function (obj) {
-      return obj.computer && obj.disk && obj.snapshot && obj.path &&
-        obj.path.match(/^\//) && obj.path.match(/\/$/)
-    }
-  }
-  function order (a, b) {
-    return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
-  }
-
-  /* import { mapGetters } from 'vuex' */
-
-  export default {
-    name: 'directory',
-    data () {
-      return {
-        url: this.$store.getters.url,
-        folders: [],
-        files: [],
-        loading: true
-      }
-    },
-    props: {
-      location: requiredLocation
-    },
-    computed: {
-      currentPath () {
-        return this.$store.getters.location.path
-      }
-    },
-    watch: {
-      location () {
-        this.refresh()
-      }
-    },
-    components: {
-      Formateddate,
-      Formatedsize
-    },
-    created () {
-      this.refresh()
-    },
-    methods: {
-      getUrl (base, entry) {
-        return this.url + base +
-          '/' + this.location.computer +
-          '/' + this.location.disk +
-          '/' + this.location.snapshot +
-          this.location.path +
-          encodeURIComponent(entry || '')
-      },
-      select (folder) {
-        this.$store.dispatch('setLocation', folder.location)
-        folder.open = !folder.open
-      },
-      refresh () {
-        try {
-          var url = this.getUrl('folder')
-          this.loading = true
-          this.$http.jsonp(url).then((response) => {
-            let files = (response.data.files || []).sort(order)
-            let folders = (response.data.folders || []).map(folder => ({
-              name: folder,
-              location: Object.assign({}, this.location, {
-                path: this.location.path + encodeURIComponent(folder) + '/'
-              }),
-              open: (this.folders.find(e => e.name === folder) || {})
-                .open === true
-            })).sort(order)
-            this.$nextTick(() => {
-              this.loading = false
-              this.files = files
-              this.folders = folders
-            })
-          }, (response) => {
-            this.loading = false
-            console.error(response)
-          })
-        } catch (e) {
-          this.loading = false
-          console.error(e)
-        }
-      }
-    }
-  }
-</script>
-

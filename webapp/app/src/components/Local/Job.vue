@@ -56,24 +56,20 @@
 </template>
 
 <script>
-  const path = require('path')
-  function order (a, b) {
-    return (a > b) ? 1 : ((b > a) ? -1 : 0)
+  const PATH = require('path')
+  function orderNames (a, b) {
+    if (a.name > b.name) return 1
+    else if (b.name > a.name) return -1
+    else return 0
   }
-  function rules (list = [], ast) {
-    const result = {}
-    list.forEach((e = '') => {
-      console.log('sep=', path.sep)
-      const steps = e.split(path.sep)
-      let rpath = ''
-      steps.forEach(step => {
-        console.log(step)
-        rpath += step + '/'
-        result[rpath] = true
-      })
-      result[e + '/' + ast] = true
-    })
-    return result
+  function order (a, b) {
+    if (a.includes === b.includes) return orderNames(a, b)
+    else if (a.includes === null) return -1
+    else if (b.includes === null) return 1
+    else if (a.includes === false) return -1
+    else if (b.includes === false) return 1
+    console.error('a==b', a, b)
+    return 0
   }
   export default {
     name: 'job',
@@ -94,8 +90,36 @@
         }
       },
       rules () {
-        const includes = rules(this.resources.includes, '**')
-        return Object.keys(includes).map(e => '+ ' + e).sort(order)
+        let parents = {}
+        this.resources.includes.forEach(e => {
+          const steps = e.split(PATH.sep)
+          let acc = ''
+          steps.forEach(step => {
+            if (step) acc += step + PATH.sep
+            else acc = PATH.sep
+            parents[acc] = true
+          })
+        })
+        const ancestors = Object.keys(parents).map(e => {
+          return {
+            name: '+ ' + e,
+            includes: null
+          }
+        })
+        const includes = this.resources.includes.map(e => {
+          return {
+            name: '+ ' + e + '/**',
+            includes: true
+          }
+        })
+        const excludes = this.resources.excludes.map(e => {
+          return {
+            name: '- ' + e + '/*',
+            includes: false
+          }
+        })
+        return ancestors.concat(includes, excludes).sort(order)
+          .map(e => e.name).concat('- *')
       }
     },
     components: {

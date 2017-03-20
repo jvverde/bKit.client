@@ -17,13 +17,13 @@
       <div>
         <div>Includes:</span>
         <div v-for="d in resources.includes">
-          {{d}}
+          {{d.path}}
         </div>
       </div>
       <div>
         <div>Excludes:</span>
         <div v-for="d in resources.excludes">
-          {{d}}
+          {{d.path}}
         </div>
       </div>
       <div>
@@ -58,18 +58,15 @@
 <script>
   const PATH = require('path')
   function orderNames (a, b) {
-    if (a.name > b.name) return 1
-    else if (b.name > a.name) return -1
+    if (a.name > b.name) return -1
+    else if (b.name > a.name) return +1
     else return 0
   }
   function order (a, b) {
     if (a.includes === b.includes) return orderNames(a, b)
     else if (a.includes === null) return -1
     else if (b.includes === null) return 1
-    else if (a.includes === false) return -1
-    else if (b.includes === false) return 1
-    console.error('a==b', a, b)
-    return 0
+    else return orderNames(a, b)
   }
   export default {
     name: 'job',
@@ -92,7 +89,7 @@
       rules () {
         let parents = {}
         this.resources.includes.forEach(e => {
-          const steps = e.split(PATH.sep)
+          const steps = e.path.split(PATH.sep)
           let acc = ''
           steps.forEach(step => {
             if (step) acc += step + PATH.sep
@@ -102,24 +99,28 @@
         })
         const ancestors = Object.keys(parents).map(e => {
           return {
-            name: '+ ' + e,
+            name: e,
             includes: null
           }
         })
         const includes = this.resources.includes.map(e => {
           return {
-            name: '+ ' + e + '/**',
+            name: e.path,
             includes: true
           }
         })
         const excludes = this.resources.excludes.map(e => {
           return {
-            name: '- ' + e + '/*',
+            name: e.path,
             includes: false
           }
         })
         return ancestors.concat(includes, excludes).sort(order)
-          .map(e => e.name).concat('- *')
+          .map(e => {
+            if (e.includes === false) return '- ' + e.name + '/**'
+            else if (e.includes === true) return '+ ' + e.name + '/**'
+            else return '+ ' + e.name
+          }).concat('- *')
       }
     },
     components: {
@@ -141,6 +142,7 @@
   @import "../../config.scss";
   .job{
     text-align: left;
+    overflow: auto;
     .select {
       display: flex;
       flex-wrap: wrap;

@@ -209,7 +209,7 @@ backup(){
 		#if a hard link (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 		
-		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take are of it
+		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
 
 		echo Is something else

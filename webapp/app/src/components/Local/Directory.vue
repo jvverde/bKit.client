@@ -61,12 +61,16 @@
         })
       },
       selected () {
+        const entry = {
+          path: this.entry.path,
+          dir: true
+        }
         if (this.selected === true) {
-          this.$store.dispatch('incBackupDir', this.entry.path)
+          this.$store.dispatch('incBackupDir', entry)
         } else if (this.selected === false) {
-          this.$store.dispatch('excBackupDir', this.entry.path)
+          this.$store.dispatch('excBackupDir', entry)
         } else if (this.selected === null) {
-          this.$store.dispatch('rmBackupDir', this.entry.path)
+          this.$store.dispatch('rmBackupDir', entry)
         }
       }
     },

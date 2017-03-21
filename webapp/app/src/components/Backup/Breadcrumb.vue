@@ -77,7 +77,7 @@
         let fullpath = '/'
         const obj = steps.map(e => {
           fullpath += e + '/'
-          return {value: e, path: fullpath}
+          return {value: decodeURIComponent(e), path: fullpath}
         })
         return obj
       }

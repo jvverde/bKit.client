@@ -90,6 +90,7 @@
         let parents = {}
         this.resources.includes.forEach(e => {
           const steps = e.path.split(PATH.sep)
+          if (!e.dir) steps.pop() // discard file name if it is a file
           let acc = ''
           steps.forEach(step => {
             if (step) acc += step + PATH.sep
@@ -106,19 +107,23 @@
         const includes = this.resources.includes.map(e => {
           return {
             name: e.path,
+            dir: e.dir,
             includes: true
           }
         })
         const excludes = this.resources.excludes.map(e => {
           return {
             name: e.path,
+            dir: e.dir,
             includes: false
           }
         })
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
-            if (e.includes === false) return '- ' + e.name + '/**'
-            else if (e.includes === true) return '+ ' + e.name + '/**'
+            if (e.includes === false && e.dir) return '- ' + e.name + '/***'
+            else if (e.includes === false && !e.dir) return '- ' + e.name
+            else if (e.includes === true && e.dir) return '+ ' + e.name + '/**'
+            else if (e.includes === true && !e.dir) return '+ ' + e.name
             else return '+ ' + e.name
           }).concat('- *')
       }

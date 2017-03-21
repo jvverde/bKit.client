@@ -1,11 +1,18 @@
 <template>
   <ul class="subtree">
     <directory v-for="(d, index) in directories"
-      v-on:subDirSelect="subDirSelect"
+      v-on:subDirSelect="childrenChanged"
       ref="subdirs"
       :entry="{path:d.path, name: d.name, index: index}" :parentSelected="parentSelected">
     </directory>
-    <li v-for="file in files" class="file">
+    <file v-for="file in files" 
+      :name="file.name"
+      :path="file.path"
+      :parentSelected="parentSelected"
+      ref="files"
+      v-on:fileSelect="childrenChanged">
+    </file>
+<!--     <li v-for="file in files" class="file">
       <span class="icon is-small">
         <i class="fa"
           :class="{
@@ -16,7 +23,7 @@
         <i class="fa fa-file-o"> </i>
       </span>
       <span>{{file.name}}</span>
-    </li>
+    </li> -->
   </ul>
 </template>
 
@@ -40,6 +47,7 @@
     name: 'subtree',
     beforeCreate: function () {
       this.$options.components.Directory = require('./Directory.vue')
+      this.$options.components.File = require('./File.vue')
     },
     data () {
       return {
@@ -51,16 +59,14 @@
     watch: {
       open () {
         this.refresh()
-      },
-      parentSelected () {
-        this.files.forEach(e => {
-          e.selected = this.parentSelected
-        })
       }
     },
     computed: {
       subdirs () {
         return this.$refs.subdirs || []
+      },
+      subfiles () {
+        return this.$refs.files || []
       },
       isDirsAll () {
         return this.subdirs.every(e => e.triState === true)
@@ -69,10 +75,10 @@
         return this.subdirs.every(e => e.triState === false)
       },
       isFilesAll () {
-        return this.files.every(e => e.selected === true)
+        return this.subfiles.every(e => e.selected === true)
       },
       isFilesClear () {
-        return this.files.every(e => e.selected === false)
+        return this.subfiles.every(e => e.selected === false)
       },
       isAllSelected () {
         return this.isFilesAll && this.isDirsAll
@@ -95,20 +101,15 @@
             })
             this.directories = entries.filter(e => e.directory).sort(order)
             this.files = entries.filter(e => !e.directory).sort(order)
-              .map(e => Object.assign(e, {selected: this.parentSelected}))
           } catch (e) {
             console.warn(e)
           }
         }
       },
-      subDirSelect () { // called every time a sub dir is (un)selected
+      childrenChanged () { // called every time a sub dir is (un)selected
         if (this.isAllSelected) return this.$emit('subTreeSelect', true)
         if (this.isAllUnselected) return this.$emit('subTreeSelect', false)
         this.$emit('subTreeSelect', null)
-      },
-      toggle (file) {
-        file.selected = !file.selected
-        this.subDirSelect()
       }
     }
   }

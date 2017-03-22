@@ -35,7 +35,7 @@
     </section>
     <section class="select">
       <span>Backup every </span>
-      <input v-model="every" 
+      <input v-model="every"
         type="number" min="1" step="1" max="120"></input>
       <span v-for="p in periods"
         @click.stop="period=p"
@@ -52,6 +52,7 @@
         placeholder="Select date and time">
       </el-date-picker>
     </section>
+    <div @click.stop="update">Update...</div>
   </div>
 </template>
 
@@ -120,12 +121,20 @@
         })
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
-            if (e.includes === false && e.dir) return '- ' + e.name + '/***'
+            if (e.includes === false && e.dir) return '- ' + PATH.join(e.name, '***')
             else if (e.includes === false && !e.dir) return '- ' + e.name
-            else if (e.includes === true && e.dir) return '+ ' + e.name + '/**'
+            else if (e.includes === true && e.dir) return '+ ' + PATH.join(e.name, '**')
             else if (e.includes === true && !e.dir) return '+ ' + e.name
             else return '+ ' + e.name
           }).concat('- *')
+      },
+      roots () {
+        let roots = {}
+        this.resources.includes.forEach(e => {
+          if (e.root) roots[e.path] = true
+        })
+        console.log(roots)
+        return Object.keys(roots)
       }
     },
     components: {
@@ -138,6 +147,16 @@
       }
     },
     methods: {
+      rulesOfRoot (root) {
+        return this.rules.filter(rule => rule.startsWith(root, 2))
+      },
+      update () {
+        console.log('Roots:', this.roots)
+        this.roots.forEach(root => {
+          const rules = this.rulesOfRoot(root)
+          console.log(rules)
+        })
+      }
     }
   }
 </script>
@@ -154,11 +173,11 @@
       .period {
         border: 1px solid $bkit-color;
         padding: .25em;
-      }      
+      }
       .period:last-child {
-        border-bottom-right-radius: 5px;      
-        border-top-right-radius: 5px;      
-      }        
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+      }
       .period.selected {
         background-color: $bkit-color;
       }

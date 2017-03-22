@@ -18,8 +18,8 @@
       </span>
     </div>
     <subtree v-on:subTreeSelect="subTreeSelect"
-      :path="name" 
-      :open="open" 
+      :path="name"
+      :open="open"
       :parentSelected="selected"
       :class="{closed:!open}" class="subtree">
     </subtree>
@@ -44,6 +44,22 @@
       triState () {
         if (this.descendantTreeStatus === null) return null
         else return this.selected
+      }
+    },
+    watch: {
+      selected () {
+        const entry = {
+          path: this.name,
+          dir: true,
+          root: true
+        }
+        if (this.selected === true) {
+          this.$store.dispatch('incBackupDir', entry)
+        } else if (this.selected === false) {
+          this.$store.dispatch('excBackupDir', entry)
+        } else if (this.selected === null) {
+          this.$store.dispatch('rmBackupDir', entry)
+        }
       }
     },
     components: {

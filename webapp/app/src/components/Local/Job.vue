@@ -52,6 +52,7 @@
         placeholder="Select date and time">
       </el-date-picker>
     </section>
+    <div @click.stop="update">Update...</div>
   </div>
 </template>
 
@@ -126,6 +127,14 @@
             else if (e.includes === true && !e.dir) return '+ ' + e.name
             else return '+ ' + e.name
           }).concat('- *')
+      },
+      roots () {
+        let roots = {}
+        this.resources.includes.forEach(e => {
+          if (e.root) roots[e.path] = true
+        })
+        console.log(roots)
+        return Object.keys(roots)
       }
     },
     components: {
@@ -138,6 +147,16 @@
       }
     },
     methods: {
+      rulesOfRoot (root) {
+        return this.rules.filter(rule => rule.startsWith(root, 2))
+      },
+      update () {
+        console.log('Roots:', this.roots)
+        this.roots.forEach(root => {
+          const rules = this.rulesOfRoot(root)
+          console.log(rules)
+        })
+      }
     }
   }
 </script>

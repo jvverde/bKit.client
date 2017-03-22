@@ -22,7 +22,6 @@
   import Disk from './Disk'
   const {spawn} = require('child_process')
   const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
-  const path = require('path')
 
   function order (a, b) {
     return (a > b) ? 1 : ((b > a) ? -1 : 0)
@@ -60,7 +59,7 @@
             const drives = output.replace(/\n$/, '').split(/\n/)
             console.log('drives:', drives)
             this.$nextTick(() => {
-              this.drives = drives.sort(order).map(e => path.join(e, '/'))
+              this.drives = drives.sort(order)
               this.loading = false
             })
           })

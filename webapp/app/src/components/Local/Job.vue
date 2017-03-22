@@ -35,7 +35,7 @@
     </section>
     <section class="select">
       <span>Backup every </span>
-      <input v-model="every" 
+      <input v-model="every"
         type="number" min="1" step="1" max="120"></input>
       <span v-for="p in periods"
         @click.stop="period=p"
@@ -120,9 +120,9 @@
         })
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
-            if (e.includes === false && e.dir) return '- ' + e.name + '/***'
+            if (e.includes === false && e.dir) return '- ' + PATH.join(e.name, '***')
             else if (e.includes === false && !e.dir) return '- ' + e.name
-            else if (e.includes === true && e.dir) return '+ ' + e.name + '/**'
+            else if (e.includes === true && e.dir) return '+ ' + PATH.join(e.name, '**')
             else if (e.includes === true && !e.dir) return '+ ' + e.name
             else return '+ ' + e.name
           }).concat('- *')
@@ -154,11 +154,11 @@
       .period {
         border: 1px solid $bkit-color;
         padding: .25em;
-      }      
+      }
       .period:last-child {
-        border-bottom-right-radius: 5px;      
-        border-top-right-radius: 5px;      
-      }        
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+      }
       .period.selected {
         background-color: $bkit-color;
       }

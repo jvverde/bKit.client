@@ -16,13 +16,13 @@
     <section>
       <div>
         <div>Includes:</span>
-        <div v-for="d in resources.includes">
+        <div v-for="d in includes">
           {{d.path}}
         </div>
       </div>
       <div>
         <div>Excludes:</span>
-        <div v-for="d in resources.excludes">
+        <div v-for="d in excludes">
           {{d.path}}
         </div>
       </div>
@@ -57,16 +57,19 @@
 </template>
 
 <script>
+  const {spawn} = require('child_process')
+  const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
   const PATH = require('path')
+
   function orderNames (a, b) {
-    if (a.name > b.name) return -1
-    else if (b.name > a.name) return +1
+    if (a.path > b.path) return -1
+    else if (b.path > a.path) return +1
     else return 0
   }
   function order (a, b) {
-    if (a.includes === b.includes) return orderNames(a, b)
-    else if (a.includes === null) return -1
-    else if (b.includes === null) return 1
+    if (a.isIncluded === b.isIncluded) return orderNames(a, b)
+    else if (a.isIncluded === null) return -1
+    else if (b.isIncluded === null) return 1
     else return orderNames(a, b)
   }
   export default {
@@ -76,7 +79,9 @@
         every: 1,
         periods: ['Min', 'Hour', 'Day', 'Week', 'Month', 'Year'],
         period: 'Day',
-        start: ''
+        start: '',
+        includes: [],
+        excludes: []
       }
     },
     props: [],
@@ -89,7 +94,8 @@
       },
       rules () {
         let parents = {}
-        this.resources.includes.forEach(e => {
+        console.log(this.includes)
+        this.includes.forEach(e => {
           const steps = e.path.split(PATH.sep)
           if (!e.dir) steps.pop() // discard file name if it is a file
           let acc = ''
@@ -101,38 +107,21 @@
         })
         const ancestors = Object.keys(parents).map(e => {
           return {
-            name: e,
-            includes: null
+            path: e,
+            isIncluded: null
           }
         })
-        const includes = this.resources.includes.map(e => {
-          return {
-            name: e.path,
-            dir: e.dir,
-            includes: true
-          }
-        })
-        const excludes = this.resources.excludes.map(e => {
-          return {
-            name: e.path,
-            dir: e.dir,
-            includes: false
-          }
-        })
-        return ancestors.concat(includes, excludes).sort(order)
+        return ancestors.concat(this.includes, this.excludes).sort(order)
           .map(e => {
-            if (e.includes === false && e.dir) return '- ' + PATH.join(e.name, '***')
-            else if (e.includes === false && !e.dir) return '- ' + e.name
-            else if (e.includes === true && e.dir) return '+ ' + PATH.join(e.name, '**')
-            else if (e.includes === true && !e.dir) return '+ ' + e.name
-            else return '+ ' + e.name
+            if (e.isIncluded === false && e.dir) return '- ' + PATH.join(e.path, '***')
+            else if (e.isIncluded === false && !e.dir) return '- ' + e.path
+            else if (e.isIncluded === true && e.dir) return '+ ' + PATH.join(e.path, '**')
+            else if (e.isIncluded === true && !e.dir) return '+ ' + e.path
+            else return '+ ' + e.path
           }).concat('- *')
       },
       roots () {
         let roots = {}
-        this.resources.includes.forEach(e => {
-          if (e.root) roots[e.path] = true
-        })
         console.log(roots)
         return Object.keys(roots)
       }
@@ -140,10 +129,14 @@
     components: {
     },
     created () {
+      this.refresh()
     },
     watch: {
       start () {
         console.log(this.start)
+      },
+      resources () {
+        this.refresh()
       }
     },
     methods: {
@@ -151,10 +144,54 @@
         return this.rules.filter(rule => rule.startsWith(root, 2))
       },
       update () {
-        console.log('Roots:', this.roots)
+        this.refresh()
+/*        console.log('Roots:', this.roots)
         this.roots.forEach(root => {
           const rules = this.rulesOfRoot(root)
           console.log(rules)
+        })*/
+      },
+      translate (list, cb) {
+        if (list.length === 0) return undefined
+        try {
+          const paths = list.map(e => e.path)
+          const fd = spawn(BASH, ['./getRoot.sh', ...paths], {cwd: '..'})
+          let output = ''
+          fd.stdout.on('data', (data) => {
+            output += `${data}`
+          })
+          fd.stderr.on('data', (msg) => {
+            console.error(`${msg}`)
+            this.$notify.error({
+              title: 'Error',
+              message: `${msg}`,
+              customClass: 'message error'
+            })
+          })
+          fd.on('close', () => {
+            const entries = output.replace(/\n$/, '').split(/\n/)
+            const pathsAndRoots = entries.map(entry => {
+              const [orig, path, root] = entry.split('|')
+              return Object.assign({}, list.find(e => e.path === orig), {path: path, root: root})
+            })
+            this.$nextTick(() => {
+              cb(pathsAndRoots)
+            })
+          })
+        } catch (e) {
+          console.error(e)
+        }
+      },
+      refresh () {
+        this.translate(this.resources.includes, includes => {
+          this.includes = includes.map(include => {
+            return Object.assign(include, {isIncluded: true})
+          })
+        })
+        this.translate(this.resources.excludes, excludes => {
+          this.excludes = excludes.map(exclude => {
+            return Object.assign(exclude, {isIncluded: false})
+          })
         })
       }
     }

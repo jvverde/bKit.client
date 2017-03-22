@@ -11,15 +11,15 @@ for DIR in "$@"
 do
   [[ -e $DIR ]] || die Cannot find $1
 
-  BDIR=$DIR
-  exists cygpath && BDIR=$(cygpath "$BDIR")
+  FULLDIR=$DIR
+  exists cygpath && FULLDIR=$(cygpath "$FULLDIR")
 
-  BDIR=$(readlink -ne "$BDIR")
+  FULLDIR=$(readlink -ne "$FULLDIR")
 
-  MOUNT=$(stat -c%m "$BDIR")
+  MOUNT=$(stat -c%m "$FULLDIR")
   exists cygpath && {
-    BDIR=$(cygpath -w "$BDIR")
-    MOUNT=$(cygpath -w "$MOUNT")
+    FULLDIR=$(cygpath -wl "$FULLDIR")
+    MOUNT=$(cygpath -wl "$MOUNT")
   }
-  echo -e "$DIR\t$BDIR\t$MOUNT"
+  echo "$DIR|$FULLDIR|$MOUNT"
 done

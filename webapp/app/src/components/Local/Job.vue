@@ -143,13 +143,15 @@
             isIncluded: null
           }
         })
+        const join = (...a) => PATH.join(PATH.sep, ...a)
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
-            if (e.isIncluded === false && e.dir) return '- ' + PATH.join(e.path, '***')
-            else if (e.isIncluded === false && e.file) return '- ' + e.path
-            else if (e.isIncluded === true && e.dir) return '+ ' + PATH.join(e.path, '**')
-            else if (e.isIncluded === true && e.file) return '+ ' + e.path
-            else return '+ ' + e.path
+            const is = e.isIncluded
+            if (is === false && e.dir) return '- ' + join(e.path, '***')
+            else if (is === false && e.file) return '- ' + join(e.path)
+            else if (is === true && e.dir) return '+ ' + join(e.path, '**')
+            else if (is === true && e.file) return '+ ' + join(e.path)
+            else return '+ ' + join(e.path)
           }).concat('- *')
       },
       update () {
@@ -176,7 +178,10 @@
             const entries = output.replace(/\n$/, '').split(/\n/)
             const pathsAndRoots = entries.map(entry => {
               const [orig, path, root] = entry.split('|')
-              return Object.assign({}, list.find(e => e.path === orig), {path: path.replace(root,''), root: root})
+              return Object.assign({}, list.find(e => e.path === orig), {
+                path: path.replace(root, ''),
+                root: root
+              })
             })
             this.$nextTick(() => {
               cb(pathsAndRoots)

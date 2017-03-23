@@ -146,11 +146,11 @@
         const join = (...a) => PATH.join(PATH.sep, ...a)
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
-            const is = e.isIncluded
-            if (is === false && e.dir) return '- ' + join(e.path, '***')
-            else if (is === false && e.file) return '- ' + join(e.path)
-            else if (is === true && e.dir) return '+ ' + join(e.path, '**')
-            else if (is === true && e.file) return '+ ' + join(e.path)
+            const is = condition => e.isIncluded === condition
+            if (is(false) && e.dir) return '- ' + join(e.path, '***')
+            else if (is(false) && e.file) return '- ' + join(e.path)
+            else if (is(true) && e.dir) return '+ ' + join(e.path, '**')
+            else if (is(true) && e.file) return '+ ' + join(e.path)
             else return '+ ' + join(e.path)
           }).concat('- *')
       },

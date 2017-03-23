@@ -28,8 +28,8 @@
       </div>
       <div>
         <div>Rules:</div>
-        <div v-for="r in rules">
-          {{r}}
+        <div v-for="r in roots">
+          {{r.name}}: {{r.values}}
         </div>
       </div>
     </section>
@@ -92,38 +92,23 @@
           excludes: this.$store.getters.backupExcludes
         }
       },
-      rules () {
-        let parents = {}
-        console.log(this.includes)
+      roots () {
+        let includesOf = {}
+        let excludesOf = {}
         this.includes.forEach(e => {
-          const steps = e.path.split(PATH.sep)
-          if (!e.dir) steps.pop() // discard file name if it is a file
-          let acc = ''
-          steps.forEach(step => {
-            if (step) acc += step + PATH.sep
-            else acc = PATH.sep
-            parents[acc] = true
-          })
+          includesOf[e.root] = includesOf[e.root] || []
+          includesOf[e.root].push(e)
         })
-        const ancestors = Object.keys(parents).map(e => {
+        this.excludes.forEach(e => {
+          excludesOf[e.root] = excludesOf[e.root] || []
+          excludesOf[e.root].push(e)
+        })
+        return Object.keys(includesOf).map(root => {
           return {
-            path: e,
-            isIncluded: null
+            name: root,
+            values: this.order(includesOf[root], excludesOf[root] || [])
           }
         })
-        return ancestors.concat(this.includes, this.excludes).sort(order)
-          .map(e => {
-            if (e.isIncluded === false && e.dir) return '- ' + PATH.join(e.path, '***')
-            else if (e.isIncluded === false && !e.dir) return '- ' + e.path
-            else if (e.isIncluded === true && e.dir) return '+ ' + PATH.join(e.path, '**')
-            else if (e.isIncluded === true && !e.dir) return '+ ' + e.path
-            else return '+ ' + e.path
-          }).concat('- *')
-      },
-      roots () {
-        let roots = {}
-        console.log(roots)
-        return Object.keys(roots)
       }
     },
     components: {
@@ -140,16 +125,35 @@
       }
     },
     methods: {
-      rulesOfRoot (root) {
-        return this.rules.filter(rule => rule.startsWith(root, 2))
+      order (includes, excludes) {
+        let parents = {}
+        includes.forEach(e => {
+          const steps = e.path.split(PATH.sep)
+          if (!e.dir) steps.pop() // discard file name if it is a file
+          let acc = ''
+          steps.forEach(step => {
+            if (step) acc += step + PATH.sep
+            else acc = PATH.sep
+            parents[acc] = true
+          })
+        })
+        const ancestors = Object.keys(parents).map(e => {
+          return {
+            path: e,
+            isIncluded: null
+          }
+        })
+        return ancestors.concat(includes, excludes).sort(order)
+          .map(e => {
+            if (e.isIncluded === false && e.dir) return '- ' + PATH.join(e.path, '***')
+            else if (e.isIncluded === false && e.file) return '- ' + e.path
+            else if (e.isIncluded === true && e.dir) return '+ ' + PATH.join(e.path, '**')
+            else if (e.isIncluded === true && e.file) return '+ ' + e.path
+            else return '+ ' + e.path
+          }).concat('- *')
       },
       update () {
         this.refresh()
-/*        console.log('Roots:', this.roots)
-        this.roots.forEach(root => {
-          const rules = this.rulesOfRoot(root)
-          console.log(rules)
-        })*/
       },
       translate (list, cb) {
         if (list.length === 0) return undefined
@@ -172,7 +176,7 @@
             const entries = output.replace(/\n$/, '').split(/\n/)
             const pathsAndRoots = entries.map(entry => {
               const [orig, path, root] = entry.split('|')
-              return Object.assign({}, list.find(e => e.path === orig), {path: path, root: root})
+              return Object.assign({}, list.find(e => e.path === orig), {path: path.replace(root,''), root: root})
             })
             this.$nextTick(() => {
               cb(pathsAndRoots)

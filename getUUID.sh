@@ -11,18 +11,14 @@ die() { echo -e "$@">&2; exit 1; }
 
 BACKUPDIR="$1"
 
-exists cygpath && BACKUPDIR=$(cygpath "$1") && SDIR=$(cygpath "$SDIR")
+exists cygpath && BACKUPDIR=$(cygpath "$1")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-[[ $BACKUPDIR == /dev/* ]] && { 
-	DEV=$BACKUPDIR
-	STARTDIR=""
-} || {
+[[ -b $BACKUPDIR ]] && STARTDIR="" || {
 	MOUNT=$(stat -c%m "$BACKUPDIR")
-	DEV=$(df --output=source "$MOUNT"|tail -1)
-	STARTDIR=${BACKUPDIR#$MOUNT}
-	STARTDIR=${STARTDIR#/}
+	STARTDIR=${BACKUPDIR#${MOUNT}/}   #BACKUPDIR=MOUNT/STARTDIR
 }
-source "$SDIR/drive.sh" "$DEV"
+VOLUMESERIALNUMBER=$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null|cut -d'|' -f2)
+
 echo "$VOLUMESERIALNUMBER|$STARTDIR"

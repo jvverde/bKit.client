@@ -75,7 +75,8 @@ BACKUPDIR="$ROOT/$STARTDIR"
 #source "$SDIR/drive.sh" "$DEV"
 IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null)
 
-[[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk
+[[ $DRIVETYPE =~ Ram.Disk ]] && die "$BACKUPDIR is in a RAM Disk"
+
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"

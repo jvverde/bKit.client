@@ -2,6 +2,10 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1 ;}
+
+exists sqlite3 || die Cannot find sqlite3
+
+
 [[ $1 == '-f' ]] && FULL=true && shift				#get -f option if present
 [[ $1 == '-b' ]] && LBD=true && shift					#get -b option if present
 
@@ -14,8 +18,10 @@ MOUNT="$(stat -c %m "$FULLPATH")"
 DIR="${FULLPATH#$MOUNT}"
 DIR="${DIR#/}"
 
-DEV=$(df --output=source "$MOUNT"|tail -1)
-source "$SDIR/drive.sh" "$DEV" || die Cannot execute $SDIR/drive.sh $DEV
+#DEV=$(df --output=source "$MOUNT"|tail -1)
+#source "$SDIR/drive.sh" "$DEV" || die Cannot execute $SDIR/drive.sh $DEV
+VOLUMESERIALNUMBER=$("$SDIR/drive.sh" "$FULLPATH" 2>/dev/null |cut -d'|' -f2)
+
 
 CACHE="$SDIR/cache/hashes/by-volume/$VOLUMESERIALNUMBER/$DIR"
 MARK="$CACHE/.lastrun"
@@ -31,12 +37,12 @@ mkdir -p "$CACHE"
 mkdir -p "$WD"
 
 
-EXC=$( 
+EXC=$(
 	[[ -n $EXCUDELIST ]] || EXCUDELIST="$SDIR/conf/excludes.txt"
 	[[ -f $EXCUDELIST ]] && cat "$EXCUDELIST"|
 	sed -E '/^#/d;/^\s*$/d;s/ /?/g'|
 	sed -E "
-		/^[^/]*$/{s%%-name '&'%p;d}									
+		/^[^/]*$/{s%%-name '&'%p;d}
 		/^([^/]*)[/]$/{s%%-name '\1' -type d%p;d}
 		/^[/](.*[^/])$/{s%%-wholename './$DIR\1'%p;d}
 		/^[/](.*)[/]$/{s%%-path './$DIR\1' -type d%p;d}
@@ -48,7 +54,7 @@ EXC=$(
 	"|
 	sed 's/^\s*-.*$/& -prune -o/'|
 	tr '\n' ' '
-) 
+)
 
 PREFIX=${DIR:+$DIR/}
 FORMAT="${PREFIX}%P\0"
@@ -70,8 +76,6 @@ do
 	echo "$HASH|$(stat -c '%s|%Y' "$FILE")|$FILE"
 done | sed -n '/^[^|]*[|][^|]*[|][^|]*[|][^|]*$/p'|tee "$NEW"
 
-exists sqlite3 || die Cannot fine sqlite3
-
 {
 	exists cygpath && NEW=$(cygpath -w "$NEW")
 	echo "DROP TABLE IF EXISTS TMP;"
@@ -81,7 +85,7 @@ exists sqlite3 || die Cannot fine sqlite3
 	echo ".import '$NEW' TMP"
 	echo "INSERT OR REPLACE INTO H SELECT * FROM TMP;"
 	echo "DROP TABLE IF EXISTS TMP;"
-}|sqlite3 "$DB" 
+}|sqlite3 "$DB"
 
 
 

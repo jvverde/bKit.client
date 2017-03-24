@@ -1,33 +1,36 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
+
+SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
-	case "$KEY" in	
+	case "$KEY" in
 		-l|-log|--log)
-			exec 1>"$1" 
+			exec 1>"$1"
 			shift
 		;;
 		-f|--force)
 			FSW='-f'
 		;;
-		-u|--uuid) 
-			BACKUPDIR=$(bash "$SDIR/getdev.sh" "$1")		
+		-u|--uuid)
+			BACKUPDIR=$(bash "$SDIR/getdev.sh" "$1")
 			shift
 		;;
-		-d|--dir) 
+		-d|--dir)
 			STARTDIR="$1" && shift
 		;;
-		-s|--snap) 
+		-s|--snap)
 			SNAP=true
 		;;
 		*)
 			die Unknow	option $KEY
-		;;		
+		;;
 	esac
 done
 
@@ -42,7 +45,7 @@ exists cygpath && BACKUPDIR=$(cygpath "$BACKUPDIR") && SDIR=$(cygpath "$SDIR")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-[[ -b $BACKUPDIR ]] && { #id it is a block device, then check if it is mounted and mount it if not
+[[ -b $BACKUPDIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
 	DEV=$BACKUPDIR
 	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 	[[ -n $MOUNT ]] || MOUNT=$(df --output=source,target|tail -n +2|fgrep "$DEV"|sort|head -n 1|awk '{print $2}')
@@ -51,11 +54,12 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 		trap "umount $DEV && rm -rvf $MOUNT" EXIT
 	}
 	ROOT=$MOUNT
-} || {
+} || { #otherwise extract ROOT, DEV and STARTDIR
 	MOUNT=$(stat -c%m "$BACKUPDIR")
+	#set STARTDIR if is not defined or empty (BACKUPDIR=MOUNT/STARTDIR)
 	[[ -z $STARTDIR ]] && STARTDIR=${BACKUPDIR#$MOUNT}
-	STARTDIR=${STARTDIR#/}	
-	DEV=$(df --output=source "$MOUNT"|tail -1)
+	STARTDIR=${STARTDIR#/}	#remove first /
+	DEV=$(df --output=source "$MOUNT"|tail -1) #extract DEV
 	ROOT=$MOUNT
 	[[ -n $MAPDRIVE ]] && exists cygpath && ROOT=$(cygpath "$MAPDRIVE")
 }
@@ -67,9 +71,11 @@ BACKUPDIR="$ROOT/$STARTDIR"
 
 [[ $SNAP == true ]] && echo "Fail to create a snaphost. I will continue..."
 
-source "$SDIR/drive.sh" "$DEV"
+#we need ROOT, DEV, BACKUPDIR and STARTDIR
+#source "$SDIR/drive.sh" "$DEV"
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null)
 
-[[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk 
+[[ $DRIVETYPE =~ Ram.Disk ]] && die Drive $DEV is a RAM Disk
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 CONF="$SDIR/conf/conf.init"
@@ -85,7 +91,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync --one-file-system --compress "$@" 2>&1 
+		rsync --one-file-system --compress "$@" 2>&1
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -97,11 +103,11 @@ dorsync(){
 				echo Try again now
 			;;
 			*)
-				echo Fail to backup. Exit value of rsync is non null: $ret 
+				echo Fail to backup. Exit value of rsync is non null: $ret
 				break
 			;;
 		esac
-		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break 
+		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break
 	done
 }
 
@@ -123,13 +129,13 @@ set_postpone_files(){
 remove_postpone_files(){
 	rm -f "$HLIST" "$DLIST" "$FLIST"
 }
-postpone_file(){ 
+postpone_file(){
 	(IFS=$'\n' && echo "$*" ) >&97
 }
-postpone_hl(){ 
+postpone_hl(){
 	(IFS=$'\n' && echo "$*" ) >&99
 }
-postpone_update(){ 
+postpone_update(){
 	(IFS=$'\n' && echo "$*" ) >&98
 }
 
@@ -180,15 +186,15 @@ backup(){
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
-		
+
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
-		
+
 		#if a directory, symlink, device or special
 		[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
-		
+
 		#if file only need to be update
 		#This is dangerous and could ends in transfer (get out ou sync) new data if file changes meanwhile [[ $I =~ ^[.]f ]] && postpone_update "$FILE" && continue
-		
+
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
 			[[ -e $HASHDB ]] && IFS='|' read HASH SIZE TIME < <(
@@ -205,15 +211,15 @@ backup(){
 			echo "$PREFIX|$SIZE|$TIME|$FILE" >> "$MANIFEST"
 			#update_file "$FULLPATH" "$BACKUPURL/$RVID/@by-id/$PREFIX/$TYPE/$FILE"
 		) && continue
-		
+
 		#if a hard link (to file or to symlink)
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
-		
+
 		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
 
 		echo Is something else
-		
+
 	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM --exclude-from="$EXC" $FMT_QUERY2 "$SRC" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
@@ -236,7 +242,7 @@ wait4jobs(){
 	done
 }
 
-bg_upload_manifest(){	
+bg_upload_manifest(){
 	local BASE="$1"
 	local STARTDIR="$2"
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
@@ -246,7 +252,7 @@ bg_upload_manifest(){
 		let START=1
 		let LEN=500
 		SEGMENT=$RUNDIR/segment.$$
-		SEGFILES=$RUNDIR/segment-files.$$	
+		SEGFILES=$RUNDIR/segment-files.$$
 		while [[ -e $MANIFEST ]]
 		do
 			let END=LEN+START-1
@@ -255,10 +261,10 @@ bg_upload_manifest(){
 			(( CNT == 0 )) && sleep 1 && continue
 			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
 			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/data/$STARTDIR/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/data/$STARTDIR/manifest.lst"		
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/data/$STARTDIR/manifest.lst"
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
 			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$RVID/@seed/data"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/data/$STARTDIR/manifest.lst"		
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/data/$STARTDIR/manifest.lst"
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
@@ -273,14 +279,14 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 		rm -fv "$LOCK"
 		die Volume $VOLUMESERIALNUMBER was locked
 	}
-	 	
+
 	bg_upload_manifest "$ROOT" "$STARTDIR"
 
 	echo Start to backup $BACKUPDIR at $(date -R)
 
 	echo Phase 1 - compute ids for new files and backup already server existing files
 
-	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes 
+	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"
@@ -300,9 +306,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
-	OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
-
-	[[ $OSTYPE == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
+	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
 		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 		SRCDIR=".bkit/$STARTDIR"
 		[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"

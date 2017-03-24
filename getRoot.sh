@@ -7,6 +7,7 @@ exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 
 [[ -n $1 ]] || die "Usage:\n\t$0 path[ path[ path [...]]]"
+
 for DIR in "$@"
 do
   [[ -e $DIR ]] || die Cannot find $1

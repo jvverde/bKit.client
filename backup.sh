@@ -19,7 +19,7 @@ do
 			FSW='-f'
 		;;
 		-u|--uuid)
-			BACKUPDIR=$(bash "$SDIR/getdev.sh" "$1")
+			BASEDIR=$(bash "$SDIR/getdev.sh" "$1")
 			shift
 		;;
 		-d|--dir)
@@ -28,25 +28,32 @@ do
 		-s|--snap)
 			SNAP=true
 		;;
+		-- )
+			while [[ $1 =~ ^- ]]
+			do
+				RSYNCOPTIONS="${RSYNCOPTIONS} $1"
+				shift
+			done
+		;;
 		*)
 			die Unknow	option $KEY
 		;;
 	esac
 done
 
-[[ -z $BACKUPDIR ]] && { #if backup dir is not previous defined (through --uuid option)
-	BACKUPDIR="$1" && shift
+[[ -z $BASEDIR ]] && { #if backup dir is not yet defined (through --uuid option)
+	BASEDIR="$1" && shift
 }
 MAPDRIVE="$1"
 
-[[ -n $BACKUPDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
+[[ -n $BASEDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
 
-exists cygpath && BACKUPDIR=$(cygpath "$BACKUPDIR") && SDIR=$(cygpath "$SDIR")
+exists cygpath && BASEDIR=$(cygpath "$BASEDIR")
 
-BACKUPDIR=$(readlink -ne "$BACKUPDIR")
+BASEDIR=$(readlink -ne "$BASEDIR")
 
-[[ -b $BACKUPDIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
-	DEV=$BACKUPDIR
+[[ -b $BASEDIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
+	DEV=$BASEDIR
 	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
 	[[ -n $MOUNT ]] || MOUNT=$(df --output=source,target|tail -n +2|fgrep "$DEV"|sort|head -n 1|awk '{print $2}')
 	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
@@ -54,15 +61,14 @@ BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 		trap "umount $DEV && rm -rvf $MOUNT" EXIT
 	}
 	ROOT=$MOUNT
-} || { #otherwise extract ROOT, DEV and STARTDIR
-	MOUNT=$(stat -c%m "$BACKUPDIR")
-	#set STARTDIR if is not defined or empty (BACKUPDIR=MOUNT/STARTDIR)
-	[[ -z $STARTDIR ]] && STARTDIR=${BACKUPDIR#$MOUNT}
-	STARTDIR=${STARTDIR#/}	#remove first /
-	DEV=$(df --output=source "$MOUNT"|tail -1) #extract DEV
+} || { #otherwise extract ROOT and STARTDIR
+	MOUNT=$(stat -c%m "$BASEDIR")
+	#set STARTDIR if is not defined or empty (BASEDIR=MOUNT/STARTDIR)
+	[[ -z $STARTDIR ]] && STARTDIR=${BASEDIR#$MOUNT/}
 	ROOT=$MOUNT
 	[[ -n $MAPDRIVE ]] && exists cygpath && ROOT=$(cygpath "$MAPDRIVE")
 }
+
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
@@ -92,7 +98,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync --one-file-system --compress "$@" 2>&1
+		rsync --one-file-system --compress $RSYNCOPTIONS "$@" 2>&1
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success

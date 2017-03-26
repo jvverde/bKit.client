@@ -1,7 +1,7 @@
 - /3rd-party
 - /cache
 - /logs
-- /run
+- /run/***
 - /conf
 - /tmp
 - /schtasks
@@ -12,6 +12,8 @@
 - /.vscode
 - /webapp/app/src/assets/
 + /webapp/app/src/
+- /webapp/app/*
++ /webapp/app/
 - /webapp/*
 - /gui
 - lixo.txt

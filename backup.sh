@@ -17,7 +17,7 @@ do
 			shift
 		;;
 		-f|--force)
-			FSW='-f'
+			FSW='-f' #check if we need it
 		;;
 		-u|--uuid)
 			BASEDIR=$(bash "$SDIR/getdev.sh" "$1")
@@ -99,7 +99,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync --one-file-system --compress "$@" 2>&1
+		rsync --filter=': .rsync-filter' --one-file-system --compress "$@" 2>&1
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -185,9 +185,8 @@ update_files(){
 backup(){
 	local BASE=$1
 	local SRC="$1/./$2"
-	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exists || return 1
-	[[ -d $SRC ]] && local HASHDB=$(bash "$SDIR/hash.sh" -b "$SRC")
+	local DST=$3
 	local TYPE=${DST##*/}
 	unset HLINK
 	set_postpone_files
@@ -202,19 +201,10 @@ backup(){
 
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
-			[[ -e $HASHDB ]] && IFS='|' read HASH SIZE TIME < <(
-				sqlite3 "$HASHDB" "SELECT hash,size,time FROM H WHERE filename=\"$FILE\""
-			)
-			CTIME=$(stat -c "%Y" "$FULLPATH") || echo unable to get stat of file $FULLPATH
-			#check if we need to compute a HASH
-			[[ -z $HASH || -z $TIME || -z $CTIME || (($CTIME > $TIME )) ]] && {
-				HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
-				[[ -e $HASHDB ]] && sqlite3 "$HASHDB" "INSERT OR REPLACE INTO H ('hash','size','time','filename') VALUES ('$HASH','$LEN','$CTIME','$FILE');"
-			}
+			HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix $PREFIX !~ ././././././" && exit;}
 			echo "$PREFIX|$SIZE|$TIME|$FILE" >> "$MANIFEST"
-			#update_file "$FULLPATH" "$BACKUPURL/$RVID/@by-id/$PREFIX/$TYPE/$FILE"
 		) && continue
 
 		#if a hard link (to file or to symlink)
@@ -291,7 +281,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	echo Phase 1 - compute ids for new files and backup already server existing files
 
-	time (bash "$SDIR/hash.sh" $FSW "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
+	time ("$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"

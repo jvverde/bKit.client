@@ -10,6 +10,8 @@
 - /not-used-anymore
 - /.backups
 - /.vscode
-- /webapp
+- /webapp/app/src/assets/
++ /webapp/app/src/
+- /webapp/*
 - /gui
 - lixo.txt

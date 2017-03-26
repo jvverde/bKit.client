@@ -4,7 +4,7 @@
     <h2>Set {{address}} as the Backup Server</h2>
     <el-button-group class="buttons">
       <el-button type="primary" @click="goback" icon="arrow-left">Return</el-button>
-      <el-button type="primary" @click="init">Set <i class="el-icon-upload2 el-icon-right"></el-button>
+      <el-button type="primary" @click="init">Set <i class="el-icon-upload2 el-icon-right"></i></el-button>
     </el-button-group>
     <section>
       <div class="stdout">

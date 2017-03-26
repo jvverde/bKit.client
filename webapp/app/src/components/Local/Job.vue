@@ -15,13 +15,13 @@
     <h1>Create a Job</h1>
     <section>
       <div>
-        <div>Includes:</span>
+        <div>Includes:</div>
         <div v-for="d in includes">
           {{d.path}}
         </div>
       </div>
       <div>
-        <div>Excludes:</span>
+        <div>Excludes:</div>
         <div v-for="d in excludes">
           {{d.path}}
         </div>

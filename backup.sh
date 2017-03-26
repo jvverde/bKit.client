@@ -99,7 +99,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync --filter=': .rsync-filter' --one-file-system --compress "$@" 2>&1
+		rsync "${RSYNCOPTIONS[@]}" --filter=': .rsync-filter' --one-file-system --compress "$@" 2>&1
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -162,13 +162,13 @@ export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync "${RSYNCOPTIONS[@]}" --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
+	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync "${RSYNCOPTIONS[@]}" --archive --relative --files-from="$FILE" --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
+	dorsync --archive --relative --files-from="$FILE" --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 update_file(){
@@ -178,7 +178,7 @@ update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync "${RSYNCOPTIONS[@]}" --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes --exclude-from="$EXC" $PERM $FMT "$@"
 	rm -f "$FILE"
 }
 
@@ -215,7 +215,7 @@ backup(){
 
 		echo "Is something else:$I|$FILE|$LINK|$LEN"
 
-	done < <(dorsync "${RSYNCOPTIONS[@]}" --dry-run --archive --hard-links --relative --itemize-changes $PERM --exclude-from="$EXC" $FMT_QUERY2 "$SRC" "$DST")
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM --exclude-from="$EXC" $FMT_QUERY2 "$SRC" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
@@ -224,7 +224,7 @@ clean(){
 	local SRC="$1/./$2"
 	local DST=$3
 	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	dorsync "${RSYNCOPTIONS[@]}" -riHDR $CLEAN $PERM $FMT --exclude-from="$EXC"  "$SRC" "$DST" #clean deleted files
+	dorsync -riHDR $CLEAN $PERM $FMT --exclude-from="$EXC"  "$SRC" "$DST" #clean deleted files
 }
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$ROOT/./" "$BACKUPURL/$RVID/@snap"

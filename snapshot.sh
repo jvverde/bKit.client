@@ -34,7 +34,7 @@ do
             done
         ;;
         *)
-            die Unknow  option $KEY
+            die Unknown  option $KEY
         ;;
     esac
 done

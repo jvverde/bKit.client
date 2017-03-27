@@ -18,11 +18,13 @@ do
             shift
         ;;
         -u|--uuid)
-            BASEDIR=$(bash "$SDIR/getdev.sh" "$1")
+            DIR=$(bash "$SDIR/getdev.sh" "$1")
             shift
         ;;
         -d|--dir)
             STARTDIR="$1" && shift
+            exists cygpath && STARTDIR=$(cygpath "$STARTDIR")
+            BASE=$(stat -c%m "$STARTDIR" 2>/dev/null) && STARTDIR=${STARTDIR#$BASE}
         ;;
         -- )
             while [[ $1 =~ ^- ]]
@@ -37,13 +39,32 @@ do
     esac
 done
 
-[[ -e $1 ]] || die "'$1' was does not not exists"
-DIR=$1
+[[ -z $DIR ]] && { #if backup dir is not yet defined (through --uuid option)
+    DIR="$1"
+}
+
 exists cygpath && DIR=$(cygpath "$DIR")
-DIR=$(readlink -e "$1")
+DIR=$(readlink -e "$DIR")
+
+[[ -b $DIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
+    DEV=$DIR
+    MOUNT=$(df --output=target $DEV|tail -n 1)
+    [[ -z $MOUNT && $UID -eq 0 ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+        mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+        trap "umount $DEV && rm -rvf $MOUNT" EXIT
+    }
+} || { #otherwise extract ROOT and STARTDIR
+    MOUNT=$(stat -c%m "$DIR")
+}
+true ${STARTDIR:=${DIR#$MOUNT}}
+STARTDIR=${STARTDIR#/}
+
+BACKUPDIR=$MOUNT/$STARTDIR
+
+[[ -e $BACKUPDIR ]] || die "$BACKUPDIR doesn't exists"
 
 [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
-    DRIVE=$(cygpath -w "$(stat -c%m "$DIR")")
+    DRIVE=$(cygpath -w "$(stat -c%m "$BACKUPDIR")")
 
     DOSBASH=$(cygpath -w "$BASH")
 
@@ -62,11 +83,11 @@ DIR=$(readlink -e "$1")
     then
     	echo Backup shadow copy
     	SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-    	"$SHADOWSPAN" /verbosity=2 $DRIVE $MAPLETTER "$DOSBASH" "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$DIR" $MAPLETTER
+    	"$SHADOWSPAN" /verbosity=2 $DRIVE $MAPLETTER "$DOSBASH" "$SDIR/backup.sh" --map $MAPLETTER -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
     else
     	echo Backup directly -- without shadow copy
-    	bash "$SDIR%backup.sh" -- "${RSYNCOPTIONS[@]}" "$DIR"
+    	bash "$SDIR%backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
     fi
 } || {
-    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$DIR"
+    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
 }

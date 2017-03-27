@@ -42,6 +42,8 @@ PASSFILE=$CONFDIR/pass.txt
 echo $PASS > "$PASSFILE"
 chmod 600 "$PASSFILE"
 
+bash "$SDIR/make-excludes.sh"
+
 exists rsync || die rsync not found
 
 export RSYNC_PASSWORD="4dm1n"

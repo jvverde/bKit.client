@@ -32,6 +32,7 @@ OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 		echo -e "\n\n#\tFrom registry\n"
 		bash "$SDIR/tools/hklm.sh" | bash "$SDIR/tools/windows-exc.sh" || true
 	} || {
+		echo -e "\n\n#\tFrom unix\n"
 		cat "$EXCDIR/$UNIX"
 	}
 }> "$DSTFILE"

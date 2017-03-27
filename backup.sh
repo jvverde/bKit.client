@@ -99,7 +99,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync "${RSYNCOPTIONS[@]}" --filter=': .rsync-filter' --one-file-system --compress "$@" 2>&1
+		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@" 2>&1
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -148,7 +148,6 @@ postpone_update(){
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-EXC="$SDIR/conf/excludes.txt"
 PERM="--perms --acls --owner --group --super --numeric-ids"
 OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
 CLEAN="--delete --force --delete-excluded --ignore-non-existing --ignore-existing"
@@ -157,7 +156,6 @@ FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
 FMT_QUERY3='--out-format=%i|%n'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
-[[ -e $SDIR/conf/excludes.txt ]] || bash "$SDIR/make-excludes.sh"
 
 update_hardlinks(){
 	FILE="${HLIST}.sort"

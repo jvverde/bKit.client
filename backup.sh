@@ -19,18 +19,9 @@ do
 		-f|--force)
 			FSW='-f' #check if we need it
 		;;
-		-u|--uuid)
-			BASEDIR=$(bash "$SDIR/getdev.sh" "$1")
-			shift
-		;;
-		-d|--dir)
-			STARTDIR="$1" && shift
-		;;
-		-s|--snap)
-			SNAP=true
-		;;
 		-m|--map)
 			MAPDRIVE="$1" && shift
+			exists cygpath && MAPDRIVE=$(cygpath "$MAPDRIVE")
 		;;
 		-- )
 			while [[ $1 =~ ^- ]]
@@ -45,10 +36,7 @@ do
 	esac
 done
 
-[[ -z $BASEDIR ]] && { #if backup dir is not yet defined (through --uuid option)
-	BASEDIR="$1"
-}
-
+BASEDIR="$1"
 
 [[ -n $BASEDIR ]] || die "Usage:\n\t$0 [options] path"
 
@@ -58,32 +46,17 @@ exists cygpath && BASEDIR=$(cygpath "$BASEDIR") && ORIGINALDIR=$(cygpath -w "$OR
 
 BASEDIR=$(readlink -ne "$BASEDIR")
 
-[[ -b $BASEDIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
-	DEV=$BASEDIR
-	MOUNT=$(lsblk -lno MOUNTPOINT $DEV)
-	[[ -n $MOUNT ]] || MOUNT=$(df --output=source,target|tail -n +2|fgrep "$DEV"|sort|head -n 1|awk '{print $2}')
-	[[ -z $MOUNT ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
-		mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
-		trap "umount $DEV && rm -rvf $MOUNT" EXIT
-	}
-	ROOT=$MOUNT
-} || { #otherwise extract ROOT and STARTDIR
-	MOUNT=$(stat -c%m "$BASEDIR")
-	#set STARTDIR if is not defined or empty (BASEDIR=MOUNT/STARTDIR)
-	[[ -z $STARTDIR ]] && STARTDIR=${BASEDIR#$MOUNT/}
-	ROOT=$MOUNT
-	[[ -n $MAPDRIVE ]] && exists cygpath && ROOT=$(cygpath "$MAPDRIVE")
-}
+ROOT=$(stat -c%m "$BASEDIR")
+#set STARTDIR if is not defined or empty (BASEDIR=ROOT/STARTDIR)
+STARTDIR=${BASEDIR#$ROOT}
+STARTDIR=${STARTDIR#/}
+
+[[ -n $MAPDRIVE ]] && ROOT=$(cygpath "$MAPDRIVE")
 
 BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
-
-[[ $SNAP == true ]] && "$SDIR/snap-backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR" && exit
-
-[[ $SNAP == true ]] && echo "Fail to create a snaphost. I will continue..."
-
-#we need ROOT, DEV, BACKUPDIR and STARTDIR
+#we need ROOT, BACKUPDIR and STARTDIR
 #source "$SDIR/drive.sh" "$DEV"
 IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ORIGINALDIR" 2>/dev/null)
 
@@ -282,14 +255,14 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	echo Start to backup $ORIGINALDIR at $(date -R)
 
-	echo Phase 1 - compute ids for new files and backup already server existing files
+	echo Phase 1 - Backup new/modified files
 
 	time ("$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"
 
-	echo Phase 2 - backup everything includind attributes and acls
+	echo Phase 2 - Update Symbolic links, Hard links, Directories and update file attributes
 
 	bg_upload_manifest "$ROOT" "$STARTDIR"
 

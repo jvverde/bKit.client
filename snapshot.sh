@@ -18,7 +18,7 @@ do
             shift
         ;;
         -u|--uuid)
-            DIR=$(bash "$SDIR/getdev.sh" "$1")
+            DIR=$(bash "$SDIR/getdev.sh" "$1") || die "Volume $1 not found"
             shift
         ;;
         -d|--dir)
@@ -39,12 +39,10 @@ do
     esac
 done
 
-[[ -z $DIR ]] && { #if backup dir is not yet defined (through --uuid option)
-    DIR="$1"
-}
-
+true ${DIR:=$1}
 exists cygpath && DIR=$(cygpath "$DIR")
-DIR=$(readlink -e "$DIR")
+
+DIR=$(readlink -ne "$DIR") || die "Directory doesn't exists"
 
 [[ -b $DIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
     DEV=$DIR
@@ -62,6 +60,17 @@ STARTDIR=${STARTDIR#/}
 BACKUPDIR=$MOUNT/$STARTDIR
 
 [[ -e $BACKUPDIR ]] || die "$BACKUPDIR doesn't exists"
+
+backup() {
+    echo Backup directly -- without shadow copy
+    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+}
+
+ntfssnap(){
+    echo Backup a ntfs shadow copy
+    SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
+    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+}
 
 [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
     DRIVE=$(cygpath -w "$(stat -c%m "$BACKUPDIR")")
@@ -81,13 +90,10 @@ BACKUPDIR=$MOUNT/$STARTDIR
 
     if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
     then
-    	echo Backup shadow copy
-    	SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-    	"$SHADOWSPAN" /verbosity=2 $DRIVE $MAPLETTER "$DOSBASH" "$SDIR/backup.sh" --map $MAPLETTER -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+        ntfssnap $DRIVE $MAPLETTER
     else
-    	echo Backup directly -- without shadow copy
-    	bash "$SDIR%backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+        backup
     fi
 } || {
-    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+    backup
 }

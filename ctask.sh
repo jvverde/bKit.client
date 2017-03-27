@@ -5,7 +5,7 @@ OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage(){
-	die "Usage:\n\t$0 [-m|-h|-d|-w [every]]"
+	die "Usage:\n\t$0 [-m|-h|-d|-w [every]] dirs"
 }
 [[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
 [[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
@@ -29,7 +29,7 @@ let ONMONTHS=1+$RANDOM%12
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
-	case "$KEY" in	
+	case "$KEY" in
 		-m|--minute)
 			SCHTYPE=MINUTE
 			[[ $# -gt 1 ]] || continue
@@ -75,9 +75,16 @@ do
 		-s|--start)
 			START=$(date -d "$1" -u) && shift || die Wrong date format
 		;;
+		-- )
+            while [[ $1 =~ ^- ]]
+            do
+                RSYNCOPTIONS+=("$1")
+                shift
+            done
+        ;;
 		*)
 			echo Unknow	option $KEY && usage
-		;;		
+		;;
 	esac
 done
 
@@ -95,17 +102,18 @@ then
 	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
 	TASKNAME="BKIT-${NAME:-$(date +%Y-%m-%dT%H-%M-%S)}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
-	[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
+	#[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
 	for BACKUPDIR in "$@"
 	do
 		BACKUPPATH=$(cygpath -u "$(readlink -e "$BACKUPDIR")")
 		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
 		LOGFILE=$LOGSDIR/$TASKNAME.$UUID.$(echo $DIR|md5sum|awk '{print $1}').log
-		CMD='"'${DOSBASH}.exe'" "'${SDIR}/backup.sh'" --snap --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'"'
+		CMD='"'${DOSBASH}.exe'" "'${SDIR}/snapshot.sh'" --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'" -- '"${RSYNCOPTIONS[@]}"
 		echo REM Backup $(cygpath -w "$BACKUPDIR") "($BACKUPPATH)"
 		echo REM Logs in $LOGFILE
-		echo $CMD 
+		echo $CMD
 	done > "$TASKBATCH"
+	exit
 	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 	ST=$(date -d "$START" +"%H:%M:%S")
 	#SD=$(date -d "$START" +"%d/%m/%Y")
@@ -126,7 +134,7 @@ else
 		echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
 	} | sort -u | crontab
 
-	#show what is scheduled 
+	#show what is scheduled
 	crontab -l
 fi
 

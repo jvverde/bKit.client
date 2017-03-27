@@ -29,6 +29,9 @@ do
 		-s|--snap)
 			SNAP=true
 		;;
+		-m|--map)
+			MAPDRIVE="$1" && shift
+		;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
@@ -43,11 +46,11 @@ do
 done
 
 [[ -z $BASEDIR ]] && { #if backup dir is not yet defined (through --uuid option)
-	BASEDIR="$1" && shift
+	BASEDIR="$1"
 }
-MAPDRIVE="$1"
 
-[[ -n $BASEDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
+
+[[ -n $BASEDIR ]] || die "Usage:\n\t$0 [options] path"
 
 ORIGINALDIR=$BASEDIR
 

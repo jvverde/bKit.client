@@ -49,7 +49,9 @@ MAPDRIVE="$1"
 
 [[ -n $BASEDIR ]] || die "Usage:\n\t$0 [options] path [mapdrive]"
 
-exists cygpath && BASEDIR=$(cygpath "$BASEDIR")
+ORIGINALDIR=$BASEDIR
+
+exists cygpath && BASEDIR=$(cygpath "$BASEDIR") && ORIGINALDIR=$(cygpath -w "$ORIGINALDIR")
 
 BASEDIR=$(readlink -ne "$BASEDIR")
 
@@ -74,13 +76,13 @@ BACKUPDIR="$ROOT/$STARTDIR"
 [[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
 
 
-[[ $SNAP == true ]] && "$SDIR/snap-backup.sh" "$BACKUPDIR" && exit
+[[ $SNAP == true ]] && "$SDIR/snap-backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR" && exit
 
 [[ $SNAP == true ]] && echo "Fail to create a snaphost. I will continue..."
 
 #we need ROOT, DEV, BACKUPDIR and STARTDIR
 #source "$SDIR/drive.sh" "$DEV"
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null)
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ORIGINALDIR" 2>/dev/null)
 
 [[ $DRIVETYPE =~ Ram.Disk ]] && die "$BACKUPDIR is in a RAM Disk"
 
@@ -275,7 +277,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	bg_upload_manifest "$ROOT" "$STARTDIR"
 
-	echo Start to backup $BACKUPDIR at $(date -R)
+	echo Start to backup $ORIGINALDIR at $(date -R)
 
 	echo Phase 1 - compute ids for new files and backup already server existing files
 
@@ -312,6 +314,6 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	) && echo Metadata tar sent to backup
 
 	time snapshot && echo snapshot done
-	echo Backup of $BACKUPDIR done at $(date -R)
+	echo Backup of $ORIGINALDIR done at $(date -R)
 ) 9>"$LOCK"
 

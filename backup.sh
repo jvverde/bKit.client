@@ -54,7 +54,7 @@ STARTDIR=${STARTDIR#/}
 [[ -n $MAPDRIVE ]] && ROOT=$(cygpath "$MAPDRIVE")
 
 BACKUPDIR="$ROOT/$STARTDIR"
-[[ -d $BACKUPDIR ]] || die Cannot find directory $BACKUPDIR
+[[ -e $BACKUPDIR ]] || die Cannot find $BACKUPDIR
 
 #we need ROOT, BACKUPDIR and STARTDIR
 #source "$SDIR/drive.sh" "$DEV"

@@ -1,5 +1,6 @@
 #!/bin/bash
-DIR=$(dirname "$(readlink -f "$0")")	#Full DIR
+SDIR=$(dirname "$(readlink -f "$0")")	#Full SDIR
+
 SECTION=bkit
 PORT=8730
 BPORT=8731
@@ -16,9 +17,9 @@ exists() { type "$1" >/dev/null 2>&1;}
 echo Contacting the server ... please wait!
 exists nc && { nc -z $SERVER $PORT 2>&1 || die Server $SERVER not found;}
 
-source "$DIR/computer.sh"
+source "$SDIR/computer.sh"
 
-CONFDIR="$DIR/conf"
+CONFDIR="$SDIR/conf"
 mkdir -p "$CONFDIR"
 
 

@@ -27,25 +27,41 @@ DIR=$1
 		sed -e "s/^$DRIVE:.*- *//" | sed -E 's/[^a-z0-9]/-/gi;s/^$/_/;s/\s/_/g'
 	)
 	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
+	exit
 } 2>/dev/null
 
-[[ $OS != cygwin ]] && {
+volume() {
 	exists lsblk && {
-		[[ $UID -eq 0 ]] || die $0 must be run as root
 		VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
 		true ${VOLUMENAME:=$(lsblk -ln -o MODEL "${DEV%%[0-9]*}")}
 		true ${VOLUMENAME:=_}
 		VOLUMENAME=$(echo $VOLUMENAME| sed -E 's/\s+/_/g')
-		FILESYSTEM=$(lsblk -ln -o FSTYPE "$DEV")
 		DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
 		true ${DRIVETYPE:=$(
 			RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
 			RESULT=${RESULT##*/}
 			echo ${RESULT%%-*}
 		)}
-		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
-		echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
+		true ${DRIVETYPE:=_}
 	}
 }
+
+[[ $OS != cygwin ]] && {
+	exists lsblk && [[ $UID -eq 0 ]] && {
+		FILESYSTEM=$(lsblk -ln -o FSTYPE "$DEV")
+		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
+		volume
+		echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
+		exit
+	}
+	exists blkid  && {
+		FILESYSTEM=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')
+		VOLUMESERIALNUMBER=$(blkid "$DEV" |sed -E 's#.*UUID="([^"]+)".*#\1#')
+		volume		
+		echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
+		exit
+	}
+} 2>/dev/null
+

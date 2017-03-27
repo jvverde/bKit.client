@@ -40,8 +40,8 @@ CACHE="$SDIR/cache/hashes/by-volume/$VOLUMESERIALNUMBER/$DIR"
 pushd "$MOUNT" > /dev/null
 
 "$SDIR/whoShouldUpdate.sh" -- "${RSYNCOPTIONS[@]}" "$FULLPATH" |
-awk -F'|' '$1 ~ /^<f/ {print $2}' |
-xargs -r sha256sum -b|sed -E 's/\s+\*/|/' |
+awk -F'|' '$1 ~ /^<f/ {print $2}' | tr '\n' '\0' |
+xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/' |
 while IFS='|' read -r HASH FILE
 do
 	echo "$HASH|$(stat -c '%s|%Y' "$FILE")|$FILE"

@@ -123,8 +123,9 @@
             filters: this.makeFilters(includesOf[root], excludesOf[root] || [])
               .filter(e => {
                 return bases.some(f => {
-                  const base = PATH.join(f, PATH.sep)
-                  return e.startsWith(base, 2)
+                  const base = PATH.join(PATH.sep, f, PATH.sep)
+                  console.log(e, base)
+                  return e.startsWith(base, 2) && e.length > base.length + 2
                 })
               })
           }

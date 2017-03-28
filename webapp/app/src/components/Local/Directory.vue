@@ -84,11 +84,15 @@
         this.$emit('subDirSelect')
       },
       subTreeSelect (status) {
+        console.log(this.entry.path, 'received a status', status)
         this.descendantSelected = status
-        if (status !== null) { // if subtree is all (un)selected then set (un)select flag
-          if (this.parentSelected === status) this.selected = null // if current status equal to parent don't flag it. Use parent selection.
+        if (status !== null) {
+          // if subtree is all (un)selected then set (un)select flag
+          if (this.parentSelected === status) this.selected = null
+          // if current status equal to parent don't flag it. Use parent selection.
           else this.selected = status
-        }
+        } 
+        console.log(this.entry.path, '=>', this.selected)
         this.$emit('subDirSelect')
       }
     }

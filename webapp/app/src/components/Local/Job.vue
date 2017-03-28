@@ -121,7 +121,7 @@
             name: root,
             bases: bases,
             filters: this.makeFilters(includesOf[root], excludesOf[root] || [])
-              .filter(e => {
+              .filter(e => { // filter off unnecessary filter rules
                 return bases.some(f => {
                   const base = PATH.join(PATH.sep, f, PATH.sep)
                   console.log(e, base)

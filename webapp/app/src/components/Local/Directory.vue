@@ -48,8 +48,8 @@
         else return this.selected
       },
       triState () {
-        if (this.descendantSelected === null) return null
-        else return this.isSelected
+        if (this.descendantSelected === false) return this.isSelected
+        else return this.descendantSelected
       }
     },
     watch: {

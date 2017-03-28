@@ -91,7 +91,7 @@
           if (this.parentSelected === status) this.selected = null
           // if current status equal to parent don't flag it. Use parent selection.
           else this.selected = status
-        } 
+        }
         console.log(this.entry.path, '=>', this.selected)
         this.$emit('subDirSelect')
       }

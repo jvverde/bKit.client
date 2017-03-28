@@ -17,7 +17,7 @@
       <div>
         <div>Includes:</div>
         <div v-for="d in includes">
-          {{d.path}}
+          {{d.root}}:=>{{d.path}}
         </div>
       </div>
       <div>
@@ -26,10 +26,17 @@
           {{d.path}}
         </div>
       </div>
-      <div>
+      <div class="rules">
         <div>Rules:</div>
         <div v-for="r in roots">
-          {{r.name}}: {{r.values}}
+          <div>Root Name: {{r.name}} 
+            <div v-for="base in r.bases">
+              base: {{base}}
+            </div> 
+            <div v-for="value in r.filters">
+              rule: {{value}}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -104,9 +111,22 @@
           excludesOf[e.root].push(e)
         })
         return Object.keys(includesOf).map(root => {
+          const includes = includesOf[root]
+          const bases = includes.filter(e => {
+            return !includes.some(f => {
+              return e.path.startsWith(PATH.join(f.path, PATH.sep))
+            })
+          }).map(e => e.path)
           return {
             name: root,
-            values: this.order(includesOf[root], excludesOf[root] || [])
+            bases: bases,
+            filters: this.makeFilters(includesOf[root], excludesOf[root] || [])
+              .filter(e => {
+                return bases.some(f => {
+                  const base = PATH.join(f, PATH.sep)
+                  return e.startsWith(base, 2)
+                })
+              })
           }
         })
       }
@@ -125,11 +145,11 @@
       }
     },
     methods: {
-      order (includes, excludes) {
+      makeFilters (includes, excludes) {
         let parents = {}
         includes.forEach(e => {
           const steps = e.path.split(PATH.sep)
-          if (!e.dir) steps.pop() // discard file name if it is a file
+          steps.pop() // discard entry name. Only use ancestors
           let acc = ''
           steps.forEach(step => {
             if (step) acc += step + PATH.sep
@@ -147,12 +167,12 @@
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
             const is = condition => e.isIncluded === condition
-            if (is(false) && e.dir) return '- ' + join(e.path, '***')
+            if (is(false) && e.dir) return '- ' + join(e.path, '/*')
             else if (is(false) && e.file) return '- ' + join(e.path)
-            else if (is(true) && e.dir) return '+ ' + join(e.path, '**')
+            else if (is(true) && e.dir) return '+ ' + join(e.path, '/')
             else if (is(true) && e.file) return '+ ' + join(e.path)
             else return '+ ' + join(e.path)
-          }).concat('- *')
+          })
       },
       update () {
         this.refresh()
@@ -226,6 +246,11 @@
       }
       .period.selected {
         background-color: $bkit-color;
+      }
+    }
+    .rules{
+      div{
+        margin-left: 1em;
       }
     }
   }

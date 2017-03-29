@@ -25,16 +25,24 @@ do
 	esac
 done
 
-BACKUPDIR=$(readlink -e "$1")
+IFS="
+"
+BACKUPDIR=( $(readlink -e "$@") )
+MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
+for M in "${MOUNT[@]}"
+do
+	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same logical disk'
+done
+STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
+STARTDIR=(${STARTDIR[@]#/})
 
-MOUNT=$(stat -c %m "$BACKUPDIR")
-STARTDIR="${BACKUPDIR#$MOUNT}"
-STARTDIR="${STARTDIR#/}"
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}" 2>/dev/null)
 
-
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null)
+exists cygpath && DRIVE=$(cygpath -w "${MOUNT[0]}")
+DRIVE=${DRIVE%%:*}
 
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source "$CONF"
@@ -50,6 +58,13 @@ FMT='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
+ROOT=${MOUNT%%/}
+SRCS=()
+for DIR in "${STARTDIR[@]}"
+do
+	SRCS+=("$ROOT/./$DIR")
+done
+
 dorsync "${RSYNCOPTIONS[@]}" \
 	--dry-run \
 	--filter=': .rsync-filter' \
@@ -62,5 +77,5 @@ dorsync "${RSYNCOPTIONS[@]}" \
 	--itemize-changes \
 	--exclude-from="$EXC" \
 	$FMT \
-	"$MOUNT/./$STARTDIR" \
+	"${SRCS[@]}" \
 	"$BACKUPURL/$RVID/@current/data"

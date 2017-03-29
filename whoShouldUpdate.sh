@@ -24,7 +24,6 @@ do
 		;;
 	esac
 done
-
 IFS="
 "
 BACKUPDIR=( $(readlink -e "$@") )
@@ -37,12 +36,12 @@ STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
 STARTDIR=(${STARTDIR[@]#/})
 
 IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}" 2>/dev/null)
+
 exists cygpath && DRIVE=$(cygpath -w "${MOUNT[0]}")
 DRIVE=${DRIVE%%:*}
 
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-echo $RVID
-exit
+
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source "$CONF"
@@ -58,6 +57,17 @@ FMT='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
+ROOT=${MOUNT%%/}
+SRCS=()
+for DIR in "${STARTDIR[@]}"
+do
+	echo DIR $DIR
+	SRCS+=("$ROOT/./$DIR")
+done
+echo all: ${SRCS[@]}
+echo 0: ${SRCS[0]}
+echo 1: ${SRCS[1]}
+
 dorsync "${RSYNCOPTIONS[@]}" \
 	--dry-run \
 	--filter=': .rsync-filter' \
@@ -70,5 +80,5 @@ dorsync "${RSYNCOPTIONS[@]}" \
 	--itemize-changes \
 	--exclude-from="$EXC" \
 	$FMT \
-	"$MOUNT/./$STARTDIR" \
+	"${SRCS[@]}" \
 	"$BACKUPURL/$RVID/@current/data"

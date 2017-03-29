@@ -31,13 +31,14 @@ BACKUPDIR=( $(readlink -e "$@") )
 MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
 for M in "${MOUNT[@]}"
 do
-	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same disk' 
+	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same disk'
 done
 STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
 STARTDIR=(${STARTDIR[@]#/})
 
 IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}" 2>/dev/null)
 exists cygpath && DRIVE=$(cygpath -w "${MOUNT[0]}")
+DRIVE=${DRIVE%%:*}
 
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 echo $RVID

@@ -296,8 +296,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	time clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
-	exit
-	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
+	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' && false ]] && (
 		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 		SRCDIR=".bkit/$STARTDIR"
 		[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"

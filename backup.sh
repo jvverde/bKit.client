@@ -58,7 +58,7 @@ BACKUPDIR=()
 for I in ${!ROOTS[@]}
 do
 	[[ "${ROOTS[$I]}" == "$ROOT" ]] || {
-		warn "Roots are different. ${ROOTS[$I]} will be igmored" && continue
+		warn "Roots are not in the same logical volume. These will be ignored:\n\t${ORIGINALDIR[$I]}" && continue
 	}
 	DIR=${BASEDIR[$I]#$ROOT}
 	DIR=${DIR#/}

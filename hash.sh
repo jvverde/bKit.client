@@ -24,22 +24,15 @@ done
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
-FULLPATH="$(readlink -e "$1")"
+IFS="
+"
+FULLPATHS=( $(readlink -e "$@") )
 
-[[ -d $FULLPATH ]] || die Directory $FULLPATH does not exists
-
-MOUNT="$(stat -c %m "$FULLPATH")"
-DIR="${FULLPATH#$MOUNT/}"
-
-VOLUMESERIALNUMBER=$("$SDIR/drive.sh" "$FULLPATH" 2>/dev/null |cut -d'|' -f2)
-
-CACHE="$SDIR/cache/hashes/by-volume/$VOLUMESERIALNUMBER/$DIR"
-
-[[ -d $CACHE ]] || mkdir -p "$CACHE"
+MOUNT="$(stat -c %m "${FULLPATHS[0]}")"
 
 pushd "$MOUNT" > /dev/null
 
-"$SDIR/whoShouldUpdate.sh" -- "${RSYNCOPTIONS[@]}" "$FULLPATH" |
+bash "$SDIR/whoShouldUpdate.sh" -- "${RSYNCOPTIONS[@]}" "${FULLPATHS[@]}" |
 awk -F'|' '$1 ~ /^<f/ {print $2}' | tr '\n' '\0' |
 xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/' |
 while IFS='|' read -r HASH FILE

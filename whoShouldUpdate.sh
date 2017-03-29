@@ -24,13 +24,14 @@ do
 		;;
 	esac
 done
+
 IFS="
 "
 BACKUPDIR=( $(readlink -e "$@") )
 MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
 for M in "${MOUNT[@]}"
 do
-	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same disk'
+	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same logical disk'
 done
 STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
 STARTDIR=(${STARTDIR[@]#/})
@@ -61,12 +62,8 @@ ROOT=${MOUNT%%/}
 SRCS=()
 for DIR in "${STARTDIR[@]}"
 do
-	echo DIR $DIR
 	SRCS+=("$ROOT/./$DIR")
 done
-echo all: ${SRCS[@]}
-echo 0: ${SRCS[0]}
-echo 1: ${SRCS[1]}
 
 dorsync "${RSYNCOPTIONS[@]}" \
 	--dry-run \

@@ -112,11 +112,13 @@
         })
         return Object.keys(includesOf).map(root => {
           const includes = includesOf[root]
-          const bases = includes.filter(e => {
-            return !includes.some(f => {
-              return e.path.startsWith(PATH.join(f.path, PATH.sep))
-            })
-          }).map(e => e.path)
+          const bases = includes
+/*            .filter(e => {
+              return !includes.some(f => {
+                return e.path.startsWith(PATH.join(f.path, PATH.sep))
+              })
+            })*/
+            .map(e => e.path)
           return {
             name: root,
             bases: bases,

@@ -25,16 +25,23 @@ do
 	esac
 done
 
-BACKUPDIR=$(readlink -e "$1")
+IFS="
+"
+BACKUPDIR=( $(readlink -e "$@") )
+MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
+for M in "${MOUNT[@]}"
+do
+	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same disk' 
+done
+STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
+STARTDIR=(${STARTDIR[@]#/})
 
-MOUNT=$(stat -c %m "$BACKUPDIR")
-STARTDIR="${BACKUPDIR#$MOUNT}"
-STARTDIR="${STARTDIR#/}"
-
-
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null)
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}" 2>/dev/null)
+exists cygpath && DRIVE=$(cygpath -w "${MOUNT[0]}")
 
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+echo $RVID
+exit
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source "$CONF"

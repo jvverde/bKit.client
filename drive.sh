@@ -30,38 +30,57 @@ DIR=$1
 	exit
 } 2>/dev/null
 
+readNameBy() {
+		RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
+		RESULT=${RESULT##*/}
+		RESULT=${RESULT%-*}
+		VOLUMENAME=${RESULT#*-}
+}
+
+readTypeBy() {
+		RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
+		RESULT=${RESULT##*/}
+		DRIVETYPE=${RESULT%%-*}
+}
+
+readUUIDby() {
+	for U in $(ls /dev/disk/by-uuid)
+	do
+		[[ "$DEV" == "$(readlink -ne "/dev/disk/by-uuid/$U")" ]] && VOLUMESERIALNUMBER="$U" && return 
+	done
+}
+
 volume() {
 	exists lsblk && {
 		VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
 		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
-		true ${VOLUMENAME:=$(lsblk -ln -o MODEL "${DEV%%[0-9]*}")}
-		true ${VOLUMENAME:=_}
-		VOLUMENAME=$(echo $VOLUMENAME| sed -E 's/\s+/_/g')
+		true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
 		DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
-		true ${DRIVETYPE:=$(
-			RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
-			RESULT=${RESULT##*/}
-			echo ${RESULT%%-*}
-		)}
-		true ${DRIVETYPE:=_}
-	}
-}
-
-[[ $OS != cygwin ]] && {
-	exists lsblk && [[ $UID -eq 0 ]] && {
 		FILESYSTEM=$(lsblk -ln -o FSTYPE "$DEV")
 		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
-		volume
-		echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
-		exit
 	}
 	exists blkid  && {
-		FILESYSTEM=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')
-		VOLUMESERIALNUMBER=$(blkid "$DEV" |sed -E 's#.*UUID="([^"]+)".*#\1#')
-		volume		
-		echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
-		exit
-	}
+		true ${FILESYSTEM:=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')}
+		true ${VOLUMESERIALNUMBER:=$(blkid "$DEV" |sed -E 's#.*UUID="([^"]+)".*#\1#')}
+	}	
+
+	[[ -n $DRIVETYPE ]] || readTypeBy
+	[[ -n $VOLUMESERIALNUMBER ]] || readUUIDby
+	[[ -n $VOLUMENAME ]] || readNameBy
+
+	true ${DRIVETYPE:=_}
+	true ${VOLUMESERIALNUMBER:=_}
+	true ${VOLUMENAME:=_}
+	true ${FILESYSTEM:=_}
+	
+	VOLUMENAME=$(echo $VOLUMENAME| sed -E 's/\s+/_/g')
+}
+
+
+[[ $OS != cygwin ]] && {
+	volume		
+	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
+	exit
 } 2>/dev/null
 

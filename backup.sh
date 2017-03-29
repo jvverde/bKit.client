@@ -41,37 +41,41 @@ BASEDIR=("$@")
 
 ORIGINALDIR=( "${BASEDIR[@]}" )
 
+OLDIFS=$IFS
 IFS="
 "
 exists cygpath && BASEDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${BASEDIR[@]}") )
 
 BASEDIR=( $(readlink -e "${BASEDIR[@]}") )
-echo ${BASEDIR[0]} - ${ORIGINALDIR[0]}
-echo ${BASEDIR[1]} - ${ORIGINALDIR[1]}
-echo ${BASEDIR[2]} - ${ORIGINALDIR[2]}
+
 ROOTS=( $(stat -c%m "${BASEDIR[@]}") )
-echo root - ${ROOTS[1]}
+ROOT=${ROOTS[0]}
+
+exists cygpath && [[ -n $MAPDRIVE ]] && MAPDRIVE=$(cygpath "$MAPDRIVE") || MAPDRIVE=$ROOT
+
+STARTDIR=()
+BACKUPDIR=()
 for I in ${!ROOTS[@]}
 do
-	echo $I - ${ROOTS[$I]}
-	# [[ $ROOTS[$I] == $ROOTS[0] ]] || warn "Roots are different"
+	[[ "${ROOTS[$I]}" == "$ROOT" ]] || {
+		warn "Roots are different. ${ROOTS[$I]} will be igmored" && continue
+	}
+	DIR=${BASEDIR[$I]#$ROOT}
+	DIR=${DIR#/}
+	STARTDIR+=( "$DIR" )
+	BACKUPDIR+=( "$MAPDRIVE/$DIR" )
 done
-exit
-#set STARTDIR if is not defined or empty (BASEDIR=ROOT/STARTDIR)
-STARTDIR=${BASEDIR#$ROOT}
-STARTDIR=${STARTDIR#/}
-exit
-
-[[ -n $MAPDRIVE ]] && ROOT=$(cygpath "$MAPDRIVE")
-
-BACKUPDIR="$ROOT/$STARTDIR"
-[[ -e $BACKUPDIR ]] || die Cannot find $BACKUPDIR
 
 #we need ROOT, BACKUPDIR and STARTDIR
 #source "$SDIR/drive.sh" "$DEV"
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ORIGINALDIR" 2>/dev/null)
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
 
-[[ $DRIVETYPE =~ Ram.Disk ]] && die "$BACKUPDIR is in a RAM Disk"
+IFS=$OLDIFS
+
+[[ $DRIVETYPE =~ Ram.Disk ]] && die "These directories/files ${BACKUPDIR[@]} are in a RAM Disk"
+
+exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+DRIVE=${DRIVE%%:*}
 
 #compute Remote Volume ID
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
@@ -80,7 +84,6 @@ CONF="$SDIR/conf/conf.init"
 source "$CONF"
 
 exists rsync || die Cannot find rsync
-exists sqlite3 || die Cannot find sqlite3
 
 trap '' SIGPIPE
 
@@ -137,44 +140,44 @@ postpone_update(){
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-PERM="--perms --acls --owner --group --super --numeric-ids"
-OPTIONS=" --inplace --delete-delay --force --delete-excluded --stats --fuzzy"
-CLEAN="--delete --force --delete-excluded --ignore-non-existing --ignore-existing"
-FMT_QUERY='--out-format=%i|%n|%L|/%f'
-FMT_QUERY2='--out-format=%i|%n|%L|/%f|%l'
-FMT_QUERY3='--out-format=%i|%n'
+PERM=(--perms --acls --owner --group --super --numeric-ids)
+CLEAN=(--delete --force --delete-excluded --ignore-non-existing --ignore-existing)
+FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $PERM $FMT "$@"
+	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync --archive --relative --files-from="$FILE" --itemize-changes $PERM $FMT "$@"
+	dorsync --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 update_file(){
-	dorsync -tiz --inplace $PERM $FMT "$@"
+	dorsync -tiz --inplace "${PERM[@]}" $FMT "$@"
 }
 update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes $PERM $FMT "$@"
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 
 backup(){
-	local BASE=$1
-	local SRC="$1/./$2"
-	[[ -e $SRC ]] || ! echo $SRC does not exists || return 1
-	local DST=$3
-	local TYPE=${DST##*/}
+	local BASE=$1 && shift
+	#local SRC="$1/./$2"
+	local SRCS=()
+	for DIR in "${@:1:$#-1}"
+	do
+		SRCS+=( "$BASE/./$DIR" )
+	done
+	local DST="${@: -1}" #last argument
 	unset HLINK
 	set_postpone_files
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
@@ -202,19 +205,25 @@ backup(){
 
 		echo "Is something else:$I|$FILE|$LINK|$LEN"
 
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes $PERM $FMT_QUERY2 "$SRC" "$DST")
+	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
 }
 clean(){
-	local SRC="$1/./$2"
-	local DST=$3
-	[[ -e $SRC ]] || ! echo $SRC does not exist || return 1
-	dorsync -riHDR $CLEAN $PERM $FMT "$SRC" "$DST" #clean deleted files
+	local BASE=$1 && shift
+	#local SRC="$1/./$2"
+	local SRCS=()
+	for DIR in "${@:1:$#-1}"
+	do
+		SRCS+=( "$BASE/./$DIR" )
+	done
+	local DST="${@: -1}" #last argument
+
+	dorsync -riHDR "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
 }
 snapshot(){
-	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$ROOT/./" "$BACKUPURL/$RVID/@snap"
+	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@snap"
 }
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
@@ -226,7 +235,6 @@ wait4jobs(){
 
 bg_upload_manifest(){
 	local BASE="$1"
-	local STARTDIR="$2"
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
 	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
 
@@ -242,11 +250,11 @@ bg_upload_manifest(){
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 			(( CNT == 0 )) && sleep 1 && continue
 			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/data/$STARTDIR/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/data/$STARTDIR/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/data/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/data/manifest.lst"
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
 			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$RVID/@seed/data"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/data/$STARTDIR/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/data/manifest.lst"
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
@@ -262,37 +270,38 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 		die Volume $VOLUMESERIALNUMBER was locked
 	}
 
-	bg_upload_manifest "$ROOT" "$STARTDIR"
+	bg_upload_manifest "$MAPDRIVE"
 
-	echo Start to backup $ORIGINALDIR at $(date -R)
+	echo Start to backup of directories/files ${ORIGINALDIR[@]} at $(date -R)
 
 	echo Phase 1 - Backup new/modified files
 
-	time ("$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
+	time (bash "$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"
 
 	echo Phase 2 - Update Symbolic links, Hard links, Directories and update file attributes
 
-	bg_upload_manifest "$ROOT" "$STARTDIR"
+	bg_upload_manifest "$MAPDRIVE"
 
-	time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo backup data done
+	time backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo backup data done
 
-	[[ -n $HLINK ]] && time backup "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+	[[ -n $HLINK ]] && time backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
 
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"
 
 
-	time clean "$ROOT" "$STARTDIR" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
+	time clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
+	exit
 	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
 		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 		SRCDIR=".bkit/$STARTDIR"
 		[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
-		bash "$SDIR/acls.sh" "$BACKUPDIR" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
+		bash "$SDIR/acls.sh" "${BACKUPDIR[@]}" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
 		cd "$METADATADIR"
 		PACKDIR=".tar/$STARTDIR"
 		[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
@@ -301,6 +310,6 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	) && echo Metadata tar sent to backup
 
 	time snapshot && echo snapshot done
-	echo Backup of $ORIGINALDIR done at $(date -R)
+	echo Backup of ${ORIGINALDIR[@]} done at $(date -R)
 ) 9>"$LOCK"
 

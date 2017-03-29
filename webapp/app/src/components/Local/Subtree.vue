@@ -75,10 +75,10 @@
         return this.subdirs.every(e => e.triState === false)
       },
       isFilesAll () {
-        return this.subfiles.every(e => e.selected === true)
+        return this.subfiles.every(e => e.isSelected === true)
       },
       isFilesClear () {
-        return this.subfiles.every(e => e.selected === false)
+        return this.subfiles.every(e => e.isSelected === false)
       },
       isAllSelected () {
         return this.isFilesAll && this.isDirsAll
@@ -108,8 +108,8 @@
       },
       childrenChanged () { // called every time a sub dir is (un)selected
         if (this.isAllSelected) return this.$emit('subTreeSelect', true)
-        if (this.isAllUnselected) return this.$emit('subTreeSelect', false)
-        this.$emit('subTreeSelect', null)
+        else if (this.isAllUnselected) return this.$emit('subTreeSelect', false)
+        else return this.$emit('subTreeSelect', null)
       }
     }
   }

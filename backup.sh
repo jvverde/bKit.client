@@ -3,6 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
+warn() { echo -e "$@">&2; }
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
@@ -36,20 +37,30 @@ do
 	esac
 done
 
-BASEDIR="$1"
+BASEDIR=("$@")
 
-[[ -n $BASEDIR ]] || die "Usage:\n\t$0 [options] path"
+ORIGINALDIR=( "${BASEDIR[@]}" )
 
-ORIGINALDIR=$BASEDIR
+IFS="
+"
+exists cygpath && BASEDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${BASEDIR[@]}") )
 
-exists cygpath && BASEDIR=$(cygpath "$BASEDIR") && ORIGINALDIR=$(cygpath -w "$ORIGINALDIR")
-
-BASEDIR=$(readlink -ne "$BASEDIR")
-
-ROOT=$(stat -c%m "$BASEDIR")
+BASEDIR=( $(readlink -e "${BASEDIR[@]}") )
+echo ${BASEDIR[0]} - ${ORIGINALDIR[0]}
+echo ${BASEDIR[1]} - ${ORIGINALDIR[1]}
+echo ${BASEDIR[2]} - ${ORIGINALDIR[2]}
+ROOTS=( $(stat -c%m "${BASEDIR[@]}") )
+echo root - ${ROOTS[1]}
+for I in ${!ROOTS[@]}
+do
+	echo $I - ${ROOTS[$I]}
+	# [[ $ROOTS[$I] == $ROOTS[0] ]] || warn "Roots are different"
+done
+exit
 #set STARTDIR if is not defined or empty (BASEDIR=ROOT/STARTDIR)
 STARTDIR=${BASEDIR#$ROOT}
 STARTDIR=${STARTDIR#/}
+exit
 
 [[ -n $MAPDRIVE ]] && ROOT=$(cygpath "$MAPDRIVE")
 

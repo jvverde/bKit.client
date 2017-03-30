@@ -88,9 +88,9 @@ OPTIONS=(
 	--partial
 	--partial-dir=.rsync-partial
 	--delay-updates
-	--delete-delay   
+	--delete-delay 
 )
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
-rsync -vv "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "${SRCS[@]}" "$ROOT" || die "Problemas ao recuperar: $!"
+rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "${SRCS[@]}" "$ROOT" || die "Problemas ao recuperar: $!"
 
 echo "A pasta foi recuperada com sucesso"

@@ -229,7 +229,7 @@ snapshot(){
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
 	do
-		echo Wait for ${#list[*]} job to finish
+		#10.11.echo Wait for ${#list[*]} job to finish
 		wait -n
 	done
 }

@@ -44,40 +44,31 @@ CONF=$SDIR/conf/conf.init
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
-FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
+FMT='--out-format=%o|%i|%b|%l|%M|%t|%f'
 PERM=(--acls --owner --group --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
 OPTIONS=(
-	--backup
-	--backup-dir="$BACKUP-$(date +"%c")"
 	--archive
-	--exclude="$BACKUP-*"
+	--no-recursive
+	--dirs
 	--hard-links
-	--compress
 	--human-readable
 	--relative
-	--partial
-	--partial-dir=".bkit.rsync-partial"
-	--delay-updates
-	--delete-delay 
+	--dry-run
 )
 
-for I in ${!RESTOREDIR[@]}
+for DIR in ${RESTOREDIR[@]}
 do
-	DIR="${RESTOREDIR[$I]}"
-	until [[ -d $DIR ]]
-	do
-		DIR=$(dirname "$DIR")
-	done
-	BASE="$DIR"
 	ENTRY=${RESTOREDIR[$I]#$DIR}
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$BASE" 2>/dev/null)
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$DIR" 2>/dev/null)
 
-	exists cygpath && DRIVE=$(cygpath -w "$BASE")
+	exists cygpath && DRIVE=$(cygpath -w "$DIR")
 	DRIVE=${DRIVE%%:*}
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-	BASE=${BASE%%/}		#remove trailing slash if present
-	ENTRY=${ENTRY#/}	#remove leading slash if present
-	SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
-	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$BASE/" || warn "Problemas ao recuperar $BASE/$ENTRY"
+	ROOT=$(stat -c%m "$DIR")
+	DST=$(dirname "$DIR")
+	DST=${DST%%/} #remove trailing slash if present
+	DIR=${DIR#$ROOT}
+	SRC="$BACKUPURL/$RVID/.snapshots/*/data$DIR"
+	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DST/" | fgrep "/data$DIR"
 done

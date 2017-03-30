@@ -76,72 +76,8 @@ do
 	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
 	DRIVE=${DRIVE%%:*}
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-	ROOT=${ROOT%%/}	#remove trailing slash if present
-	ENTRY=${ENTRY#/} #remove leading slash if present
+	ROOT=${ROOT%%/}		#remove trailing slash if present
+	ENTRY=${ENTRY#/}	#remove leading slash if present
 	SRC="$BACKUPURL/$RVID/@current/data$ROOT/./$ENTRY"
-	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$ROOT/" || warn "Problemas ao recuperar: $!"
-done
-exit
-
-ROOTS=( $(stat -c%m "${BASEDIR[@]}") )
-ROOT=${ROOTS[0]}
-
-[[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
-
-
-STARTDIR=()
-for I in ${!ROOTS[@]}
-do
-	[[ "${ROOTS[$I]}" == "$ROOT" ]] || {
-		warn "Roots are not in the same logical volume. These will be ignored:\n\t${ORIGINALDIR[$I]}" && continue
-	}
-	DIR=${BASEDIR[$I]#$ROOT}
-	DIR=${DIR#/}
-	STARTDIR+=( "$DIR" )
-done
-
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
-
-exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-DRIVE=${DRIVE%%:*}
-
-#compute Remote Volume ID
-RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-
-CONF=$SDIR/conf/conf.init
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-. "$CONF"                                                                     #get configuration parameters
-
-SRCS=()
-for SRC in ${STARTDIR[@]}
-do
-	SRCS+=( "$BACKUPURL/$RVID/@current/data/./$STARTDIR" )
-done
-
-FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
-PERM=(--acls --owner --group --super --numeric-ids)
-BACKUP=".bkit-backups/$(date +"%c")"
-OPTIONS=(
-	--backup
-	--backup-dir="$BACKUP"
-	--archive
-	--hard-links
-	--compress
-	--human-readable
-	--relative
-	--partial
-	--partial-dir=".bkit.rsync-partial"
-	--delay-updates
-	--delete-delay 
-)
-export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
-rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "${SRCS[@]}" "$ROOT" || die "Problemas ao recuperar: $!"
-
-[[ "${RSYNCOPTIONS[*]}" =~ --dry-run ]] && exit
-
-echo -e "\n"
-
-for SRC in ${STARTDIR[@]}
-do
-	echo "A pasta $ROOT/$SRC foi recuperada com sucesso"
+	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$ROOT/" || warn "Problemas ao recuperar $ROOT/$ENTRY"
 done

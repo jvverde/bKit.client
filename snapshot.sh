@@ -6,7 +6,6 @@ OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 
-
 RSYNCOPTIONS=()
 
 while [[ $1 =~ ^- ]]
@@ -18,13 +17,17 @@ do
             shift
         ;;
         -u|--uuid)
-            DIR=$(bash "$SDIR/getdev.sh" "$1") || die "Volume $1 not found"
-            shift
-        ;;
-        -d|--dir)
-            STARTDIR="$1" && shift
-            exists cygpath && STARTDIR=$(cygpath "$STARTDIR")
-            BASE=$(stat -c%m "$STARTDIR" 2>/dev/null) && STARTDIR=${STARTDIR#$BASE}
+            DEV=$(bash "$SDIR/getdev.sh" "$1") && shift || die "Volume $1 not found"
+            [[ -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
+                MOUNT=$(df --output=target $DEV|tail -n 1)
+                [[ -z $MOUNT && $UID -eq 0 ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+                    mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+                    trap "umount $DEV && rm -rvf $MOUNT" EXIT
+                }
+            } || { #otherwise extract ROOT and STARTDIR
+                MOUNT=$(stat -c%m "$DEV")
+            }
+            [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
         ;;
         -- )
             while [[ $1 =~ ^- ]]
@@ -38,22 +41,13 @@ do
         ;;
     esac
 done
-
+exit
 true ${DIR:=$1}
 exists cygpath && DIR=$(cygpath "$DIR")
 
 DIR=$(readlink -ne "$DIR") || die "Directory doesn't exists"
 
-[[ -b $DIR ]] && { #if it is a block device, then check if it is mounted and mount it if not
-    DEV=$DIR
-    MOUNT=$(df --output=target $DEV|tail -n 1)
-    [[ -z $MOUNT && $UID -eq 0 ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
-        mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
-        trap "umount $DEV && rm -rvf $MOUNT" EXIT
-    }
-} || { #otherwise extract ROOT and STARTDIR
-    MOUNT=$(stat -c%m "$DIR")
-}
+
 true ${STARTDIR:=${DIR#$MOUNT}}
 STARTDIR=${STARTDIR#/}
 

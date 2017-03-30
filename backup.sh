@@ -92,7 +92,7 @@ dorsync(){
 	local RETRIES=1000
 	while true
 	do
-		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@" 2>&1
+		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -206,7 +206,7 @@ backup(){
 
 		echo "Is something else:$I|$FILE|$LINK|$LEN"
 
-	done < <(dorsync --dry-run --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
+	done < <(dorsync --dry-run --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
@@ -313,7 +313,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	NOW=$(date -R)
 	for I in ${!ORIGINALDIR[@]}
 	do 
-		echo Backup of ${ORIGINALDIR[$I]} done at $NOW on $BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}
+		echo -e "Backup of ${ORIGINALDIR[$I]} done at $NOW on:\n\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 	done
 ) 9>"$LOCK"
 

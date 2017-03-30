@@ -51,6 +51,8 @@ BASEDIR=( $(readlink -e "${BASEDIR[@]}") )
 ROOTS=( $(stat -c%m "${BASEDIR[@]}") )
 ROOT=${ROOTS[0]}
 
+[[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
+
 exists cygpath && [[ -n $MAPDRIVE ]] && MAPDRIVE=$(cygpath "$MAPDRIVE") || MAPDRIVE=$ROOT
 
 STARTDIR=()
@@ -82,7 +84,6 @@ RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FI
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 source "$CONF"
-
 exists rsync || die Cannot find rsync
 
 trap '' SIGPIPE
@@ -309,6 +310,10 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	) && echo Metadata tar sent to backup
 
 	time snapshot && echo snapshot done
-	echo Backup of ${ORIGINALDIR[@]} done at $(date -R)
+	NOW=$(date -R)
+	for I in ${!ORIGINALDIR[@]}
+	do 
+		echo Backup of ${ORIGINALDIR[$I]} done at $NOW on $BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}
+	done
 ) 9>"$LOCK"
 

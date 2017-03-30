@@ -74,12 +74,12 @@ do
 	SRCS+=( "$BACKUPURL/$RVID/@current/data/./$STARTDIR" )
 done
 
-FMT='--out-format="%p|%t|%o|%i|%b|%l|%f"'
+FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
 PERM=(--acls --owner --group --super --numeric-ids)
+BACKUP=".bkit-backups/$(date +"%c")"
 OPTIONS=(
-	--dry-run
 	--backup
-	--backup-dir=".bkit-backups/$(date +"%c")"
+	--backup-dir="$BACKUP"
 	--archive
 	--hard-links
 	--compress
@@ -93,4 +93,9 @@ OPTIONS=(
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "${SRCS[@]}" "$ROOT" || die "Problemas ao recuperar: $!"
 
-echo "A pasta foi recuperada com sucesso"
+echo -e "\n"
+
+for SRC in ${STARTDIR[@]}
+do
+	echo "A pasta $ROOT/$SRC foi recuperada com sucesso"
+done

@@ -150,8 +150,12 @@ export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 getacls(){
 	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
 		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
-		SRCDIR=".bkit/$1"
-		echo "$SDIR/diracls.sh" "$1" "$METADATADIR/$SRCDIR"
+		DIRS=()
+		while read DIR
+		do
+			DIRS+=( "$MAPDRIVE/$DIR" )
+		done < "$1"
+		bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR"
 	)
 }
 
@@ -165,6 +169,7 @@ update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
 	dorsync --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+	getacls "$FILE"
 	rm -f "$FILE"
 }
 update_file(){

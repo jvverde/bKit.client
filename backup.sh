@@ -156,6 +156,7 @@ getacls(){
 			DIRS+=( "$MAPDRIVE/$DIR" )
 		done < "$1"
 		bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR"
+		dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
 	)
 }
 
@@ -310,7 +311,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	time clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
-	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' && false ]] && (
+	[[ $OS == 'cygwinwwwwwwwwwwwwwwwwwwwww' && $FILESYSTEM == 'NTFS' ]] && (
 		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 		SRCDIR=".bkit/$STARTDIR"
 		[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
@@ -326,7 +327,8 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	NOW=$(date -R)
 	for I in ${!ORIGINALDIR[@]}
 	do
-		echo -e "Backup of ${ORIGINALDIR[$I]} done at $NOW on:\n\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
+		echo "Backup of '${ORIGINALDIR[$I]}' done at $NOW on:"
+		echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 	done
 ) 9>"$LOCK"
 

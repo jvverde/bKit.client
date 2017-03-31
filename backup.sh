@@ -148,14 +148,15 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
 getacls(){
-	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
+	FILE="$1"
+	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
 		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
 		DIRS=()
 		while read DIR
 		do
 			DIRS+=( "$MAPDRIVE/$DIR" )
-		done < "$1"
-		bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR"
+		done < "$FILE"
+		bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR" |  xargs -d '\n' -I{} echo {}
 		dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
 	)
 }

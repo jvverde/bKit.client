@@ -44,31 +44,51 @@ CONF=$SDIR/conf/conf.init
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
-FMT='--out-format=%o|%i|%b|%l|%M|%t|%f'
 PERM=(--acls --owner --group --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
 OPTIONS=(
 	--archive
-	--no-recursive
-	--dirs
 	--hard-links
 	--human-readable
 	--relative
 	--dry-run
 )
 
-for DIR in ${RESTOREDIR[@]}
+for DIR in "${RESTOREDIR[@]}"
 do
-	ENTRY=${RESTOREDIR[$I]#$DIR}
 	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$DIR" 2>/dev/null)
 
 	exists cygpath && DRIVE=$(cygpath -w "$DIR")
 	DRIVE=${DRIVE%%:*}
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-	ROOT=$(stat -c%m "$DIR")
+
 	DST=$(dirname "$DIR")
 	DST=${DST%%/} #remove trailing slash if present
+
+	ROOT=$(stat -c%m "$DIR")
+
+	PARENT=$DIR
+	
 	DIR=${DIR#$ROOT}
-	SRC="$BACKUPURL/$RVID/.snapshots/*/data$DIR"
-	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DST/" | fgrep "/data$DIR"
+	DIR=${DIR#/}
+
+	FILTERS=()
+	until [[ $PARENT == $ROOT || ${#PARENT} -le 1 ]]
+	do
+		P=${PARENT#$ROOT}
+		F="--include=/${P#/}"
+		FILTERS+=( "$F" )
+		PARENT=$(dirname "$PARENT")
+	done
+	FILTERS+=(
+		'--exclude=*' 
+	)
+
+	VERSIONS=( $(rsync --list-only "$BACKUPURL/$RVID/.snapshots/"|grep -Po '@GMT-.+$') )
+	for V in "${VERSIONS[@]}"
+	do
+		FMT="--out-format=$V|%o|%i|%M|%l|%f"
+		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/./"
+		rsync "${RSYNCOPTIONS[@]}" "${FILTERS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$ROOT/" |awk -F'|' '$6 == "'$DIR'" {print $0}'
+	done
 done

@@ -312,17 +312,17 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	time clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
 
-	[[ $OS == 'cygwinwwwwwwwwwwwwwwwwwwwww' && $FILESYSTEM == 'NTFS' ]] && (
-		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
-		SRCDIR=".bkit/$STARTDIR"
-		[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
-		bash "$SDIR/acls.sh" "${BACKUPDIR[@]}" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
-		cd "$METADATADIR"
-		PACKDIR=".tar/$STARTDIR"
-		[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
-		tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
-		update_file -R "$METADATADIR/./$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata/"
-	) && echo Metadata tar sent to backup
+	# [[ $OS == 'cygwinwwwwwwwwwwwwwwwwwwwww' && $FILESYSTEM == 'NTFS' ]] && (
+	# 	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
+	# 	SRCDIR=".bkit/$STARTDIR"
+	# 	[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
+	# 	bash "$SDIR/acls.sh" "${BACKUPDIR[@]}" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
+	# 	cd "$METADATADIR"
+	# 	PACKDIR=".tar/$STARTDIR"
+	# 	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
+	# 	tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
+	# 	update_file -R "$METADATADIR/./$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata/"
+	# ) && echo Metadata tar sent to backup
 
 	time snapshot && echo snapshot done
 	NOW=$(date -R)

@@ -147,6 +147,14 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
+getacls(){
+	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (
+		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
+		SRCDIR=".bkit/$1"
+		echo "$SDIR/diracls.sh" "$1" "$METADATADIR/$SRCDIR"
+	)
+}
+
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
@@ -312,7 +320,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	time snapshot && echo snapshot done
 	NOW=$(date -R)
 	for I in ${!ORIGINALDIR[@]}
-	do 
+	do
 		echo -e "Backup of ${ORIGINALDIR[$I]} done at $NOW on:\n\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 	done
 ) 9>"$LOCK"

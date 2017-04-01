@@ -68,7 +68,7 @@ do
 	ROOT=$(stat -c%m "$DIR")
 
 	PARENT=$DIR
-	
+
 	DIR=${DIR#$ROOT}
 	DIR=${DIR#/}
 
@@ -81,7 +81,7 @@ do
 		PARENT=$(dirname "$PARENT")
 	done
 	FILTERS+=(
-		'--exclude=*' 
+		'--exclude=*'
 	)
 
 	VERSIONS=( $(rsync --list-only "$BACKUPURL/$RVID/.snapshots/"|grep -Po '@GMT-.+$') )
@@ -89,6 +89,14 @@ do
 	do
 		FMT="--out-format=$V|%o|%i|%M|%l|%f"
 		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/./"
-		rsync "${RSYNCOPTIONS[@]}" "${FILTERS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$ROOT/" |awk -F'|' '$6 == "'$DIR'" {print $0}'
-	done
+		rsync "${RSYNCOPTIONS[@]}" "${FILTERS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$ROOT/" |
+		awk -F'|' -v entry="$DIR" '$6 == entry {print $0}'
+	done | awk -F'|' '
+		{
+			LINES[$2 $3 $4 $5] = $0
+		}
+		END{
+			for (L in LINES) print LINES[L]
+		}
+	' | sort
 done

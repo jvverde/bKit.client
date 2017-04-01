@@ -314,7 +314,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	rm -f "$MANIFEST" "$ENDFLAG"
 
 
-	echo "\nPhase 3 - Clean deleted files from backup\n"
+	echo -e "\nPhase 3 - Clean deleted files from backup\n"
 
 	clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
@@ -330,7 +330,7 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	# 	update_file -R "$METADATADIR/./$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata/"
 	# ) && echo Metadata tar sent to backup
 
-	echo "\nPhase 4 - Create a realonly snapshot on server\n"
+	echo -e "\nPhase 4 - Create a realonly snapshot on server\n"
 	snapshot
 
 	NOW=$(date -R)

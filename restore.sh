@@ -19,6 +19,9 @@ do
 				shift
 			done
 		;;
+		-d|--date)
+			DATE=$1 && shift
+    ;;
 		*)
 			die Unknown	option $KEY
 		;;
@@ -83,7 +86,11 @@ do
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 	BASE=${BASE%%/}		#remove trailing slash if present
 	ENTRY=${ENTRY#/}	#remove leading slash if present
-	SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
+	[[ -n $DATE ]] && {
+		SRC="$BACKUPURL/$RVID/.snapshots/$DATE/data$BASE/./$ENTRY"		
+	} || {
+		SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
+	}
 	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DIR/" || warn "Problemas ao recuperar $BASE/$ENTRY"
 	[[ -n $(find "$RESTOREDIR/$BACKUPDIR" -prune -empty 2>/dev/null) ]] && rm -rfv "$RESTOREDIR/$BACKUPDIR"
 done

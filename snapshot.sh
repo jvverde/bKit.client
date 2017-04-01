@@ -28,6 +28,7 @@ do
                 MOUNT=$(stat -c%m "$DEV")
             }
             [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
+            MOUNT=${MOUNT#/} #remove trailing slash if any
         ;;
         -- )
             while [[ $1 =~ ^- ]]
@@ -41,53 +42,64 @@ do
         ;;
     esac
 done
-exit
-true ${DIR:=$1}
-exists cygpath && DIR=$(cygpath "$DIR")
+DIRS=("$@")
 
-DIR=$(readlink -ne "$DIR") || die "Directory doesn't exists"
+BACKUPDIRS=()
+declare -A ROOTS
 
-
-true ${STARTDIR:=${DIR#$MOUNT}}
-STARTDIR=${STARTDIR#/}
-
-BACKUPDIR=$MOUNT/$STARTDIR
-
-[[ -e $BACKUPDIR ]] || die "$BACKUPDIR doesn't exists"
+for DIR in "${DIRS[@]}"
+do
+    [[ -n $MOUNT ]] && FULL=$MOUNT/$DIR || FULL=$DIR
+    FULL=$(readlink -ne "$FULL") || continue
+    exists cygpath && FULL=$(cygpath -u "$FULL")
+    ROOT=$(stat -c%m "$FULL")
+    ROOTS["$ROOT"]="1"
+    BACKUPDIRS+=( "$FULL" )
+done
 
 backup() {
     echo Backup directly -- without shadow copy
-    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$@"
 }
 
 ntfssnap(){
     echo Backup a ntfs shadow copy
     SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "$BACKUPDIR"
+    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
 
-[[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
-    DRIVE=$(cygpath -w "$(stat -c%m "$BACKUPDIR")")
-
-    DOSBASH=$(cygpath -w "$BASH")
-
-    NTFS=$(FSUTIL FSINFO VOLUMEINFO $DRIVE | fgrep -i "File System Name" | fgrep -oi "NTFS")
-    FIXED=$(FSUTIL FSINFO DRIVETYPE $DRIVE | fgrep -oi "Fixed Drive")
-    CDRIVES=$(FSUTIL FSINFO DRIVES|sed 'N;s/\n//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*'|tr '[:lower:]' '[:upper:]')
-
-    for LETTER in {H..Z} B {D..G} A
+for ROOT in ${!ROOTS[@]}
+do
+    DIRSOFROOT=()
+    for B in "${BACKUPDIRS[@]}"
     do
-    	[[ $CDRIVES =~ $LETTER ]] || {
-    		MAPLETTER="${LETTER}:" && break
-    	}
+        [[ $ROOT == $(stat -c%m "$B") ]] && DIRSOFROOT+=( "$B" )
     done
+    [[ ${#DIRSOFROOT[@]} -gt 0 ]] || continue
 
-    if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
-    then
-        ntfssnap $DRIVE $MAPLETTER
-    else
-        backup
-    fi
-} || {
-    backup
-}
+    [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
+        DRIVE=$(cygpath -w "$(stat -c%m "$ROOT")")
+
+        DOSBASH=$(cygpath -w "$BASH")
+
+        NTFS=$(FSUTIL FSINFO VOLUMEINFO $DRIVE | fgrep -i "File System Name" | fgrep -oi "NTFS")
+        FIXED=$(FSUTIL FSINFO DRIVETYPE $DRIVE | fgrep -oi "Fixed Drive")
+        CDRIVES=$(FSUTIL FSINFO DRIVES|sed 'N;s/\n//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*'|tr '[:lower:]' '[:upper:]')
+
+        for LETTER in {H..Z} B {D..G} A
+        do
+        	[[ $CDRIVES =~ $LETTER ]] || {
+        		MAPLETTER="${LETTER}:" && break
+        	}
+        done
+
+        if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
+        then
+            ntfssnap $DRIVE $MAPLETTER "${DIRSOFROOT[@]}"
+        else
+            backup "${DIRSOFROOT[@]}"
+        fi
+    } || {
+        backup "${DIRSOFROOT[@]}"
+    }
+done

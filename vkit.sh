@@ -26,4 +26,4 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && die "Usage:\n\t $0: [-- [rsyncoptions]] dir1/file1 [[dir2/file2 [...]]"
 
-bash "$SDIR/history.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"
+bash "$SDIR/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

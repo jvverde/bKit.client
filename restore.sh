@@ -76,8 +76,8 @@ do
 
 	ROOT=$(stat -c%m "$DIR")
 
-	BASE="${DIR#$ROOT}"
-	
+	BASE="${DIR#${ROOT%%/}}"
+
 	ENTRY=${RESTOREDIR#$DIR}
 	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
 
@@ -88,9 +88,17 @@ do
 	ENTRY=${ENTRY#/}	#remove leading slash if present
 	[[ -n $DATE ]] && {
 		SRC="$BACKUPURL/$RVID/.snapshots/$DATE/data$BASE/./$ENTRY"		
+		METASRC="$BACKUPURL/$RVID/.snapshots/$DATE/metadata$BASE/./$ENTRY"		
 	} || {
 		SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
+		METASRC="$BACKUPURL/$RVID/@current/metadata$BASE/./$ENTRY"
 	}
 	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DIR/" || warn "Problemas ao recuperar $BASE/$ENTRY"
 	[[ -n $(find "$RESTOREDIR/$BACKUPDIR" -prune -empty 2>/dev/null) ]] && rm -rfv "$RESTOREDIR/$BACKUPDIR"
+
+	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+		METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
+		rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST/$BASE/" || warn "Problemas ao recuperar $METADATADST/$BASE/"
+	)
+
 done

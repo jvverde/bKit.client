@@ -44,8 +44,8 @@ do
 done
 DIRS=("$@")
 
-BACKUPDIRS=()
 declare -A ROOTS
+declare -A ROOTOF
 
 for DIR in "${DIRS[@]}"
 do
@@ -53,8 +53,8 @@ do
     FULL=$(readlink -ne "$FULL") || continue
     exists cygpath && FULL=$(cygpath -u "$FULL")
     ROOT=$(stat -c%m "$FULL")
-    ROOTS["$ROOT"]="1"
-    BACKUPDIRS+=( "$FULL" )
+    ROOTS["$ROOT"]=1
+    ROOTOF["$FULL"]=$ROOT
 done
 
 backup() {
@@ -70,12 +70,12 @@ ntfssnap(){
 
 for ROOT in ${!ROOTS[@]}
 do
-    DIRSOFROOT=()
-    for B in "${BACKUPDIRS[@]}"
+    BACKUPDIR=()
+    for DIR in "${!ROOTOF[@]}"
     do
-        [[ $ROOT == $(stat -c%m "$B") ]] && DIRSOFROOT+=( "$B" )
+        [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "$DIR" )
     done
-    [[ ${#DIRSOFROOT[@]} -gt 0 ]] || continue
+    [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
 
     [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
         DRIVE=$(cygpath -w "$(stat -c%m "$ROOT")")
@@ -95,11 +95,11 @@ do
 
         if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
         then
-            ntfssnap $DRIVE $MAPLETTER "${DIRSOFROOT[@]}"
+            ntfssnap $DRIVE $MAPLETTER "${BACKUPDIR[@]}"
         else
-            backup "${DIRSOFROOT[@]}"
+            backup "${BACKUPDIR[@]}"
         fi
     } || {
-        backup "${DIRSOFROOT[@]}"
+        backup "${BACKUPDIR[@]}"
     }
 done

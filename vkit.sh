@@ -18,11 +18,12 @@ do
 			done
 		;;
 		*)
-			OPTIONS+=( "$KEY" )
 		;;
 	esac
 done
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-[[ $# -eq 0 ]] && die "Usage:\n\t $0: dir1/file1 [[dir2/file2 [...]]"
-bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"
+
+[[ $# -eq 0 ]] && die "Usage:\n\t $0: [-- [rsyncoptions]] dir1/file1 [[dir2/file2 [...]]"
+
+bash "$SDIR/restore.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

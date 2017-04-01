@@ -290,27 +290,33 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	echo Start to backup of directories/files ${ORIGINALDIR[@]} at $(date -R)
 
-	echo Phase 1 - Backup new/modified files
+	echo -e "\nPhase 1 - Backup new/modified files\n"
 
-	time (bash "$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST") && echo got data hashes
+	bash "$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"
 
-	echo Phase 2 - Update Symbolic links, Hard links, Directories and update file attributes
+	echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
 
 	bg_upload_manifest "$MAPDRIVE"
 
-	time backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo backup data done
+	backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
-	[[ -n $HLINK ]] && time backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"	&& echo checked missed hardlinks
+	[[ -n $HLINK ]] && {
+		echo -e "\n\tPhase 2.1 update delayed hardlinks"
+		backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+	}
 
 	touch "$ENDFLAG"
 	wait4jobs
 	rm -f "$MANIFEST" "$ENDFLAG"
 
 
-	time clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data" && echo cleaned deleted files
+	echo "\nPhase 3 - Clean deleted files from backup\n"
+
+	clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
 	# [[ $OS == 'cygwinwwwwwwwwwwwwwwwwwwwww' && $FILESYSTEM == 'NTFS' ]] && (
 	# 	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
@@ -324,7 +330,9 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 	# 	update_file -R "$METADATADIR/./$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata/"
 	# ) && echo Metadata tar sent to backup
 
-	time snapshot && echo snapshot done
+	echo "\nPhase 4 - Create a realonly snapshot on server\n"
+	snapshot
+
 	NOW=$(date -R)
 	for I in ${!ORIGINALDIR[@]}
 	do

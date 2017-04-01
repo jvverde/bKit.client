@@ -12,6 +12,9 @@ TARGETDIR=$(readlink -nm "$(cygpath "${@: -1}")")
 
 [[ -d $TARGETDIR ]]  || mkdir -pv "$TARGETDIR" || die Cannot create dir $ACLSDIR
 
+SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
+[[ -f $SUBINACL ]] || die SUBINACL.exe not found
+
 acldir(){
 	local WSPATH=$(cygpath -w "$1")
 	local WACLSFILE=$(cygpath -w "$2")
@@ -33,11 +36,7 @@ do
 	ACLSDIR=${TARGETDIR%/}${SRCDIR#$ROOT}
 	ACLSDIR=${ACLSDIR%/} 	#remove trailing slash if any
 
-
 	mkdir -pv "$ACLSDIR" || die Cannot create dir $ACLSDIR
-
-	SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
-	[[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
 	acldir "$SRCDIR" "$ACLSDIR/.bkit-acls" "$ACLSDIR/.bkit-sids"
 

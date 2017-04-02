@@ -24,5 +24,7 @@ do
 done
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+
 [[ $# -eq 0 ]] && die "Usage:\n\t $0: dir1/file1 [[dir2/file2 [...]]"
+echo $PWD
 bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

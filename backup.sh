@@ -318,18 +318,6 @@ LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 	clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
-	# [[ $OS == 'cygwinwwwwwwwwwwwwwwwwwwwww' && $FILESYSTEM == 'NTFS' ]] && (
-	# 	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
-	# 	SRCDIR=".bkit/$STARTDIR"
-	# 	[[ -d $METADATADIR/$SRCDIR ]] || mkdir -p "$METADATADIR/$SRCDIR"
-	# 	bash "$SDIR/acls.sh" "${BACKUPDIR[@]}" "$METADATADIR/$SRCDIR" 2>&1 |  xargs -d '\n' -I{} echo Acls: {} && echo got ACLS
-	# 	cd "$METADATADIR"
-	# 	PACKDIR=".tar/$STARTDIR"
-	# 	[[ -d $PACKDIR ]] || mkdir -p "$PACKDIR"
-	# 	tar --update --file "$PACKDIR/dir.tar" "$SRCDIR"
-	# 	update_file -R "$METADATADIR/./$PACKDIR/dir.tar" "$BACKUPURL/$RVID/@current/metadata/"
-	# ) && echo Metadata tar sent to backup
-
 	echo -e "\nPhase 4 - Create a realonly snapshot on server\n"
 	snapshot
 

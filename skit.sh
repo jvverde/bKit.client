@@ -3,9 +3,9 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage() {
-	NAME=$(basename "$0")
+	NAME=$(basename -s .sh "$0")
 	echo Snapshot and backup one or more directories or files
-	echo -e "Usage:\n\t $NAME: dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $NAME dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 

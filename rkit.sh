@@ -4,6 +4,7 @@ exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage() {
 	NAME=$(basename "$0")
+	echo Restore from backup one or more directories of files
 	echo -e "Usage:\n\t $NAME: dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }

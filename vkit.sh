@@ -18,6 +18,7 @@ do
 			done
 		;;
 		*)
+			OPTIONS+=( "$KEY" )
 		;;
 	esac
 done

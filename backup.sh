@@ -171,7 +171,7 @@ update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
 	dorsync --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
-	getacls "$FILE"
+	#getacls "$FILE"
 	rm -f "$FILE"
 }
 update_file(){

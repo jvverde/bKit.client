@@ -5,10 +5,10 @@ set oldpath=%path%
 set path="%~dp03rd-party\cygwin\bin";%path%
 set HOME=/home/user
 set SHELL=/bin/bash
-pushd "%~dp0"
-"%~dp03rd-party\cygwin\bin\bash.exe" %*
+REM pushd "%~dp0"
+"%~dp03rd-party\cygwin\bin\bash.exe" -c 'SDIR=$(cygpath -u "$1");"$SDIR/bkit.sh" "${@:2}"' -- %~dp0 %*
 SET /a errno=%ERRORLEVEL%
-popd
+REM popd
 set path=%oldpath%
 set SHELL=%oldshell%
 set HOME=%oldhome%

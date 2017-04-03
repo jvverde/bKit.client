@@ -82,9 +82,8 @@ backup() {
 ntfssnap(){
     echo Backup a ntfs shadow copy
     SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-    echo "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
+    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
-echo ROOT = ${!ROOTS[@]}
 for ROOT in ${!ROOTS[@]}
 do
     BACKUPDIR=()

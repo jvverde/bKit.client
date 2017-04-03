@@ -187,8 +187,8 @@ do
 		{
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
-			echo $CMD "${OPTIONS[@]}"  -- '--filter=". ./'$FILTERNAME'" --filter=": .rsync-filter"' "${BACKUPDIR[@]}"
-		} >> "$TASKBATCH" && echo "Updated batch file $(cygpath -w "$TASKBATCH")"
+			echo $CMD "${OPTIONS[@]}"  -- --filter='": .rsync-filter"' --filter='". ./'$FILTERNAME'"' "${BACKUPDIR[@]}"
+		} >> "$TASKBATCH"
 		continue
 		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
@@ -214,6 +214,6 @@ do
 		crontab -l
 	fi
 done
-
+cat "$TASKBATCH"
 
 

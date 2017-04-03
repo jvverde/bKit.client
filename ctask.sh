@@ -187,7 +187,9 @@ do
 		{
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
+			echo 'pushd "%~dp0"'
 			echo $CMD "${OPTIONS[@]}"  -- --filter='": .rsync-filter"' --filter='". ./'$FILTERNAME'"' "${BACKUPDIR[@]}"
+			echo 'popd'
 		} >> "$TASKBATCH"
 		continue
 		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'

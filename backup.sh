@@ -183,7 +183,7 @@ update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync --archive -vv --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 

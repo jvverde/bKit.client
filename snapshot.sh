@@ -5,9 +5,22 @@ OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
+getdev(){
+    DEV=$(bash "$SDIR/getdev.sh" "$1") || die "Volume $1 not found"
+    [[ -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
+        MOUNT=$(df --output=target $DEV|tail -n 1)
+        [[ -z $MOUNT && $UID -eq 0 ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+            mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+            trap "umount $DEV && rm -rvf $MOUNT" EXIT
+        }
+    } || { #otherwise extract ROOT and STARTDIR
+        MOUNT=$(stat -c%m "$DEV")
+    }
+    [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
+    MOUNT=${MOUNT%%/} #remove trailing slash if any
+}
 
 RSYNCOPTIONS=()
-
 while [[ $1 =~ ^- ]]
 do
     KEY="$1" && shift
@@ -16,19 +29,22 @@ do
             exec 1>"$1"
             shift
         ;;
+        --logdir)
+            LOGDIR=$1 && shift
+            [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
+            DATE=$(date +%Y-%m-%dT%H-%M-%S)
+            LOGFILE="$LOGDIR/log-$DATE"
+            ERRFILE="$LOGDIR/err-$DATE"
+            :> $LOGFILE
+            :> $ERRFILE
+            exec 1>"$LOGFILE"
+            exec 2>"$ERRFILE"
+        ;;
         -u|--uuid)
-            DEV=$(bash "$SDIR/getdev.sh" "$1") && shift || die "Volume $1 not found"
-            [[ -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
-                MOUNT=$(df --output=target $DEV|tail -n 1)
-                [[ -z $MOUNT && $UID -eq 0 ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
-                    mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
-                    trap "umount $DEV && rm -rvf $MOUNT" EXIT
-                }
-            } || { #otherwise extract ROOT and STARTDIR
-                MOUNT=$(stat -c%m "$DEV")
-            }
-            [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
-            MOUNT=${MOUNT#/} #remove trailing slash if any
+            getdev "$1" && shift
+        ;;
+        -u=*|--uuid=*)
+            getdev "${KEY#*=}"
         ;;
         -- )
             while [[ $1 =~ ^- ]]
@@ -42,6 +58,7 @@ do
         ;;
     esac
 done
+
 DIRS=("$@")
 
 declare -A ROOTS
@@ -49,7 +66,7 @@ declare -A ROOTOF
 
 for DIR in "${DIRS[@]}"
 do
-    [[ -n $MOUNT ]] && FULL=$MOUNT/$DIR || FULL=$DIR
+    [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/$DIR || FULL=$DIR
     FULL=$(readlink -ne "$FULL") || continue
     exists cygpath && FULL=$(cygpath -u "$FULL")
     ROOT=$(stat -c%m "$FULL")
@@ -65,9 +82,9 @@ backup() {
 ntfssnap(){
     echo Backup a ntfs shadow copy
     SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
+    echo "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
-
+echo ROOT = ${!ROOTS[@]}
 for ROOT in ${!ROOTS[@]}
 do
     BACKUPDIR=()

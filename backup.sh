@@ -119,8 +119,10 @@ HLIST=$RUNDIR/hl-list.$$
 DLIST=$RUNDIR/dir-list.$$
 MANIFEST=$RUNDIR/manifest.$$
 ENDFLAG=$RUNDIR/endflag.$$
+LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
-trap "rm -fv $RUNDIR/*.$$ $RUNDIR/*.$$.*" EXIT
+
+trap "rm -fv $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK" EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -277,8 +279,6 @@ bg_upload_manifest(){
 		rm -f "$SEGMENT" "$SEGFILES"
 	)&
 }
-
-LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 (
 	flock -w $((3600*24)) 9 || {

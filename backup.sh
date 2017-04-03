@@ -122,7 +122,7 @@ ENDFLAG=$RUNDIR/endflag.$$
 LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
 
 
-trap "rm -fv $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK" EXIT
+trap "rm -f $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK" EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -280,11 +280,11 @@ bg_upload_manifest(){
 	)&
 }
 
-(
-	flock -w $((3600*24)) 9 || {
-		rm -fv "$LOCK"
-		die Volume $VOLUMESERIALNUMBER was locked
-	}
+#(
+#	flock -w $((3600*24)) 9 || {
+#		rm -fv "$LOCK"
+#		die Volume $VOLUMESERIALNUMBER was locked for 1 day
+#	}
 
 	bg_upload_manifest "$MAPDRIVE"
 
@@ -322,10 +322,11 @@ bg_upload_manifest(){
 	snapshot
 
 	NOW=$(date -R)
+	echo "Backup done at $NOW for:"
 	for I in ${!ORIGINALDIR[@]}
 	do
-		echo "Backup of '${ORIGINALDIR[$I]}' done at $NOW on:"
+		echo "'${ORIGINALDIR[$I]}' on:"
 		echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 	done
-) 9>"$LOCK"
+#) 9>"$LOCK"
 

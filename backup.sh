@@ -183,7 +183,8 @@ update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
+	cat "$FILE"
+	dorsync --archive -vv --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 
@@ -212,7 +213,8 @@ backup(){
 			HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
 			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix $PREFIX !~ ././././././" && exit;}
-			echo "$PREFIX|$SIZE|$TIME|$FILE" >> "$MANIFEST"
+			#echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE"
+			echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >> "$MANIFEST"
 		) && continue
 
 		#if a hard link (to file or to symlink)

@@ -36,7 +36,7 @@ done
 STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
 STARTDIR=(${STARTDIR[@]#/})
 
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}" 2>/dev/null)
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}")
 
 exists cygpath && DRIVE=$(cygpath -w "${MOUNT[0]}")
 DRIVE=${DRIVE%%:*}
@@ -50,10 +50,10 @@ source "$CONF"
 exists rsync || die Cannot find rsync
 
 dorsync(){
-	rsync "$@" 2>&1
+	rsync "$@"
 }
 
-EXC="$SDIR/conf/excludes.txt"
+#EXC="$SDIR/conf/excludes.txt"
 FMT='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
@@ -67,7 +67,6 @@ done
 
 dorsync "${RSYNCOPTIONS[@]}" \
 	--dry-run \
-	--filter=': .rsync-filter' \
 	--one-file-system \
 	--recursive \
 	--links \
@@ -75,7 +74,6 @@ dorsync "${RSYNCOPTIONS[@]}" \
 	--hard-links \
 	--relative \
 	--itemize-changes \
-	--exclude-from="$EXC" \
 	$FMT \
 	"${SRCS[@]}" \
 	"$BACKUPURL/$RVID/@current/data"

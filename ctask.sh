@@ -104,16 +104,18 @@ do
 done
 IFS=$OLDIFS
 
+CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
+
 [[ $OS == cygwin ]] && {
 	TASKDIR="$SDIR/schtasks"
 	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
-	TASKNAME="BKIT-${NAME:-$(date +%Y-%m-%dT%H-%M-%S)}"
+	TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
 	CMD='"'${DOSBASH}.exe'" "'${RDIR}/snapshot.sh'"'
-	:> "$TASKBATCH"
+	echo '@echo OFF'> "$TASKBATCH"
 }
 
 
@@ -149,7 +151,7 @@ do
     	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
 
     	#echo B:$DIR
-    	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "$F" ) && continue
+    	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) && continue
     	BASE=${DIR%\**}
 		until [[ -d $BASE ]]
 		do
@@ -165,16 +167,27 @@ do
 		#[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
 		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$ROOT" 2>/dev/null)
 		DRIVE=$(cygpath -w "$ROOT")
-		LOGDIR=$RDIR/logs/${DRIVE:0:1}
+		DRIVE=${DRIVE:0:1}
+		DRIVE=${DRIVE,}
+
+		FILTERNAME="${TASKNAME}-$DRIVE.lst"
+		FILTERFILE="${TASKDIR}/$FILTERNAME"
+		echo "#Filter rules to be used in $(cygpath -w "$TASKBATCH"). Don't remove this file" > "$FILTERFILE"
+		for F in "${ROOTFILTERS[@]}"
+		do
+			echo "$F"
+		done >> "$FILTERFILE"
+
+
+		LOGDIR=$RDIR/logs/$DRIVE
 		OPTIONS=(
 			'--uuid "'$UUID'"'
 			'--logdir "'$LOGDIR'"'
 		)
 		{
-			echo '@echo OFF'
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
-			echo $CMD "${OPTIONS[@]}"  -- '--filter=": .rsync-filter"' "${BACKUPDIR[@]}"
+			echo $CMD "${OPTIONS[@]}"  -- '--filter=". ./'$FILTERNAME'" --filter=": .rsync-filter"' "${BACKUPDIR[@]}"
 		} >> "$TASKBATCH" && echo "Updated batch file $(cygpath -w "$TASKBATCH")"
 		continue
 		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'

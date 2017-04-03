@@ -4,15 +4,18 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
+warn() { echo -e "$@">&2;}
 usage(){
 	die "Usage:\n\t$0 [-m|-h|-d|-w [every]] dirs"
 }
+
 [[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
 [[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
 	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 	echo I am to going to runas Administrator
 	cygstart -w --action=runas /bin/bash bash "$0" "$@" && exit
 }
+
 ONALL='*'
 MINUTE=ONALL
 HOUR=ONALL
@@ -26,6 +29,10 @@ let ONHOURS=$RANDOM%24
 let ONDAYOFWEEK=$RANDOM%7
 let ONDAYOFMONTH=1+$RANDOM%28
 let ONMONTHS=1+$RANDOM%12
+FILTERS=()
+OLDIFS=$IFS
+IFS="
+"
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -75,68 +82,125 @@ do
 		-s|--start)
 			START=$(date -d "$1" -u) && shift || die Wrong date format
 		;;
-		-- )
-            while [[ $1 =~ ^- ]]
-            do
-                RSYNCOPTIONS+=("$1")
-                shift
-            done
+		-f|--filter)
+			FILTERS+=("$1")
         ;;
+        -f=*|--filter=*)
+			FILTERS+=("${KEY#*=}")
+        ;;
+        --filters-from)
+			[[ -e $1 ]] || die "Can't find $1"
+			FILTERS+=( $(cat "$1") )
+		;;
+        --filters-from=*)
+			FILE="${KEY#*=}"
+			[[ -e $FILE ]] || die "Can't find $FILE"
+			FILTERS+=( $(cat "$FILE") )
+		;;
 		*)
 			echo Unknow	option $KEY && usage
 		;;
 	esac
 done
+IFS=$OLDIFS
 
-
-LOGSDIR=$SDIR/logs
-[[ -d $LOGSDIR ]] || mkdir -pv "$LOGSDIR"
-
-
-[[ -n $DIR ]] && FLATDIR=${DIR//[^a-zA-Z0-9_-]/_} || FLATDIR=ROOT
-
-if [[ $OS == cygwin ]]
-then
-	DOSBASH=$(cygpath -w "$BASH")
+[[ $OS == cygwin ]] && {
 	TASKDIR="$SDIR/schtasks"
 	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
 	TASKNAME="BKIT-${NAME:-$(date +%Y-%m-%dT%H-%M-%S)}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
-	#[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
-	for BACKUPDIR in "$@"
-	do
-		BACKUPPATH=$(cygpath -u "$(readlink -e "$BACKUPDIR")")
-		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$BACKUPPATH" 2>/dev/null)
-		LOGFILE=$LOGSDIR/$TASKNAME.$UUID.$(echo $DIR|md5sum|awk '{print $1}').log
-		CMD='"'${DOSBASH}.exe'" "'${SDIR}/snapshot.sh'" --uuid "'$UUID'" --dir "'$DIR'" --log "'$LOGFILE'" -- '"${RSYNCOPTIONS[@]}"
-		echo REM Backup $(cygpath -w "$BACKUPDIR") "($BACKUPPATH)"
-		echo REM Logs in $LOGFILE
-		echo $CMD
-	done > "$TASKBATCH"
-	exit
-	TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
-	ST=$(date -d "$START" +"%H:%M:%S")
-	#SD=$(date -d "$START" +"%d/%m/%Y")
-	#http://www.robvanderwoude.com/datetimentparse.php
-	#schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
-	let FORMAT=$(REG QUERY "HKCU\Control Panel\International"|fgrep -i "iDate"|grep -Po "\d")
-	(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
-	(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
-	(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
-	schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
-	schtasks /QUERY|fgrep BKIT
-else
-	[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
-	LOGFILE="$LOGSDIR/${NAME:-_}-$UUID.${FLATDIR}.log"
+	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
+	WBASH=$(cygpath -w "$BASH")
+	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
+	CMD='"'${DOSBASH}.exe'" "'${RDIR}/snapshot.sh'"'
+	:> "$TASKBATCH"
+}
 
-	{
-		crontab -l 2>/dev/null
-		echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
-	} | sort -u | crontab
 
-	#show what is scheduled
-	crontab -l
-fi
+declare -A ROOTS
+declare -A ROOTOF
+
+for DIR in "$@"
+do
+    FULL=$(readlink -ne "$DIR") || { warn $DIR "doesn't exists" && continue ;}
+    exists cygpath && FULL=$(cygpath -u "$FULL")
+    ROOT=$(stat -c%m "$FULL")
+    ROOTS["$ROOT"]=1
+    REL=${FULL#$ROOT}	#path relative to root
+    REL=${REL#/} 		#remove leading slasj if any
+    ROOTOF["$REL"]=$ROOT
+done
+
+for ROOT in ${!ROOTS[@]}
+do
+	ROOTFILTERS=()
+	BACKUPDIR=()
+    for DIR in "${!ROOTOF[@]}"
+    do
+        [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "\"$DIR\"" )
+    done
+    [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
+    #echo ROOT:$ROOT
+    for F in "${FILTERS[@]}"
+    do
+    	#echo F:$F
+    	DIR=${F:2}
+    	set -f
+    	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
+
+    	#echo B:$DIR
+    	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "$F" ) && continue
+    	BASE=${DIR%\**}
+		until [[ -d $BASE ]]
+		do
+			BASE=$(dirname "$BASE")
+		done
+    	R=$(stat -c%m "$BASE")
+    	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${F:0:2}$DIR" )
+    done
+	#echo "${ROOTFILTERS[@]}"
+
+	if [[ $OS == cygwin ]]
+	then
+		#[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
+		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$ROOT" 2>/dev/null)
+		DRIVE=$(cygpath -w "$ROOT")
+		LOGDIR=$RDIR/logs/${DRIVE:0:1}
+		OPTIONS=(
+			'--uuid "'$UUID'"'
+			'--logdir "'$LOGDIR'"'
+		)
+		{
+			echo '@echo OFF'
+			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
+			echo REM Logs on folder $LOGDIR
+			echo $CMD "${OPTIONS[@]}"  -- '--filter=": .rsync-filter"' "${BACKUPDIR[@]}"
+		} >> "$TASKBATCH" && echo "Updated batch file $(cygpath -w "$TASKBATCH")"
+		continue
+		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
+		ST=$(date -d "$START" +"%H:%M:%S")
+		#SD=$(date -d "$START" +"%d/%m/%Y")
+		#http://www.robvanderwoude.com/datetimentparse.php
+		#schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
+		let FORMAT=$(REG QUERY "HKCU\Control Panel\International"|fgrep -i "iDate"|grep -Po "\d")
+		(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
+		(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
+		(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
+		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
+		schtasks /QUERY|fgrep BKIT
+	else
+		[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
+		LOGFILE="$LOGSDIR/${NAME:-_}-$UUID.${FLATDIR}.log"
+
+		{
+			crontab -l 2>/dev/null
+			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
+		} | sort -u | crontab
+
+		#show what is scheduled
+		crontab -l
+	fi
+done
 
 
 

@@ -102,7 +102,7 @@ ntfssnap(){
 }
 
 RMFILES=()
-trap 'rm -f "'${RMFILES[@]}'"' EXIT
+trap 'rm -f "${RMFILES[@]}"' EXIT
 
 for ROOT in ${!ROOTS[@]}
 do

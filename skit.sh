@@ -35,4 +35,16 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 
-bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"
+RUNDIR=$SDIR/run
+[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
+
+EXCL=$RUNDIR/exclude-$$.lst
+
+trap "rm -f $EXCL" EXIT
+
+echo Compile exclude list
+bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+
+echo Start snapshot backup
+
+bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- --filter=". $EXCL" --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

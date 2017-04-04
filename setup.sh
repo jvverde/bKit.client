@@ -30,4 +30,3 @@ exists CMD && {
 	rm -f $BATCH
 }
 echo Compile excludes file
-bash "$SDIR/make-excludes.sh"

@@ -41,14 +41,11 @@ RUNDIR=$SDIR/run
 [[ -d $RUNDIR ]] || mkdir -p $RUNDIR
 
 EXCL=$RUNDIR/exclude-$$.lst
-:> "$EXCL"
 
-EXCLUDESDIR="$SDIR/excludes"
-EXCLUDESALL="$EXCLUDESDIR/excludes-all.txt"
-[[ -e $EXCLUDESALL ]] && cat "$EXCLUDESALL" >> "$EXCL"
-[[ $OS == cygwin ]] && {
-	bash "$SDIR/tools/hklm.sh"| bash "$SDIR/tools/w2f.sh" >> "$EXCL"
+trap "rm -f $EXCL" EXIT
 
-}
+echo Compile exclude list
+bash "SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 
+echo Start backup
 bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- --filter=". $EXCL" --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

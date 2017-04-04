@@ -194,7 +194,6 @@ do
 		continue
 		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
-		#SD=$(date -d "$START" +"%d/%m/%Y")
 		#http://www.robvanderwoude.com/datetimentparse.php
 		#schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 		let FORMAT=$(REG QUERY "HKCU\Control Panel\International"|fgrep -i "iDate"|grep -Po "\d")

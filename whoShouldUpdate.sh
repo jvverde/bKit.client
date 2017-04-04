@@ -29,16 +29,17 @@ IFS="
 "
 BACKUPDIR=( $(readlink -e "$@") )
 MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
+ROOT=${MOUNT[0]}
 for M in "${MOUNT[@]}"
 do
 	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same logical disk'
 done
-STARTDIR=(${BACKUPDIR[@]#${MOUNT[0]}})
-STARTDIR=(${STARTDIR[@]#/})
+STARTDIR=(${BACKUPDIR[@]#$ROOT}) #remove mount pointfrom path
+STARTDIR=(${STARTDIR[@]#/}) #remove leading slash if any
 
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "${MOUNT[0]}")
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
-exists cygpath && DRIVE=$(cygpath -w "${MOUNT[0]}")
+exists cygpath && DRIVE=$(cygpath -w "$ROOT")
 DRIVE=${DRIVE%%:*}
 
 RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
@@ -58,7 +59,8 @@ FMT='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
-ROOT=${MOUNT%%/}
+ROOT=${ROOT%%/} #remove trailing slash if any
+
 SRCS=()
 for DIR in "${STARTDIR[@]}"
 do

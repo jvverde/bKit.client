@@ -82,6 +82,24 @@ backup() {
 ntfssnap(){
     echo Backup a ntfs shadow copy
     SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
+    RMFILES=()
+    for I in "${!RSYNCOPTIONS[@]}"
+    do
+        [[ ${RSYNCOPTIONS[$I]} =~ --filter=\.[[:space:]]+ ]] && {
+            FILE=${RSYNCOPTIONS[$I]#--filter=\.}
+            FILE=${FILE#${FILE%%[![:space:]]*}}  #remoce leading spaces
+            EXT=${FILE##*.}
+            NEWFILE=${FILE%.$EXT}-$$.$EXT
+            OLDROOT=$(cygpath -u "$1")
+            NEWROOT=$(cygpath -u "$2")
+            OLDROOT=${OLDROOT%/}
+            NEWROOT=${NEWROOT%/}
+            cat "$FILE" |sed -E "s#([+-]/\s+)$OLDROOT#\\1$NEWROOT#" > "$NEWFILE"
+            RSYNCOPTIONS[$I]=${RSYNCOPTIONS[$I]/$FILE/$NEWFILE}
+            RMFILES+=( "$NEWFILE" )
+        }
+    done
+    trap 'rm -f "'${RMFILES[@]}'"' EXIT
     "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
 for ROOT in ${!ROOTS[@]}

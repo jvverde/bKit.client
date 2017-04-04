@@ -97,11 +97,20 @@ do
 			[[ -e $FILE ]] || die "Can't find $FILE"
 			FILTERS+=( $(cat "$FILE") )
 		;;
+		--install)
+			INSTALL="I"
+		;;
+		--force)
+			FORCE="F"
+		;;
 		*)
 			echo Unknow	option $KEY && usage
 		;;
 	esac
 done
+
+[[ $# -eq 0 ]] && usage
+
 IFS=$OLDIFS
 
 CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
@@ -111,6 +120,8 @@ CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
 	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
 	TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
+	echo $F
+	[[ -e $TASKBATCH && -z $FORCE ]] && die $TASKBATCH already exists
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
@@ -164,7 +175,6 @@ do
 
 	if [[ $OS == cygwin ]]
 	then
-		#[[ -e $TASKBATCH ]] && die $TASKBATCH already exists
 		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$ROOT" 2>/dev/null)
 		DRIVE=$(cygpath -w "$ROOT")
 		DRIVE=${DRIVE:0:1}
@@ -191,7 +201,7 @@ do
 			echo $CMD "${OPTIONS[@]}"  -- --filter='": .rsync-filter"' --filter='". ./'$FILTERNAME'"' "${BACKUPDIR[@]}"
 			echo 'popd'
 		} >> "$TASKBATCH"
-		continue
+		[[ -n $INSTALL ]] || continue
 		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
 		#http://www.robvanderwoude.com/datetimentparse.php
@@ -215,6 +225,7 @@ do
 		crontab -l
 	fi
 done
+echo Created the following schedule task in $TASKBATCH
 cat "$TASKBATCH"
 
 

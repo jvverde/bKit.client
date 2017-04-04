@@ -8,6 +8,8 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 RSYNCOPTIONS=()
+FMT='--out-format=%i|%n|%L|/%f|%l'
+
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -18,6 +20,9 @@ do
 				RSYNCOPTIONS+=("$1")
 				shift
 			done
+		;;
+		--out-format=*)
+			FMT="$KEY"
 		;;
 		*)
 			die Unknow	option $KEY
@@ -32,7 +37,7 @@ MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
 ROOT=${MOUNT[0]}
 for M in "${MOUNT[@]}"
 do
-	[[ $M == ${MOUNT[0]} ]] || die 'All directories/file must belongs to same logical disk'
+	[[ $M == $ROOT ]] || die 'All directories/file must belongs to same logical disk'
 done
 STARTDIR=(${BACKUPDIR[@]#$ROOT}) #remove mount pointfrom path
 STARTDIR=(${STARTDIR[@]#/}) #remove leading slash if any
@@ -55,7 +60,6 @@ dorsync(){
 }
 
 #EXC="$SDIR/conf/excludes.txt"
-FMT='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 

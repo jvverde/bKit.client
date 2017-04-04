@@ -289,7 +289,7 @@ bg_upload_manifest(){
 
 	bg_upload_manifest "$MAPDRIVE"
 
-	echo Start to backup of directories/files ${ORIGINALDIR[@]} at $(date -R)
+	echo Start to backup directories/files on ${ORIGINALDIR[@]} at $(date -R)
 
 	echo -e "\nPhase 1 - Backup new/modified files\n"
 

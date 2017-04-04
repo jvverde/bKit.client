@@ -11,6 +11,23 @@ usage() {
 	exit 1
 }
 
+FILTERS=()
+
+RMFILES=()
+trap 'rm -f "${RMFILES[@]}"' EXIT
+
+excludes(){
+	RUNDIR=$SDIR/run
+	[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
+
+	EXCL=$RUNDIR/exclude-$$.lst
+
+	echo Compile exclude list
+	bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	FILTERS+=( --filter=". $EXCL" )
+	RMFILES+=( "$EXCL" )
+}
+
 OPTIONS=()
 RSYNCOPTIONS=()
 while [[ $1 =~ ^- ]]
@@ -23,6 +40,9 @@ do
 				RSYNCOPTIONS+=( "$1" )
 				shift
 			done
+		;;
+		-e|--excludes)
+			excludes
 		;;
 		-h|--help)
 			usage
@@ -37,15 +57,7 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 
-RUNDIR=$SDIR/run
-[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
-
-EXCL=$RUNDIR/exclude-$$.lst
-
-trap "rm -f $EXCL" EXIT
-
-echo Compile exclude list
-bash "SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+FILTERS+=( --filter=": .rsync-filter" )
 
 echo Start backup
-bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- --filter=". $EXCL" --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"
+bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "$@"

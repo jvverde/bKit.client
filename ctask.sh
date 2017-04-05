@@ -125,7 +125,7 @@ CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
-	CMD='"'${DOSBASH}.exe'" "'${RDIR}/snapshot.sh'"'
+	CMD='"'${DOSBASH}.exe'" "'${RDIR}/skit.sh'"'
 	echo '@echo OFF'> "$TASKBATCH"
 }
 
@@ -189,8 +189,9 @@ do
 		done >> "$FILTERFILE"
 
 
-		LOGDIR=$RDIR/logs/$DRIVE
+		LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
 		OPTIONS=(
+			'--excludes'
 			'--uuid "'$UUID'"'
 			'--logdir "'$LOGDIR'"'
 		)
@@ -198,7 +199,7 @@ do
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
 			echo 'pushd "%~dp0"'
-			echo $CMD "${OPTIONS[@]}"  -- --filter='": .rsync-filter"' --filter='". ./'$FILTERNAME'"' "${BACKUPDIR[@]}"
+			echo $CMD "${OPTIONS[@]}"  -- --filter='". ./'$FILTERNAME'"' "${BACKUPDIR[@]}"
 			echo 'popd'
 		} >> "$TASKBATCH"
 		[[ -n $INSTALL ]] || continue

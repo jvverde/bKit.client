@@ -56,7 +56,7 @@ source "$CONF"
 exists rsync || die Cannot find rsync
 
 dorsync(){
-	rsync "$@"
+	echo rsync "$@"
 }
 
 #EXC="$SDIR/conf/excludes.txt"

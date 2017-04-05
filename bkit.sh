@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
-SDIR="$(dirname "$(readlink -f "$0")")"
+SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage() {
@@ -52,8 +52,6 @@ do
 		;;
 	esac
 done
-
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 

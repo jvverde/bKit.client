@@ -99,16 +99,16 @@ dorsync(){
 			;;
 			5|10|12|30|35)
 				DELAY=$((1 + RANDOM % 60))
-				echo Received error $ret. Try again in $DELAY seconds
+				warn "Received error $ret. Try again in $DELAY seconds"
 				sleep $DELAY
-				echo Try again now
+				warn "Try again now"
 			;;
 			*)
-				echo Fail to backup. Exit value of rsync is non null: $ret
+				warn "Fail to backup. Exit value of rsync is non null: $ret"
 				break
 			;;
 		esac
-		(( --RETRIES < 0 )) && echo "I'm tired of trying" && break
+		(( --RETRIES < 0 )) && warn "I'm tired of trying" && break
 	done
 }
 

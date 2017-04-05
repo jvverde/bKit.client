@@ -15,10 +15,6 @@ exists cygpath && BACKUPDIR=$(cygpath "$1")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-[[ -b $BACKUPDIR ]] && STARTDIR="" || {
-	MOUNT=$(stat -c%m "$BACKUPDIR")
-	STARTDIR=${BACKUPDIR#${MOUNT}/}   #BACKUPDIR=MOUNT/STARTDIR
-}
-VOLUMESERIALNUMBER=$("$SDIR/drive.sh" "$BACKUPDIR" 2>/dev/null|cut -d'|' -f2)
+VOLUMESERIALNUMBER=$(bash "$SDIR/drive.sh" "$BACKUPDIR"|cut -d'|' -f2)
 
-echo "$VOLUMESERIALNUMBER|$STARTDIR"
+echo "$VOLUMESERIALNUMBER"

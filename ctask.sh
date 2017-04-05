@@ -173,9 +173,9 @@ do
     done
 	#echo "${ROOTFILTERS[@]}"
 
+	UUID=$(bash "$SDIR/getUUID.sh" "$ROOT")
 	if [[ $OS == cygwin ]]
 	then
-		IFS='|' read UUID DIR <<<$(bash "$SDIR/getUUID.sh" "$ROOT" 2>/dev/null)
 		DRIVE=$(cygpath -w "$ROOT")
 		DRIVE=${DRIVE:0:1}
 		DRIVE=${DRIVE,}

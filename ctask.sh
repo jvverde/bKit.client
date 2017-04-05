@@ -9,12 +9,12 @@ usage(){
 	die "Usage:\n\t$0 [-m|-h|-d|-w [every]] dirs"
 }
 
-[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
-[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
-	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
-	echo I am to going to runas Administrator
-	cygstart -w --action=runas /bin/bash bash "$0" "$@" && exit
-}
+# [[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
+# [[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
+# 	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
+# 	echo I am to going to runas Administrator
+# 	cygstart -w --action=runas /bin/bash bash "$0" "$@" && exit
+# }
 
 ONALL='*'
 MINUTE=ONALL
@@ -114,13 +114,16 @@ done
 IFS=$OLDIFS
 
 CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
+FILTERDIR="$SDIR/filters"
+[[ -d $FILTERDIR ]] || mkdir -pv "$FILTERDIR"
 
+TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
+
+RDIR=$SDIR
 [[ $OS == cygwin ]] && {
 	TASKDIR="$SDIR/schtasks"
 	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
-	TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
 	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
-	echo $F
 	[[ -e $TASKBATCH && -z $FORCE ]] && die $TASKBATCH already exists
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
@@ -174,32 +177,38 @@ do
 	#echo "${ROOTFILTERS[@]}"
 
 	UUID=$(bash "$SDIR/getUUID.sh" "$ROOT")
-	if [[ $OS == cygwin ]]
-	then
+	DRIVE=${ROOT//\//_}
+	[[ $OS == cygwin ]] && {
 		DRIVE=$(cygpath -w "$ROOT")
 		DRIVE=${DRIVE:0:1}
 		DRIVE=${DRIVE,}
+	}
 
-		FILTERNAME="${TASKNAME}-$DRIVE.lst"
-		FILTERFILE="${TASKDIR}/$FILTERNAME"
-		echo "#Filter rules to be used in $(cygpath -w "$TASKBATCH"). Don't remove this file" > "$FILTERFILE"
-		for F in "${ROOTFILTERS[@]}"
-		do
-			echo "$F"
-		done >> "$FILTERFILE"
+	FILTERNAME="${TASKNAME}-$DRIVE.lst"
+	FILTERFILE="${FILTERDIR}/$FILTERNAME"
 
+	echo "#Filter rules to be used by a cronjob" > "$FILTERFILE"
+	[[ $OS == cygwin ]] && echo "#Filter rules to be used in '$(cygpath -w "$TASKBATCH")'. Don't remove this file" > "$FILTERFILE"
 
-		LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
-		OPTIONS=(
-			'--excludes'
-			'--uuid "'$UUID'"'
-			'--logdir "'$LOGDIR'"'
-		)
+	for F in "${ROOTFILTERS[@]}"
+	do
+		echo "$F"
+	done >> "$FILTERFILE"
+	LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
+	OPTIONS=(
+		'--excludes'
+		'--uuid "'$UUID'"'
+		'--logdir "'$LOGDIR'"'
+	)
+
+	if [[ $OS == cygwin ]]
+	then
+		FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")	
 		{
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
 			echo 'pushd "%~dp0"'
-			echo $CMD "${OPTIONS[@]}"  -- --filter='". ./'$FILTERNAME'"' "${BACKUPDIR[@]}"
+			echo $CMD "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
 			echo 'popd'
 		} >> "$TASKBATCH"
 		[[ -n $INSTALL ]] || continue
@@ -214,19 +223,14 @@ do
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 		schtasks /QUERY|fgrep BKIT
 	else
-		[[ -z $NAME ]] && exists lsblk && NAME=$(lsblk -Pno LABEL,UUID|fgrep "UUID=\"$UUID\""|grep -Po '(?<=LABEL=")([^"]|\\")*(?=")')
-		LOGFILE="$LOGSDIR/${NAME:-_}-$UUID.${FLATDIR}.log"
-
-		{
-			crontab -l 2>/dev/null
-			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash '$SDIR/backup.sh' --uuid '$UUID' --dir '$DIR' --log '$LOGSDIR/${NAME:-_}-$UUID'"
-		} | sort -u | crontab
-
+		#crontab -l 2>/dev/null
+		echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 
+		#| sort -u | crontab
 		#show what is scheduled
-		crontab -l
+		#crontab -l
 	fi
 done
 echo Created the following schedule task in $TASKBATCH
-cat "$TASKBATCH"
+#cat "$TASKBATCH"
 
 

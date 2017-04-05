@@ -61,4 +61,4 @@ FILTERS+=( --filter=": .rsync-filter" )
 
 echo Start snapshot backup
 
-bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "$@"
+echo bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "$@"

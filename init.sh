@@ -12,8 +12,14 @@ SERVER="$1"
 
 die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
+usage() {
+    NAME=$(basename -s .sh "$0")
+    echo Restore from backup one or more directories of files
+    echo -e "Usage:\n\t $NAME Server-address"
+    exit 1
+}
 
-[[ -z $SERVER ]] && die "Usage:\n\t$0 server-address"
+[[ -n $SERVER ]] || usage
 echo Contacting the server ... please wait!
 exists nc && { nc -z $SERVER $PORT 2>&1 || die Server $SERVER not found;}
 

@@ -53,10 +53,11 @@ ROOT=${ROOTS[0]}
 
 [[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
 
-exists cygpath && [[ -n $MAPDRIVE ]] && MAPDRIVE=$(cygpath "$MAPDRIVE") || MAPDRIVE=$ROOT
+[[ -n $MAPDRIVE ]] || MAPDRIVE=$ROOT
 
 STARTDIR=()
 BACKUPDIR=()
+REALSRCDIR=()
 for I in ${!ROOTS[@]}
 do
 	[[ "${ROOTS[$I]}" == "$ROOT" ]] || {
@@ -66,6 +67,7 @@ do
 	DIR=${DIR#/}
 	STARTDIR+=( "$DIR" )
 	BACKUPDIR+=( "$MAPDRIVE/$DIR" )
+	REALSRCDIR+=( "$ROOT/$DIR" )
 done
 
 #we need ROOT, BACKUPDIR and STARTDIR
@@ -293,7 +295,7 @@ bg_upload_manifest(){
 
 	echo -e "\nPhase 1 - Backup new/modified files\n"
 
-	bash "$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+	bash "$SDIR/hash.sh" -- "${RSYNCOPTIONS[@]}" "${REALSRCDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
 	touch "$ENDFLAG"
 	wait4jobs

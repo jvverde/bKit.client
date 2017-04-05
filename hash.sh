@@ -37,7 +37,6 @@ do
 done
 
 #pushd "$MOUNT" > /dev/null
-
 bash "$SDIR/whoShouldUpdate.sh" -- "${RSYNCOPTIONS[@]}" "${FULLPATHS[@]}"|
 awk -F'|' '$1 ~ /^<f/ {print $4}' | tr '\n' '\0' |
 xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/' |

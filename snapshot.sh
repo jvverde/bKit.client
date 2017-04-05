@@ -19,7 +19,18 @@ getdev(){
     [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
     MOUNT=${MOUNT%%/} #remove trailing slash if any
 }
+redirectlogs() {
+    LOGDIR=$1
+    [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
+    DATE=$(date +%Y-%m-%dT%H-%M-%S)
+    LOGFILE="$LOGDIR/log-$DATE"
+    ERRFILE="$LOGDIR/err-$DATE"
+    :> $LOGFILE
+    :> $ERRFILE
+    exec 1>"$LOGFILE"
+    exec 2>"$ERRFILE"
 
+}
 RSYNCOPTIONS=()
 while [[ $1 =~ ^- ]]
 do
@@ -30,15 +41,10 @@ do
             shift
         ;;
         --logdir)
-            LOGDIR=$1 && shift
-            [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
-            DATE=$(date +%Y-%m-%dT%H-%M-%S)
-            LOGFILE="$LOGDIR/log-$DATE"
-            ERRFILE="$LOGDIR/err-$DATE"
-            :> $LOGFILE
-            :> $ERRFILE
-            exec 1>"$LOGFILE"
-            exec 2>"$ERRFILE"
+            redirectlogs $1 && shift
+        ;;
+        --logdir=*)
+            redirectlogs "${KEY#*=}"
         ;;
         -u|--uuid)
             getdev "$1" && shift
@@ -102,7 +108,10 @@ ntfssnap(){
 }
 
 RMFILES=()
-trap 'rm -f "${RMFILES[@]}"' EXIT
+trap '
+    rm -f "${RMFILES[@]}"
+    [[ -s $ERRFILE ]] || rm -f "$ERRFILE"
+' EXIT
 
 for ROOT in ${!ROOTS[@]}
 do

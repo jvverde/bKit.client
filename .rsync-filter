@@ -5,7 +5,7 @@
 - /conf
 - /tmp
 - /schtasks
-- /filter
+- /filters
 - *~
 - /old
 - /not-used-anymore

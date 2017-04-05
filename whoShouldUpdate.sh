@@ -24,6 +24,9 @@ do
 		--out-format=*)
 			FMT="$KEY"
 		;;
+		--rvid=*)
+			RVID="${KEY#*=}"
+		;;
 		*)
 			die Unknow	option $KEY
 		;;
@@ -42,12 +45,14 @@ done
 STARTDIR=(${BACKUPDIR[@]#$ROOT}) #remove mount pointfrom path
 STARTDIR=(${STARTDIR[@]#/}) #remove leading slash if any
 
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
-exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-DRIVE=${DRIVE%%:*}
+[[ -n $RVID ]] || {
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
-RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+	DRIVE=${DRIVE%%:*}
+	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+}
 
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF

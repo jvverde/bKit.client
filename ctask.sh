@@ -223,11 +223,12 @@ do
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 		schtasks /QUERY|fgrep BKIT
 	else
-		#crontab -l 2>/dev/null
-		echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 
-		#| sort -u | crontab
+		{
+			crontab -l 2>/dev/null
+			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 
+		}| sort -u | crontab
 		#show what is scheduled
-		#crontab -l
+		crontab -l
 	fi
 done
 echo Created the following schedule task in $TASKBATCH

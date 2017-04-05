@@ -7,14 +7,12 @@ die() { echo -e "$@">&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 getdev(){
     DEV=$(bash "$SDIR/getdev.sh" "$1") || die "Volume $1 not found"
-    [[ -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
-        MOUNT=$(df --output=target $DEV|tail -n 1)
-        [[ -z $MOUNT && $UID -eq 0 ]] && MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+    MOUNT=$(df --output=target "$DEV"|tail -n 1)
+    [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
+        MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
             mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
             trap "umount $DEV && rm -rvf $MOUNT" EXIT
         }
-    } || { #otherwise extract ROOT and STARTDIR
-        MOUNT=$(stat -c%m "$DEV")
     }
     [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
     MOUNT=${MOUNT%%/} #remove trailing slash if any
@@ -29,7 +27,6 @@ redirectlogs() {
     :> $ERRFILE
     exec 1>"$LOGFILE"
     exec 2>"$ERRFILE"
-
 }
 RSYNCOPTIONS=()
 while [[ $1 =~ ^- ]]
@@ -72,6 +69,7 @@ declare -A ROOTOF
 
 for DIR in "${DIRS[@]}"
 do
+    DIR=${DIR#/} # remove leading slash if any
     [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/$DIR || FULL=$DIR
     FULL=$(readlink -ne "$FULL") || continue
     exists cygpath && FULL=$(cygpath -u "$FULL")

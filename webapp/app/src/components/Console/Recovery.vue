@@ -25,7 +25,6 @@
       <div class="stdout">{{stdout}}</div>
       <div class="stderr">{{stderr}}</div>
     </section>
-    <div @click.stop="isVisible = true">Show</div>{{isVisible}}
   </div>
 </template>
 
@@ -42,12 +41,12 @@ export default {
       stdout: '',
       stderr: '',
       location: undefined,
-      myself: this.$store.getters.computer || {}
+      this: this.$store.getters.computer || {}
     }
   },
   computed: {
     myid () {
-      return this.myself.id
+      return this.this.id
     },
     computerId () {
       return this.resource.computer
@@ -72,12 +71,11 @@ export default {
     let resource = this.resource || {}
     let [letter, volID] = (resource.drive || '').split(/\./)
     const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
-    const myself = this
     fd.stdout.on('data', (data) => {
       let drive = `${data}`.replace(/\r?\n.*$/, '')
-      myself.path = path.resolve(drive, resource.path, resource.entry)
-      myself.isVisible = true
-      myself.location = myself.path
+      this.path = path.resolve(drive, resource.path, resource.entry)
+      this.isVisible = true
+      this.location = this.path
     })
 
 /*    fd.stderr.on('data', (msg) => {
@@ -96,15 +94,12 @@ export default {
           message: 'You can still recovery it but you must choose an alternative location',
           duration: 100,
           onClose: () => {
-            myself.$nextTick(() => {
-              const folder = this.selectDestination()
-              if (folder) {
-                myself.isVisible = true
-                myself.path = path.resolve(`${letter}:/`, resource.path, resource.entry)
-                console.log(myself.path)
-                myself.location = folder
-              }
-            })
+            const folder = this.selectDestination()
+            if (folder) {
+              this.isVisible = true
+              this.path = path.resolve(`${letter}:/`, resource.path, resource.entry)
+              this.location = folder
+            }
           }
         })
       }

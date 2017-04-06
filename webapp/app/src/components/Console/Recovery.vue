@@ -73,12 +73,14 @@ export default {
   mounted () {
     console.log('recovery mounted')
     let resource = this.resource || {}
+    console.log(resource)
     let [letter, volID] = (resource.drive || '').split(/\./)
     const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
 
     fd.stdout.on('data', (data) => {
       let drive = `${data}`.replace(/\r?\n.*$/, '')
       this.path = path.resolve(drive, resource.path, resource.entry)
+      console.log(this.path)
       this.isVisible = true
       this.location = this.path
     })
@@ -87,13 +89,14 @@ export default {
       this.$notify.error({
         title: 'Error',
         message: `${msg}`,
-        customClass: 'message error'
+        customClass: 'message warn'
       })
     })
 
     fd.on('close', (code) => {
       code = 0 | code
-      if (code === 2) { // In case of volume wasn't found
+      console.log('code', code)
+      if (code === 1) { // In case of volume wasn't found
         this.$notify.info({
           title: 'Volume not found on this computer',
           message: 'You can still recovery it but you must choose an alternate location',

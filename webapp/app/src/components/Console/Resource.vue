@@ -3,9 +3,9 @@
     <section>
       <header>{{entry.filename}}</header>
       <aside v-if="entry.resource">
-        <span class="icon is-small" @click.prevent="run">
+<!--         <span class="icon is-small" @click.prevent="run">
           <i class="fa fa-cogs"></i>
-        </span>
+        </span> -->
         <span class="icon is-small" @click.prevent="open = !open">
           <i class="fa fa-chevron-circle-right" :class="{'fa-rotate-90':open}"></i>
         </span>

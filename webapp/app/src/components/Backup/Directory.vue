@@ -169,7 +169,7 @@
         bottom: auto; //disable bottom
         height: $line-height / 2;
       }
-      &:last-child:first-child::after{ //just to correct shift to top on first line
+      li:last-child:first-child::after{ //just to correct shift to top on first line
         height: $line-height / 2 + $line-height / 4;
       }
       header.line{

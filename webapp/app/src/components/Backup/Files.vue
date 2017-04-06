@@ -1,7 +1,7 @@
 <template>
   <ul class="files">
     <li v-for="file in files">
-      <div class="props">
+      <div class="props" :class="{deleted:file.deleted, changed:file.changed}">
         <span class="icon is-small">
           <i class="fa fa-file-o"></i>
         </span>
@@ -50,6 +50,7 @@
       display: flex;
       padding-left: 2px;
       line-height:$line-height;
+      padding-right: 1em;
       .links{
         flex-shrink: 0;
         margin-right: 3px;
@@ -80,6 +81,12 @@
           }
         }
       }
+      .props.deleted{
+        color:red;
+      }
+      .props.changed{
+        color: blue;
+      }
     }
   }
 </style>
@@ -95,7 +102,9 @@
     data () {
       return {
         url: this.$store.getters.url,
-        files: []
+        files: [],
+        oldpath: this.location.path,
+        newestsnap: ''
       }
     },
     props: {
@@ -134,8 +143,34 @@
           const url = this.getUrl('folder')
           this.$http.jsonp(url).then((response) => {
             let files = (response.data.files || []).sort(order)
-            this.$nextTick(() => {
+            if (this.location.path === this.oldpath) {
+              if (this.location.snapshot > this.newestsnap) {
+                this.newestsnap = this.location.snapshot
+                this.newestfiles = files
+                // console.log('New snapshot', this.newestsnap)
+              } else { // old snapshot in same path
+                // console.log('compare files')
+                files.forEach(f => {
+                  const old = this.newestfiles.find(e => {
+                    return e.name === f.name
+                  })
+                  if (!old) {
+                    // console.log('Not found', f.name)
+                    f.deleted = true
+                  } else if (old.size !== f.size) {
+                    // console.log('Different size for', f.name)
+                    f.changed = true
+                  }
+                })
+              }
+            } else { // new path
+              this.newestfiles = files
+              this.newestsnap = this.location.snapshot
+              // console.log('new path and new snapshot', this.newestsnap)
+            }
+            this.$nextTick(() => { // update on next clock ticket
               this.files = files
+              this.oldpath = this.location.path
             })
           }, (error) => {
             console.error(error)

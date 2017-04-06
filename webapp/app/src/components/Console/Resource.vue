@@ -31,7 +31,7 @@ export default {
   data () {
     return {
       open: this.entry.resource instanceof Object,
-      recoveries: [this.entry.resource]
+      recoveries: [this.entry.fullpath]
     }
   },
   props: ['entry'],
@@ -39,15 +39,16 @@ export default {
     Recovery
   },
   created () {
+    console.log(this.entry)
   },
   mounted () {
   },
   methods: {
     openFile () {
-      shell.openItem(this.resource.fullpath)
+      shell.openItem(this.entry.fullpath)
     },
     showFolder () {
-      shell.showItemInFolder(this.resource.fullpath)
+      shell.showItemInFolder(this.entry.fullpath)
     },
     run () {
       this.recoveries.push(this.recoveries[0])

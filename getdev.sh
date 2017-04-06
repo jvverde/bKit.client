@@ -14,7 +14,7 @@ exists fsutil &&{
 	DRIVE=($(FSUTIL FSINFO DRIVES|sed 's/\r//g;/^$/d'|tr '\0' ' '|grep -io '[a-z]:\\'|xargs -d'\n' -rI{} sh -c '
 		FSUTIL FSINFO VOLUMEINFO "$1"|grep -iq "\bVolume Serial Number\s*:\s*0x$2\b" && echo $1 && exit
 	' -- {} "$UUID"))
-	[[ -e $DRIVE ]] || die "Drive with id $1 is not installed"
+	[[ -e $DRIVE ]] || die "Drive with id $UUID is not installed"
 	echo "$DRIVE" && exit
 }
 
@@ -34,4 +34,4 @@ exists lsblk && {
 	echo "$DEV" && exit
 }
 
-
+die "Device with id $UUID is not installed"

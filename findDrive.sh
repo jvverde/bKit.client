@@ -1,4 +1,5 @@
 #!/bin/bash
+SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
 [[ -n $1 ]] || echo -e "Usage:\n\t$0 VolumeId"
 UUID=$1
 die() { echo -e "$@">&2; exit 1; }
@@ -10,13 +11,9 @@ exists fsutil && {
     fsutil fsinfo volumeinfo "$DRV\\"|grep -Piq '^\s*Volume\s+Serial\s+Number\s*:\s*0x'$UUID'\s*$' || continue
     echo $DRV && exit 0
   done
-  exit 2
+  exit 1
 }
-exists lsblk && exec 3>&2 &&{ #this need more testing
-  [[ $UID -eq 0 ]] || die $0 must be run as root>&3
-  MOUNT=$(lsblk -Pno UUID,MOUNTPOINT|fgrep "UUID=\"$UUID\""|grep -Po '(?<=MOUNTPOINT=")([^"]|\\")*(?=")')
-  [[ -z $MOUNT ]] && MOUNT="/dev/$(lsblk -Pno UUID,KNAME|fgrep "UUID=\"$UUID\""|grep -Po '(?<=KNAME=")([^"]|\\")*(?=")')"
-  echo $MOUNT && exit 0
-  exit 2
-} #2>/dev/null
-die neither found fsutil nor lsblk
+
+set -o pipefail
+
+bash "$SDIR/getdev.sh" "$UUID" |xargs -I{} df --output=target "{}"|tail -n 1

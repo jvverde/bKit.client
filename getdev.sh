@@ -14,24 +14,23 @@ exists fsutil &&{
 	DRIVE=($(FSUTIL FSINFO DRIVES|sed 's/\r//g;/^$/d'|tr '\0' ' '|grep -io '[a-z]:\\'|xargs -d'\n' -rI{} sh -c '
 		FSUTIL FSINFO VOLUMEINFO "$1"|grep -iq "\bVolume Serial Number\s*:\s*0x$2\b" && echo $1 && exit
 	' -- {} "$UUID"))
-	[[ -e $DRIVE ]] || die "Drive with id $1 is not installed"
-	echo "$DRIVE" && exit
+	[[ -e $DRIVE ]] || die "Drive with id $UUID is not installed"
+	echo -n "$DRIVE" && exit
 }
 
 [[ -e /dev/disk/by-uuid ]] && {
-	echo $(readlink -ne "/dev/disk/by-uuid/$UUID") && exit
+	readlink -ne "/dev/disk/by-uuid/$UUID" && exit
 }
 
 exists blkid && {
-	echo $(blkid -U "$UUID") && exit
+	blkid -U "$UUID" && exit
 }
 
-exists lsblk && {
-	[[ $UID -eq 0 ]] || die "You must be root"
+exists lsblk && [[ $UID -eq 0 ]] && {
 	NAME=$(lsblk -lno KNAME,UUID|grep -i "\b$UUID\b"|head -n 1|cut -d' ' -f1)
 	DEV=${NAME:+/dev/$NAME}
 	[[ -e $DEV ]] || die "'$DEV' does not exists"
-	echo "$DEV" && exit
+	echo -n "$DEV" && exit
 }
 
-
+die "Device with id $UUID is not installed"

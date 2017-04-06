@@ -1,9 +1,7 @@
 <template>
   <div class="main">
     <span @click="debug" class="opendebug">.</span>
-    <keep-alive>
-      <router-view></router-view>
-    </keep-alive>
+    <router-view></router-view>
   </div>
 </template>
 

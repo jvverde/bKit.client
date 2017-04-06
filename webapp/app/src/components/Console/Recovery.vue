@@ -1,6 +1,7 @@
 <template>
   <div class="recovery">
-    <el-dialog title="Recovery" v-model="isVisible" size="small" class="dialog">
+    <el-dialog title="Recovery" v-model="isVisible" size="small"
+      class="dialog">
       <h3>
         {{path}}
         <span v-if="location">
@@ -9,7 +10,7 @@
         </span>
       </h3>
       <div v-if="myid !== computerId">
-        <div class="alert">Please notice: You are in a different computer</div>
+        <!-- <div class="alert">Please notice: You are in a different computer</div> -->
         <div v-if="location === path">Are you really sure that you want to import and overwrite you local data?</div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -21,13 +22,10 @@
       </span>
     </el-dialog>
     <section :class="{show:show}">
-      <div class="stdout">
-        {{stdout}}
-      </div>
-      <div class="stderr">
-        {{stderr}}
-      </div>
+      <div class="stdout">{{stdout}}</div>
+      <div class="stderr">{{stderr}}</div>
     </section>
+    <div @click.stop="isVisible = true">Show</div>{{isVisible}}
   </div>
 </template>
 
@@ -71,40 +69,42 @@ export default {
     })
   },
   mounted () {
-    console.log('recovery mounted')
     let resource = this.resource || {}
     let [letter, volID] = (resource.drive || '').split(/\./)
     const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
-
+    const myself = this
     fd.stdout.on('data', (data) => {
       let drive = `${data}`.replace(/\r?\n.*$/, '')
-      this.path = path.resolve(drive, resource.path, resource.entry)
-      this.isVisible = true
-      this.location = this.path
+      myself.path = path.resolve(drive, resource.path, resource.entry)
+      myself.isVisible = true
+      myself.location = myself.path
     })
 
-    fd.stderr.on('data', (msg) => {
+/*    fd.stderr.on('data', (msg) => {
       this.$notify.error({
         title: 'Error',
         message: `${msg}`,
-        customClass: 'message error'
+        customClass: 'message warn'
       })
-    })
+    })*/
 
     fd.on('close', (code) => {
       code = 0 | code
-      if (code === 2) { // In case of volume wasn't found
+      if (code === 1) { // In case of volume wasn't found
         this.$notify.info({
           title: 'Volume not found on this computer',
-          message: 'You can still recovery it but you must choose an alternate location',
-          duration: 2000,
+          message: 'You can still recovery it but you must choose an alternative location',
+          duration: 100,
           onClose: () => {
-            const folder = this.selectDestination()
-            if (folder) {
-              this.isVisible = true
-              this.path = path.resolve(`${letter}:/`, resource.path, resource.entry)
-              this.location = folder
-            }
+            myself.$nextTick(() => {
+              const folder = this.selectDestination()
+              if (folder) {
+                myself.isVisible = true
+                myself.path = path.resolve(`${letter}:/`, resource.path, resource.entry)
+                console.log(myself.path)
+                myself.location = folder
+              }
+            })
           }
         })
       }
@@ -113,22 +113,25 @@ export default {
   methods: {
     selectDestination () {
       const {dialog} = this.$electron.remote
-      const [folder] = dialog.showOpenDialog({properties: ['openDirectory']}) || []
+      const [folder] = dialog.showOpenDialog({
+        properties: ['openDirectory'],
+        title: 'Import Location',
+        message: 'Choose an location to recovery the resource'
+      }) || []
       return folder
     },
     selectLocation () {
       // this.isVisible = false
       this.location = this.selectDestination() || this.location
       // this.isVisible = true
-      console.log('Location:', this.location)
     },
     recovery () {
       this.isVisible = false
       const dst = this.location === this.path ? '' : this.location || ''
       const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
       const now = (new Date()).toString()
-      this.stdout += `\n-------- Start recovery ${this.path} at ${now} --------\n`
-      this.stderr += `\n-------- Start recovery ${this.path} at ${now} --------\n`
+      this.stdout += `\n------ Start recovery ${this.path} at ${now} ------\n`
+      this.stderr += `\n------ Start recovery ${this.path} at ${now} ------\n`
       fd.stdout.on('data', (data) => {
         this.stdout += `${data}`
         this.stdout = this.stdout.substr(-10000)
@@ -153,8 +156,8 @@ export default {
           })
         }
         const now = (new Date()).toString()
-        this.stdout += `\n-------- Finish at ${now} --------\n`
-        this.stderr += `\n-------- Finish at ${now} --------\n`
+        this.stdout += `\n------ Finish at ${now} ------n`
+        this.stderr += `\n------ Finish at ${now} ------n`
       })
     }
   }
@@ -165,7 +168,7 @@ export default {
 <style scoped lang="scss">
   .recovery {
     section {
-      transition: max-height 2s cubic-bezier(0,1,0,1);
+      transition: max-height 1s cubic-bezier(0,1,0,1);
       overflow-y: hidden;
       max-height: 0;
       &.show{

@@ -3,9 +3,9 @@
     <section>
       <header>{{entry.filename}}</header>
       <aside v-if="entry.resource">
-        <span class="icon is-small" @click.prevent="run">
+<!--         <span class="icon is-small" @click.prevent="run">
           <i class="fa fa-cogs"></i>
-        </span>
+        </span> -->
         <span class="icon is-small" @click.prevent="open = !open">
           <i class="fa fa-chevron-circle-right" :class="{'fa-rotate-90':open}"></i>
         </span>
@@ -19,7 +19,8 @@
         </span>
       </aside>
     </section>
-    <recovery :resource="recovery" :show="open" v-for="recovery in recoveries" v-if="recovery"></recovery>
+    <recovery :resource="entry.resource" :show="open" 
+      v-if="entry.resource"></recovery>
   </div>
 </template>
 
@@ -30,8 +31,7 @@ export default {
   name: 'downloads',
   data () {
     return {
-      open: this.entry.resource instanceof Object,
-      recoveries: [this.entry.resource]
+      open: this.entry.resource instanceof Object
     }
   },
   props: ['entry'],
@@ -44,10 +44,10 @@ export default {
   },
   methods: {
     openFile () {
-      shell.openItem(this.resource.fullpath)
+      shell.openItem(this.entry.fullpath)
     },
     showFolder () {
-      shell.showItemInFolder(this.resource.fullpath)
+      shell.showItemInFolder(this.entry.fullpath)
     },
     run () {
       this.recoveries.push(this.recoveries[0])

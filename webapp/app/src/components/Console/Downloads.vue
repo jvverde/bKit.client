@@ -21,15 +21,20 @@ export default {
   created () {
     ipcRenderer.on('download', (event, arg) => {
       if (arg instanceof Object && arg.type === 'download') {
-        this.downloads.find(x => x.fullpath === arg.fullpath) || this.downloads.push(arg)
-        this.$notify.info({
-          title: arg.filename,
-          message: 'Download completed'
-        })
+        // this.downloads.find(x => x.fullpath === arg.fullpath) || this.downloads.push(arg)
         if (arg.mimetype === 'application/bkit') {
-          let download = this.downloads.find(x => x.fullpath === arg.fullpath)
+          const oldIndex = this.downloads.findIndex(
+            x => x.fullpath === arg.fullpath
+          )
+          const download = arg
+          this.downloads.push(download)
+          if (oldIndex !== -1) {
+            this.$nextTick(() => {
+              this.downloads.splice(oldIndex, 1)
+            })
+          }
           try {
-            let file = fs.readFileSync(arg.fullpath)
+            const file = fs.readFileSync(arg.fullpath)
             download.resource = JSON.parse(file)
             download.resource.downloadLocation = arg.fullpath
             download.open = true
@@ -39,6 +44,13 @@ export default {
               message: `Error: ${err}`
             })
           }
+        } else {
+          this.downloads.find(x => x.fullpath === arg.fullpath) ||
+            this.downloads.push(arg)
+          this.$notify.info({
+            title: arg.filename,
+            message: 'Download completed'
+          })
         }
       }
     })

@@ -19,7 +19,8 @@
         </span>
       </aside>
     </section>
-    <recovery :resource="recovery" :show="open" v-for="recovery in recoveries" v-if="recovery"></recovery>
+    <recovery :resource="entry.resource" :show="open" 
+      v-if="entry.resource"></recovery>
   </div>
 </template>
 
@@ -30,8 +31,7 @@ export default {
   name: 'downloads',
   data () {
     return {
-      open: this.entry.resource instanceof Object,
-      recoveries: [this.entry.fullpath]
+      open: this.entry.resource instanceof Object
     }
   },
   props: ['entry'],
@@ -39,7 +39,6 @@ export default {
     Recovery
   },
   created () {
-    console.log(this.entry)
   },
   mounted () {
   },

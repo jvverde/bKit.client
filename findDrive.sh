@@ -14,4 +14,6 @@ exists fsutil && {
   exit 1
 }
 
+set -o pipefail
+
 bash "$SDIR/getdev.sh" "$UUID" |xargs -I{} df --output=target "{}"|tail -n 1

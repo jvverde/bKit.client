@@ -121,8 +121,8 @@
       padding-top:1px;
       margin-top: 1px;
       width: 100%;
-      overflow-y: auto;
       max-height: 30%;
+      display: flex;
     }
   }
 

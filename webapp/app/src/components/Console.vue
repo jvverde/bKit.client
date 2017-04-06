@@ -35,5 +35,6 @@ export default {
     padding: 2px;
     background-color: gainsboro;
     border-top: 1px solid $bkit-color;
+    display:flex;
   }
 </style>

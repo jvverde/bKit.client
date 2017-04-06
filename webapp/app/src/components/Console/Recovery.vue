@@ -151,8 +151,8 @@ export default {
           })
         }
         const now = (new Date()).toString()
-        this.stdout += `\n------ Finish at ${now} ------n`
-        this.stderr += `\n------ Finish at ${now} ------n`
+        this.stdout += `\n------ Finish at ${now} ------\n`
+        this.stderr += `\n------ Finish at ${now} ------\n`
       })
     }
   }

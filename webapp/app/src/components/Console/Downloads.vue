@@ -69,9 +69,11 @@ export default {
   .downloads{
     display: flex;
     flex-direction: column;
-    max-height: 25%;
     overflow-y:auto;
     overflow-x:hidden;
     width: 100%;
+    * {
+      flex-shrink:0;
+    }
   }
 </style>

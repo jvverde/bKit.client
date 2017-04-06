@@ -23,16 +23,16 @@ export default {
       if (arg instanceof Object && arg.type === 'download') {
         // this.downloads.find(x => x.fullpath === arg.fullpath) || this.downloads.push(arg)
         if (arg.mimetype === 'application/bkit') {
-          const oldIndex = this.downloads.findIndex(
-            x => x.fullpath === arg.fullpath
-          )
+          // const oldIndex = this.downloads.findIndex(
+          //   x => x.fullpath === arg.fullpath
+          // )
           const download = arg
           this.downloads.push(download)
-          if (oldIndex !== -1) {
-            this.$nextTick(() => {
-              this.downloads.splice(oldIndex, 1)
-            })
-          }
+          // if (oldIndex !== -1) {
+          //   this.$nextTick(() => {
+          //     this.downloads.splice(oldIndex, 1)
+          //   })
+          // }
           try {
             const file = fs.readFileSync(arg.fullpath)
             download.resource = JSON.parse(file)

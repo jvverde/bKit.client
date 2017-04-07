@@ -3,12 +3,9 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage() {
-	NAME=$(basename -s .sh "$0")
-	echo Restore from backup one or more directories of files
-	echo -e "Usage:\n\t $NAME dir1/file1 [[dir2/file2 [...]]"
-	exit 1
+	bash "$SDIR/restore.sh" --help="$(basename -s .sh "$0")"
+	exit 1;
 }
-
 OPTIONS=()
 RSYNCOPTIONS=()
 while [[ $1 =~ ^- ]]

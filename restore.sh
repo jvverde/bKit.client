@@ -28,7 +28,10 @@ OPTIONS=(
 	--delete-delay
 )
 
-[[ $OS == cygwin && $(id -G|grep -qE '\b544\b') || $UID -eq 0 ]] || OPTIONS+=( "--no-group" "--no-owner" )
+[[ $OS == cygwin ]] && {
+    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
+}
+[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 
 echo "${OPTIONS[@]}"
 exit
@@ -40,7 +43,7 @@ dorsync() {
 
 destination() {
 	DST="$1"
-	[[ -d $DST ]] || die $DST should be a directory	
+	[[ -d $DST ]] || die $DST should be a directory
 	[[ ${DST: -1} == / ]] || DST="$DST/"
 }
 
@@ -55,7 +58,7 @@ do
 			destination "$1" && shift
     ;;
 		-d=*|--dst=*)
-			destination "${KEY#*=}" 
+			destination "${KEY#*=}"
     ;;
 		-- )
 			while [[ $1 =~ ^- ]]
@@ -87,7 +90,7 @@ mkdir -p "$RESULT"
 
 for RESOURCE in "${RESOURCES[@]}"
 do
-	if [[ $RESOURCE =~ ^rsync: ]]  
+	if [[ $RESOURCE =~ ^rsync: ]]
 	then
 		[[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #get last argument
 		[[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
@@ -116,7 +119,7 @@ do
 		RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 		BASE=${BASE%%/}		#remove trailing slash if present
 		ENTRY=${ENTRY#/}	#remove leading slash if present
-		
+
 		[[ -n $SNAP ]] && { # if we want an older version
 			SRC="$BACKUPURL/$RVID/.snapshots/$SNAP/data$BASE/./$ENTRY"
 			METASRC="$BACKUPURL/$RVID/.snapshots/$SNAP/metadata$BASE/./$ENTRY"
@@ -126,20 +129,20 @@ do
 		}
 
 		[[ -z $DST ]] && DST="$DIR/"
-		
+
 		set -o pipefail
 		dorsync "$SRC" "$DST" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 
 		[[ -n $(find "${DST}$BACKUPDIR" -prune -empty 2>/dev/null) ]] &&
 			echo "Nothing to restore" &&
-			rm -rf "${DST}$BACKUPDIR" && 
+			rm -rf "${DST}$BACKUPDIR" &&
 			echo "Removed empty backup dir $BACKUPDIR" ||
 			echo "Old files saved on $BACKUPDIR"
 
 		[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
 			METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
 			[[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
-			rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" || 
+			rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
 				warn "Problemas ao recuperar $METADATADST/$BASE/"
 			DRIVE=$(cygpath -w "$ROOT")
 			: > "$RESULT/acls"

@@ -79,7 +79,7 @@ CONF=$SDIR/conf/conf.init
 . "$CONF"                                                                     #get configuration parameters
 
 
-RESULT="$SDIR/RUN/restore-$$/"
+RESULT="$SDIR/run/restore-$$/"
 trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 

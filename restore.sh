@@ -3,6 +3,8 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
+set -o pipefail
+
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@" >&2; exit 1;}
 warn() { echo -e "$@" >&2;}
@@ -14,7 +16,7 @@ PERM=(--perms --acls --owner --group --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
 BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S")"
 while [[ -e $BACKUPDIR ]]
-do 
+do
 	BACKUPDIR="${BACKUPDIR}_"
 done
 
@@ -22,7 +24,7 @@ OPTIONS=(
 	--backup
 	--backup-dir="$BACKUPDIR"
 	--archive
-	--exclude="$BACKUP-*"
+	--exclude="${BACKUP}*"
 	--hard-links
 	--compress
 	--human-readable
@@ -40,8 +42,9 @@ dorsync() {
 }
 
 destination() {
-	DST="$1"
-	[[ -d $DST ]] || die $DST should be a directory
+    DST="$1"
+    exists cygpath && DST=$(cygpath -u "$DST") || die "'$'1 should be a directory"
+	DST=$(readlink -ne "$DST") || die "'$1' should be a directory"
 	[[ ${DST: -1} == / ]] || DST="$DST/"
 
 	#Don't try to chown or chgrp if not root or Administrator
@@ -53,11 +56,14 @@ destination() {
 
 check() {
 	DST="$1"
-	[[ -n $(find "${DST}$BACKUPDIR" -prune -empty 2>/dev/null) ]] &&
-		echo "Nothing to restore" &&
-		rm -rf "${DST}$BACKUPDIR" &&
-		echo "Removed empty backup dir $BACKUPDIR" ||
-		echo "Old files saved on $BACKUPDIR"
+	if $(find "${DST}$BACKUPDIR" -prune -empty  2>/dev/null)
+    then
+        echo "Old files saved on $BACKUPDIR"
+    else
+        echo "Nothing to restore"
+        rm -rf "${DST}$BACKUPDIR"
+        echo "Removed empty backup dir $BACKUPDIR"
+    fi
 }
 
 while [[ $1 =~ ^- ]]
@@ -94,7 +100,7 @@ CONF=$SDIR/conf/conf.init
 
 
 RESULT="$SDIR/run/restore-$$/"
-#trap "rm -rf '$RESULT'" EXIT
+trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 
 SRCS=()
@@ -140,9 +146,8 @@ do
 
 		if [[ -n $DST ]]
 		then
-			SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call 
+			SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call
 		else
-			set -o pipefail
 			dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 			check "$DIR/"
 

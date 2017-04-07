@@ -32,7 +32,6 @@ OPTIONS=(
 	--partial
 	--partial-dir=".bkit.rsync-partial"
 	--delay-updates
-	--delete-delay
 )
 
 RSYNCOPTIONS=()
@@ -72,13 +71,16 @@ do
 	case "$KEY" in
 		-s|--snap|--snapshot)
 			SNAP=$1 && shift
-    ;;
+        ;;
 		-d|--dst)
 			destination "$1" && shift
-    ;;
+        ;;
 		-d=*|--dst=*)
 			destination "${KEY#*=}"
-    ;;
+        ;;
+        --delete)
+            OPTIONS+=( '--delete-delay' )
+        ;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do

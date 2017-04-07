@@ -28,12 +28,6 @@ OPTIONS=(
 	--delete-delay
 )
 
-#remove chown and chgrp if not root or Administrator
-[[ $OS == cygwin ]] && {
-    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
-}
-[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
-
 RSYNCOPTIONS=()
 
 dorsync() {
@@ -44,6 +38,11 @@ destination() {
 	DST="$1"
 	[[ -d $DST ]] || die $DST should be a directory
 	[[ ${DST: -1} == / ]] || DST="$DST/"
+	#remove chown and chgrp if not root or Administrator
+	[[ $OS == cygwin ]] && {
+	    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
+	}
+	[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 }
 
 while [[ $1 =~ ^- ]]
@@ -79,7 +78,7 @@ CONF=$SDIR/conf/conf.init
 . "$CONF"                                                                     #get configuration parameters
 
 
-RESULT="$SDIR/RUN/restore-$$/"
+RESULT="$SDIR/run/restore-$$/"
 trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 

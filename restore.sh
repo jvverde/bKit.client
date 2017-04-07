@@ -84,14 +84,13 @@ mkdir -p "$RESULT"
 
 for RESOURCE in "${RESOURCES[@]}"
 do
-	if [[ $RESOURCE =~ ^rsync: ]]
+	if [[ $RESOURCE =~ ^rsync://[^@]+@ ]]
 	then
 		[[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #get last argument
 		[[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
 
 		dorsync "$RESOURCE" "$DST"
 	else
-		exit
 		exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
 		RESOURCE=$(readlink -m "${RESOURCE}")
 		DIR=$RESOURCE

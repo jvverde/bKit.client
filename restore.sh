@@ -65,12 +65,22 @@ check() {
     fi
 }
 
+usage() {
+    NAME=${1:$(basename -s .sh "$0")}
+    echo Restore from backup one or more directories of files
+    echo -e "Usage:\n\t $NAME [--delete] [--dst=directory] [--snap=snap] dir1/file1 [[dir2/file2 [...]]"
+    exit 1
+}
+
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
-		-s|--snap|--snapshot)
-			SNAP=$1 && shift
+        -s|--snap|--snapshot)
+            SNAP=$1 && shift
+        ;;
+        -s=*|--snap*=|--snapshot=*)
+            SNAP="${KEY#*=}"
         ;;
 		-d|--dst)
 			destination "$1" && shift
@@ -88,8 +98,15 @@ do
 				shift
 			done
 		;;
+        -h|--help)
+            usage
+        ;;
+        -h=*|--help=*)
+            usage "${KEY#*=}"
+        ;;
 		*)
-			die Unknown	option $KEY
+			warn Unknown option $KEY
+            usage
 		;;
 	esac
 done

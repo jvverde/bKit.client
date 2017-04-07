@@ -12,7 +12,12 @@ export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
-BACKUPDIR="$BACKUP-$(date +"%c")"
+BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S")"
+while [[ -e $BACKUPDIR ]]
+do 
+	BACKUPDIR="${BACKUPDIR}_"
+done
+
 OPTIONS=(
 	--backup
 	--backup-dir="$BACKUPDIR"
@@ -38,11 +43,21 @@ destination() {
 	DST="$1"
 	[[ -d $DST ]] || die $DST should be a directory
 	[[ ${DST: -1} == / ]] || DST="$DST/"
-	#remove chown and chgrp if not root or Administrator
+
+	#Don't try to chown or chgrp if not root or Administrator
 	[[ $OS == cygwin ]] && {
 	    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
 	}
 	[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
+}
+
+check() {
+	DST="$1"
+	[[ -n $(find "${DST}$BACKUPDIR" -prune -empty 2>/dev/null) ]] &&
+		echo "Nothing to restore" &&
+		rm -rf "${DST}$BACKUPDIR" &&
+		echo "Removed empty backup dir $BACKUPDIR" ||
+		echo "Old files saved on $BACKUPDIR"
 }
 
 while [[ $1 =~ ^- ]]
@@ -79,8 +94,10 @@ CONF=$SDIR/conf/conf.init
 
 
 RESULT="$SDIR/run/restore-$$/"
-trap "rm -rf '$RESULT'" EXIT
+#trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
+
+SRCS=()
 
 for RESOURCE in "${RESOURCES[@]}"
 do
@@ -88,8 +105,8 @@ do
 	then
 		[[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #get last argument
 		[[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
-
-		dorsync "$RESOURCE" "$DST"
+		SRCS+=( "$RESOURCE" )
+		#dorsync "$RESOURCE" "$DST"
 	else
 		exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
 		RESOURCE=$(readlink -m "${RESOURCE}")
@@ -121,38 +138,41 @@ do
 			METASRC="$BACKUPURL/$RVID/@current/metadata$BASE/./$ENTRY"
 		}
 
-		[[ -z $DST ]] && DST="$DIR/"
+		if [[ -n $DST ]]
+		then
+			SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call 
+		else
+			set -o pipefail
+			dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+			check "$DIR/"
 
-		set -o pipefail
-		dorsync "$SRC" "$DST" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
-
-		[[ -n $(find "${DST}$BACKUPDIR" -prune -empty 2>/dev/null) ]] &&
-			echo "Nothing to restore" &&
-			rm -rf "${DST}$BACKUPDIR" &&
-			echo "Removed empty backup dir $BACKUPDIR" ||
-			echo "Old files saved on $BACKUPDIR"
-
-		[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-			METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
-			[[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
-			rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
-				warn "Problemas ao recuperar $METADATADST/$BASE/"
-			DRIVE=$(cygpath -w "$ROOT")
-			: > "$RESULT/acls"
-			cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
-			while read FILE
-			do
-				ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
-				echo $ACLFILE
-				iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
-					sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
-					iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
-				cat
-			done
-			[[ -s "$RESULT/acls" ]] && {
-				echo 'Apply ACLS now'
-				bash "$SDIR/applyacls.sh" "$RESULT/acls"
-			}
-		)
+			[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+				METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
+				[[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
+				rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
+					warn "Problemas ao recuperar $METADATADST/$BASE/"
+				DRIVE=$(cygpath -w "$ROOT")
+				: > "$RESULT/acls"
+				cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
+				while read FILE
+				do
+					ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
+					echo $ACLFILE
+					iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
+						sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
+						iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
+					cat
+				done
+				[[ -s "$RESULT/acls" ]] && {
+					echo 'Apply ACLS now'
+					bash "$SDIR/applyacls.sh" "$RESULT/acls"
+				}
+			)
+		fi
 	fi
 done
+
+[[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
+	dorsync "${SRCS[@]}" "$DST"
+	check "$DST"
+}

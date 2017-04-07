@@ -28,12 +28,6 @@ OPTIONS=(
 	--delete-delay
 )
 
-#remove chown and chgrp if not root or Administrator
-[[ $OS == cygwin ]] && {
-    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
-}
-[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
-
 RSYNCOPTIONS=()
 
 dorsync() {
@@ -44,6 +38,11 @@ destination() {
 	DST="$1"
 	[[ -d $DST ]] || die $DST should be a directory
 	[[ ${DST: -1} == / ]] || DST="$DST/"
+	#remove chown and chgrp if not root or Administrator
+	[[ $OS == cygwin ]] && {
+	    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
+	}
+	[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 }
 
 while [[ $1 =~ ^- ]]
@@ -85,14 +84,13 @@ mkdir -p "$RESULT"
 
 for RESOURCE in "${RESOURCES[@]}"
 do
-	if [[ $RESOURCE =~ ^rsync: ]]
+	if [[ $RESOURCE =~ ^rsync://[^@]+@ ]]
 	then
 		[[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #get last argument
 		[[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
 
 		dorsync "$RESOURCE" "$DST"
 	else
-		exit
 		exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
 		RESOURCE=$(readlink -m "${RESOURCE}")
 		DIR=$RESOURCE

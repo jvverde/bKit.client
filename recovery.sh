@@ -94,6 +94,7 @@ rsync -rlitzvvhRP $PERM $OPTIONS $FMT "$SRC" "$DST/" || die "Problemas ao recupe
 OSTYPE=$(uname -o |tr '[:upper:]' '[:lower:]')
 [[ $OSTYPE == 'cygwin' && $DISK =~  NTFS && -n ${BASE+x} ]] && {
 	info "A descarregar as ACLs"
+	
 	SRCMETA="$BACKUPURL/$DISK/.snapshots/$BACKUP/metadata/./.tar/"
 	METADATADIR=$(cygpath "$SDIR/cache/metadata/by-volume/${VOLUME}/")
 	[[ -d $METADATADIR ]] || mkdir -pv $METADATADIR

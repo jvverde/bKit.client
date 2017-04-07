@@ -7,45 +7,6 @@ exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@" >&2; exit 1;}
 warn() { echo -e "$@" >&2;}
 
-RSYNCOPTIONS=()
-
-while [[ $1 =~ ^- ]]
-do
-	KEY="$1" && shift
-	case "$KEY" in
-		-- )
-			while [[ $1 =~ ^- ]]
-			do
-				RSYNCOPTIONS+=("$1")
-				shift
-			done
-		;;
-		-d|--date)
-			DATE=$1 && shift
-    ;;
-		*)
-			die Unknown	option $KEY
-		;;
-	esac
-done
-
-RESTOREDIR=("$@")
-
-ORIGINALDIR=( "${RESTOREDIR[@]}" )
-
-OLDIFS=$IFS
-IFS="
-"
-exists cygpath && RESTOREDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${RESTOREDIR[@]}") )
-
-RESTOREDIR=( $(readlink -m "${RESTOREDIR[@]}") )
-
-IFS=$OLDIFS
-
-CONF=$SDIR/conf/conf.init
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-. "$CONF"                                                                     #get configuration parameters
-
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
 FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
@@ -67,9 +28,69 @@ OPTIONS=(
 	--delete-delay
 )
 
+RSYNCOPTIONS=()
+
+dorsync() {
+	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
+}
+
+destination() {
+	DST="$1"
+	[[ -d $DST ]] || die $DST should be a directory	
+	[[ ${DST: -1} == / ]] && DST="$DST./" || DST="$DST/./"
+}
+
+while [[ $1 =~ ^- ]]
+do
+	KEY="$1" && shift
+	case "$KEY" in
+		-d|--date)
+			DATE=$1 && shift
+    ;;
+		-dst|--destination)
+			destination "$1" && shift
+    ;;
+		-dst=*|--destination=*)
+			destination "${KEY#*=}" 
+    ;;
+		-- )
+			while [[ $1 =~ ^- ]]
+			do
+				RSYNCOPTIONS+=("$1")
+				shift
+			done
+		;;
+		*)
+			die Unknown	option $KEY
+		;;
+	esac
+done
+
+dorsync() {
+	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
+}
+
+RESTOREDIR=("$@")
+
+ORIGINALDIR=( "${RESTOREDIR[@]}" )
+
+OLDIFS=$IFS
+IFS="
+"
+exists cygpath && RESTOREDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${RESTOREDIR[@]}") )
+
+RESTOREDIR=( $(readlink -m "${RESTOREDIR[@]}") )
+
+IFS=$OLDIFS
+
+CONF=$SDIR/conf/conf.init
+[[ -f $CONF ]] || die Cannot found configuration file at $CONF
+. "$CONF"                                                                     #get configuration parameters
+
+
 RESULT="$SDIR/RUN/restore-$$/"
-trap "rm -rfv '$RESULT'" EXIT
-mkdir -pv "$RESULT"
+trap "rm -rf '$RESULT'" EXIT
+mkdir -p "$RESULT"
 
 for RESTOREDIR in "${RESTOREDIR[@]}"
 do
@@ -91,14 +112,16 @@ do
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 	BASE=${BASE%%/}		#remove trailing slash if present
 	ENTRY=${ENTRY#/}	#remove leading slash if present
-	[[ -n $DATE ]] && {
+	[[ -n $DATE ]] && { # a older version
 		SRC="$BACKUPURL/$RVID/.snapshots/$DATE/data$BASE/./$ENTRY"
 		METASRC="$BACKUPURL/$RVID/.snapshots/$DATE/metadata$BASE/./$ENTRY"
-	} || {
+	} || {							#or last version
 		SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
 		METASRC="$BACKUPURL/$RVID/@current/metadata$BASE/./$ENTRY"
 	}
-	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problemas ao recuperar $BASE/$ENTRY"
+	set -o pipefail
+	[[ -z $DST ]] && DST="$DIR/"
+	dorsync "$SRC" "$DST" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 	[[ -n $(find "$RESTOREDIR/$BACKUPDIR" -prune -empty 2>/dev/null) ]] && rm -rfv "$RESTOREDIR/$BACKUPDIR"
 
 	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (

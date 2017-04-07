@@ -28,13 +28,12 @@ OPTIONS=(
 	--delete-delay
 )
 
+#remove chown and chgrp if not root or Administrator
 [[ $OS == cygwin ]] && {
     $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
 }
 [[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 
-echo "${OPTIONS[@]}"
-exit
 RSYNCOPTIONS=()
 
 dorsync() {
@@ -72,10 +71,6 @@ do
 		;;
 	esac
 done
-
-dorsync() {
-	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
-}
 
 RESOURCES=("$@")
 

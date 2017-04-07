@@ -28,6 +28,10 @@ OPTIONS=(
 	--delete-delay
 )
 
+[[ $OS == cygwin && $(id -G|grep -qE '\b544\b') || $UID -eq 0 ]] || OPTIONS+=( "--no-group" "--no-owner" )
+
+echo "${OPTIONS[@]}"
+exit
 RSYNCOPTIONS=()
 
 dorsync() {
@@ -37,20 +41,20 @@ dorsync() {
 destination() {
 	DST="$1"
 	[[ -d $DST ]] || die $DST should be a directory	
-	[[ ${DST: -1} == / ]] && DST="$DST./" || DST="$DST/./"
+	[[ ${DST: -1} == / ]] || DST="$DST/"
 }
 
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
-		-d|--date)
-			DATE=$1 && shift
+		-s|--snap|--snapshot)
+			SNAP=$1 && shift
     ;;
-		-dst|--destination)
+		-d|--dst)
 			destination "$1" && shift
     ;;
-		-dst=*|--destination=*)
+		-d=*|--dst=*)
 			destination "${KEY#*=}" 
     ;;
 		-- )
@@ -70,18 +74,7 @@ dorsync() {
 	rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
 }
 
-RESTOREDIR=("$@")
-
-ORIGINALDIR=( "${RESTOREDIR[@]}" )
-
-OLDIFS=$IFS
-IFS="
-"
-exists cygpath && RESTOREDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${RESTOREDIR[@]}") )
-
-RESTOREDIR=( $(readlink -m "${RESTOREDIR[@]}") )
-
-IFS=$OLDIFS
+RESOURCES=("$@")
 
 CONF=$SDIR/conf/conf.init
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
@@ -92,58 +85,78 @@ RESULT="$SDIR/RUN/restore-$$/"
 trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 
-for RESTOREDIR in "${RESTOREDIR[@]}"
+for RESOURCE in "${RESOURCES[@]}"
 do
-	DIR=$RESTOREDIR
-	until [[ -d $DIR ]]
-	do
-		DIR=$(dirname "$DIR")
-	done
+	if [[ $RESOURCE =~ ^rsync: ]]  
+	then
+		[[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #get last argument
+		[[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
 
-	ROOT=$(stat -c%m "$DIR")
-
-	BASE="${DIR#${ROOT%%/}}"
-
-	ENTRY=${RESTOREDIR#$DIR}
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
-
-	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-	DRIVE=${DRIVE%%:*}
-	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-	BASE=${BASE%%/}		#remove trailing slash if present
-	ENTRY=${ENTRY#/}	#remove leading slash if present
-	[[ -n $DATE ]] && { # a older version
-		SRC="$BACKUPURL/$RVID/.snapshots/$DATE/data$BASE/./$ENTRY"
-		METASRC="$BACKUPURL/$RVID/.snapshots/$DATE/metadata$BASE/./$ENTRY"
-	} || {							#or last version
-		SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
-		METASRC="$BACKUPURL/$RVID/@current/metadata$BASE/./$ENTRY"
-	}
-	set -o pipefail
-	[[ -z $DST ]] && DST="$DIR/"
-	dorsync "$SRC" "$DST" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
-	[[ -n $(find "$RESTOREDIR/$BACKUPDIR" -prune -empty 2>/dev/null) ]] && rm -rfv "$RESTOREDIR/$BACKUPDIR"
-
-	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-		METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
-		[[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
-		rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" || warn "Problemas ao recuperar $METADATADST/$BASE/"
-		DRIVE=$(cygpath -w "$ROOT")
-		: > "$RESULT/acls"
-		cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
-		while read FILE
+		dorsync "$RESOURCE" "$DST"
+	else
+		exit
+		exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
+		RESOURCE=$(readlink -m "${RESOURCE}")
+		DIR=$RESOURCE
+		until [[ -d $DIR ]]				#find a existing parent
 		do
-			ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
-			echo $ACLFILE
-			iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
-				sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
-				iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
-			cat
+			DIR=$(dirname "$DIR")
 		done
-		[[ -s "$RESULT/acls" ]] && {
-			echo 'Apply ACLS now'
-			bash "$SDIR/applyacls.sh" "$RESULT/acls"
-		}
-	)
 
+		ROOT=$(stat -c%m "$DIR")
+
+		BASE="${DIR#${ROOT%%/}}"
+
+		ENTRY=${RESOURCE#$DIR}		#Is empty when resource is a existing directory (DIR==RESOURCE)
+
+		IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
+
+		exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+		DRIVE=${DRIVE%%:*}
+		RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+		BASE=${BASE%%/}		#remove trailing slash if present
+		ENTRY=${ENTRY#/}	#remove leading slash if present
+		
+		[[ -n $SNAP ]] && { # if we want an older version
+			SRC="$BACKUPURL/$RVID/.snapshots/$SNAP/data$BASE/./$ENTRY"
+			METASRC="$BACKUPURL/$RVID/.snapshots/$SNAP/metadata$BASE/./$ENTRY"
+		} || {							#or last version
+			SRC="$BACKUPURL/$RVID/@current/data$BASE/./$ENTRY"
+			METASRC="$BACKUPURL/$RVID/@current/metadata$BASE/./$ENTRY"
+		}
+
+		[[ -z $DST ]] && DST="$DIR/"
+		
+		set -o pipefail
+		dorsync "$SRC" "$DST" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+
+		[[ -n $(find "${DST}$BACKUPDIR" -prune -empty 2>/dev/null) ]] &&
+			echo "Nothing to restore" &&
+			rm -rf "${DST}$BACKUPDIR" && 
+			echo "Removed empty backup dir $BACKUPDIR" ||
+			echo "Old files saved on $BACKUPDIR"
+
+		[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+			METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
+			[[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
+			rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" || 
+				warn "Problemas ao recuperar $METADATADST/$BASE/"
+			DRIVE=$(cygpath -w "$ROOT")
+			: > "$RESULT/acls"
+			cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
+			while read FILE
+			do
+				ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
+				echo $ACLFILE
+				iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
+					sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
+					iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
+				cat
+			done
+			[[ -s "$RESULT/acls" ]] && {
+				echo 'Apply ACLS now'
+				bash "$SDIR/applyacls.sh" "$RESULT/acls"
+			}
+		)
+	fi
 done

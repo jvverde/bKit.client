@@ -135,23 +135,21 @@ export default {
       const {dialog} = this.$electron.remote
       const [folder] = dialog.showOpenDialog({
         properties: ['openDirectory'],
-        title: 'Import Location',
-        message: 'Choose an location to recovery the resource'
+        title: 'Destination dolder',
+        message: 'Choose an location where to restore'
       }) || []
       return folder
     },
     selectLocation () {
-      // this.isVisible = false
       this.dst = this.selectDestination() || this.dst
-      // this.isVisible = true
     },
     recovery () {
       this.isVisible = false
       const entry = this.resource.entry
-      const dst = this.dst
+      const {dst, src} = this
       const cmd = ['./restore.sh', `--dst=${dst}`]
-      if (this.src) {
-        cmd.push(`--link-dest=${this.src}`)
+      if (src && src !== dst) {
+        cmd.push(`--link-dest=${src}`)
       }
       cmd.push(this.resource.url)
 

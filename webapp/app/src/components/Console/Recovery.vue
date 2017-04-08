@@ -2,22 +2,24 @@
   <div class="recovery">
     <el-dialog title="Recovery" v-model="isVisible" size="small"
       class="dialog">
-      <h3>
-        {{path}}
-        <span v-if="location">
-          =>
-          <a href="" @click.prevent="selectLocation">{{location}}</a>
-        </span>
-      </h3>
-      <div v-if="myid !== computerId">
-        <!-- <div class="alert">Please notice: You are in a different computer</div> -->
-        <div v-if="location === path">Are you really sure that you want to import and overwrite you local data?</div>
+      <div>{{origin}} => {{dst}}/{{resource.entry}}</div>
+      <div v-if="isOriginalLocation">
+        Are you really sure that you want restore to the original location?
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button-group>
-          <el-button @click="isVisible = false">Cancel</el-button>
-          <el-button v-if="myid !== computerId" type="warning" @click="recovery">Import</el-button>
-          <el-button v-else type="primary" @click="recovery">Continue</el-button>
+          <el-button @click="isVisible = false">
+            Cancel
+          </el-button>
+          <el-button @click="selectLocation" type="primary">
+            Change
+          </el-button>
+          <el-button v-if="isSameComputer" type="primary" @click="recovery">
+            Restore
+          </el-button>
+          <el-button v-else type="primary" @click="recovery">
+            Import
+          </el-button>
         </el-button-group>
       </span>
     </el-dialog>
@@ -40,16 +42,39 @@ export default {
       drive: '',
       stdout: '',
       stderr: '',
-      location: undefined,
-      this: this.$store.getters.computer || {}
+      dst: '',
+      src: '',
+      computer: this.$store.getters.computer || {}
     }
   },
   computed: {
     myid () {
-      return this.this.id
+      return this.computer.id
     },
     computerId () {
       return this.resource.computer
+    },
+    isOriginalLocation () {
+      return this.myid === this.computerId && this.src === this.dst
+    },
+    isSameComputer () {
+      return this.myid === this.computerId
+    },
+    isOriginalDiskPresent () {
+      return this.src !== ''
+    },
+    origin () {
+      const orig = `${this.resource.path}/${this.resource.entry}`
+      if (this.isOriginalDiskPresent) {
+        return `Backup of "${orig}"`
+      } else if (this.isSameComputer) {
+        return `Import "${orig}" from a older drive in backup`
+      } else {
+        const names = this.resource.computer.split('.')
+        names.pop()
+        const comp = names.pop()
+        return `Import "${orig}" from computer ${comp} in backup`
+      }
     }
   },
   props: ['resource', 'show'],
@@ -69,13 +94,13 @@ export default {
   },
   mounted () {
     let resource = this.resource || {}
-    let [letter, volID] = (resource.drive || '').split(/\./)
+    let [, volID] = (resource.drive || '').split(/\./)
     const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
     fd.stdout.on('data', (data) => {
-      let drive = `${data}`.replace(/\r?\n.*$/, '')
-      this.path = path.resolve(drive, resource.path, resource.entry)
+      const root = `${data}`.replace(/\r?\n.*$/, '')
+      this.src = path.resolve(root, resource.path)
       this.isVisible = true
-      this.location = this.path
+      this.dst = this.src
     })
 
 /*    fd.stderr.on('data', (msg) => {
@@ -89,16 +114,16 @@ export default {
     fd.on('close', (code) => {
       code = 0 | code
       if (code === 1) { // In case of volume wasn't found
+        this.src = ''
         this.$notify.info({
           title: 'Volume not found on this computer',
           message: 'You can still recovery it but you must choose an alternative location',
-          duration: 100,
+          duration: 1000,
           onClose: () => {
             const folder = this.selectDestination()
             if (folder) {
               this.isVisible = true
-              this.path = path.resolve(`${letter}:/`, resource.path, resource.entry)
-              this.location = folder
+              this.dst = folder
             }
           }
         })
@@ -117,24 +142,33 @@ export default {
     },
     selectLocation () {
       // this.isVisible = false
-      this.location = this.selectDestination() || this.location
+      this.dst = this.selectDestination() || this.dst
       // this.isVisible = true
     },
     recovery () {
       this.isVisible = false
-      const dst = this.location === this.path ? '' : this.location || ''
-      const fd = spawn(BASH, ['./recovery.sh', '-y', '-f', this.resource.downloadLocation, dst], {cwd: '..'})
+      const entry = this.resource.entry
+      const dst = this.dst
+      const cmd = ['./restore.sh', `--dst=${dst}`]
+      if (this.src) {
+        cmd.push(`--link-dest=${this.src}`)
+      }
+      cmd.push(this.resource.url)
+
+      const fd = spawn(BASH, cmd, {cwd: '..'})
+
       const now = (new Date()).toString()
-      this.stdout += `\n------ Start recovery ${this.path} at ${now} ------\n`
-      this.stderr += `\n------ Start recovery ${this.path} at ${now} ------\n`
+      this.stdout = `\n------ Start restore ${entry} at ${now}------\n`
+      const errhead = `\n------ Start restore ${entry} at ${now} ------\n`
       fd.stdout.on('data', (data) => {
         this.stdout += `${data}`
         this.stdout = this.stdout.substr(-10000)
       })
 
+      let errdata = ''
       fd.stderr.on('data', (data) => {
-        this.stderr += `${data}`
-        this.stderr = this.stderr.substr(-10000)
+        errdata += `${data}`
+        this.stderr = errhead + errdata.substr(-10000)
       })
 
       fd.on('close', (code) => {
@@ -142,7 +176,7 @@ export default {
         if (code === 0) {
           this.$notify.success({
             title: 'Good news',
-            message: `${this.path} was successfully recovered`
+            message: `${entry} was successfully restored to ${dst}`
           })
         } else {
           this.$notify.warning({
@@ -152,7 +186,9 @@ export default {
         }
         const now = (new Date()).toString()
         this.stdout += `\n------ Finish at ${now} ------\n`
-        this.stderr += `\n------ Finish at ${now} ------\n`
+        if (errdata !== '') {
+          this.stderr += `\n------ Finish at ${now} ------\n`
+        }
       })
     }
   }

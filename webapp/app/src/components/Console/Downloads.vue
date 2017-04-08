@@ -36,7 +36,22 @@ export default {
           try {
             const file = fs.readFileSync(arg.fullpath)
             download.resource = JSON.parse(file)
+            const {computer, backup, entry, path, drive} = download.resource
             download.resource.downloadLocation = arg.fullpath
+            const server = this.$store.getters.address
+            download.resource.url = [
+              `rsync://user@${server}:8731`,
+              computer,
+              drive,
+              '.snapshots',
+              backup,
+              'data',
+              path,
+              '.',
+              entry
+            ].join('/')
+            console.log(download.resource.url)
+
             download.open = true
           } catch (err) {
             this.$notify.error({

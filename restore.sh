@@ -41,8 +41,8 @@ dorsync() {
 }
 
 destination() {
-    DST="$1"
-    exists cygpath && DST=$(cygpath -u "$DST")
+  DST="$1"
+  exists cygpath && DST=$(cygpath -u "$DST")
   DST=$(readlink -ne "$DST") || die "'$1' should be a directory"
   [[ ${DST: -1} == / ]] || DST="$DST/"
 
@@ -55,7 +55,7 @@ destination() {
 
 check() {
   DST="$1"
-  find "${DST}$BACKUPDIR" -maxdepth 0 -empty -delete
+  find "${DST}$BACKUPDIR" -maxdepth 0 -empty -delete 2>/dev/null
   [[ -e "${DST}$BACKUPDIR" ]] && echo Old files saved on "${DST}$BACKUPDIR" || echo Empty backup directory "${DST}$BACKUPDIR" deleted
 }
 

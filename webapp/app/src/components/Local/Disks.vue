@@ -57,7 +57,6 @@
           })
           fd.on('close', () => {
             const drives = output.replace(/\n$/, '').split(/\n/)
-            console.log('drives:', drives)
             this.$nextTick(() => {
               this.drives = drives.sort(order)
               this.loading = false

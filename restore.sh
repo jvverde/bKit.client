@@ -41,7 +41,10 @@ dorsync() {
   mkdir -p "$BACKUP"
   rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
   find "$BACKUP" -maxdepth 0 -empty -delete 2>/dev/null
-  [[ -e "$BACKUP" ]] && echo Old files saved on "$BACKUP"
+  [[ -e "$BACKUP" ]] && {
+    exists cygpath && BACKUP=$(cygpath -w "$BACKUP")
+    echo Old files saved on "$BACKUP"
+  }
 }
 
 destination() {
@@ -58,7 +61,7 @@ destination() {
 }
 
 usage() {
-  NAME=${1:$(basename -s .sh "$0")}
+  local NAME=${1:$(basename -s .sh "$0")}
   echo Restore from backup one or more directories of files
   echo -e "Usage:\n\t $NAME [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
   exit 1
@@ -191,7 +194,9 @@ do
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
-  LINKS=( "${!LINKTO[@]}" )       #get different link-dest/copy-dest
-  FIRST20=( "${LINKS[@]:0:20}" )  #a rsync limitation
+  LINKS=( "${!LINKTO[@]}" )                   #get different link-dest/copy-dest
+  FIRST20=( "${LINKS[@]:0:20}" )              #a rsync limitation
   dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST"
+  exists cygpath && DST=$(cygpath -w "$DST")
+  echo "Files restored to $DST"
 }

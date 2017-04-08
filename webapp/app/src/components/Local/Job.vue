@@ -15,28 +15,9 @@
     <h1>Create a Job</h1>
     <section>
       <div>
-        <div>Includes:</div>
-        <div v-for="d in includes">
-          {{d.root}}:=>{{d.path}}
-        </div>
-      </div>
-      <div>
-        <div>Excludes:</div>
-        <div v-for="d in excludes">
-          {{d.path}}
-        </div>
-      </div>
-      <div class="rules">
-        <div>Rules:</div>
-        <div v-for="r in roots">
-          <div>Root Name: {{r.name}} 
-            <div v-for="base in r.bases">
-              base: {{base}}
-            </div> 
-            <div v-for="value in r.filters">
-              rule: {{value}}
-            </div>
-          </div>
+        <div>Filters:</div>
+        <div v-for="f in filters">
+          {{f}}
         </div>
       </div>
     </section>
@@ -44,11 +25,11 @@
       <span>Backup every </span>
       <input v-model="every"
         type="number" min="1" step="1" max="120"></input>
-      <span v-for="p in periods"
-        @click.stop="period=p"
-        :class="{selected: p === period}"
+      <span v-for="(val,key) in periods"
+        @click.stop="period=key"
+        :class="{selected: key === period}"
         class="period">
-        {{p}}
+        {{val}}
       </span>
     </section>
     <section class="start">
@@ -59,7 +40,7 @@
         placeholder="Select date and time">
       </el-date-picker>
     </section>
-    <div @click.stop="update">Update...</div>
+    <div @click.stop="create">Create a Job</div>
   </div>
 </template>
 
@@ -84,70 +65,75 @@
     data () {
       return {
         every: 1,
-        periods: ['Min', 'Hour', 'Day', 'Week', 'Month', 'Year'],
-        period: 'Day',
-        start: '',
-        includes: [],
-        excludes: []
+        periods: {
+          m: 'Min',
+          h: 'Hour',
+          d: 'Day',
+          w: 'Week',
+          M: 'Month',
+          y: 'Year'
+        },
+        period: 'd',
+        start: ''
       }
     },
     props: [],
     computed: {
-      resources () {
-        return {
-          includes: this.$store.getters.backupIncludes,
-          excludes: this.$store.getters.backupExcludes
-        }
+      includes () {
+        return this.$store.getters.backupIncludes
       },
-      roots () {
-        let includesOf = {}
-        let excludesOf = {}
-        this.includes.forEach(e => {
-          includesOf[e.root] = includesOf[e.root] || []
-          includesOf[e.root].push(e)
-        })
-        this.excludes.forEach(e => {
-          excludesOf[e.root] = excludesOf[e.root] || []
-          excludesOf[e.root].push(e)
-        })
-        return Object.keys(includesOf).map(root => {
-          const includes = includesOf[root]
-          const bases = includes
-/*            .filter(e => {
-              return !includes.some(f => {
-                return e.path.startsWith(PATH.join(f.path, PATH.sep))
-              })
-            })*/
-            .map(e => e.path)
-          return {
-            name: root,
-            bases: bases,
-            filters: this.makeFilters(includesOf[root], excludesOf[root] || [])
-              .filter(e => { // filter off unnecessary filter rules
-                return bases.some(f => {
-                  const base = PATH.join(PATH.sep, f, PATH.sep)
-                  console.log(e, base)
-                  return e.startsWith(base, 2) && e.length > base.length + 2
-                })
-              })
-          }
-        })
+      filters () {
+        const includes = (this.$store.getters.backupIncludes || [])
+          .map(include => {
+            return Object.assign(include, {isIncluded: true})
+          })
+        const excludes = (this.$store.getters.backupExcludes || [])
+          .map(include => {
+            return Object.assign(include, {isIncluded: false})
+          })
+        return this.makeFilters(includes, excludes)
       }
     },
     components: {
     },
     created () {
-      this.refresh()
     },
     watch: {
       start () {
         console.log(this.start)
-      },
-      resources () {
-        this.refresh()
       }
     },
     methods: {
+      create () {
+        const options = ['--name', 'teste', `-${this.period}`, this.every]
+        if (this.start) options.push('--start', this.start)
+        const includes = this.includes.map(e => e.path)
+        const cmd = ['./ctask.sh', '--test', ...options, ...includes]
+        console.log(cmd)
+        const fd = spawn(BASH, cmd, {cwd: '..'})
+
+        fd.stdout.on('data', (data) => {
+          console.log('' + data)
+          console.log('stdout', `${data}`)
+        })
+
+        fd.stderr.on('data', (data) => {
+          this.$notify.error({
+            title: 'Create Job',
+            message: `Error:${data}`
+          })
+        })
+
+        fd.on('close', (code) => {
+          code = 0 | code
+          if (code === 0) {
+            this.$notify.success({
+              title: 'Good news',
+              message: 'Job was successfully created'
+            })
+          }
+        })
+      },
       makeFilters (includes, excludes) {
         let parents = {}
         includes.forEach(e => {
@@ -176,55 +162,6 @@
             else if (is(true) && e.file) return '+ ' + join(e.path)
             else return '+ ' + join(e.path)
           })
-      },
-      update () {
-        this.refresh()
-      },
-      translate (list, cb) {
-        if (list.length === 0) return undefined
-        try {
-          const paths = list.map(e => e.path)
-          const fd = spawn(BASH, ['./getRoot.sh', ...paths], {cwd: '..'})
-          let output = ''
-          fd.stdout.on('data', (data) => {
-            output += `${data}`
-          })
-          fd.stderr.on('data', (msg) => {
-            console.error(`${msg}`)
-            this.$notify.error({
-              title: 'Error',
-              message: `${msg}`,
-              customClass: 'message error'
-            })
-          })
-          fd.on('close', () => {
-            const entries = output.replace(/\n$/, '').split(/\n/)
-            const pathsAndRoots = entries.map(entry => {
-              const [orig, path, root] = entry.split('|')
-              return Object.assign({}, list.find(e => e.path === orig), {
-                path: path.replace(root, ''),
-                root: root
-              })
-            })
-            this.$nextTick(() => {
-              cb(pathsAndRoots)
-            })
-          })
-        } catch (e) {
-          console.error(e)
-        }
-      },
-      refresh () {
-        this.translate(this.resources.includes, includes => {
-          this.includes = includes.map(include => {
-            return Object.assign(include, {isIncluded: true})
-          })
-        })
-        this.translate(this.resources.excludes, excludes => {
-          this.excludes = excludes.map(exclude => {
-            return Object.assign(exclude, {isIncluded: false})
-          })
-        })
       }
     }
   }

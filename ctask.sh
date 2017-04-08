@@ -84,15 +84,15 @@ do
 		;;
 		-f|--filter)
 			FILTERS+=("$1")
-        ;;
-        -f=*|--filter=*)
+    ;;
+    -f=*|--filter=*)
 			FILTERS+=("${KEY#*=}")
-        ;;
-        --filters-from)
-			[[ -e $1 ]] || die "Can't find $1"
+    ;;
+    --filters-from)
+			[[ -e $1 ]] || die "Can't find '$1'"
 			FILTERS+=( $(cat "$1") )
 		;;
-        --filters-from=*)
+    --filters-from=*)
 			FILE="${KEY#*=}"
 			[[ -e $FILE ]] || die "Can't find $FILE"
 			FILTERS+=( $(cat "$FILE") )
@@ -102,6 +102,9 @@ do
 		;;
 		--force)
 			FORCE="F"
+		;;
+		--test)
+			TESTE=1
 		;;
 		*)
 			echo Unknow	option $KEY && usage
@@ -135,7 +138,7 @@ RDIR=$SDIR
 
 declare -A ROOTS
 declare -A ROOTOF
-
+echo "$@" && exit
 for DIR in "$@"
 do
     FULL=$(readlink -ne "$DIR") || { warn $DIR "doesn't exists" && continue ;}
@@ -165,14 +168,14 @@ do
     	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
 
     	#echo B:$DIR
-    	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) && continue
+    	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) && continue #if not start on root
     	BASE=${DIR%\**}
-		until [[ -d $BASE ]]
-		do
-			BASE=$(dirname "$BASE")
-		done
+			until [[ -d $BASE ]]
+			do
+				BASE=$(dirname "$BASE")
+			done
     	R=$(stat -c%m "$BASE")
-    	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${F:0:2}$DIR" )
+    	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) #only filters with same mountpoint
     done
 	#echo "${ROOTFILTERS[@]}"
 
@@ -223,6 +226,8 @@ do
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 		schtasks /QUERY|fgrep BKIT
 	else
+		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 
+		[[ -n $TEST ]] && echo $JOB && exit
 		{
 			crontab -l 2>/dev/null
 			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 

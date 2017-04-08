@@ -37,7 +37,11 @@ OPTIONS=(
 RSYNCOPTIONS=()
 
 dorsync() {
+  local BACKUP="${@: -1}$BACKUPDIR"
+  mkdir -p "$BACKUP"
   rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
+  find "$BACKUP" -maxdepth 0 -empty -delete 2>/dev/null
+  [[ -e "$BACKUP" ]] && echo Old files saved on "$BACKUP"
 }
 
 destination() {
@@ -51,12 +55,6 @@ destination() {
       $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
   }
   [[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
-}
-
-check() {
-  DST="$1"
-  find "${DST}$BACKUPDIR" -maxdepth 0 -empty -delete 2>/dev/null
-  [[ -e "${DST}$BACKUPDIR" ]] && echo Old files saved on "${DST}$BACKUPDIR" || echo Empty backup directory "${DST}$BACKUPDIR" deleted
 }
 
 usage() {
@@ -118,7 +116,7 @@ trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 
 SRCS=()
-LINKTO=()
+declare -A LINKTO
 
 for RESOURCE in "${RESOURCES[@]}"
 do
@@ -162,10 +160,9 @@ do
     if [[ -n $DST ]]
     then
       SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call
-      LINKTO+=( "$LOCALCOPY=$DIR/" )
+      LINKTO["$LOCALCOPY=$DIR/"]=1
     else
       dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
-      check "$DIR/"
 
       [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
         METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
@@ -194,6 +191,7 @@ do
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
-  dorsync "${LINKTO[@]}" "${SRCS[@]}" "$DST"
-  check "$DST"
+  LINKS=( "${!LINKTO[@]}" )       #get different link-dest/copy-dest
+  FIRST20=( "${LINKS[@]:0:20}" )  #a rsync limitation
+  dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST"
 }

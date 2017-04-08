@@ -67,6 +67,8 @@ usage() {
   exit 1
 }
 
+SRCS=()
+declare -A LINKTO
 LOCALCOPY="--link-dest" #rsync option
 while [[ $1 =~ ^- ]]
 do
@@ -89,6 +91,12 @@ do
     ;;
     --local-copy)
       LOCALCOPY="--copy-dest"
+    ;;
+    --link-dest=*)
+      LINKTO["--link-dest=${KEY#*=}"]=1
+    ;;
+    --copy-dest=*)
+      LINKTO["--copy-dest=${KEY#*=}"]=1
     ;;
     -- )
       while [[ $1 =~ ^- ]]
@@ -118,8 +126,6 @@ RESULT="$SDIR/run/restore-$$/"
 trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 
-SRCS=()
-declare -A LINKTO
 
 for RESOURCE in "${RESOURCES[@]}"
 do

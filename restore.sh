@@ -55,14 +55,8 @@ destination() {
 
 check() {
 	DST="$1"
-	if $(find "${DST}$BACKUPDIR" -prune -empty  2>/dev/null)
-    then
-        echo "Old files saved on $BACKUPDIR"
-    else
-        echo "Nothing to restore"
-        rm -rf "${DST}$BACKUPDIR"
-        echo "Removed empty backup dir $BACKUPDIR"
-    fi
+  find "${DST}$BACKUPDIR" -maxdepth 0 -empty -delete
+  [[ -e "${DST}$BACKUPDIR" ]] && echo Old files saved on "${DST}$BACKUPDIR" || echo Empty backup directory "${DST}$BACKUPDIR" deleted
 }
 
 usage() {

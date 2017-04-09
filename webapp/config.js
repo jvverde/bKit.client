@@ -11,7 +11,7 @@ let config = {
   // Further changes can be made in `.eslintrc.js`
   eslint: true,
 
-  // webpack-dev-server port
+  // webpack+-dev-server port
   port: 9080,
 
   // electron-packager options

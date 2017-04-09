@@ -1,13 +1,12 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo Backup one or more directories or files
-	echo -e "Usage:\n\t $NAME dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $NAME [-a|--all] dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
@@ -41,19 +40,24 @@ do
 				shift
 			done
 		;;
-		-e|--excludes)
-			excludes
+		-a|--all)
+			ALL=1
 		;;
 		-h|--help)
 			usage
 		;;
+		*=*)
+			OPTIONS+=( "$KEY")
+		;;
 		*)
-			OPTIONS+=( "$KEY" )
+			OPTIONS+=( "$KEY" "$1" ) && shift
 		;;
 	esac
 done
 
 [[ $# -eq 0 ]] && usage
+
+[[ -n $ALL ]] || excludes
 
 FILTERS+=( --filter=": .rsync-filter" )
 

@@ -6,27 +6,29 @@ die() { echo -e "$@">&2; exit 1; }
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo Backup one or more directories or files
-	echo -e "Usage:\n\t $NAME [-a|--all] dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $NAME [-a|--all] [-c|--compile] dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
 FILTERS=()
 
-RMFILES=()
-trap 'rm -f "${RMFILES[@]}"' EXIT
-
 excludes(){
-	RUNDIR=$SDIR/run
-	[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
+	EXCDIR=$SDIR/cache/excludes
+	[[ -d $EXCDIR ]] || mkdir -p $EXCDIR
 
-	EXCL=$RUNDIR/exclude-$$.lst
+	EXCL=$EXCDIR/exclude.lst
 
-	echo Compile exclude list
-	bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	[[ -e "$EXCL" ]] || {
+		echo Compile exclude list
+		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	}
+	[[ -z $(find "$EXCL" -mtime +30) && -z $COMPILE ]] || {
+		echo Recompile exclude list
+		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	}
+
 	FILTERS+=( --filter=". $EXCL" )
-	RMFILES+=( "$EXCL" )
 }
-
 OPTIONS=()
 RSYNCOPTIONS=()
 while [[ $1 =~ ^- ]]
@@ -42,6 +44,12 @@ do
 		;;
 		-a|--all)
 			ALL=1
+		;;
+		-c|--compile)
+			COMPILE=1
+		;;
+		--ignore-filters)
+			NOFILTERS=1
 		;;
 		-h|--help)
 			usage
@@ -59,7 +67,7 @@ done
 
 [[ -n $ALL ]] || excludes
 
-FILTERS+=( --filter=": .rsync-filter" )
+[[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 
 echo Start backup
 bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "$@"

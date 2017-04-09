@@ -7,25 +7,29 @@ die() { echo -e "$@">&2; exit 1; }
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo Snapshot and backup one or more directories or files
-	echo -e "Usage:\n\t $NAME [-a|--all] dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $NAME [-a|--all] [-c|--compile] dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
+
 FILTERS=()
 
-RMFILES=()
-trap 'rm -f "${RMFILES[@]}"' EXIT
-
 excludes(){
-	RUNDIR=$SDIR/run
-	[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
+	EXCDIR=$SDIR/cache/excludes
+	[[ -d $EXCDIR ]] || mkdir -p $EXCDIR
 
-	EXCL=$RUNDIR/exclude-$$.lst
+	EXCL=$EXCDIR/exclude.lst
 
-	echo Compile exclude list
-	bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	[[ -e "$EXCL" ]] || {
+		echo Compile exclude list
+		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	}
+	[[ -z $(find "$EXCL" -mtime +30) && -z $COMPILE ]] || {
+		echo Recompile exclude list
+		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	}
+
 	FILTERS+=( --filter=". $EXCL" )
-	RMFILES+=( "$EXCL" )
 }
 
 ARGS=("$@")
@@ -45,6 +49,12 @@ do
 		-a|--all)
 			ALL=1
 		;;
+		-c|--compile)
+			COMPILE=1
+		;;
+		--ignore-filters)
+			NOFILTERS=1
+		;;
 		--start-in=*)
 			cd "${KEY#*=}"
 		;;
@@ -62,10 +72,11 @@ done
 
 [[ $# -eq 0 ]] && usage
 
+#Don't move up in order to allow help/usage msg
 [[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
 [[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
 	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
-	echo I am to going to runas Administrator
+	echo I am going to runas Administrator
 	WDIR=$(cygpath -w "$SDIR")
 	cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" "${ARGS[@]}"
 	exit
@@ -73,7 +84,7 @@ done
 
 [[ -n $ALL ]] || excludes
 
-FILTERS+=( --filter=": .rsync-filter" )
+[[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 
 echo Start snapshot backup
 

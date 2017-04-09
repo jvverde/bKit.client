@@ -7,6 +7,7 @@ tmp/
 gui/
 schtasks/
 filters/
+testar/
 *~
 old
 not-used-anymore/

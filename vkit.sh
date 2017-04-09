@@ -35,4 +35,5 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 
+echo "Please wait... this may take a while"
 bash "$SDIR/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

@@ -11,4 +11,4 @@ echo %TAB%- dkit: Show whether directory differs from the last backup
 echo %TAB%- vkit: Show the backups versions of a given directory or file.
 echo.
 CMD /K
-REM End
+EXIT /b

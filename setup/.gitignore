@@ -3,3 +3,4 @@
 *.full
 cygwi*/*.log
 cygwi*/*.full
+!cyg*/repo

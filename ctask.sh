@@ -199,14 +199,13 @@ do
 	done >> "$FILTERFILE"
 	LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
 	OPTIONS=(
-		'--excludes'
 		'--uuid "'$UUID'"'
 		'--logdir "'$LOGDIR'"'
 	)
 
 	if [[ $OS == cygwin ]]
 	then
-		FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")	
+		FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
 		{
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
@@ -226,11 +225,11 @@ do
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 		schtasks /QUERY|fgrep BKIT
 	else
-		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 
+		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}"
 		[[ -n $TEST ]] && echo $JOB && exit
 		{
 			crontab -l 2>/dev/null
-			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}" 
+			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}"
 		}| sort -u | crontab
 		#show what is scheduled
 		crontab -l

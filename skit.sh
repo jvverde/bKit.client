@@ -1,12 +1,13 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo Snapshot and backup one or more directories or files
-	echo -e "Usage:\n\t $NAME dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $NAME [-a|--all] dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
@@ -27,6 +28,7 @@ excludes(){
 	RMFILES+=( "$EXCL" )
 }
 
+ARGS=("$@")
 OPTIONS=()
 RSYNCOPTIONS=()
 while [[ $1 =~ ^- ]]
@@ -40,8 +42,11 @@ do
 				shift
 			done
 		;;
-		-e|--excludes)
-			excludes
+		-a|--all)
+			ALL=1
+		;;
+		--start-in=*)
+			cd "${KEY#*=}"
 		;;
 		-h|--help)
 			usage
@@ -56,6 +61,17 @@ do
 done
 
 [[ $# -eq 0 ]] && usage
+
+[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
+[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
+	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
+	echo I am to going to runas Administrator
+	WDIR=$(cygpath -w "$SDIR")
+	cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" "${ARGS[@]}"
+	exit
+}
+
+[[ -n $ALL ]] || excludes
 
 FILTERS+=( --filter=": .rsync-filter" )
 

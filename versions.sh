@@ -48,11 +48,16 @@ PERM=(--acls --owner --group --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
 OPTIONS=(
 	--archive
+	--no-recursive
+	--dirs
 	--hard-links
 	--human-readable
-	--relative
 	--dry-run
 )
+
+DST="$SDIR/run/fake-root-$$"
+mkdir -p "$DST"
+trap 'rm -rf "$DST"' EXIT
 
 for DIR in "${RESTOREDIR[@]}"
 do
@@ -62,38 +67,21 @@ do
 	DRIVE=${DRIVE%%:*}
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 
-	DST=$(dirname "$DIR")
-	DST=${DST%%/} #remove trailing slash if present
-
 	ROOT=$(stat -c%m "$DIR")
 
 	PARENT=$DIR
 
 	DIR=${DIR#$ROOT}
-	DIR=${DIR#/}
-
-	FILTERS=()
-	until [[ $PARENT == $ROOT || ${#PARENT} -le 1 ]]
-	do
-		P=${PARENT#$ROOT}
-		F="--include=/${P#/}"
-		FILTERS+=( "$F" )
-		PARENT=$(dirname "$PARENT")
-	done
-	FILTERS+=(
-		'--exclude=*'
-	)
 
 	VERSIONS=( $(rsync --list-only "$BACKUPURL/$RVID/.snapshots/"|grep -Po '@GMT-.+$') )
 	for V in "${VERSIONS[@]}"
 	do
 		FMT="--out-format=$V|%o|%i|%M|%l|%f"
-		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/./"
-		rsync "${RSYNCOPTIONS[@]}" "${FILTERS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$ROOT/" |
-		awk -F'|' -v entry="$DIR" '$6 == entry {print $0}'
-	done | awk -F'|' '
+		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/$DIR"
+		rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DST/" 2>/dev/null
+	done| awk -F'|' '
 		{
-			LINES[$2 $3 $4 $5] = $0
+			LINES[$2 $3 $4 $5 $6] = $0
 		}
 		END{
 			for (L in LINES) print LINES[L]

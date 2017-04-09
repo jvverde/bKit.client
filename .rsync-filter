@@ -13,6 +13,7 @@
 - /.vscode
 - /webapp/app/src/assets/
 + /webapp/app/src/
++ /webapp/app/icons/
 - /webapp/app/*
 + /webapp/app/
 - /webapp/*

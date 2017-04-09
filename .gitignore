@@ -13,3 +13,4 @@ old
 not-used-anymore/
 .backups
 lixo.txt
+!setup/cygwi*/repo

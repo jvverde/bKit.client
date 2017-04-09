@@ -58,6 +58,9 @@ do
 		--start-in=*)
 			cd "${KEY#*=}"
 		;;
+		--no-ask)
+       NOASK=1
+    ;;
 		-h|--help)
 			usage
 		;;
@@ -73,13 +76,15 @@ done
 [[ $# -eq 0 ]] && usage
 
 #Don't move up in order to allow help/usage msg
-[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
-[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
-	#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
-	echo I am going to runas Administrator
-	WDIR=$(cygpath -w "$SDIR")
-	cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" "${ARGS[@]}"
-	exit
+[[ -n $NOASK ]] || { 
+	[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
+	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
+		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
+		echo I am going to runas Administrator
+		WDIR=$(cygpath -w "$SDIR")
+		cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" "${ARGS[@]}"
+		exit
+	}
 }
 
 [[ -n $ALL ]] || excludes

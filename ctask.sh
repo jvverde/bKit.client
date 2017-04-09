@@ -131,11 +131,7 @@ RDIR=$SDIR
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
-	(id -G|grep -qE '\b544\b') && {
-		CMD='"'${DOSBASH}.exe'" "'${RDIR}/skit.sh'"'
-	} || {
-		CMD='"'${DOSBASH}.exe'" "'${RDIR}/bkit.sh'"'
-	}
+	CMD='"'${DOSBASH}.exe'" "'${RDIR}/skit.sh'"'
 	echo '@echo OFF'> "$TASKBATCH"
 }
 
@@ -203,6 +199,7 @@ do
 	done >> "$FILTERFILE"
 	LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
 	OPTIONS=(
+		'--no-ask'
 		'--uuid "'$UUID'"'
 		'--logdir "'$LOGDIR'"'
 	)
@@ -233,7 +230,7 @@ do
 		[[ -n $TEST ]] && echo $JOB && exit
 		{
 			crontab -l 2>/dev/null
-			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/bkit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}"
+			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}"
 		}| sort -u | crontab
 		#show what is scheduled
 		crontab -l

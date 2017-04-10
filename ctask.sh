@@ -146,6 +146,7 @@ do
     ROOT=$(stat -c%m "$FULL")
     ROOTS["$ROOT"]=1
     REL=${FULL#$ROOT}	#path relative to root
+    [[ -z $REL ]] && REL='/'
     ROOTOF["$REL"]="$ROOT"
 done
 

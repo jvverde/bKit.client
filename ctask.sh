@@ -122,17 +122,25 @@ FILTERDIR="$SDIR/filters"
 
 TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
 
-RDIR=$SDIR
+TASKDIR="$SDIR/cronjobs"
+[[ $OS == cygwin ]] && TASKDIR="$SDIR/schtasks"
+
+[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
+JOBFILE="${TASKDIR}/${TASKNAME}.sh"
+[[ $OS == cygwin ]] && JOBFILE="${TASKDIR}/${TASKNAME}.bat"
+
+[[ -e $JOBFILE && -z $FORCE ]] && die "'$JOBFILE' already exists"
+:> "$JOBFILE"
+
+#RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
+RDIR="$SDIR"
+
 [[ $OS == cygwin ]] && {
-	TASKDIR="$SDIR/schtasks"
-	[[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
-	TASKBATCH="${TASKDIR}/${TASKNAME}.bat"
-	[[ -e $TASKBATCH && -z $FORCE ]] && die $TASKBATCH already exists
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
 	CMD='"'${DOSBASH}.exe'" "'${RDIR}/skit.sh'"'
-	echo '@echo OFF'> "$TASKBATCH"
+	echo '@echo OFF'> "$JOBFILE"
 }
 
 
@@ -152,34 +160,37 @@ done
 
 for ROOT in ${!ROOTS[@]}
 do
+	echo ROOT=$ROOT
 	ROOTFILTERS=()
 	BACKUPDIR=()
-    for DIR in "${!ROOTOF[@]}"
-    do
-        [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "\"$DIR\"" )
-    done
-    [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
-    #echo ROOT:$ROOT
-    for F in "${FILTERS[@]}"
-    do
-    	#echo F:$F
-    	DIR=${F:2}
-    	set -f
-    	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
+  for DIR in "${!ROOTOF[@]}"
+  do
+      [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "\"$DIR\"" )
+  done
+  [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
+  #echo ROOT:$ROOT
+  for F in "${FILTERS[@]}"
+  do
+  	#echo F:$F
+  	DIR=${F:2}
+  	set -f
+  	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
 
-    	#echo B:$DIR
-    	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) && continue #if not start on root
-    	BASE=${DIR%\**}
-			until [[ -d $BASE ]]
-			do
-				BASE=$(dirname "$BASE")
-			done
-    	R=$(stat -c%m "$BASE")
-    	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) #only filters with same mountpoint
-    done
+  	#echo B:$DIR
+  	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) && continue #if not start on root
+  	BASE=${DIR%\**}
+		until [[ -d $BASE ]]
+		do
+			BASE=$(dirname "$BASE")
+		done
+  	R=$(stat -c%m "$BASE")
+  	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) #only filters with same mountpoint
+  done
 	#echo "${ROOTFILTERS[@]}"
 
 	UUID=$(bash "$SDIR/getUUID.sh" "$ROOT")
+	[[ $UUID == _ ]] && continue
+	
 	DRIVE=${ROOT//\//_}
 	[[ $OS == cygwin ]] && {
 		DRIVE=$(cygpath -w "$ROOT")
@@ -187,11 +198,11 @@ do
 		DRIVE=${DRIVE,}
 	}
 
-	FILTERNAME="${TASKNAME}-$DRIVE.lst"
+	FILTERNAME="${TASKNAME}-$UUID.lst"
 	FILTERFILE="${FILTERDIR}/$FILTERNAME"
 
 	echo "#Filter rules to be used by a cronjob" > "$FILTERFILE"
-	[[ $OS == cygwin ]] && echo "#Filter rules to be used in '$(cygpath -w "$TASKBATCH")'. Don't remove this file" > "$FILTERFILE"
+	[[ $OS == cygwin ]] && echo "#Filter rules to be used in '$(cygpath -w "$JOBFILE")'. Don't remove this file" > "$FILTERFILE"
 
 	for F in "${ROOTFILTERS[@]}"
 	do
@@ -204,6 +215,9 @@ do
 		'--logdir "'$LOGDIR'"'
 	)
 
+	#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
+	FILTERLOCATION="$FILTERFILE"
+	
 	if [[ $OS == cygwin ]]
 	then
 		FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
@@ -213,9 +227,22 @@ do
 			echo 'pushd "%~dp0"'
 			echo $CMD "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
 			echo 'popd'
-		} >> "$TASKBATCH"
-		[[ -n $INSTALL ]] || continue
-		TASCMD='"'$(cygpath -w "$TASKBATCH")'"'
+		} >> "$JOBFILE"
+	else
+		{
+			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"
+			echo "#Logs on folder $LOGDIR"
+			echo 'pushd "$(dirname "$(readlink -f "$0")")"'
+			echo "/bin/bash \"$SDIR/skit.sh\"" "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
+			echo 'popd'
+		} >> "$JOBFILE"
+	fi
+done
+if [[ $OS == cygwin ]]
+then
+	echo "Created batch file in $JOBFILE"
+	[[ -n $INSTALL ]] && {
+		TASCMD='"'$(cygpath -w "$JOBFILE")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
 		#http://www.robvanderwoude.com/datetimentparse.php
 		#schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
@@ -225,19 +252,20 @@ do
 		(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
 		schtasks /QUERY|fgrep BKIT
+	}
+else
+	JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
+	if [[ -z $TEST ]]
+	then 
+		echo $JOB
 	else
-		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}"
-		[[ -n $TEST ]] && echo $JOB && exit
 		{
 			crontab -l 2>/dev/null
-			echo "${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$SDIR/skit.sh\" ${OPTIONS[@]} -- --filter=\". $FILTERFILE\" ${BACKUPDIR[@]}"
+			echo $JOB
 		}| sort -u | crontab
-		#show what is scheduled
-		crontab -l
-		exit
+		crontab -l|fgrep BKIT
 	fi
-done
-echo Created the following schedule task in $TASKBATCH
-#cat "$TASKBATCH"
+fi
+#cat "$JOBFILE"
 
 

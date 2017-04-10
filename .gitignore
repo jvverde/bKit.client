@@ -6,6 +6,7 @@ conf/
 tmp/
 gui/
 schtasks/
+cronjobs/
 filters/
 testar/
 *~

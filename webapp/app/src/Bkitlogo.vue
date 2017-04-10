@@ -22,7 +22,7 @@
 
 <template>
   <header>
-    <img class="logo" src="./assets/00-Logotipo/64x64.png">
+    <router-link to="/"><img class="logo" src="./assets/00-Logotipo/64x64.png"></router-link>
     <h1>bK<span class="i">i</span>t</h1>
   </header>
 </template>

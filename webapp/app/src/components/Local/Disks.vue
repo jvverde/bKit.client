@@ -44,6 +44,7 @@
       refresh () {
         try {
           const fd = spawn(BASH, ['./listDisks.sh'], {cwd: '..'})
+          this.$store.dispatch('resetBackupDir')
           let output = ''
           fd.stdout.on('data', (data) => {
             output += `${data}`

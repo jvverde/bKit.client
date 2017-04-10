@@ -32,7 +32,7 @@
 
 <script>
 const path = require('path')
-const {spawn, exec} = require('child_process')
+const {spawn} = require('child_process')
 const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 
 export default {
@@ -80,7 +80,7 @@ export default {
   props: ['resource', 'show'],
   components: {
   },
-  created () {
+/*  created () {
     process.platform === 'win32' && exec('NET SESSION', (err) => {
       if (err) {
         this.$notify.warning({
@@ -91,7 +91,7 @@ export default {
         })
       }
     })
-  },
+  },*/
   mounted () {
     let resource = this.resource || {}
     let [, volID] = (resource.drive || '').split(/\./)

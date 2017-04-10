@@ -163,7 +163,8 @@
                   if (!old) {
                     // console.log('Not found', f.name)
                     f.deleted = true
-                  } else if (old.size !== f.size) {
+                  } else if (old.size !== f.size ||
+                      old.datetime !== f.datetime) {
                     // console.log('Different size for', f.name)
                     f.changed = true
                   }

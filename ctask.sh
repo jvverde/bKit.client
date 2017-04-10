@@ -138,7 +138,7 @@ RDIR=$SDIR
 
 declare -A ROOTS
 declare -A ROOTOF
-echo "$@" && exit
+
 for DIR in "$@"
 do
     FULL=$(readlink -ne "$DIR") || { warn $DIR "doesn't exists" && continue ;}
@@ -146,8 +146,7 @@ do
     ROOT=$(stat -c%m "$FULL")
     ROOTS["$ROOT"]=1
     REL=${FULL#$ROOT}	#path relative to root
-    REL=${REL#/} 		#remove leading slasj if any
-    ROOTOF["$REL"]=$ROOT
+    ROOTOF["$REL"]="$ROOT"
 done
 
 for ROOT in ${!ROOTS[@]}
@@ -234,6 +233,7 @@ do
 		}| sort -u | crontab
 		#show what is scheduled
 		crontab -l
+		exit
 	fi
 done
 echo Created the following schedule task in $TASKBATCH

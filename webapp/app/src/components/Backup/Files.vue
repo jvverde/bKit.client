@@ -103,7 +103,7 @@
       return {
         url: this.$store.getters.url,
         files: [],
-        oldpath: this.location.path,
+        oldlocation: {},
         newestsnap: ''
       }
     },
@@ -138,12 +138,18 @@
           this.location.path +
           encodeURIComponent(entry || '')
       },
+      isSnap () {
+        return this.location.path === this.oldlocation.path &&
+          this.location.computer === this.oldlocation.computer &&
+          this.location.disk === this.oldlocation.disk &&
+          this.location.snapshot !== this.oldlocation.snapshot
+      },
       refresh () {
         try {
           const url = this.getUrl('folder')
           this.$http.jsonp(url).then((response) => {
             let files = (response.data.files || []).sort(order)
-            if (this.location.path === this.oldpath) {
+            if (this.isSnap()) {
               if (this.location.snapshot > this.newestsnap) {
                 this.newestsnap = this.location.snapshot
                 this.newestfiles = files
@@ -170,7 +176,7 @@
             }
             this.$nextTick(() => { // update on next clock ticket
               this.files = files
-              this.oldpath = this.location.path
+              this.oldlocation = this.location
             })
           }, (error) => {
             console.error(error)

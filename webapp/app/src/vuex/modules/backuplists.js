@@ -20,6 +20,10 @@ const mutations = {
   [types.RMBACKUPDIR] (state, entry) {
     rmfrom(state.include, entry)
     rmfrom(state.exclude, entry)
+  },
+  [types.LISTRESET] (state) {
+    state.include = []
+    state.exclude = []
   }
 }
 

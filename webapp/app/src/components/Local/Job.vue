@@ -111,7 +111,7 @@
         const filters = this.filters.map(e => {
           return `--filter=${e}`
         })
-        const cmd = ['./ctask.sh', '--test',
+        const cmd = ['./ctask.sh', '--test', '--force',
           ...options,
           ...filters,
           ...includes
@@ -121,10 +121,10 @@
 
         fd.stdout.on('data', (data) => {
           console.log('' + data)
-          console.log('stdout', `${data}`)
         })
 
         fd.stderr.on('data', (data) => {
+          console.error('' + data)
           this.$notify.error({
             title: 'Create Job',
             message: `Error:${data}`

@@ -32,3 +32,6 @@ export const excBackupDir = ({ commit }, dir) => {
 export const rmBackupDir = ({ commit }, dir) => {
   commit(types.RMBACKUPDIR, dir)
 }
+export const resetBackupDir = ({ commit }) => {
+  commit(types.LISTRESET)
+}

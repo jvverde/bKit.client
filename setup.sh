@@ -4,10 +4,9 @@ exists() { type "$1" >/dev/null 2>&1;}
 OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 [[ $UID -ne 0 ]] && exists sudo && exec sudo "$0" "$@"
 SDIR="$(dirname "$(readlink -f "$0")")"               #Full DIR
-exists apt-get && {
-	apt-get update
-	apt-get install -y sqlite3
-}
+#exists apt-get && {
+	#apt-get update
+#}
 
 [[ $UID -eq 0 ]] && U=$(who am i | awk '{print $1}')
 USERID=$(id -u $U)

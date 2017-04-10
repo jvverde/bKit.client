@@ -108,7 +108,14 @@
         const options = ['--name', 'teste', `-${this.period}`, this.every]
         if (this.start) options.push('--start', this.start)
         const includes = this.includes.map(e => e.path)
-        const cmd = ['./ctask.sh', '--test', ...options, ...includes]
+        const filters = this.filters.map(e => {
+          return `--filter=${e}`
+        })
+        const cmd = ['./ctask.sh', '--test',
+          ...options,
+          ...filters,
+          ...includes
+        ]
         console.log(cmd)
         const fd = spawn(BASH, cmd, {cwd: '..'})
 

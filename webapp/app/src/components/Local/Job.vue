@@ -111,12 +111,11 @@
         const filters = this.filters.map(e => {
           return `--filter=${e}`
         })
-        const cmd = ['./ctask.sh', '--test', '--force',
+        const cmd = ['./ctask.sh', '--force',
           ...options,
           ...filters,
           ...includes
         ]
-        console.log(cmd)
         const fd = spawn(BASH, cmd, {cwd: '..'})
 
         fd.stdout.on('data', (data) => {
@@ -163,11 +162,11 @@
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
             const is = condition => e.isIncluded === condition
-            if (is(false) && e.dir) return '- ' + join(e.path, '/*')
-            else if (is(false) && e.file) return '- ' + join(e.path)
-            else if (is(true) && e.dir) return '+ ' + join(e.path, '/')
-            else if (is(true) && e.file) return '+ ' + join(e.path)
-            else return '+ ' + join(e.path)
+            if (is(false) && e.dir) return '-/ ' + join(e.path, '/*')
+            else if (is(false) && e.file) return '-/ ' + join(e.path)
+            else if (is(true) && e.dir) return '+/ ' + join(e.path, '/')
+            else if (is(true) && e.file) return '+/ ' + join(e.path)
+            else return '+/ ' + join(e.path)
           })
       }
     }

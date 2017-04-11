@@ -183,7 +183,7 @@ do
       SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call
       LINKTO["$LOCALCOPY=$DIR/"]=1
     else
-      dorsync "$SRC" "$BASE/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+      dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 
       [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
         METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/

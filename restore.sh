@@ -70,7 +70,7 @@ destination() {
 usage() {
   local NAME=${1:$(basename -s .sh "$0")}
   echo Restore from backup one or more directories of files
-  echo -e "Usage:\n\t $NAME [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
+  echo -e "Usage:\n\t $NAME [--dry-run] [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
   exit 1
 }
 
@@ -95,6 +95,9 @@ do
     ;;
     --acls)
       ACLS=1
+    ;;
+    --dry-run)
+      RSYNCOPTIONS+=('--dry-run')
     ;;
     --delete)
         OPTIONS+=( '--delete-delay' )

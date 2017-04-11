@@ -238,7 +238,7 @@ do
 done
 if [[ $OS == cygwin ]]
 then
-	echo "Created a batch file in $JOBFILE"
+	echo "Create a batch file in $JOBFILE"
 	[[ -n $INSTALL ]] && {
 		TASCMD='"'$(cygpath -w "$JOBFILE")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
@@ -249,16 +249,18 @@ then
 		(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
 		(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
+		echo "These are your bKit schedule tasks now" 
 		schtasks /QUERY|fgrep BKIT
 	}
 else
-	echo "Created a job file in $JOBFILE"
+	echo "Create a job file in $JOBFILE"
 	[[ -n $INSTALL ]] && {
 		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
 		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
 			echo $JOB
 		}| sort -u | crontab
+		echo "These are your bKit jobs now" 
 		crontab -l|fgrep BKIT #show all BKIT jobs
 	}
 fi

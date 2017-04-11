@@ -215,7 +215,7 @@ do
 
 	#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
 	FILTERLOCATION="$FILTERFILE"
-	
+
 	if [[ $OS == cygwin ]]
 	then
 		FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
@@ -238,7 +238,7 @@ do
 done
 if [[ $OS == cygwin ]]
 then
-	echo "Created batch file in $JOBFILE"
+	echo "Created a batch file in $JOBFILE"
 	[[ -n $INSTALL ]] && {
 		TASCMD='"'$(cygpath -w "$JOBFILE")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
@@ -262,6 +262,8 @@ else
 		crontab -l|fgrep BKIT #show all BKIT jobs
 	}
 fi
+echo done
+exit 0
 #cat "$JOBFILE"
 
 

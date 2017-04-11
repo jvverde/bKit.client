@@ -4,7 +4,7 @@
     <h1>bKit Home</h1>
     <section>
       <router-link v-for="link in links"
-        :to="link.ref" class="link" 
+        :to="link.ref" class="link"
         :style="{width:width, height:height}">
         {{link.name}}
       </router-link>
@@ -21,8 +21,8 @@ export default {
         {name: 'Backup', ref: '/local/disks'},
         {name: 'Recovery', ref: '/computers'},
         {name: 'Server', ref: '/server'},
-        {name: 'Init', ref: '/init'},
-        {name: 'Update', ref: '/update'}
+        {name: 'Init', ref: '/init'} // ,
+        // {name: 'Update', ref: '/update'}
       ]
     }
   },
@@ -59,13 +59,13 @@ export default {
       flex-grow:1;
       display: flex;
       flex-wrap: wrap;
-      justify-content: center; 
+      justify-content: center;
       align-content: center;
       overflow: auto;
       .link {
         display:flex;
-        align-items: center; 
-        justify-content: center; 
+        align-items: center;
+        justify-content: center;
         min-height: 3em;
         border-radius: 20px;
         border: 1px solid $bkit-color;

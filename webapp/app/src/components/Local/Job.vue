@@ -2,49 +2,42 @@
   <div class="job">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      <ul class="breadcrumb">
-        <li>
-          <span>
-            <router-link to="/" class="icon is-small">
-              <i class="fa fa-home">Home</i>
-            </router-link>
-          </span>
-        </li>
-      </ul>
+      <breadcrumb></breadcrumb>
+      <h2>Create a Job</h2>
     </header>
-    <h1>Create a Job</h1>
-    <section>
-      <div>
-        <div>Filters:</div>
-        <div v-for="f in filters">
-          {{f}}
-        </div>
-      </div>
-    </section>
-    <section class="select">
-      <span>Backup every </span>
-      <input v-model="every"
-        type="number" min="1" step="1" max="120"></input>
-      <span v-for="(val,key) in periods"
-        @click.stop="period=key"
-        :class="{selected: key === period}"
-        class="period">
-        {{val}}
-      </span>
-    </section>
-    <section class="start">
-      <span>Start on </span>
-      <el-date-picker
-        v-model="start"
-        type="datetime"
-        placeholder="Select date and time">
-      </el-date-picker>
-    </section>
-    <div @click.stop="create">Create a Job</div>
+    <div class="main">
+      <section class="select">
+        <span>Backup every </span>
+        <input v-model="every"
+          type="number" min="1" step="1" max="120"></input>
+        <span v-for="(val,key) in periods"
+          @click.stop="period=key"
+          :class="{selected: key === period}"
+          class="period">
+          {{val}}
+        </span>
+      </section>
+      <section class="start">
+        <span>Start on </span>
+        <el-date-picker
+          v-model="start"
+          type="datetime"
+          placeholder="Select date and time">
+        </el-date-picker>
+      </section>
+      <section>
+        <el-button type="primary" @click.stop="create">
+          Create Task
+          <i class="el-icon-arrow-right el-icon-right"></i>
+        </el-button>
+      </section>
+    </div>
   </div>
 </template>
 
 <script>
+  import Breadcrumb from './Breadcrumb'
+
   const {spawn} = require('child_process')
   const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
   const PATH = require('path')
@@ -95,6 +88,7 @@
       }
     },
     components: {
+      Breadcrumb
     },
     created () {
     },
@@ -137,6 +131,8 @@
               title: 'Good news',
               message: 'Job was successfully created'
             })
+          } else {
+            console.error(code)
           }
         })
       },
@@ -158,7 +154,13 @@
             isIncluded: null
           }
         })
-        const join = (...a) => PATH.join(PATH.sep, ...a)
+        const join = (...a) => {
+          if (a[0].match(/\\|\/|[a-zA-Z]:/)) {
+            return PATH.join(...a)
+          } else {
+            return PATH.join(PATH.sep, ...a)
+          }
+        }
         return ancestors.concat(includes, excludes).sort(order)
           .map(e => {
             const is = condition => e.isIncluded === condition
@@ -179,6 +181,26 @@
   .job{
     text-align: left;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    header.top{
+      flex-shrink: 0;
+      .logo{
+        float:left;
+      }
+      h2{
+        width: 100%;
+        text-align: center;
+      }
+    }
+    .main{
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+    }
     .select {
       display: flex;
       flex-wrap: wrap;

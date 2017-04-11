@@ -4,10 +4,14 @@ SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 set -o pipefail
+ERROR=0
 
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@" >&2; exit 1;}
-warn() { echo -e "$@" >&2;}
+warn() { 
+  ERROR=1
+  echo -e "$@" >&2
+}
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
@@ -34,17 +38,25 @@ OPTIONS=(
   --delay-updates
 )
 
+#Don't try to chown or chgrp if not root or Administrator
+[[ $OS == cygwin ]] && {
+    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
+}
+[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
+
 RSYNCOPTIONS=()
 
 dorsync() {
   local BACKUP="${@: -1}$BACKUPDIR"
   mkdir -p "$BACKUP"
   rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
+  RET=$?
   find "$BACKUP" -maxdepth 0 -empty -delete 2>/dev/null
   [[ -e "$BACKUP" ]] && {
     exists cygpath && BACKUP=$(cygpath -w "$BACKUP")
     echo Old files saved on "$BACKUP"
   }
+  return $RET
 }
 
 destination() {
@@ -53,11 +65,6 @@ destination() {
   DST=$(readlink -ne "$DST") || die "'$1' should be a directory"
   [[ ${DST: -1} == / ]] || DST="$DST/"
 
-  #Don't try to chown or chgrp if not root or Administrator
-  [[ $OS == cygwin ]] && {
-      $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
-  }
-  [[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 }
 
 usage() {
@@ -85,6 +92,9 @@ do
     ;;
     -d=*|--dst=*)
       destination "${KEY#*=}"
+    ;;
+    --acls)
+      ACLS=1
     ;;
     --delete)
         OPTIONS+=( '--delete-delay' )
@@ -171,9 +181,9 @@ do
       SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call
       LINKTO["$LOCALCOPY=$DIR/"]=1
     else
-      dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+      dorsync "$SRC" "$BASE/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 
-      [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+      [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
         METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
         [[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
         rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
@@ -202,7 +212,10 @@ done
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
   LINKS=( "${!LINKTO[@]}" )                   #get different link-dest/copy-dest
   FIRST20=( "${LINKS[@]:0:20}" )              #a rsync limitation
-  dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST"
+  dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"
   exists cygpath && DST=$(cygpath -w "$DST")
   echo "Files restored to $DST"
+  exit 0
 }
+
+exit $ERROR

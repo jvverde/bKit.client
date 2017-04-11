@@ -200,6 +200,7 @@ backup(){
 	set_postpone_files
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
 	do
+		[[ $I =~ unpack_smb_acl ]] && continue
 		echo miss "$I|$FILE|$LINK|$LEN"
 
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly

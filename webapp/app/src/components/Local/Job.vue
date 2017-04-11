@@ -5,7 +5,14 @@
       <breadcrumb></breadcrumb>
       <h2>Create a Job</h2>
     </header>
-    <div class="main">
+    <div class="alert" v-if="includes.length === 0">
+      No directories or files has been selected
+    </div>
+    <div class="main" v-if="includes.length > 0">
+      <section class="select">
+        <span>Task Name</span>
+        <input v-model="taskname" type="text" class="name"></input>
+      </section>
       <section class="select">
         <span>Backup every </span>
         <input v-model="every"
@@ -20,18 +27,34 @@
       <section class="start">
         <span>Start on </span>
         <el-date-picker
+          class="picker"
           v-model="start"
           type="datetime"
           placeholder="Select date and time">
         </el-date-picker>
       </section>
-      <section>
-        <el-button type="primary" @click.stop="create">
+      <section class="action">
+        <el-button type="primary" @click.stop="create"
+          :disabled="taskname === ''">
           Create Task
           <i class="el-icon-arrow-right el-icon-right"></i>
         </el-button>
       </section>
     </div>
+    <div class="resources">
+      <span v-if="includes.length > 0 ">Backup</span>
+      <div v-for="f in includes">
+        {{f.path}}
+      </div>
+      <span v-if="excludes.length > 0 ">Excluding</span>
+      <div v-for="f in excludes">
+        {{f.path}}
+      </div>
+    </div>
+    <section v-if="show" class="output">
+      <div class="stdout">{{stdout}}</div>
+      <div class="stderr">{{stderr}}</div>
+    </section>
   </div>
 </template>
 
@@ -57,6 +80,7 @@
     name: 'job',
     data () {
       return {
+        taskname: '',
         every: 1,
         periods: {
           m: 'Min',
@@ -67,13 +91,18 @@
           y: 'Year'
         },
         period: 'd',
-        start: ''
+        start: '',
+        stdout: '',
+        stderr: ''
       }
     },
     props: [],
     computed: {
       includes () {
         return this.$store.getters.backupIncludes
+      },
+      excludes () {
+        return this.$store.getters.backupExcludes
       },
       filters () {
         const includes = (this.$store.getters.backupIncludes || [])
@@ -85,6 +114,9 @@
             return Object.assign(include, {isIncluded: false})
           })
         return this.makeFilters(includes, excludes)
+      },
+      show () {
+        return this.stdout !== '' || this.stderr !== ''
       }
     },
     components: {
@@ -99,13 +131,17 @@
     },
     methods: {
       create () {
-        const options = ['--name', 'teste', `-${this.period}`, this.every]
+        const options = [
+          '--name', this.taskname,
+          `-${this.period}`, this.every,
+          '--install'
+        ]
         if (this.start) options.push('--start', this.start)
         const includes = this.includes.map(e => e.path)
         const filters = this.filters.map(e => {
           return `--filter=${e}`
         })
-        const cmd = ['./ctask.sh', '--force',
+        const cmd = ['./ctask.sh',
           ...options,
           ...filters,
           ...includes
@@ -113,15 +149,11 @@
         const fd = spawn(BASH, cmd, {cwd: '..'})
 
         fd.stdout.on('data', (data) => {
-          console.log('' + data)
+          this.stdout += data
         })
 
         fd.stderr.on('data', (data) => {
-          console.error('' + data)
-          this.$notify.error({
-            title: 'Create Job',
-            message: `Error:${data}`
-          })
+          this.stderr += data
         })
 
         fd.on('close', (code) => {
@@ -129,7 +161,8 @@
           if (code === 0) {
             this.$notify.success({
               title: 'Good news',
-              message: 'Job was successfully created'
+              message: 'Task was successfully created',
+              duration: 5000
             })
           } else {
             console.error(code)
@@ -194,31 +227,91 @@
         text-align: center;
       }
     }
+    .alert{
+      flex-grow: 4;
+      align-self: center;
+    }
     .main{
-      flex-grow: 1;
+      flex-grow: 2;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
+      section:not(.action) {
+        width: 80%;
+        margin: .5em;
+        :first-child{
+          width:30%;
+          display: inline-block;
+          text-align: right;
+          margin-right: .5em;
+        }
+        >*{
+          padding: .5em;
+        }
+        .picker{
+          margin-left: -.3em;
+          padding-left: 0em;
+        }
+      }
+      section.select {
+        display: flex;
+        flex-wrap: wrap;
+        input{
+          border: 1px solid $bkit-color;
+          text-align: right;
+          background-color: $bkit-color;
+          border-bottom-left-radius: 5px;
+          border-top-left-radius: 5px;
+          &:hover{
+            background-color: bisque;
+          }
+        }
+        .period {
+          border: 1px solid $bkit-color;
+          border-left-width: 0;
+          cursor: pointer;
+        }
+        .period:last-child {
+          border-bottom-right-radius: 5px;
+          border-top-right-radius: 5px;
+        }
+        .period.selected {
+          background-color: $bkit-color;
+        }
+        .name {
+          border-radius: 5px;
+          text-align: left;
+          background-color: beige;
+        }
+      }
+      section.action{
+        width: 65%;
+        >*{
+          float: right;
+        }
+      }
     }
-    .select {
-      display: flex;
-      flex-wrap: wrap;
-      .period {
-        border: 1px solid $bkit-color;
-        padding: .25em;
-      }
-      .period:last-child {
-        border-bottom-right-radius: 5px;
-        border-top-right-radius: 5px;
-      }
-      .period.selected {
-        background-color: $bkit-color;
-      }
-    }
-    .rules{
+    .resources{
+      padding: 1em;
+      overflow: auto;
+      flex-grow: 1;
       div{
         margin-left: 1em;
+      }
+    }
+    .output{
+      overflow: auto;
+      font-family: monospace;
+      margin-bottom: 1px;
+      white-space: pre-line;
+      background-color: white;
+      color: darkgreen;
+      padding: 2px;
+      padding-left:1em;
+      .stderr {
+        color: darkred;
       }
     }
   }

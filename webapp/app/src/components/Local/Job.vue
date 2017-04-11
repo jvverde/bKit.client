@@ -165,7 +165,10 @@
               duration: 5000
             })
           } else {
-            console.error(code)
+            this.$notify.warning({
+              title: 'Please verify logs',
+              message: "Something didn't go as expected"
+            })
           }
         })
       },

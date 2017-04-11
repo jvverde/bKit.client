@@ -103,9 +103,6 @@ do
 		--force)
 			FORCE="F"
 		;;
-		--test)
-			TESTE=1
-		;;
 		*)
 			echo Unknow	option $KEY && usage
 		;;
@@ -160,7 +157,6 @@ done
 
 for ROOT in ${!ROOTS[@]}
 do
-	echo ROOT=$ROOT
 	ROOTFILTERS=()
 	BACKUPDIR=()
   for DIR in "${!ROOTOF[@]}"
@@ -172,25 +168,27 @@ do
   for F in "${FILTERS[@]}"
   do
   	#echo F:$F
-  	DIR=${F:2}
+  	#DIR=${F:2}
+  	DIR=${F#* }
+  	P=${F%% *}
   	set -f
   	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
 
   	#echo B:$DIR
-  	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) && continue #if not start on root
+  	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${P} $DIR" ) && continue #if not start on root
   	BASE=${DIR%\**}
 		until [[ -d $BASE ]]
 		do
 			BASE=$(dirname "$BASE")
 		done
   	R=$(stat -c%m "$BASE")
-  	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${F:0:2}$DIR" ) #only filters with same mountpoint
+  	[[ $R == $ROOT ]] && ROOTFILTERS+=( "${P} $DIR" ) #only filters with same mountpoint
   done
 	#echo "${ROOTFILTERS[@]}"
 
 	UUID=$(bash "$SDIR/getUUID.sh" "$ROOT")
 	[[ $UUID == _ ]] && continue
-	
+
 	DRIVE=${ROOT//\//_}
 	[[ $OS == cygwin ]] && {
 		DRIVE=$(cygpath -w "$ROOT")
@@ -198,11 +196,11 @@ do
 		DRIVE=${DRIVE,}
 	}
 
-	FILTERNAME="${TASKNAME}-$UUID.lst"
+	FILTERNAME="${TASKNAME}-${DRIVE}-${UUID}.lst"
 	FILTERFILE="${FILTERDIR}/$FILTERNAME"
 
-	echo "#Filter rules to be used by a cronjob" > "$FILTERFILE"
-	[[ $OS == cygwin ]] && echo "#Filter rules to be used in '$(cygpath -w "$JOBFILE")'. Don't remove this file" > "$FILTERFILE"
+	echo "#Filter rules used by cronjob $JOBFILE. Don't remove this file" > "$FILTERFILE"
+	[[ $OS == cygwin ]] && echo "#Filter rules used in '$(cygpath -w "$JOBFILE")'. Don't remove this file" > "$FILTERFILE"
 
 	for F in "${ROOTFILTERS[@]}"
 	do
@@ -254,17 +252,15 @@ then
 		schtasks /QUERY|fgrep BKIT
 	}
 else
-	JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
-	if [[ -z $TEST ]]
-	then 
-		echo $JOB
-	else
-		{
+	echo "Created a job file in $JOBFILE"
+	[[ -n $INSTALL ]] && {
+		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
+		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
 			echo $JOB
 		}| sort -u | crontab
-		crontab -l|fgrep BKIT
-	fi
+		crontab -l|fgrep BKIT #show all BKIT jobs
+	}
 fi
 #cat "$JOBFILE"
 

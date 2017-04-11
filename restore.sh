@@ -16,7 +16,7 @@ warn() {
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
 FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
-PERM=(--perms --acls --owner --group --super --numeric-ids)
+PERM=(--perms --acls --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
 BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S")"
 while [[ -e $BACKUPDIR ]]
@@ -64,13 +64,12 @@ destination() {
   exists cygpath && DST=$(cygpath -u "$DST")
   DST=$(readlink -ne "$DST") || die "'$1' should be a directory"
   [[ ${DST: -1} == / ]] || DST="$DST/"
-
 }
 
 usage() {
   local NAME=${1:$(basename -s .sh "$0")}
   echo Restore from backup one or more directories of files
-  echo -e "Usage:\n\t $NAME [--dry-run] [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
+  echo -e "Usage:\n\t $NAME [--dry-run] [--permissions] [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
   exit 1
 }
 
@@ -93,7 +92,7 @@ do
     -d=*|--dst=*)
       destination "${KEY#*=}"
     ;;
-    --acls)
+    --permissions)
       ACLS=1
     ;;
     --dry-run)
@@ -106,7 +105,7 @@ do
       LOCALCOPY="--copy-dest"
     ;;
     --link-dest=*)
-      LINKTO["--link-dest=${KEY#*=}"]=1
+      cd tes  ["--link-dest=${KEY#*=}"]=1
     ;;
     --copy-dest=*)
       LINKTO["--copy-dest=${KEY#*=}"]=1

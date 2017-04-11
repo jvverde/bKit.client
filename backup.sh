@@ -244,6 +244,9 @@ clean(){
 snapshot(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@snap"
 }
+prepare(){
+	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@current/data"
+}
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
 	do
@@ -286,6 +289,8 @@ bg_upload_manifest(){
 #		rm -fv "$LOCK"
 #		die Volume $VOLUMESERIALNUMBER was locked for 1 day
 #	}
+
+	prepare
 
 	bg_upload_manifest "$MAPDRIVE"
 

@@ -212,6 +212,9 @@ do
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
+  [[ $OS == cygwin ]] && {
+    OPTIONS+=( "--no-group" "--no-owner" )
+  }
   LINKS=( "${!LINKTO[@]}" )                   #get different link-dest/copy-dest
   FIRST20=( "${LINKS[@]:0:20}" )              #a rsync limitation
   dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"

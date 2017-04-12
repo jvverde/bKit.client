@@ -105,7 +105,7 @@ do
       LOCALCOPY="--copy-dest"
     ;;
     --link-dest=*)
-      cd tes  ["--link-dest=${KEY#*=}"]=1
+      LINKTO["--link-dest=${KEY#*=}"]=1
     ;;
     --copy-dest=*)
       LINKTO["--copy-dest=${KEY#*=}"]=1

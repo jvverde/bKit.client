@@ -11,13 +11,13 @@
         <el-button type="primary"
           class="action"
           @click.stop="backup"
-          :disabled="!selected">
+          :disabled="!allowbackup">
           Backup now
         </el-button>
       </span>
       <span class="or">or</span>
-      <router-link to="/job">        
-        <el-button type="primary" 
+      <router-link to="/job">
+        <el-button type="primary"
           class="action"
           :disabled="!selected">
           Create a Schedule Task
@@ -58,20 +58,23 @@
     },
     computed: {
       selected () {
-        return (this.$store.getters.backupIncludes || []).length > 0
+        return this.includes.length > 0
       },
       includes () {
-        return this.$store.getters.backupIncludes
+        return this.$store.getters.backupIncludes || []
+      },
+      roots () {
+        return this.includes.filter(e => e.root === true).map(e => e.path)
       },
       excludes () {
-        return this.$store.getters.backupExcludes
+        return this.$store.getters.backupExcludes || []
       },
       filters () {
-        const includes = (this.$store.getters.backupIncludes || [])
+        const includes = this.includes
           .map(include => {
             return Object.assign(include, {isIncluded: true})
           })
-        const excludes = (this.$store.getters.backupExcludes || [])
+        const excludes = this.excludes
           .map(include => {
             return Object.assign(include, {isIncluded: false})
           })
@@ -79,6 +82,9 @@
       },
       show () {
         return this.stdout !== '' || this.stderr !== ''
+      },
+      allowbackup () {
+        return this.roots.length === 1
       }
     },
     components: {
@@ -218,7 +224,7 @@
         flex-grow: 1;
       }
       .head, .or {
-        padding-top: .5em;        
+        padding-top: .5em;
       }
       .action{
         cursor: pointer;

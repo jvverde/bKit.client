@@ -249,8 +249,8 @@ then
 		(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
 		(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
 		(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
-		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
-		echo "These are your bKit schedule tasks now" 
+		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
+		echo "These are your bKit schedule tasks now"
 		schtasks /QUERY|fgrep BKIT
 	}
 else
@@ -261,7 +261,7 @@ else
 			crontab -l 2>/dev/null
 			echo $JOB
 		}| sort -u | crontab
-		echo "These are your bKit jobs now" 
+		echo "These are your bKit jobs now"
 		crontab -l|fgrep BKIT #show all BKIT jobs
 	}
 fi

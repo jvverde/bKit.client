@@ -143,6 +143,7 @@ RDIR="$SDIR"
 
 declare -A ROOTS
 declare -A ROOTOF
+declare -A RPATHS
 
 for DIR in "$@"
 do
@@ -151,8 +152,8 @@ do
     ROOT=$(stat -c%m "$FULL")
     ROOTS["$ROOT"]=1
     REL=${FULL#$ROOT}	#path relative to root
-    [[ -z $REL ]] && REL='/'
-    ROOTOF["$REL"]="$ROOT"
+    ROOTOF["$FULL"]="$ROOT"
+    RPATHS["$FULL"]="$REL"
 done
 
 for ROOT in ${!ROOTS[@]}
@@ -161,7 +162,7 @@ do
 	BACKUPDIR=()
   for DIR in "${!ROOTOF[@]}"
   do
-      [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "\"$DIR\"" )
+      [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "\"${RPATHS["$DIR"]}\"" )
   done
   [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
   #echo ROOT:$ROOT

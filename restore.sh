@@ -67,8 +67,7 @@ destination() {
 }
 
 usage() {
-  local NAME=${1:$(basename -s .sh "$0")}
-  echo Restore from backup one or more directories of files
+  local NAME=${1:-"$(basename -s .sh "$0")"}
   echo -e "Usage:\n\t $NAME [--dry-run] [--permissions] [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
   exit 1
 }
@@ -80,11 +79,11 @@ while [[ $1 =~ ^- ]]
 do
   KEY="$1" && shift
   case "$KEY" in
+    -s=*|--snap=*|--snapshot=*)
+        SNAP="${KEY#*=}"
+    ;;
     -s|--snap|--snapshot)
         SNAP=$1 && shift
-    ;;
-    -s=*|--snap*=|--snapshot=*)
-        SNAP="${KEY#*=}"
     ;;
     -d|--dst)
       destination "$1" && shift
@@ -99,7 +98,7 @@ do
       RSYNCOPTIONS+=('--dry-run')
     ;;
     --delete)
-        OPTIONS+=( '--delete-delay' )
+      OPTIONS+=( '--delete-delay' )
     ;;
     --local-copy)
       LOCALCOPY="--copy-dest"
@@ -110,17 +109,17 @@ do
     --copy-dest=*)
       LINKTO["--copy-dest=${KEY#*=}"]=1
     ;;
-    -- )
-      while [[ $1 =~ ^- ]]
-      do
-        RSYNCOPTIONS+=("$1") && shift
-      done
-    ;;
     -h|--help)
         usage
     ;;
     -h=*|--help=*)
         usage "${KEY#*=}"
+    ;;
+    -- )
+      while [[ $1 =~ ^- ]]
+      do
+        RSYNCOPTIONS+=("$1") && shift
+      done
     ;;
     *)
       warn Unknown option $KEY && usage

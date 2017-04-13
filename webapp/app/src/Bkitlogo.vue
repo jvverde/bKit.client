@@ -62,6 +62,8 @@
               customClass: 'message warning',
               duration: 0
             })
+          } else {
+            this.admin = true
           }
         })
       }

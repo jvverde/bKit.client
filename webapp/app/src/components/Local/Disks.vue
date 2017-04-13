@@ -3,7 +3,8 @@
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
       <breadcrumb></breadcrumb>
-      <h2>Backup</h2>
+      <h2 v-if="server">Backup to {{server}}</h2>
+      <h2 v-else class="alert">Server not set yet</h2>
     </header>
     <section class="actions">
       <span class="head">Select directories or files to backup</span>
@@ -57,6 +58,9 @@
       }
     },
     computed: {
+      server () {
+        return this.$store.state.server.address
+      },
       selected () {
         return this.includes.length > 0
       },

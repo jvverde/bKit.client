@@ -1,6 +1,19 @@
 <template>
   <div class="main">
-    <bkitlogo></bkitlogo>
+    <header class="top">
+      <bkitlogo class="logo"></bkitlogo>
+      <ul class="breadcrumb">
+        <li>
+          <span>
+            <router-link to="/" class="icon is-small">
+              <i class="fa fa-home">Home</i>
+            </router-link>
+          </span>
+        </li>
+      </ul>
+      <h2 v-if="server">Restore from {{server}}</h2>
+      <h2 v-else class="alert">Server not set yet</h2>
+    </header>
     <div class="computers" :class="{onlyone:onlyone}">
       <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
       <div class="computer" v-for="(computer,index) in computers"
@@ -22,6 +35,11 @@
       return {
         onlyone: false,
         computers: []
+      }
+    },
+    computed: {
+      server () {
+        return this.$store.state.server.address
       }
     },
     components: {
@@ -66,6 +84,15 @@
 
 <style scoped lang="scss">
   @import "../config.scss";
+  @import "../breadcrumb.scss";
+  header.top{
+    flex-shrink:0;
+    width: 100%;
+    align-self:flex-start;
+    .logo{
+      float:left;
+    }
+  }
   .computers{
     display: flex;
     flex-wrap: wrap;

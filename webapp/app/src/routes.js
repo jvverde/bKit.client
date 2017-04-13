@@ -17,7 +17,7 @@ export default [
   {
     path: '/init',
     name: 'Init-page',
-    component: require('components/Console/Init')
+    component: require('components/Init')
   },
   {
     path: '/computers',

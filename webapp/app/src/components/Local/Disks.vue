@@ -84,7 +84,7 @@
         return this.stdout !== '' || this.stderr !== ''
       },
       allowbackup () {
-        return this.roots.length === 1
+        return this.roots.length < 2 && this.selected
       }
     },
     components: {

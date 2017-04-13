@@ -5,7 +5,9 @@
       <ul class="breadcrumb">
         <li>
           <span>
-           <router-link to="/" class="icon is-small"><i class="fa fa-home">Home</i></router-link>
+            <router-link to="/" class="icon is-small">
+              <i class="fa fa-home">Home</i>
+            </router-link>
           </span>
         </li>
       </ul>
@@ -60,7 +62,7 @@ export default {
       this.$router.back()
     },
     go () {
-      this.$router.push({ path: '/computers' })
+      this.$router.push({ path: '/init' })
     }
   }
 }
@@ -84,17 +86,6 @@ export default {
       align-self: center;
       h1, h2 {
         font-weight: normal;
-      }
-      a {
-        text-decoration: none;
-      }
-      a:hover {
-        color: rgb(40, 56, 76);
-      }
-      .set{
-        position: absolute;
-        bottom: 1em;
-        right: 1em;
       }
       .buttons{
         align-self:flex-end;

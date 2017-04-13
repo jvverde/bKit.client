@@ -20,8 +20,8 @@ export default {
       links: [
         {name: 'Backup', ref: '/local/disks'},
         {name: 'Recovery', ref: '/computers'},
-        {name: 'Server', ref: '/server'},
-        {name: 'Init', ref: '/init'} // ,
+        {name: 'Server', ref: '/server'} // ,
+        // {name: 'Init', ref: '/init'} // ,
         // {name: 'Update', ref: '/update'}
       ]
     }

@@ -45,7 +45,7 @@
     name: 'bkitlogo',
     data () {
       return {
-        admin: process.getuid && process.getuid() === 0,
+        admin: 5,
         alert: process.platform === 'win32'
           ? "You don't have full access. Run as Administrator"
           : "You don't have full access. Run with sudo"

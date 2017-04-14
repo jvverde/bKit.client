@@ -47,8 +47,8 @@
       return {
         admin: process.getuid && process.getuid() === 0,
         alert: process.platform === 'win32'
-          ? "You don't have full rights. Run as Administrator"
-          : "You don't have full rights. Run with sudo"
+          ? "You don't have full access. Run as Administrator"
+          : "You don't have full access. Run with sudo"
       }
     },
     methods: {

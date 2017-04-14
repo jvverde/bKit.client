@@ -41,6 +41,7 @@
 
 <script>
   const {exec} = require('child_process')
+  let init = true
   export default {
     name: 'bkitlogo',
     data () {
@@ -51,16 +52,17 @@
           : "You don't have full access. Run with sudo"
       }
     },
-    mounted () {
+    created () {
       process.platform === 'win32' && exec('NET SESSION', (err) => {
         if (err) {
           this.admin = false
-          this.$notify.warning({
+          init && this.$notify.warning({
             title: 'Missing privilegies',
             message: 'You should run as Administrator in order to have full access',
             customClass: 'message warning',
             duration: 5000
           })
+          init = false
         } else {
           this.admin = true
         }

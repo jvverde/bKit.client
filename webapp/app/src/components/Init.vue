@@ -16,7 +16,7 @@
     <h2>Set {{address}} as the Backup Server</h2>
     <el-button-group class="buttons">
       <el-button type="primary" @click="goback" icon="arrow-left">Return</el-button>
-      <el-button type="primary" @click="init">Set 
+      <el-button type="primary" @click="init">Set
         <i class="fa fa-cloud-download" aria-hidden="true"></i>
       </el-button>
     </el-button-group>
@@ -44,7 +44,6 @@ export default {
     }
   },
   mounted () {
-    console.log('init console')
   },
   computed: {
     output () {

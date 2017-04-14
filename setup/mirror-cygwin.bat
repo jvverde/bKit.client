@@ -9,7 +9,7 @@ cd %~dp0
 
 for %%i in ("%~dp0..") do set "PARENT=%%~fi"
 
-set MODULES=awk,rsync,ping,nc,util-linux,sqlite3
+set MODULES=awk,rsync,ping,nc,util-linux,perl,ssmtp
 
 reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | findstr /i "x86" > NUL && set OSARCH=32BIT || set OSARCH=64BIT
 

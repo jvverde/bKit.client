@@ -32,7 +32,7 @@
       <img class="logo" src="./assets/00-Logotipo/64x64.png">
     </router-link>
     <h1>bK<span class="i">i</span>t</h1>
-    <i v-if="admin === false" 
+    <i v-if="admin !== true"
       :title="alert"
       class="fa fa-exclamation-triangle alert" aria-hidden="true">
     </i>
@@ -45,28 +45,28 @@
     name: 'bkitlogo',
     data () {
       return {
-        admin: process.getuid && process.getuid() === 0,
+        admin: process.getuid && process.getuid() === 0 || false,
         alert: process.platform === 'win32'
           ? "You don't have full access. Run as Administrator"
           : "You don't have full access. Run with sudo"
       }
     },
-    methods: {
-      created () {
-        process.platform === 'win32' && exec('NET SESSION', (err) => {
-          if (err) {
-            this.admin = false
-            this.$notify.warning({
-              title: 'Missing privilegies',
-              message: 'You should run as Administrator in order to have full access',
-              customClass: 'message warning',
-              duration: 0
-            })
-          } else {
-            this.admin = true
-          }
-        })
-      }
+    mounted () {
+      console.log('admin=', this.admin)
+
+      process.platform === 'win32' && exec('NET SESSION', (err) => {
+        if (err) {
+          this.admin = false
+          this.$notify.warning({
+            title: 'Missing privilegies',
+            message: 'You should run as Administrator in order to have full access',
+            customClass: 'message warning',
+            duration: 5000
+          })
+        } else {
+          this.admin = true
+        }
+      })
     }
   }
 </script>

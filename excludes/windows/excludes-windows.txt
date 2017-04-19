@@ -73,3 +73,5 @@ Config.Msi/
 #SendTo/
 
 #C:\Documents and Settings
+
+Trend Micro/OfficeScan/PCCSRV

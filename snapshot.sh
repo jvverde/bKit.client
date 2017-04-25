@@ -18,11 +18,11 @@ getdev(){
     MOUNT=${MOUNT%%/} #remove trailing slash if any
 }
 redirectlogs() {
-    LOGDIR=$1
+    local LOGDIR=$1
     [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
-    DATE=$(date +%Y-%m-%dT%H-%M-%S)
-    LOGFILE="$LOGDIR/log-$DATE"
-    ERRFILE="$LOGDIR/err-$DATE"
+    STARTDATE=$(date +%Y-%m-%dT%H-%M-%S)
+    LOGFILE="$LOGDIR/log-$STARTDATE"
+    ERRFILE="$LOGDIR/err-$STARTDATE"
     :> $LOGFILE
     :> $ERRFILE
     exec 1>"$LOGFILE"
@@ -146,3 +146,18 @@ do
         backup "${BACKUPDIR[@]}"
     }
 done
+
+[[ -n $LOGFILE || -n $ERRFILE ]] && {
+    exists email && {
+        ME=$(uname -n)
+        TIME=$(date +%H-%M-%S)
+        SUBJECT="Backup on $ME at $TIME ends successful"
+        [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME at $TIME ends with errors"
+        {
+            cat "$ERRFILE"
+            echo '-------------------'
+            cat "$LOGFILE"
+        } | email -smtp-server 10.11.0.135 -subject "$SUBJECT" -from-name "$ME" -from-addr "backup@bkit.pt" -cc jvilaverde@yahoo.com jvverde@gmail.com
+    }
+}
+

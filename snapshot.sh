@@ -150,9 +150,9 @@ done
 [[ -n $LOGFILE || -n $ERRFILE ]] && {
     exists email && {
         ME=$(uname -n)
-        TIME=$(date +%H-%M-%S)
-        SUBJECT="Backup on $ME at $TIME ends successful"
-        [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME at $TIME ends with errors"
+        TIME=$(date +%Hh%Mm)
+        SUBJECT="Backup on $ME ends at $TIME successful"
+        [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME ends at $TIME with errors"
         {
             cat "$ERRFILE"
             echo '-------------------'

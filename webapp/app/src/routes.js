@@ -10,6 +10,11 @@ export default [
     component: require('components/Server')
   },
   {
+    path: '/smtp',
+    name: 'Smtp-page',
+    component: require('components/Smtp')
+  },
+  {
     path: '/update',
     name: 'Update-page',
     component: require('components/Update')

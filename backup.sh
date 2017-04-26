@@ -332,10 +332,10 @@ bg_upload_manifest(){
 	snapshot
 
 	NOW=$(date -R)
-	echo "Backup done at $NOW for:"
+	echo "Backup done on $NOW for:"
 	for I in ${!ORIGINALDIR[@]}
 	do
-		echo "'${ORIGINALDIR[$I]}' on:"
+		echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
 		echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 	done
 #) 9>"$LOCK"

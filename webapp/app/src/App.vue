@@ -106,6 +106,9 @@
   .alert {
     color: #DE3163;
   }
+  .ok{
+    color: palegreen;
+  }
 
 </style>
 

@@ -14,26 +14,51 @@
     </header>
     <section>
       <h1>Notifications</h1>
+      <div class="form">
       <table>
         <tr>
-          <td>Server Address:</td>
-          <td><input v-model="server" placeholder="SMTP Server IP or Name address"></td>
+          <td>SMTP Server Address:</td>
+          <td><input v-model.lazy="server" placeholder="SMTP Server IP or Name address"></td>
+          <td>
+            <i v-if="connectError === undefined" class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i>
+            <i v-if="connectError === true" class="fa fa-exclamation-triangle alert" aria-hidden="true"></i>
+            <i v-if="connectError === false" class="fa fa-check ok" aria-hidden="true"></i>
+          </td>
         </tr>
         <tr v-for="(address, index) in addresses">
-          <td>To:</td>
-          <td><input type="email" v-model="addresses[index]" placeholder="Destinations address"></td>
+          <td :rowspan="addresses.length" v-if="index === 0">Send Notifications To:</td>
+          <td>
+            <input type="email" v-model="addresses[index]"
+              v-validate="'required|email'" data-vv-delay="1000" :data-vv-name="'email'+index"
+              placeholder="Destinations address">
+            <i class="fa fa-exclamation-triangle alert error" v-show="errors.has('email'+index)"
+              :title="errors.first('email'+index)"></i>
+          </td>
+          <td v-if="index > 0">
+            <el-button type="danger" :plain="true" size="mini" icon="minus" @click.stop="addresses.splice(index,1)"></el-button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <el-button type="success" :plain="true" size="mini" icon="plus" @click.stop="addresses.push('')"></el-button>
+          </td>
         </tr>
       </table>
+      </div>
       <el-button-group class="buttons">
         <el-button type="primary" @click.stop="goback" icon="arrow-left">Return</el-button>
-        <el-button type="primary" @click.stop="apply"
-          :disabled="!isValid">Apply<i class="el-icon-arrow-right el-icon-right"></i></el-button>
+        <el-button type="primary" @click.stop="apply" :disabled="fields.failed() || connectError !== false">
+          Save
+          <i class="fa fa-floppy-o"></i>
+        </el-button>
       </el-button-group>
     </section>
   </div>
 </template>
 
 <script>
+const {spawn} = require('child_process')
+const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 const fs = require('fs')
 const path = require('path')
 const readline = require('readline')
@@ -44,7 +69,8 @@ export default {
   data () {
     return {
       init: {},
-      addresses: ['']
+      addresses: [''],
+      connectError: false
     }
   },
   computed: {
@@ -54,6 +80,7 @@ export default {
       },
       set (v) {
         this.init.SERVER = v
+        this.check()
       }
     }
   },
@@ -64,9 +91,10 @@ export default {
       }).on('line', (line) => {
         console.log('Line from file:', line)
         const [k, v] = line.split(/=/)
-        console.log(k)
-        console.log(v)
         this.$nextTick(() => {
+          if (k === 'TO') {
+            this.addresses = v.split(',')
+          }
           this.init = Object.assign({}, this.init, {[k]: v})
         })
       })
@@ -77,6 +105,28 @@ export default {
       this.$router.back()
     },
     apply () {
+
+    },
+    check () {
+      console.log('ckeck', this.server)
+      this.connectError = undefined
+      const fd = spawn(BASH, ['./check-smtp.sh', this.server], {cwd: '..'})
+      let error = ''
+      fd.stderr.on('data', (data) => {
+        error = `${data}`
+      })
+      fd.on('close', (code) => {
+        code = 0 | code
+        if (code === 1) {
+          this.$notify.error({
+            title: 'SMTP Server connect error',
+            message: error
+          })
+          this.connectError = true
+        } else {
+          this.connectError = false
+        }
+      })
     }
   }
 }
@@ -88,6 +138,7 @@ export default {
   .smtp{
     display:flex;
     flex-direction: column;
+    flex-grow: 1;
     header.top{
       flex-shrink:0;
       .logo{
@@ -96,13 +147,29 @@ export default {
     }
     section{
       display:flex;
+      flex-grow: 1;
       flex-direction: column;
       align-self: center;
       h1, h2 {
         font-weight: normal;
       }
+      .form{
+        flex-grow: 1;
+        overflow-y: auto;
+      }
       .buttons{
-        align-self:flex-end;
+        align-self:center;
+      }
+      td{
+        position: relative;
+        .error {
+          position:absolute;
+          right: 3px;
+          bottom: 3px;
+        }
+      }
+      td:first-child{
+        text-align: right;
       }
     }
   }

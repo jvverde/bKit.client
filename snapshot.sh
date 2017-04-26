@@ -151,13 +151,16 @@ done
     exists email && {
         ME=$(uname -n)
         TIME=$(date +%Hh%Mm)
-        SUBJECT="Backup on $ME ends at $TIME successful"
-        [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME ends at $TIME with errors"
+        SUBJECT="Backup on $ME ended at $TIME successful"
+        [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME ended at $TIME with errors"
+        SMTP="$SDIR/conf/smtp.init"
+        [[ -f $SMTP ]] || die Cannot found configuration file at $SMTP
+        source "$SMTP"
         {
-            cat "$ERRFILE"
-            echo '-------------------'
             cat "$LOGFILE"
-        } | email -smtp-server 10.11.0.135 -subject "$SUBJECT" -from-name "$ME" -from-addr "backup@bkit.pt" -cc jvilaverde@yahoo.com jvverde@gmail.com
+            echo '-------------------'
+            cat "$ERRFILE"
+        } | email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup@bkit.pt" "$TO"
     }
 }
 

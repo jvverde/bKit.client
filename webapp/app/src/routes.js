@@ -11,8 +11,8 @@ export default [
   },
   {
     path: '/smtp',
-    name: 'Smtp-page',
-    component: require('components/Smtp')
+    name: 'Smtp-conf-page',
+    component: require('components/SMTP/Conf')
   },
   {
     path: '/update',

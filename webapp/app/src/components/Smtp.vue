@@ -18,11 +18,13 @@
       <table>
         <tr>
           <td>SMTP Server Address:</td>
-          <td><input v-model.lazy="server" placeholder="SMTP Server IP or Name address"></td>
           <td>
-            <i v-if="connectError === undefined" class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i>
-            <i v-if="connectError === true" class="fa fa-exclamation-triangle alert" aria-hidden="true"></i>
-            <i v-if="connectError === false" class="fa fa-check ok" aria-hidden="true"></i>
+            <input v-model="server" placeholder="SMTP Server IP or Name address">
+          </td>
+          <td>
+            <i v-if="isServerOk === null" class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i>
+            <i v-if="isServerOk === false" class="fa fa-exclamation-triangle alert" aria-hidden="true"></i>
+            <i v-if="isServerOk === true" class="fa fa-check ok" aria-hidden="true"></i>
           </td>
         </tr>
         <tr v-for="(address, index) in addresses">
@@ -47,7 +49,7 @@
       </div>
       <el-button-group class="buttons">
         <el-button type="primary" @click.stop="goback" icon="arrow-left">Return</el-button>
-        <el-button type="primary" @click.stop="apply" :disabled="fields.failed() || connectError !== false">
+        <el-button type="primary" @click.stop="apply" :disabled="isDisable">
           Save
           <i class="fa fa-floppy-o"></i>
         </el-button>
@@ -63,6 +65,7 @@ const fs = require('fs')
 const path = require('path')
 const readline = require('readline')
 const smtpfile = path.resolve(process.cwd(), '..', 'conf', 'smtp.init')
+const validServerAddr = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/
 
 export default {
   name: 'server',
@@ -70,18 +73,53 @@ export default {
     return {
       init: {},
       addresses: [''],
-      connectError: false
+      child: null
     }
   },
   computed: {
     server: {
       get () {
-        return this.init.SERVER
+        return this.init.SERVER || ''
       },
       set (v) {
         this.init.SERVER = v
         this.check()
       }
+    },
+    isDisable () {
+      return this.fields.failed() || this.connectError !== false
+    },
+    isValidName () {
+      return this.server.match(validServerAddr) !== null
+    }
+  },
+  asyncComputed: {
+    isServerOk () {
+      return new Promise(resolve => {
+        console.log('ckeck', this.server, this.isValidName)
+        if (!this.isValidName) return resolve(undefined)
+        console.log('go-check')
+        // if (this.child) this.child.kill('SIGKILL')
+        const fd = this.child = spawn(BASH, ['./check-smtp.sh', this.server], {cwd: '..'})
+        let error = ''
+        fd.stderr.on('data', (data) => {
+          error = `${data}`
+        })
+        fd.on('close', (code, signal) => {
+          console.log('signal=', signal)
+          code = 0 | code
+          if (code === 1) {
+            this.$notify.error({
+              title: 'SMTP Server connect error',
+              message: error
+            })
+            resolve(false)
+          } else {
+            resolve(true)
+          }
+          this.child = null
+        })
+      })
     }
   },
   created () {
@@ -89,7 +127,6 @@ export default {
       readline.createInterface({
         input: require('fs').createReadStream(smtpfile)
       }).on('line', (line) => {
-        console.log('Line from file:', line)
         const [k, v] = line.split(/=/)
         this.$nextTick(() => {
           if (k === 'TO') {

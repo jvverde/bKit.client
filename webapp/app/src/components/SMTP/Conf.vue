@@ -19,10 +19,12 @@
         <tr>
           <td>SMTP Server Address:</td>
           <td>
-            <input v-model="server" placeholder="SMTP Server IP or Name address">
+            <input v-model="server" 
+              :class="{invalid: !isValidName}"
+              placeholder="SMTP Server IP or Name address"
+            >
           </td>
           <td>
-            <i v-if="isServerOk === null" class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i>
             <i v-if="isServerOk === false" class="fa fa-exclamation-triangle alert" aria-hidden="true"></i>
             <i v-if="isServerOk === true" class="fa fa-check ok" aria-hidden="true"></i>
           </td>
@@ -46,7 +48,7 @@
       </div>
       <el-button-group class="buttons">
         <el-button type="primary" @click.stop="goback" icon="arrow-left">Return</el-button>
-        <el-button type="primary" @click.stop="apply" :disabled="isDisable">
+        <el-button type="primary" @click.stop="save" :disabled="isDisable">
           Save
           <i class="fa fa-floppy-o"></i>
         </el-button>
@@ -61,7 +63,7 @@ const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 const fs = require('fs')
 const path = require('path')
 const readline = require('readline')
-const smtpfile = path.resolve(process.cwd(), '..', 'conf', 'smtp.init')
+const smtpfile = path.resolve(process.cwd(), '..', 'conf', 'smtp.conf')
 const IPAddrRE = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/
 
 const HostnameRE = /^(([a-z]|[a-z][a-z0-9\-]*[a-z0-9])\.)*([a-z]|[a-z][a-z0-9\-]*[a-z0-9])$/i
@@ -72,26 +74,19 @@ export default {
   name: 'SmtpConf',
   data () {
     return {
-      init: {
-        SERVER: ''
-      },
+      isServerOk: undefined,
+      validatedServer: null,
+      conf: {},
+      server: '',
       addresses: ['']
     }
   },
   computed: {
-    server: {
-      get () {
-        return this.init.SERVER
-      },
-      set (v) {
-        this.init.SERVER = v
-      }
-    },
     isOk () {
-      return this.isValidName && this.areValidAddress
+      return this.isValidated && this.areValidAddress
     },
     isDisable () {
-      return this.isOk === false
+      return this.isOk === false || this.unchanged
     },
     isValidName () {
       return this.server.match(validServerAddr) !== null
@@ -100,25 +95,37 @@ export default {
       return this.addresses.every(e => {
         return e.match(validEmail) !== null
       })
+    },
+    isValidated () {
+      return this.server === this.validatedServer
+    },
+    addressList () {
+      return this.addresses.join(',')
+    },
+    unchanged () {
+      return this.server === this.conf.SERVER &&
+        this.addressList === this.conf.TO
     }
   },
-  asyncComputed: {
-    isServerOk () {
-      return new Promise(resolve => this.checkSMTP(resolve))
+  watch: {
+    server () {
+      this.checkSMTP()
     }
   },
   created () {
     if (fs.existsSync(smtpfile)) {
-      readline.createInterface({
+      const input = readline.createInterface({
         input: require('fs').createReadStream(smtpfile)
-      }).on('line', (line) => {
+      })
+      input.on('line', (line) => {
         const [k, v] = line.split(/=/)
-        this.$nextTick(() => {
-          if (k === 'TO') {
-            this.addresses = v.split(',')
-          }
-          this.init = Object.assign({}, this.init, {[k]: v})
-        })
+        if (k === 'TO') {
+          this.addresses = v.split(',') || ['']
+        }
+        this.conf = Object.assign({}, this.conf, {[k]: v})
+      })
+      input.on('close', () => {
+        this.server = this.conf['SERVER'] || ''
       })
     }
   },
@@ -126,39 +133,53 @@ export default {
     goback () {
       this.$router.back()
     },
-    apply () {
-
+    save () {
+      const file = fs.createWriteStream(smtpfile)
+      file.on('error', (err) => {
+        console.error(err)
+      })
+      this.conf['SERVER'] = this.server
+      this.conf['TO'] = this.addressList
+      Object.keys(this.conf).forEach(k => {
+        const v = this.conf[k]
+        const line = `${k}=${v}\n`
+        console.log(line)
+        file.write(line)
+      })
+      file.end()
     },
-    checkSMTP (resolve) {
-      if (!this.isValidName) return resolve(undefined)
-      if (this.isChecking) {
-        console.log('wait')
-        this.nextResolver = resolve
+    checkSMTP () {
+      if (!this.isValidName || this.isChecking) {
+        this.isServerOk = undefined
         return
       }
       this.isChecking = true
-      console.log('go-check', this.server)
-      this.lastAddr = this.server
-      const fd = spawn(BASH, ['./check-smtp.sh', this.server], {cwd: '..'})
-      let error = ''
-      fd.stderr.on('data', (data) => {
-        error = `${data}`
-      })
-      fd.on('close', (code) => {
-        this.isChecking = false
-        if (this.lastAddr !== this.server && this.nextResolver instanceof Function) {
-          console.log('Go check again')
-          this.checkSMTP(this.nextResolver)
-        }
-        if (code === 1) {
-          console.log('nok', error)
-          resolve(false)
-        } else {
-          console.log('ok')
-          resolve(true)
-        }
-        console.log('ckecked')
-      })
+      setTimeout(() => {
+        console.log('go-check', this.server)
+        this.lastAddr = this.server
+        const fd = spawn(BASH, ['./check-smtp.sh', this.lastAddr], {cwd: '..'})
+        let error = ''
+        fd.stderr.on('data', (data) => {
+          error = `${data}`
+        })
+        fd.on('close', (code) => {
+          this.isChecking = false
+          if (this.lastAddr !== this.server) {
+            console.log('Go check again')
+            this.checkSMTP()
+          } else {
+            if (code === 1) {
+              console.log('nok', error)
+              this.isServerOk = false
+            } else {
+              console.log('ok')
+              this.isServerOk = true
+              this.validatedServer = this.lastAddr
+            }
+            console.log('ckecked')
+          }
+        })
+      }, 1000)
     }
   }
 }
@@ -194,15 +215,15 @@ export default {
         flex-grow: .1;
       }
       td{
-        position: relative;
-        .error {
-          position:absolute;
-          right: 3px;
-          bottom: 3px;
+        .invalid {
+          border: 1px solid LightCoral;
         }
       }
       td:first-child{
         text-align: right;
+      }
+      td:last-child{
+        min-width: 1em;
       }
     }
   }

@@ -31,10 +31,7 @@
           <td :rowspan="addresses.length" v-if="index === 0">Send Notifications To:</td>
           <td>
             <input type="email" v-model="addresses[index]"
-              v-validate="'required|email'" data-vv-delay="1000" :data-vv-name="'email'+index"
               placeholder="Destinations address">
-            <i class="fa fa-exclamation-triangle alert error" v-show="errors.has('email'+index)"
-              :title="errors.first('email'+index)"></i>
           </td>
           <td v-if="index > 0">
             <el-button type="danger" :plain="true" size="mini" icon="minus" @click.stop="addresses.splice(index,1)"></el-button>
@@ -65,61 +62,49 @@ const fs = require('fs')
 const path = require('path')
 const readline = require('readline')
 const smtpfile = path.resolve(process.cwd(), '..', 'conf', 'smtp.init')
-const validServerAddr = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/
+const IPAddrRE = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/
+
+const HostnameRE = /^(([a-z]|[a-z][a-z0-9\-]*[a-z0-9])\.)*([a-z]|[a-z][a-z0-9\-]*[a-z0-9])$/i
+const validServerAddr = new RegExp(IPAddrRE.source + '|' + HostnameRE.source)
+const validEmail = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i
 
 export default {
-  name: 'server',
+  name: 'SmtpConf',
   data () {
     return {
-      init: {},
-      addresses: [''],
-      child: null
+      init: {
+        SERVER: ''
+      },
+      addresses: ['']
     }
   },
   computed: {
     server: {
       get () {
-        return this.init.SERVER || ''
+        return this.init.SERVER
       },
       set (v) {
         this.init.SERVER = v
-        this.check()
       }
     },
+    isOk () {
+      return this.isValidName && this.areValidAddress
+    },
     isDisable () {
-      return this.fields.failed() || this.connectError !== false
+      return this.isOk === false
     },
     isValidName () {
       return this.server.match(validServerAddr) !== null
+    },
+    areValidAddress () {
+      return this.addresses.every(e => {
+        return e.match(validEmail) !== null
+      })
     }
   },
   asyncComputed: {
     isServerOk () {
-      return new Promise(resolve => {
-        console.log('ckeck', this.server, this.isValidName)
-        if (!this.isValidName) return resolve(undefined)
-        console.log('go-check')
-        // if (this.child) this.child.kill('SIGKILL')
-        const fd = this.child = spawn(BASH, ['./check-smtp.sh', this.server], {cwd: '..'})
-        let error = ''
-        fd.stderr.on('data', (data) => {
-          error = `${data}`
-        })
-        fd.on('close', (code, signal) => {
-          console.log('signal=', signal)
-          code = 0 | code
-          if (code === 1) {
-            this.$notify.error({
-              title: 'SMTP Server connect error',
-              message: error
-            })
-            resolve(false)
-          } else {
-            resolve(true)
-          }
-          this.child = null
-        })
-      })
+      return new Promise(resolve => this.checkSMTP(resolve))
     }
   },
   created () {
@@ -144,25 +129,35 @@ export default {
     apply () {
 
     },
-    check () {
-      console.log('ckeck', this.server)
-      this.connectError = undefined
+    checkSMTP (resolve) {
+      if (!this.isValidName) return resolve(undefined)
+      if (this.isChecking) {
+        console.log('wait')
+        this.nextResolver = resolve
+        return
+      }
+      this.isChecking = true
+      console.log('go-check', this.server)
+      this.lastAddr = this.server
       const fd = spawn(BASH, ['./check-smtp.sh', this.server], {cwd: '..'})
       let error = ''
       fd.stderr.on('data', (data) => {
         error = `${data}`
       })
       fd.on('close', (code) => {
-        code = 0 | code
-        if (code === 1) {
-          this.$notify.error({
-            title: 'SMTP Server connect error',
-            message: error
-          })
-          this.connectError = true
-        } else {
-          this.connectError = false
+        this.isChecking = false
+        if (this.lastAddr !== this.server && this.nextResolver instanceof Function) {
+          console.log('Go check again')
+          this.checkSMTP(this.nextResolver)
         }
+        if (code === 1) {
+          console.log('nok', error)
+          resolve(false)
+        } else {
+          console.log('ok')
+          resolve(true)
+        }
+        console.log('ckecked')
       })
     }
   }
@@ -171,7 +166,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  @import "../breadcrumb.scss";
+  @import "../../breadcrumb.scss";
   .smtp{
     display:flex;
     flex-direction: column;
@@ -196,6 +191,7 @@ export default {
       }
       .buttons{
         align-self:center;
+        flex-grow: .1;
       }
       td{
         position: relative;

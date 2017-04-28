@@ -153,7 +153,7 @@ done
         TIME=$(date +%Hh%Mm)
         SUBJECT="Backup on $ME ended at $TIME successful"
         [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME ended at $TIME with errors"
-        SMTP="$SDIR/conf/smtp.init"
+        SMTP="$SDIR/conf/smtp.conf"
         [[ -f $SMTP ]] || die Cannot found configuration file at $SMTP
         source "$SMTP"
         {

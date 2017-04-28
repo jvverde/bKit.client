@@ -9,8 +9,8 @@ import Bkitlogo from './Bkitlogo'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import locale from 'element-ui/lib/locale/lang/en'
-import VeeValidate from 'vee-validate'
-import AsyncComputed from 'vue-async-computed'
+// import VeeValidate from 'vee-validate'
+// import AsyncComputed from 'vue-async-computed'
 
 Vue.use(Electron)
 Vue.use(Resource)
@@ -18,8 +18,8 @@ Vue.use(Router)
 Vue.use(ElementUI, { locale })
 Vue.config.debug = true
 Vue.component('bkitlogo', Bkitlogo)
-Vue.use(VeeValidate)
-Vue.use(AsyncComputed)
+// Vue.use(VeeValidate)
+// Vue.use(AsyncComputed)
 
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),

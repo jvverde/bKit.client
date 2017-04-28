@@ -1,0 +1,1629 @@
+
+
+Backup a ntfs shadow copy
+ShadowSpawn (c) 2011 Craig Andera. shadowspawn@wangdera.com
+
+Start to backup directories/files on F:\ at Fri, 14 Apr 2017 23:14:43 +0100
+
+Phase 1 - Backup new/modified files
+
+
+Phase 2 - Update Symbolic links, Hard links, Directories and file attributes
+
+miss .d..t......|./||0
+Is something else:.d..t......|.||0
+miss .d..t......|Arquivandus/BackupZen/||0
+miss <f..t......|Arquivandus/BackupZen/sportstudio_zen.db||415215616
+miss <f..t......|Arquivandus/BackupZen/sportstudio_zen_extstorage.db||143872000
+miss <f.st......|Arquivandus/Sportstudio/MESSAGING201704.LOG||2748217
+"send|<f.st......|cygdrive/e/bKit/run/manifest-segment.10980|478|153|133|2017/04/14 23:15:17"
+miss <f.st......|Arquivandus/Sportstudio/MESSAGINGZEN201704.LOG||2911394
+miss <f.st......|Arquivandus/Sportstudio/SPORTSTUDIO.LOG||23597
+miss <f..t......|Arquivandus/Sportstudio/SportStudio.ini||1474
+miss <f.st......|Arquivandus/Sportstudio/dbiLog.Log||208313
+miss <f..t......|Arquivandus/Sportstudio/Database/Loja/sportstudio.db||111841280
+miss .d..t......|Arquivandus/Sportstudio/Database/Zen/||0
+miss <f.st......|Arquivandus/Sportstudio/Database/Zen/sportstudio_zen.db||417423360
+miss <f..t......|Arquivandus/Sportstudio/Database/Zen/sportstudio_zen_extstorage.db||143872000
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/icrc$oth.339||37969847
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/lpt$vpn.339||77165701
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/ofcscan.ini||53813
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/AU_Backup/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/AU_Backup/AuBackup.ini||2832
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/149900.txt||53
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/crcz.ptn||20912539
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/tmwlchk.ptn||39848
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/AuBackup.ini||2788
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1073741840/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1082130432/backup.001||39822
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1208221731/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1208221826/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/Utility/ClientPackager/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Autopcc.cfg/ApNT.ini||7881
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Autopcc.cfg/ApNT_X64.ini||9132
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/CCSF/module/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/CCSF/module/scan/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/ClnPack_files.xml||254946
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/ClnPack_files.xml.sig||508
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/SettingProfile.ini||85
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/SettingProfile.ini.sig||508
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_cloud_x64.msi||125947392
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_cloud_x86.msi||100642304
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_standard_x64.msi||136281600
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_standard_x86.msi||110977536
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.7z||1070
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.7z.sig||508
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.ini||475
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.ini.sig||508
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/hotfixserver.ini||42
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/hotfixserver.ini.sig||508
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/newpnt.zip||93111518
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/newpx64.zip||116909704
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/package.ini||139
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/pattern.zip||74055911
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/pattern.zip.sig||508
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/saf.7z||167799
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/saf.7z.sig||508
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/server.ini||14108
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpnt.zip||3012990
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpnt.zip.sig||508
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpx64.zip||4070485
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpx64.zip.sig||508
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud/||0
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud/pattern.zip||58235104
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud/pattern.zip.sig||508
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/tmwlchk_149900.zip||40183
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_309.339||291508
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_311.339||290524
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_313.339||273708
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_315.339||277542
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_317.339||255206
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_319.339||215589
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_321.339||196379
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_337.339||20632
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f00.339||54150
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f01.339||104869
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f02.339||121006
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f03.339||120452
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f04.339||125905
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f05.339||157898
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/vsapi339.zip||52051868
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth1333900.zip||20820799
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1330900.1333900||262479
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331100.1333900||258340
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331300.1333900||258270
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331500.1333900||258294
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331700.1333900||252439
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331900.1333900||237660
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1332100.1333900||216954
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333700.1333900||10419
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f00.1333900||25189
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f01.1333900||32235
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f02.1333900||37756
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f03.1333900||37912
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f04.1333900||38013
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f05.1333900||202390
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/temp/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/temp/newpnt/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADComp1.dbf||258
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADComp2.dbf||258
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADCredential.cdx||3072
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADCredential.dbf||130
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADPreDefinedScope.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADPreDefinedScope.dbf||322
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADScope.cdx||6144
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADScope.dbf||322
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAcntMang.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAcntMang.dbf||844
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAcntMang.fpt||1024
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmCfg.cdx||4096
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmCfg.dbf||1811
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmCfg.fpt||32768
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmLog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmLog.dbf||386
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisDacLog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisDacLog.dbf||290
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbBackupLog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbBackupLog.dbf||194
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbBackupLog.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCALog.cdx||10752
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCALog.dbf||1179
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCAStat.cdx||7680
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCAStat.dbf||325
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCfwLog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCfwLog.dbf||386
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCfwLog.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientCfg.cdx||4096
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientCfg.dbf||3758
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientExtra.cdx||4096
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientExtra.dbf||6134
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientExtra.fpt||538112
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientInfo.cdx||20480
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientInfo.dbf||255834
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCLC.cdx||3072
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCLC.dbf||386
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCLC.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCfg.cdx||4096
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCfg.dbf||3360
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCfg.fpt||97280
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDPolicy.cdx||3072
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDPolicy.dbf||130
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDRule.cdx||3072
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDRule.dbf||418
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDRule.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpLog.cdx||10752
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpLog.dbf||386
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpLog.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpStat.cdx||9216
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpStat.dbf||226
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpTemplateStat.dbf||130
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreItem.cdx||7680
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreItem.dbf||395
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreLog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreLog.dbf||388
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIECfg.cdx||4096
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIECfg.dbf||1786
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIELog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIELog.dbf||585
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbRestoreLog.cdx||6144
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbRestoreLog.dbf||226
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbScanOPLog.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbScanOPLog.dbf||333
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbScanOPLog.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpecialLog.cdx||9216
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpecialLog.dbf||121302
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpecialLog.fpt||453120
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareCount.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareCount.dbf||98
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareItem.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareItem.dbf||258
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareItem.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareLog.cdx||6144
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareLog.dbf||258
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbURLFilteringLog.cdx||6144
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbURLFilteringLog.dbf||514
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbUpdateAgentVisibility.cdx||3072
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbUpdateAgentVisibility.dbf||130
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbUpdateAgentVisibility.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusCount.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusCount.dbf||98
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLog.cdx||10752
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLog.dbf||625
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLog.fpt||512
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLogTimeRef.cdx||4608
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLogTimeRef.dbf||98
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbWCSCfg.cdx||4096
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbWCSCfg.dbf||1919
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbWCSCfg.fpt||65024
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/GetServer.ini||184
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/WCSUpdateStatus.ini||268
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/WCSVersion.ini||141
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/AU_Data/AU_Log/TmuDump.txt||2876133
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/AU_Data/AU_Temp/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/dup10034186.ptn||26341832
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/AU_Backup/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/AU_Backup/AuBackup.ini||470
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/dup10034186.ptn||26341832
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/003798.sst||2169058
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/003800.sst||2261688
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/003802.sst||1963917
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Log/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/PLM/components/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/DLPForensicDataTracker.db||9216
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/component.ini||22538
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/last_spn_summary_data.dat||87413
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/ofcbl.db||6160
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/ofcserver.ini||42941
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/spn_summary_data.dat||87413
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/||0
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000.zip||89985
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000.zip.sig||508
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/DRT.dat||77
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/SettingProfile.ini||85
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/SettingProfile.ini.sig||508
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/ofcscan.ini||53780
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/RqDlp_1.ini||962
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqCfg_0.ini||9488
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqCfg_16.ini||3648
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_.ini||2427
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_16.ini||34
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_17.ini||1228
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_20.ini||291
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_21.ini||124
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/PatchNews.ini||472
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/saf.7z||167799
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/saf.7z.sig||508
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/ClnPack/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/FRSUpdateCounter.ini||122
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/FRSUpdateStatus.ini||235
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/FRSVersion.ini||150
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/GetServer.ini||180
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/AU_Data/AU_Log/TmuDump.txt||2677548
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/AU_Data/AU_Temp/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/activeupdate/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crcz.ptn.1720802100||20861393
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crczdiff_1720801900.1720802000||18572
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crczdiff_1720802000.1720802100||19184
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/itbldiff_1720801900.1720802000||182662
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/itbldiff_1720802000.1720802100||218454
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/conf/attr||9216
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/conf/attr-wal||1054320
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026858.ldb||2106827
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026859.ldb||2111103
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027545.ldb||2110629
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027546.ldb||2121663
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027547.ldb||2108655
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027548.ldb||2139282
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027549.ldb||2111233
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027550.ldb||2113107
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027551.ldb||2110847
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027552.ldb||2113353
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027553.ldb||2113803
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027554.ldb||2114710
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027555.ldb||2113133
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027556.ldb||1691280
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027707.ldb||2102830
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027708.ldb||1734994
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027710.ldb||2202628
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027711.ldb||538799
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027712.ldb||1105441
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027713.ldb||2106621
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027714.ldb||13875
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027715.ldb||2238098
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027735.ldb||2111351
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027736.ldb||2113474
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027737.ldb||1216748
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027738.ldb||2134917
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027739.ldb||3280119
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027740.ldb||2094710
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027741.ldb||2110189
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027742.ldb||2110758
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027743.ldb||1158753
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027744.ldb||2108220
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027745.ldb||1992724
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027746.ldb||2109415
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027747.ldb||2114576
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027748.ldb||1677664
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027749.ldb||2137942
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027750.ldb||2107584
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027751.ldb||1529560
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027752.ldb||1247659
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027753.ldb||878422
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027754.ldb||426269
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027755.ldb||228129
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027756.ldb||2108970
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027757.ldb||177540
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027758.ldb||2107398
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027759.ldb||2111384
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027760.ldb||2173932
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027761.ldb||418944
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027762.ldb||2134015
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027763.ldb||2174225
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027764.ldb||1515501
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027765.ldb||2162181
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027766.ldb||2108058
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027767.ldb||316859
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027768.ldb||4789
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027788.ldb||2607215
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027789.ldb||2432982
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027790.ldb||254645
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027791.ldb||2117658
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027792.ldb||73549
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027793.ldb||1448100
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027794.ldb||2099251
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027795.ldb||2117905
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027796.ldb||3528012
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027797.ldb||1061028
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027798.ldb||2129470
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027800.ldb||2107262
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027801.ldb||1176999
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027802.ldb||2109749
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027803.ldb||781953
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027804.ldb||2105571
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027805.ldb||864285
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027806.ldb||2976765
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027807.ldb||2104757
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027808.ldb||2654539
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027809.ldb||2103727
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027810.ldb||1159626
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027811.ldb||2100088
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027812.ldb||2574136
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/CURRENT||16
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/LOCK||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/MANIFEST-027781||65536
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026116.ldb||2111808
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026117.ldb||2109377
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026118.ldb||2111347
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026769.ldb||2108262
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026770.ldb||2120220
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026771.ldb||2110141
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026772.ldb||2142237
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026773.ldb||2113473
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027009.ldb||2114246
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027010.ldb||2112190
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027011.ldb||2111181
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027012.ldb||2114942
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027013.ldb||2111819
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027326.ldb||2112458
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027327.ldb||2113393
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027328.ldb||2114223
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027329.ldb||2108675
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027330.ldb||54397
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027376.ldb||2108713
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027377.ldb||177552
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027378.ldb||2106398
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027379.ldb||2111360
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027380.ldb||2174351
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027381.ldb||419215
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027382.ldb||2132034
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027383.ldb||2170889
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027384.ldb||1508892
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027385.ldb||2162142
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027386.ldb||2108796
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027387.ldb||308104
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027388.ldb||4689
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027389.ldb||2081949
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027390.ldb||2107653
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027391.ldb||3523484
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027392.ldb||2106467
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027393.ldb||1780202
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027394.ldb||2106095
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027395.ldb||809715
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027397.ldb||2344930
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027398.ldb||596827
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027399.ldb||2114539
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027400.ldb||842836
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027401.ldb||2471331
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027402.ldb||1221404
+"send|.d..t......|Arquivandus/BackupZen|0|0|0|2017/04/14 23:15:25"
+"send|<f..t......|Arquivandus/BackupZen/sportstudio_zen.db|142662|9462607|415215616|2017/04/14 23:17:11"
+"send|<f.st......|cygdrive/e/bKit/run/manifest-segment.10980|478|153|133|2017/04/14 23:17:18"
+sent 1 lines of manifest starting at 1
+"send|<f.st......|cygdrive/e/bKit/run/manifest-segment.10980|22|18038|54656|2017/04/14 23:17:19"
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027403.ldb||3520941
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027405.ldb||2102242
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027406.ldb||1157324
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027410.ldb||4747973
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027411.ldb||2103742
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027412.ldb||2578481
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027415.ldb||2110982
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027416.ldb||1767918
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027417.ldb||2119121
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027418.ldb||763328
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027419.ldb||1935669
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027420.ldb||2110143
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027421.ldb||77910
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027423.ldb||4657081
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027424.ldb||2128373
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027425.ldb||2109277
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027426.ldb||844661
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027427.ldb||2108426
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027428.ldb||2111920
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027429.ldb||2345577
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027430.ldb||2113463
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027431.ldb||2109395
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027432.ldb||881390
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027433.ldb||2112858
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027434.ldb||2220652
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027435.ldb||2129012
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027436.ldb||2107859
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027437.ldb||1142120
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027438.ldb||2115622
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027439.ldb||2109232
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027440.ldb||1710518
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027441.ldb||2107648
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027442.ldb||1600482
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027443.ldb||178536
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027444.ldb||947742
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027445.ldb||387697
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027446.ldb||28618
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027448.ldb||4239009
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027450.ldb||2097863
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/CURRENT||16
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/LOCK||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/MANIFEST-027449||15002
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz/crcz.ptn.1720802000||20868449
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz/crcz.ptn.1720802100||20861393
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720602000.1720602100||17647
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720602100.1720602200||15677
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720602200.1720602300||15147
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720602300.1720602400||22460
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720602400.1720800100||23463
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800100.1720800200||24749
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800200.1720800300||16600
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800300.1720800400||17238
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800400.1720800500||17435
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800500.1720800600||28420
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800600.1720800700||27510
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800700.1720800800||17647
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800800.1720800900||17368
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800900.1720801000||18287
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801000.1720801100||18348
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801100.1720801200||26873
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801200.1720801300||23911
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801300.1720801400||19675
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801400.1720801500||17828
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801500.1720801600||16792
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801600.1720801700||16061
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801700.1720801800||25185
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801800.1720801900||16519
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801900.1720802000||18572
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720802000.1720802100||19184
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720602000.1720602100||206086
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720602100.1720602200||175498
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720602200.1720602300||173447
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720602300.1720602400||273370
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720602400.1720800100||283583
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800100.1720800200||289485
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800200.1720800300||192886
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800300.1720800400||221744
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800400.1720800500||177157
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800500.1720800600||319926
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800600.1720800700||293524
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800700.1720800800||238466
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800800.1720800900||192986
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800900.1720801000||192593
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801000.1720801100||193314
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801100.1720801200||290732
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801200.1720801300||243833
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801300.1720801400||198406
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801400.1720801500||188213
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801500.1720801600||192329
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801600.1720801700||175417
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801700.1720801800||279121
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801800.1720801900||180977
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801900.1720802000||182662
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720802000.1720802100||218454
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/tmp/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/GetServer.ini||96
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Log/||0
+miss <f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Log/TmuDump.txt||3521546
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/AuStorage.ini||2585
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1073741840/1827/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333700/||0
+miss cd+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333900/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333900/icrc$oth.339||37969847
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333700/||0
+miss cd+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333900/||0
+miss <f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333900/lpt$vpn.339||77165701
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/536871936/182700/||0
+miss .d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Temp/||0
+miss <f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web_OSCE/Web_console/CGI/cgiWebUpdate.ini||27144
+miss .d..t......|Program Files/TrendMicro/SProtect/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/GetServer.ini||164
+miss .d..t......|Program Files/TrendMicro/SProtect/AU_Data/||0
+miss <f.st......|Program Files/TrendMicro/SProtect/AU_Data/AU_Log/TmuDump.txt||616782
+miss .d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/AuStorage.ini||561
+miss .d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/||0
+miss cd+++++++++|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1333700/||0
+miss <f+++++++++|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1333700/lpt$vpn.337||77151877
+miss .d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Temp/||0
+miss <f.st......|Program Files/TrendMicro/SProtect/ISLog/IS.dat||7392
+miss <f.st......|Program Files/TrendMicro/SProtect/SpntShare/server.ini||4036
+miss .d..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/||0
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_813.827||52789
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_815.827||51081
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_817.827||46071
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_819.827||38554
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_821.827||35537
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_823.827||31940
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_825.827||20372
+miss <f.st......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssaptn.zip||5506715
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_307.337||380120
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_309.337||306161
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_311.337||265088
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_313.337||258353
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_315.337||257195
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_317.337||235516
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_319.337||199519
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_335.337||37250
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f00.337||107200
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f01.337||127004
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f02.337||126363
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f03.337||132690
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f04.337||168891
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f05.337||191868
+miss <f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/vsapi337.zip||52041841
+miss .d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/auaction.zip||30177
+miss .d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/186/spnt58/spnt580/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/186/spnt58/spnt580/auspnt50.zip||43919
+miss .d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/2/spnt58/spnt580/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/2/spnt58/spnt580/auspnt50.zip||43919
+miss .d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/453/spnt58/spnt580/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/453/spnt58/spnt580/auspnt50.zip||43919
+miss .d..t......|Program Files/TrendMicro/SProtect/x64/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/x64/PatchDLL.ini||991
+miss <f+++++++++|Program Files/TrendMicro/SProtect/x64/lpt$vpn.337||77151877
+miss .d..t......|Program Files/TrendMicro/SProtect/x64/AU_Backup/||0
+miss <f..t......|Program Files/TrendMicro/SProtect/x64/AU_Backup/AuBackup.ini||638
+miss <f.s.......|Program Files/TrendMicro/SProtect/x64/SpntLog/SpntLog.cdx||296448
+miss <f.s.......|Program Files/TrendMicro/SProtect/x64/SpntLog/SpntLog.dbf||59330688
+miss .d..t......|Program Files/TrendMicro/SProtect/x64/Temp/||0
+miss .d..t......|Program Files/TrendMicro/SProtect/x64/report/||0
+miss .d..t......|Windows/NTDS/||0
+miss <f..t......|Windows/NTDS/edb.chk||8192
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-03.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-05.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-11.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-12.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-13.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-15.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-10.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-22.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-23.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-24.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-25.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAMO-DPC-18.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAMO-DPC-29.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAMO-DPC-35.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CARR-DPC-06.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CARR-DPC-09.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVE-DPC-33.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVE-DPC-37.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVE-DPC-39.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-04.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-14.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-16.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-24.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-04.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-06.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-10.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-12.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-27.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-09.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-11.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-13.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-17.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-18.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-23.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-24.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-11.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-29.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-36.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-43.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-08.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-11.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-13.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-51.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-55.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-57.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-06.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-07.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-15.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-31.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-32.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-02.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-40.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-41.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-42.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-43.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-46.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-10.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-11.txt||347
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-28.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-29.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-30.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-COUT-DPC-31.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-COUT-DPC-33.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-13.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-15.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-16.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-21.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-10.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-37.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-38.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-43.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDF-DPC-36.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDF-DPC-37.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDF-DPC-40.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-03.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-05.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-07.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-10.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-13.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-18.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-19.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-20.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-21.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-25.txt||259
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZCOI-DPC-01.txt||250
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZCOI-DPC-02.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZMIR-DPC-01.txt||234
+miss <f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZTEJ-DPC-01.txt||234
+miss .d..t......|Windows/SYSVOL/staging/domain/||0
+"send|.d..t......|Arquivandus/BackupZen|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Arquivandus/Sportstudio/Database/Zen|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/AU_Backup|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1073741840|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1208221731|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1208221826|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/Utility/ClientPackager|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/CCSF/module|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/CCSF/module/scan|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/temp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/temp/newpnt|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/AU_Data/AU_Temp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/AU_Backup|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Log|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/PLM/components|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/ClnPack|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/AU_Data/AU_Temp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/activeupdate|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/tmp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Log|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1073741840/1827|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333700|0|0|0|2017/04/14 23:18:47"
+"send|cd+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333900|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333700|0|0|0|2017/04/14 23:18:47"
+"send|cd+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333900|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/536871936/182700|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Temp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4|0|0|0|2017/04/14 23:18:47"
+"send|cd+++++++++|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1333700|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Temp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/186/spnt58/spnt580|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/2/spnt58/spnt580|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/453/spnt58/spnt580|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/x64|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/x64/AU_Backup|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/x64/Temp|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Program Files/TrendMicro/SProtect/x64/report|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Windows/NTDS|0|0|0|2017/04/14 23:18:47"
+"send|.d..t......|Windows/SYSVOL/staging/domain|0|0|0|2017/04/14 23:18:47"
+"send|<f..t......|Arquivandus/BackupZen/sportstudio_zen_extstorage.db|84002|79868|143872000|2017/04/14 23:17:40"
+"send|<f.st......|Arquivandus/Sportstudio/MESSAGING201704.LOG|9634|8656|2748217|2017/04/14 23:17:41"
+"send|<f.st......|Arquivandus/Sportstudio/MESSAGINGZEN201704.LOG|9922|10386|2911394|2017/04/14 23:17:42"
+"send|<f.st......|Arquivandus/Sportstudio/SPORTSTUDIO.LOG|214|74|23597|2017/04/14 23:17:42"
+"send|<f..t......|Arquivandus/Sportstudio/SportStudio.ini|34|39|1474|2017/04/14 23:17:42"
+"send|<f.st......|Arquivandus/Sportstudio/dbiLog.Log|1732|555|208313|2017/04/14 23:17:42"
+"send|<f..t......|Arquivandus/Sportstudio/Database/Loja/sportstudio.db|74104|6517881|111841280|2017/04/14 23:18:51"
+"send|.d..t......|Arquivandus/Sportstudio/Database/Zen|0|0|0|2017/04/14 23:18:51"
+"send|<f.st......|Arquivandus/Sportstudio/Database/Zen/sportstudio_zen.db|143082|7859387|417423360|2017/04/14 23:20:11"
+"send|<f..t......|Arquivandus/Sportstudio/Database/Zen/sportstudio_zen_extstorage.db|84002|77948|143872000|2017/04/14 23:20:15"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV|0|0|0|2017/04/14 23:20:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/icrc$oth.339|16|20824612|37969847|2017/04/14 23:23:46"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/lpt$vpn.339|16|52061484|77165701|2017/04/14 23:32:39"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/ofcscan.ini|478|1023|53813|2017/04/14 23:32:39"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/AU_Backup|0|0|0|2017/04/14 23:32:39"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/AU_Backup/AuBackup.ini|46|149|2832|2017/04/14 23:32:39"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin|0|0|0|2017/04/14 23:32:39"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/149900.txt|16|87|53|2017/04/14 23:32:39"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/crcz.ptn|27550|16887987|20912539|2017/04/14 23:35:32"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/tmwlchk.ptn|358|39903|39848|2017/04/14 23:35:32"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup|0|0|0|2017/04/14 23:35:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/AuBackup.ini|40|216|2788|2017/04/14 23:35:32"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1082130432|0|0|0|2017/04/14 23:35:32"
+"send|.f...p.g.a.|Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1082130432/backup.001|0|0|39822|2017/04/14 23:35:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Autopcc.cfg/ApNT.ini|88|39|7881|2017/04/14 23:35:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Autopcc.cfg/ApNT_X64.ini|100|39|9132|2017/04/14 23:35:32"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download|0|0|0|2017/04/14 23:35:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/ClnPack_files.xml|2206|469|254946|2017/04/14 23:35:33"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/ClnPack_files.xml.sig|22|457|508|2017/04/14 23:35:33"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/SettingProfile.ini|22|122|85|2017/04/14 23:35:33"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/SettingProfile.ini.sig|22|458|508|2017/04/14 23:35:33"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_cloud_x64.msi|78626|75694800|125947392|2017/04/14 23:48:28"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_cloud_x86.msi|70247|73683763|100642304|2017/04/15 00:01:02"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_standard_x64.msi|81748|83117182|136281600|2017/04/15 00:16:20"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/agent_standard_x86.msi|73803|84083927|110977536|2017/04/15 00:30:41"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.7z|28|1114|1070|2017/04/15 00:30:41"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.7z.sig|22|455|508|2017/04/15 00:30:41"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.ini|22|315|475|2017/04/15 00:30:41"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/bl.ini.sig|22|458|508|2017/04/15 00:30:41"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/hotfixserver.ini|22|37|42|2017/04/15 00:30:41"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/hotfixserver.ini.sig|22|37|508|2017/04/15 00:30:41"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/newpnt.zip|67629|21330632|93111518|2017/04/15 00:34:20"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/newpx64.zip|75735|20624962|116909704|2017/04/15 00:37:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/package.ini|22|163|139|2017/04/15 00:37:52"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/pattern.zip|60293|62335158|74055911|2017/04/15 00:48:30"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/pattern.zip.sig|22|459|508|2017/04/15 00:48:30"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/saf.7z|1456|167230|167799|2017/04/15 00:48:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/saf.7z.sig|22|460|508|2017/04/15 00:48:32"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/server.ini|142|1692|14108|2017/04/15 00:48:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpnt.zip|10480|39|3012990|2017/04/15 00:48:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpnt.zip.sig|22|37|508|2017/04/15 00:48:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpx64.zip|12136|39|4070485|2017/04/15 00:48:32"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/tmnewpx64.zip.sig|22|37|508|2017/04/15 00:48:32"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud|0|0|0|2017/04/15 00:48:32"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud/pattern.zip|53496|40930260|58235104|2017/04/15 00:55:36"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Cloud/pattern.zip.sig|22|458|508|2017/04/15 00:55:36"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern|0|0|0|2017/04/15 00:55:36"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/tmwlchk_149900.zip|16|40182|40183|2017/04/15 00:55:36"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_309.339|16|289300|291508|2017/04/15 00:55:39"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_311.339|16|288395|290524|2017/04/15 00:55:42"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_313.339|16|271954|273708|2017/04/15 00:55:45"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_315.339|16|275275|277542|2017/04/15 00:55:48"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_317.339|16|253400|255206|2017/04/15 00:55:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_319.339|16|214074|215589|2017/04/15 00:55:53"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_321.339|16|195004|196379|2017/04/15 00:55:55"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_337.339|16|20405|20632|2017/04/15 00:55:55"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f00.339|16|53543|54150|2017/04/15 00:55:55"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f01.339|16|104077|104869|2017/04/15 00:55:57"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f02.339|16|119951|121006|2017/04/15 00:55:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f03.339|16|119421|120452|2017/04/15 00:55:59"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f04.339|16|124909|125905|2017/04/15 00:56:00"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f05.339|16|156728|157898|2017/04/15 00:56:01"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/vsapi339.zip|16|52069563|52051868|2017/04/15 01:04:56"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc|0|0|0|2017/04/15 01:04:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth1333900.zip|16|20814875|20820799|2017/04/15 01:08:29"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1330900.1333900|16|256735|262479|2017/04/15 01:08:31"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331100.1333900|16|252664|258340|2017/04/15 01:08:34"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331300.1333900|16|252626|258270|2017/04/15 01:08:36"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331500.1333900|16|252689|258294|2017/04/15 01:08:39"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331700.1333900|16|246853|252439|2017/04/15 01:08:42"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331900.1333900|16|232101|237660|2017/04/15 01:08:44"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1332100.1333900|16|212172|216954|2017/04/15 01:08:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333700.1333900|16|10255|10419|2017/04/15 01:08:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f00.1333900|16|24876|25189|2017/04/15 01:08:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f01.1333900|16|31818|32235|2017/04/15 01:08:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f02.1333900|16|37233|37756|2017/04/15 01:08:48"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f03.1333900|16|37443|37912|2017/04/15 01:08:48"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f04.1333900|16|37586|38013|2017/04/15 01:08:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f05.1333900|16|197660|202390|2017/04/15 01:08:50"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB|0|0|0|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADComp1.dbf|22|37|258|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADComp2.dbf|22|37|258|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADCredential.cdx|46|39|3072|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADCredential.dbf|22|37|130|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADPreDefinedScope.cdx|58|39|4608|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADPreDefinedScope.dbf|22|37|322|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADScope.cdx|70|39|6144|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbADScope.dbf|22|37|322|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAcntMang.cdx|58|39|4608|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAcntMang.dbf|28|39|844|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAcntMang.fpt|28|39|1024|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmCfg.cdx|52|39|4096|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmCfg.dbf|34|39|1811|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmCfg.fpt|298|39|32768|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmLog.cdx|58|39|4608|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisBmLog.dbf|22|37|386|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisDacLog.cdx|58|39|4608|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbAegisDacLog.dbf|22|37|290|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbBackupLog.cdx|58|39|4608|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbBackupLog.dbf|22|37|194|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbBackupLog.fpt|22|37|512|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCALog.cdx|112|39|10752|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCALog.dbf|28|39|1179|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCAStat.cdx|82|39|7680|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCCCAStat.dbf|22|37|325|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCfwLog.cdx|58|39|4608|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCfwLog.dbf|22|37|386|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbCfwLog.fpt|22|37|512|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientCfg.cdx|52|39|4096|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientCfg.dbf|52|39|3758|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientExtra.cdx|52|39|4096|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientExtra.dbf|70|39|6134|2017/04/15 01:08:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientExtra.fpt|4456|39|538112|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientInfo.cdx|196|369|20480|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbClientInfo.dbf|2212|2698|255834|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCLC.cdx|46|39|3072|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCLC.dbf|22|37|386|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCLC.fpt|22|37|512|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCfg.cdx|52|39|4096|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCfg.dbf|46|39|3360|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpCfg.fpt|850|39|97280|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDPolicy.cdx|46|39|3072|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDPolicy.dbf|22|37|130|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDRule.cdx|46|39|3072|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDRule.dbf|22|37|418|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpDDRule.fpt|22|37|512|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpLog.cdx|112|39|10752|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpLog.dbf|22|37|386|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpLog.fpt|22|37|512|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpStat.cdx|100|39|9216|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpStat.dbf|22|37|226|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbDlpTemplateStat.dbf|22|37|130|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreItem.cdx|82|39|7680|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreItem.dbf|22|37|395|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreLog.cdx|58|39|4608|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbFARestoreLog.dbf|22|37|388|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIECfg.cdx|52|39|4096|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIECfg.dbf|34|39|1786|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIELog.cdx|58|39|4608|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbNCIELog.dbf|22|37|585|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbRestoreLog.cdx|70|39|6144|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbRestoreLog.dbf|22|37|226|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbScanOPLog.cdx|58|39|4608|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbScanOPLog.dbf|22|37|333|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbScanOPLog.fpt|22|37|512|2017/04/15 01:08:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpecialLog.cdx|100|1717|9216|2017/04/15 01:08:51"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpecialLog.dbf|1024|381|121302|2017/04/15 01:08:51"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpecialLog.fpt|3772|1343|453120|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareCount.cdx|58|39|4608|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareCount.dbf|22|37|98|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareItem.cdx|58|39|4608|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareItem.dbf|22|37|258|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareItem.fpt|22|37|512|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareLog.cdx|70|39|6144|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbSpywareLog.dbf|22|37|258|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbURLFilteringLog.cdx|70|39|6144|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbURLFilteringLog.dbf|22|37|514|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbUpdateAgentVisibility.cdx|46|39|3072|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbUpdateAgentVisibility.dbf|22|37|130|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbUpdateAgentVisibility.fpt|22|37|512|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusCount.cdx|58|39|4608|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusCount.dbf|22|37|98|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLog.cdx|112|39|10752|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLog.dbf|22|37|625|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLog.fpt|22|37|512|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLogTimeRef.cdx|58|39|4608|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbVirusLogTimeRef.dbf|22|37|98|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbWCSCfg.cdx|52|39|4096|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbWCSCfg.dbf|34|39|1919|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/HTTPDB/dbWCSCfg.fpt|574|39|65024|2017/04/15 01:08:52"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS|0|0|0|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/GetServer.ini|22|37|184|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/WCSUpdateStatus.ini|22|216|268|2017/04/15 01:08:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/WCSVersion.ini|22|120|141|2017/04/15 01:08:52"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/AU_Data/AU_Log/TmuDump.txt|9124|35803|2876133|2017/04/15 01:08:53"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate|0|0|0|2017/04/15 01:08:53"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/dup10034186.ptn|16|26351995|26341832|2017/04/15 01:13:21"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/AU_Backup|0|0|0|2017/04/15 01:13:21"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/AU_Backup/AuBackup.ini|22|260|470|2017/04/15 01:13:21"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns|0|0|0|2017/04/15 01:13:21"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/dup10034186.ptn|16|26351995|26341832|2017/04/15 01:17:51"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin|0|0|0|2017/04/15 01:17:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/003798.sst|16|1940430|2169058|2017/04/15 01:18:11"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/003800.sst|16|1978977|2261688|2017/04/15 01:18:32"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/ws/muffin/003802.sst|16|1707151|1963917|2017/04/15 01:18:50"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private|0|0|0|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/DLPForensicDataTracker.db|100|324|9216|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/component.ini|214|438|22538|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/last_spn_summary_data.dat|766|39|87413|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/ofcbl.db|70|39|6160|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/ofcserver.ini|388|2634|42941|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/spn_summary_data.dat|766|39|87413|2017/04/15 01:18:50"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf|0|0|0|2017/04/15 01:18:50"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000.zip|790|21127|89985|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000.zip.sig|22|457|508|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/DRT.dat|22|37|77|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/SettingProfile.ini|22|122|85|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/SettingProfile.ini.sig|22|458|508|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/ofcscan.ini|478|1544|53780|2017/04/15 01:18:50"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000|0|0|0|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/RqDlp_1.ini|28|39|962|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqCfg_0.ini|100|927|9488|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqCfg_16.ini|52|926|3648|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_.ini|40|739|2427|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_16.ini|22|37|34|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_17.ini|28|39|1228|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_20.ini|22|37|291|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Private/Saf/00000000-0000-0000-0000-000000000000/cgiRqIni_21.ini|22|37|124|2017/04/15 01:18:50"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP|0|0|0|2017/04/15 01:18:50"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/PatchNews.ini|22|37|472|2017/04/15 01:18:50"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/saf.7z|1456|167230|167799|2017/04/15 01:18:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/TEMP/saf.7z.sig|22|460|508|2017/04/15 01:18:51"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS|0|0|0|2017/04/15 01:18:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/FRSUpdateCounter.ini|22|140|122|2017/04/15 01:18:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/FRSUpdateStatus.ini|22|194|235|2017/04/15 01:18:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/FRSVersion.ini|22|121|150|2017/04/15 01:18:51"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/GetServer.ini|22|37|180|2017/04/15 01:18:51"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/AU_Data/AU_Log/TmuDump.txt|9040|18898|2677548|2017/04/15 01:18:52"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate|0|0|0|2017/04/15 01:18:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crcz.ptn.1720802100|16|20614208|20861393|2017/04/15 01:22:22"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crczdiff_1720801900.1720802000|16|18609|18572|2017/04/15 01:22:23"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crczdiff_1720802000.1720802100|16|19235|19184|2017/04/15 01:22:23"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/itbldiff_1720801900.1720802000|16|95510|182662|2017/04/15 01:22:24"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/itbldiff_1720802000.1720802100|16|111508|218454|2017/04/15 01:22:25"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/conf/attr|100|1640|9216|2017/04/15 01:22:25"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/conf/attr-wal|6196|45342|1054320|2017/04/15 01:22:25"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1|0|0|0|2017/04/15 01:22:25"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026858.ldb|16|993308|2106827|2017/04/15 01:22:36"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026859.ldb|16|1168968|2111103|2017/04/15 01:22:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027545.ldb|16|1031082|2110629|2017/04/15 01:22:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027546.ldb|16|1114796|2121663|2017/04/15 01:23:10"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027547.ldb|16|1106239|2108655|2017/04/15 01:23:21"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027548.ldb|16|1149043|2139282|2017/04/15 01:23:33"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027549.ldb|16|1110844|2111233|2017/04/15 01:23:44"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027550.ldb|16|1156058|2113107|2017/04/15 01:23:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027551.ldb|16|1089379|2110847|2017/04/15 01:24:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027552.ldb|16|1136657|2113353|2017/04/15 01:24:19"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027553.ldb|16|1150676|2113803|2017/04/15 01:24:30"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027554.ldb|16|1156994|2114710|2017/04/15 01:24:42"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027555.ldb|16|1116351|2113133|2017/04/15 01:24:54"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027556.ldb|16|912533|1691280|2017/04/15 01:25:03"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027707.ldb|16|868796|2102830|2017/04/15 01:25:12"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027708.ldb|16|677596|1734994|2017/04/15 01:25:19"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027710.ldb|16|917701|2202628|2017/04/15 01:25:28"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027711.ldb|16|193967|538799|2017/04/15 01:25:30"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027712.ldb|16|394596|1105441|2017/04/15 01:25:35"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027713.ldb|16|1040463|2106621|2017/04/15 01:25:45"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027714.ldb|16|7056|13875|2017/04/15 01:25:45"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027715.ldb|16|1091778|2238098|2017/04/15 01:25:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027735.ldb|16|1056677|2111351|2017/04/15 01:26:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027736.ldb|16|1043552|2113474|2017/04/15 01:26:18"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027737.ldb|16|629208|1216748|2017/04/15 01:26:24"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027738.ldb|16|1069432|2134917|2017/04/15 01:26:35"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027739.ldb|16|1306639|3280119|2017/04/15 01:26:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027740.ldb|16|955533|2094710|2017/04/15 01:26:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027741.ldb|16|1100526|2110189|2017/04/15 01:27:10"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027742.ldb|16|1096641|2110758|2017/04/15 01:27:21"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027743.ldb|16|556835|1158753|2017/04/15 01:27:29"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027744.ldb|16|995032|2108220|2017/04/15 01:27:37"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027745.ldb|16|1009457|1992724|2017/04/15 01:27:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027746.ldb|16|1048417|2109415|2017/04/15 01:27:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027747.ldb|16|1098441|2114576|2017/04/15 01:28:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027748.ldb|16|776059|1677664|2017/04/15 01:28:17"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027749.ldb|16|1042855|2137942|2017/04/15 01:28:28"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027750.ldb|16|1006850|2107584|2017/04/15 01:28:38"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027751.ldb|16|760091|1529560|2017/04/15 01:28:46"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027752.ldb|16|620025|1247659|2017/04/15 01:28:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027753.ldb|16|288303|878422|2017/04/15 01:28:55"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027754.ldb|16|185607|426269|2017/04/15 01:28:57"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027755.ldb|16|101081|228129|2017/04/15 01:28:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027756.ldb|16|1096866|2108970|2017/04/15 01:29:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027757.ldb|16|92955|177540|2017/04/15 01:29:10"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027758.ldb|16|1075292|2107398|2017/04/15 01:29:22"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027759.ldb|16|1065909|2111384|2017/04/15 01:29:33"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027760.ldb|16|1073337|2173932|2017/04/15 01:29:44"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027761.ldb|16|217902|418944|2017/04/15 01:29:46"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027762.ldb|16|1011757|2134015|2017/04/15 01:29:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027763.ldb|16|1045929|2174225|2017/04/15 01:30:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027764.ldb|16|760452|1515501|2017/04/15 01:30:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027765.ldb|16|1088269|2162181|2017/04/15 01:30:27"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027766.ldb|16|1068163|2108058|2017/04/15 01:30:38"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027767.ldb|16|166572|316859|2017/04/15 01:30:40"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027768.ldb|16|3085|4789|2017/04/15 01:30:41"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027788.ldb|16|942367|2607215|2017/04/15 01:30:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027789.ldb|16|896728|2432982|2017/04/15 01:30:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027790.ldb|16|106205|254645|2017/04/15 01:31:00"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027791.ldb|16|882008|2117658|2017/04/15 01:31:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027792.ldb|16|27166|73549|2017/04/15 01:31:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027793.ldb|16|557044|1448100|2017/04/15 01:31:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027794.ldb|16|947898|2099251|2017/04/15 01:31:24"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027795.ldb|16|912297|2117905|2017/04/15 01:31:33"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027796.ldb|16|1339593|3528012|2017/04/15 01:31:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027797.ldb|16|510121|1061028|2017/04/15 01:31:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027798.ldb|16|1030625|2129470|2017/04/15 01:32:03"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027800.ldb|16|1005600|2107262|2017/04/15 01:32:13"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027801.ldb|16|557601|1176999|2017/04/15 01:32:19"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027802.ldb|16|1003829|2109749|2017/04/15 01:32:30"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027803.ldb|16|359616|781953|2017/04/15 01:32:34"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027804.ldb|16|828095|2105571|2017/04/15 01:32:42"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027805.ldb|16|380758|864285|2017/04/15 01:32:46"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027806.ldb|16|1138841|2976765|2017/04/15 01:32:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027807.ldb|16|933236|2104757|2017/04/15 01:33:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027808.ldb|16|1281290|2654539|2017/04/15 01:33:21"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027809.ldb|16|847668|2103727|2017/04/15 01:33:29"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027810.ldb|16|478994|1159626|2017/04/15 01:33:34"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027811.ldb|16|884407|2100088|2017/04/15 01:33:43"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/027812.ldb|16|940265|2574136|2017/04/15 01:33:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/CURRENT|22|60|16|2017/04/15 01:33:52"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/LOCK|16|36|0|2017/04/15 01:33:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/MANIFEST-027781|16|8883|65536|2017/04/15 01:33:53"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2|0|0|0|2017/04/15 01:33:53"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026116.ldb|16|1119075|2111808|2017/04/15 01:34:04"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026117.ldb|16|995767|2109377|2017/04/15 01:34:14"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026118.ldb|16|1168572|2111347|2017/04/15 01:34:27"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026769.ldb|16|1029085|2108262|2017/04/15 01:34:37"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026770.ldb|16|1113860|2120220|2017/04/15 01:34:48"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026771.ldb|16|1106978|2110141|2017/04/15 01:34:59"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026772.ldb|16|1150595|2142237|2017/04/15 01:35:12"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/026773.ldb|16|1111992|2113473|2017/04/15 01:35:23"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027009.ldb|16|1156678|2114246|2017/04/15 01:35:35"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027010.ldb|16|1090092|2112190|2017/04/15 01:35:46"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027011.ldb|16|1135109|2111181|2017/04/15 01:35:57"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027012.ldb|16|1151380|2114942|2017/04/15 01:36:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027013.ldb|16|1155230|2111819|2017/04/15 01:36:21"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027326.ldb|16|1115482|2112458|2017/04/15 01:36:33"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027327.ldb|16|1149468|2113393|2017/04/15 01:36:45"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027328.ldb|16|1150716|2114223|2017/04/15 01:36:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027329.ldb|16|1103429|2108675|2017/04/15 01:37:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027330.ldb|16|31002|54397|2017/04/15 01:37:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027376.ldb|16|1096723|2108713|2017/04/15 01:37:19"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027377.ldb|16|92962|177552|2017/04/15 01:37:20"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027378.ldb|16|1074997|2106398|2017/04/15 01:37:31"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027379.ldb|16|1065865|2111360|2017/04/15 01:37:42"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027380.ldb|16|1073610|2174351|2017/04/15 01:37:53"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027381.ldb|16|218052|419215|2017/04/15 01:37:55"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027382.ldb|16|1010518|2132034|2017/04/15 01:38:06"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027383.ldb|16|1044052|2170889|2017/04/15 01:38:17"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027384.ldb|16|756934|1508892|2017/04/15 01:38:24"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027385.ldb|16|1087943|2162142|2017/04/15 01:38:35"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027386.ldb|16|1070217|2108796|2017/04/15 01:38:46"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027387.ldb|16|162092|308104|2017/04/15 01:38:48"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027388.ldb|16|3012|4689|2017/04/15 01:38:48"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027389.ldb|16|938345|2081949|2017/04/15 01:38:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027390.ldb|16|906660|2107653|2017/04/15 01:39:06"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027391.ldb|16|1337138|3523484|2017/04/15 01:39:20"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027392.ldb|16|1030218|2106467|2017/04/15 01:39:31"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027393.ldb|16|836830|1780202|2017/04/15 01:39:39"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027394.ldb|16|1015604|2106095|2017/04/15 01:39:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027395.ldb|16|388591|809715|2017/04/15 01:39:54"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027397.ldb|16|1085478|2344930|2017/04/15 01:40:05"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027398.ldb|16|292703|596827|2017/04/15 01:40:08"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027399.ldb|16|803315|2114539|2017/04/15 01:40:16"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027400.ldb|16|396308|842836|2017/04/15 01:40:20"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027401.ldb|16|895268|2471331|2017/04/15 01:40:30"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027402.ldb|16|543516|1221404|2017/04/15 01:40:35"
+"send|<f.st......|cygdrive/e/bKit/run/manifest-segment.10980|22|18038|54656|2017/04/15 01:41:14"
+sent 341 lines of manifest starting at 2
+"send|<f.st......|cygdrive/e/bKit/run/manifest-segment.10980|490|12689|36239|2017/04/15 01:41:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027403.ldb|16|1661497|3520941|2017/04/15 01:41:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027405.ldb|16|848352|2102242|2017/04/15 01:41:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027406.ldb|16|477294|1157324|2017/04/15 01:42:01"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027410.ldb|16|2040814|4747973|2017/04/15 01:42:22"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027411.ldb|16|886106|2103742|2017/04/15 01:42:31"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027412.ldb|16|942753|2578481|2017/04/15 01:42:40"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027415.ldb|16|874065|2110982|2017/04/15 01:42:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027416.ldb|16|695832|1767918|2017/04/15 01:42:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027417.ldb|16|886856|2119121|2017/04/15 01:43:06"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027418.ldb|16|277836|763328|2017/04/15 01:43:08"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027419.ldb|16|732394|1935669|2017/04/15 01:43:16"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027420.ldb|16|1028638|2110143|2017/04/15 01:43:27"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027421.ldb|16|33008|77910|2017/04/15 01:43:27"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027423.ldb|16|1592744|4657081|2017/04/15 01:43:43"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027424.ldb|16|1064399|2128373|2017/04/15 01:43:54"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027425.ldb|16|1048676|2109277|2017/04/15 01:44:05"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027426.ldb|16|431375|844661|2017/04/15 01:44:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027427.ldb|16|1070408|2108426|2017/04/15 01:44:20"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027428.ldb|16|1081153|2111920|2017/04/15 01:44:31"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027429.ldb|16|818065|2345577|2017/04/15 01:44:40"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027430.ldb|16|964117|2113463|2017/04/15 01:44:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027431.ldb|16|1101748|2109395|2017/04/15 01:45:01"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027432.ldb|16|480596|881390|2017/04/15 01:45:05"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027433.ldb|16|1023472|2112858|2017/04/15 01:45:16"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027434.ldb|16|1055489|2220652|2017/04/15 01:45:27"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027435.ldb|16|1082602|2129012|2017/04/15 01:45:38"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027436.ldb|16|1047429|2107859|2017/04/15 01:45:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027437.ldb|16|594310|1142120|2017/04/15 01:45:55"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027438.ldb|16|1077835|2115622|2017/04/15 01:46:06"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027439.ldb|16|973161|2109232|2017/04/15 01:46:16"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027440.ldb|16|850376|1710518|2017/04/15 01:46:25"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027441.ldb|16|1017543|2107648|2017/04/15 01:46:35"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027442.ldb|16|781342|1600482|2017/04/15 01:46:43"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027443.ldb|16|63059|178536|2017/04/15 01:46:44"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027444.ldb|16|333938|947742|2017/04/15 01:46:47"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027445.ldb|16|170001|387697|2017/04/15 01:46:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027446.ldb|16|13237|28618|2017/04/15 01:46:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027448.ldb|16|1609322|4239009|2017/04/15 01:47:06"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/027450.ldb|16|851027|2097863|2017/04/15 01:47:15"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/CURRENT|22|60|16|2017/04/15 01:47:15"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/LOCK|16|36|0|2017/04/15 01:47:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/MANIFEST-027449|16|7764|15002|2017/04/15 01:47:15"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz|0|0|0|2017/04/15 01:47:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz/crcz.ptn.1720802000|16|20621144|20868449|2017/04/15 01:50:49"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff|0|0|0|2017/04/15 01:50:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720602400.1720800100|16|23514|23463|2017/04/15 01:50:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800100.1720800200|16|24775|24749|2017/04/15 01:50:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800200.1720800300|16|16623|16600|2017/04/15 01:50:49"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800300.1720800400|16|17107|17238|2017/04/15 01:50:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800400.1720800500|16|17468|17435|2017/04/15 01:50:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800500.1720800600|16|28471|28420|2017/04/15 01:50:50"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800600.1720800700|16|27550|27510|2017/04/15 01:50:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800700.1720800800|16|17592|17647|2017/04/15 01:50:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800800.1720800900|16|17409|17368|2017/04/15 01:50:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720800900.1720801000|16|18338|18287|2017/04/15 01:50:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801000.1720801100|16|18399|18348|2017/04/15 01:50:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801100.1720801200|16|26924|26873|2017/04/15 01:50:51"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801200.1720801300|16|23941|23911|2017/04/15 01:50:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801300.1720801400|16|19726|19675|2017/04/15 01:50:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801400.1720801500|16|17879|17828|2017/04/15 01:50:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801500.1720801600|16|16843|16792|2017/04/15 01:50:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801600.1720801700|16|16105|16061|2017/04/15 01:50:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801700.1720801800|16|25221|25185|2017/04/15 01:50:52"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1720801800.1720801900|16|16570|16519|2017/04/15 01:50:53"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff|0|0|0|2017/04/15 01:50:53"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720602400.1720800100|16|154703|283583|2017/04/15 01:50:54"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800100.1720800200|16|155493|289485|2017/04/15 01:50:56"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800200.1720800300|16|100999|192886|2017/04/15 01:50:57"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800300.1720800400|16|119190|221744|2017/04/15 01:50:58"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800400.1720800500|16|93544|177157|2017/04/15 01:50:59"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800500.1720800600|16|166800|319926|2017/04/15 01:51:01"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800600.1720800700|16|157809|293524|2017/04/15 01:51:03"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800700.1720800800|16|129949|238466|2017/04/15 01:51:04"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800800.1720800900|16|102363|192986|2017/04/15 01:51:05"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720800900.1720801000|16|97339|192593|2017/04/15 01:51:06"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801000.1720801100|16|102015|193314|2017/04/15 01:51:07"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801100.1720801200|16|151494|290732|2017/04/15 01:51:09"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801200.1720801300|16|130890|243833|2017/04/15 01:51:10"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801300.1720801400|16|106886|198406|2017/04/15 01:51:11"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801400.1720801500|16|100040|188213|2017/04/15 01:51:12"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801500.1720801600|16|103008|192329|2017/04/15 01:51:13"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801600.1720801700|16|90811|175417|2017/04/15 01:51:14"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801700.1720801800|16|149835|279121|2017/04/15 01:51:15"
+"send|<f+++++++++|Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720801800.1720801900|16|100441|180977|2017/04/15 01:51:17"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service|0|0|0|2017/04/15 01:51:17"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/GetServer.ini|22|37|96|2017/04/15 01:51:17"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Log|0|0|0|2017/04/15 01:51:17"
+"send|<f.st......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Log/TmuDump.txt|12544|100895|3521546|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage|0|0|0|2017/04/15 01:51:18"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/AuStorage.ini|40|687|2585|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624|0|0|0|2017/04/15 01:51:18"
+"send|.d..tpog.a.|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333900|0|0|0|2017/04/15 01:51:18"
+"send|.f...p...a.|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1333900/icrc$oth.339|0|0|37969847|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4|0|0|0|2017/04/15 01:51:18"
+"send|.d..tpog.a.|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333900|0|0|0|2017/04/15 01:51:18"
+"send|.f...p...a.|Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1333900/lpt$vpn.339|0|0|77165701|2017/04/15 01:51:18"
+"send|<f..t......|Program Files/Trend Micro/OfficeScan/PCCSRV/Web_OSCE/Web_console/CGI/cgiWebUpdate.ini|250|39|27144|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/TrendMicro/SProtect|0|0|0|2017/04/15 01:51:18"
+"send|<f..t......|Program Files/TrendMicro/SProtect/GetServer.ini|22|37|164|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data|0|0|0|2017/04/15 01:51:18"
+"send|<f.st......|Program Files/TrendMicro/SProtect/AU_Data/AU_Log/TmuDump.txt|4636|1450|616782|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage|0|0|0|2017/04/15 01:51:18"
+"send|<f..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/AuStorage.ini|22|37|561|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4|0|0|0|2017/04/15 01:51:18"
+"send|.d..tpog.a.|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1333700|0|0|0|2017/04/15 01:51:18"
+"send|.f...p...a.|Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1333700/lpt$vpn.337|0|0|77151877|2017/04/15 01:51:18"
+"send|<f.st......|Program Files/TrendMicro/SProtect/ISLog/IS.dat|82|54|7392|2017/04/15 01:51:18"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/server.ini|52|39|4036|2017/04/15 01:51:18"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern|0|0|0|2017/04/15 01:51:18"
+"send|<f..tp...a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_813.827|472|39|52789|2017/04/15 01:51:18"
+"send|<f..tp...a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_815.827|454|39|51081|2017/04/15 01:51:18"
+"send|<f..tp...a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_817.827|412|39|46071|2017/04/15 01:51:18"
+"send|<f..t....a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_819.827|352|39|38554|2017/04/15 01:51:18"
+"send|<f..t....a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_821.827|322|39|35537|2017/04/15 01:51:18"
+"send|<f..t....a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_823.827|292|39|31940|2017/04/15 01:51:18"
+"send|<f..tp...a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_825.827|196|39|20372|2017/04/15 01:51:18"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssaptn.zip|14116|39|5506715|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_307.337|3280|39|380120|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_309.337|2644|39|306161|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_311.337|2290|39|265088|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_313.337|2236|39|258353|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_315.337|2224|39|257195|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_317.337|2038|39|235516|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_319.337|1732|39|199519|2017/04/15 01:51:19"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_335.337|340|39|37250|2017/04/15 01:51:19"
+"send|<f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f00.337|16|106424|107200|2017/04/15 01:51:19"
+"send|<f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f01.337|16|126084|127004|2017/04/15 01:51:20"
+"send|<f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f02.337|16|125522|126363|2017/04/15 01:51:21"
+"send|<f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f03.337|16|131740|132690|2017/04/15 01:51:22"
+"send|<f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f04.337|16|167788|168891|2017/04/15 01:51:24"
+"send|<f+++++++++|Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f05.337|16|190791|191868|2017/04/15 01:51:26"
+"send|<f..tp...a.|Program Files/TrendMicro/SProtect/SpntShare/Pattern/vsapi337.zip|50563|39|52041841|2017/04/15 01:51:27"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect|0|0|0|2017/04/15 01:51:27"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/auaction.zip|280|39|30177|2017/04/15 01:51:27"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/186/spnt58/spnt580|0|0|0|2017/04/15 01:51:27"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/186/spnt58/spnt580/auspnt50.zip|394|39|43919|2017/04/15 01:51:27"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/2/spnt58/spnt580|0|0|0|2017/04/15 01:51:27"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/2/spnt58/spnt580/auspnt50.zip|394|39|43919|2017/04/15 01:51:27"
+"send|.d..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/453/spnt58/spnt580|0|0|0|2017/04/15 01:51:27"
+"send|<f..t......|Program Files/TrendMicro/SProtect/SpntShare/ServerProtect/453/spnt58/spnt580/auspnt50.zip|394|39|43919|2017/04/15 01:51:27"
+"send|.d..t......|Program Files/TrendMicro/SProtect/x64|0|0|0|2017/04/15 01:51:27"
+"send|<f..t......|Program Files/TrendMicro/SProtect/x64/PatchDLL.ini|28|39|991|2017/04/15 01:51:27"
+"send|.f...p...a.|Program Files/TrendMicro/SProtect/x64/lpt$vpn.337|0|0|77151877|2017/04/15 01:51:27"
+"send|.d..t......|Program Files/TrendMicro/SProtect/x64/AU_Backup|0|0|0|2017/04/15 01:51:27"
+"send|<f..t......|Program Files/TrendMicro/SProtect/x64/AU_Backup/AuBackup.ini|22|308|638|2017/04/15 01:51:27"
+"send|<f.s.......|Program Files/TrendMicro/SProtect/x64/SpntLog/SpntLog.cdx|2308|6810|296448|2017/04/15 01:51:28"
+"send|<f.s.......|Program Files/TrendMicro/SProtect/x64/SpntLog/SpntLog.dbf|51851|33492|59330688|2017/04/15 01:51:31"
+"send|.d..t......|Windows/NTDS|0|0|0|2017/04/15 01:51:31"
+"send|<f..t......|Windows/NTDS/edb.chk|88|191|8192|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-03.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-05.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-11.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-12.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-13.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALG-DPC-15.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-10.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-22.txt|22|37|250|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-23.txt|22|37|250|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-24.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CALV-DPC-25.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAMO-DPC-18.txt|22|37|234|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAMO-DPC-29.txt|22|37|259|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAMO-DPC-35.txt|22|37|259|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CARR-DPC-06.txt|22|37|250|2017/04/15 01:51:31"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CARR-DPC-09.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVE-DPC-33.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVE-DPC-37.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVE-DPC-39.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-04.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-14.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-16.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CAVR-DPC-24.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-04.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-06.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-10.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-12.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBOA-DPC-27.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-09.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-11.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-13.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-17.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-18.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-23.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CBRA-DPC-24.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-11.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-29.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-36.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCAS-DPC-43.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-08.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-11.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-13.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-51.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-55.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCOI-DPC-57.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-06.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-07.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-15.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-31.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CCON-DPC-32.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-02.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-40.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-41.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-42.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-43.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CDDC-DPC-46.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-10.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-11.txt|22|37|347|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-28.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-29.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CMIR-DPC-30.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-COUT-DPC-31.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-COUT-DPC-33.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-13.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-15.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-16.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CPDN-DPC-21.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-10.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-37.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-38.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDB-DPC-43.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDF-DPC-36.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDF-DPC-37.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CQDF-DPC-40.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-03.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-05.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-07.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-10.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-13.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-18.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-19.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-20.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-21.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-CTEJ-DPC-25.txt|22|37|259|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZCOI-DPC-01.txt|22|37|250|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZCOI-DPC-02.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZMIR-DPC-01.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f..t......|Windows/SYSVOL/domain/silverlight/log/PT-ZTEJ-DPC-01.txt|22|37|234|2017/04/15 01:51:32"
+"send|<f.st......|cygdrive/e/bKit/run/manifest-segment.10980|490|12689|36239|2017/04/15 01:51:44"
+sent 227 lines of manifest starting at 343
+
+Phase 3 - Clean deleted files from backup
+
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/lpt$vpn.329|0|0|0|2017/04/15 01:51:50"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/icrc$oth.329|0|0|0|2017/04/15 01:51:50"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Admin/AU_Backup/3/1082130432/backup.00a|0|0|0|2017/04/15 01:51:52"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/vsapi337.zip|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f05.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f04.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f03.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f02.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f01.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_f00.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_335.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_319.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_317.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_315.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_313.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_311.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_309.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/v_307.337|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/tmwlchk_149800.zip|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f05.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f04.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f03.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f02.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f01.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333f00.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1333500.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331900.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331700.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331500.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331300.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1331100.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1330900.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth_1330700.1333700|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Download/Pattern/icrc/ioth1333700.zip|0|0|0|2017/04/15 01:51:56"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/activeupdate/dup10034162.ptn|0|0|0|2017/04/15 01:51:57"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/LWCS/wcspatterns/dup10034162.ptn|0|0|0|2017/04/15 01:51:57"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/AU_Data/AU_Temp/6292_10276/ini_xml.zip|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/AU_Data/AU_Temp/6292_10276|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/itbldiff_1720601900.1720602000|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/itbldiff_1720601800.1720601900|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crczdiff_1720601900.1720602000|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crczdiff_1720601800.1720601900|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/activeupdate/crcz.ptn.1720602000|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/MANIFEST-026008|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026060.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026059.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026058.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026057.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026056.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026055.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026054.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026053.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026052.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026051.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026050.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026049.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026048.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026047.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026046.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026045.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026044.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026043.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026042.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026041.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026040.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026039.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026038.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026037.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026036.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026035.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026034.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026033.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026032.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026031.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026030.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026029.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026028.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026027.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026026.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026025.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026024.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026023.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026022.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026021.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026020.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026018.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026017.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026016.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026015.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026001.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/026000.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025999.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025983.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025982.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025981.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025980.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025979.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025978.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025975.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025974.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025973.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025972.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025971.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025970.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025969.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025968.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025967.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025966.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025965.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025963.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025960.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025959.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025957.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025956.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025953.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025883.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/025696.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/000196.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/000194.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/000192.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/000190.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db1/000188.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/MANIFEST-025804|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025805.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025803.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025801.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025800.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025799.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025798.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025797.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025796.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025795.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025794.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025793.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025792.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025791.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025790.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025789.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025788.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025787.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025786.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025785.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025784.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025783.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025782.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025781.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025780.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025778.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025777.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025776.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025775.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025774.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025773.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025772.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025771.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025769.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025768.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025767.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025766.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025765.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025764.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025763.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025762.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025761.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025760.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025759.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025758.ldb|0|0|0|2017/04/15 01:51:59"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025757.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025756.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025755.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025754.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025753.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025752.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025751.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025750.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025749.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025747.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025746.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025745.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025737.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025736.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025718.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025717.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025716.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025715.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025714.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025713.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025712.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025711.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025707.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025706.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025570.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025569.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025568.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/025567.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/000198.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/000196.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/000194.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/000192.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/000190.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/data/db2/000188.ldb|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz/crcz.ptn.1720602000|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crcz/crcz.ptn.1720601900|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718002000.1718002100|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001900.1718002000|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001800.1718001900|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001700.1718001800|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001600.1718001700|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001500.1718001600|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001400.1718001500|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001300.1718001400|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001200.1718001300|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001100.1718001200|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718001000.1718001100|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000900.1718001000|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000800.1718000900|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000700.1718000800|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000600.1718000700|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000500.1718000600|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000400.1718000500|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000300.1718000400|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000200.1718000300|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1718000100.1718000200|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1717802400.1718000100|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1717802300.1717802400|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1717802200.1717802300|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1717802100.1717802200|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/crczdiff/crczdiff_1717802000.1717802100|0|0|0|2017/04/15 01:52:00"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720002000.1720002100|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001900.1720002000|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001800.1720001900|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001700.1720001800|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001600.1720001700|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001500.1720001600|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001400.1720001500|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001300.1720001400|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001200.1720001300|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001100.1720001200|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720001000.1720001100|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000900.1720001000|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000800.1720000900|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000700.1720000800|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000600.1720000700|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000500.1720000600|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000400.1720000500|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000300.1720000400|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000200.1720000300|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1720000100.1720000200|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1719802400.1720000100|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1719802300.1719802400|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1719802200.1719802300|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1719802100.1719802200|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/WSS/spsc/patterns/itbldiff/itbldiff_1719802000.1719802100|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1332500/icrc$oth.325|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/1208090624/1332500|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1332500/lpt$vpn.325|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/Trend Micro/OfficeScan/PCCSRV/Web/Service/AU_Data/AU_Storage/3/4/1332500|0|0|0|2017/04/15 01:52:01"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1332100/lpt$vpn.321|0|0|0|2017/04/15 01:52:14"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/AU_Data/AU_Storage/3/4/1332100|0|0|0|2017/04/15 01:52:14"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/vsapi335.zip|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f05.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f04.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f03.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f02.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f01.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_f00.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_333.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_317.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_315.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_313.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_311.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_309.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_307.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/v_305.335|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_823.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_821.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_819.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_817.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_815.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_813.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/SpntShare/Pattern/ssa_811.825|0|0|0|2017/04/15 01:52:17"
+"del.|*deleting  |Program Files/TrendMicro/SProtect/x64/lpt$vpn.333|0|0|0|2017/04/15 01:52:17"
+
+Phase 4 - Create a realonly snapshot on server
+
+Backup done at Sat, 15 Apr 2017 01:52:40 +0100 for:
+'F:\' on:
+  rsync://user@192.168.6.15:8731/hppt.local.PT-CBRA-DCS-02.200A3018-E928-E411-B6D1-001E6794E528/F.2E9CBC06.SYS-DATA.Fixed-Drive.NTFS/@current/data/

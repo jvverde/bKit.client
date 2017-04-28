@@ -297,8 +297,8 @@ bg_upload_manifest(){
 	prepare
 
 	bg_upload_manifest "$MAPDRIVE"
-
-	echo Start to backup directories/files on ${ORIGINALDIR[@]} at $(date -R)
+	ITIME=$(date -R)
+	echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
 
 	echo -e "\nPhase 1 - Backup new/modified files\n"
 
@@ -331,12 +331,32 @@ bg_upload_manifest(){
 	echo -e "\nPhase 4 - Create a readonly snapshot on server\n"
 	snapshot
 
-	NOW=$(date -R)
-	echo "Backup done on $NOW for:"
+	ETIME=$(date -R)
+	echo "Backup done on $ETIME for:"
 	for I in ${!ORIGINALDIR[@]}
 	do
 		echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
 		echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 	done
+	let DTIME=$(date +%s -d "$ETIME")-$(date +%s -d "$ITIME")
+	SEC=${DTIME}s
+	(($DTIME>59)) && {
+		let SEC=DTIME%60
+		let DTIME=DTIME/60
+		SEC=${SEC}s
+		MIN=${DTIME}m
+		(($DTIME>59)) && {
+			let MIN=DTIME%60
+			let DTIME=DTIME/60
+			MIN=${MIN}m
+			HOUR=${DTIME}h
+			(($DTIME>23)) && {
+				let HOUR=DTIME%24
+				let DTIME=DTIME/24
+				DAYS=${DTIME}d
+			}
+		}
+	}
+	echo "Backup done in $DAYS$HOUR$MIN$SEC"
 #) 9>"$LOCK"
 

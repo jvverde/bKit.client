@@ -25,6 +25,7 @@
             >
           </td>
           <td>
+            <i v-if="isServerOk === undefined" class="fa fa-cog fa-spin fa-fw" aria-hidden="true"></i>
             <i v-if="isServerOk === false" class="fa fa-exclamation-triangle alert" aria-hidden="true"></i>
             <i v-if="isServerOk === true" class="fa fa-check ok" aria-hidden="true"></i>
           </td>
@@ -149,10 +150,9 @@ export default {
       file.end()
     },
     checkSMTP () {
-      if (!this.isValidName || this.isChecking) {
-        this.isServerOk = undefined
-        return
-      }
+      if (!this.isValidName) return
+      this.isServerOk = undefined
+      if (this.isChecking) return
       this.isChecking = true
       setTimeout(() => {
         console.log('go-check', this.server)
@@ -187,6 +187,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+  @import "../../config.scss";
   @import "../../breadcrumb.scss";
   .smtp{
     display:flex;
@@ -215,8 +216,15 @@ export default {
         flex-grow: .1;
       }
       td{
+        line-height: 2em;
         .invalid {
           border: 1px solid LightCoral;
+        }
+        input{
+          line-height: 2em;
+          border:1px solid $bkit-color;
+          border-radius: 6px;
+          padding-left: 6px;
         }
       }
       td:first-child{

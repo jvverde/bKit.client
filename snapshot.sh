@@ -160,7 +160,7 @@ done
             cat "$LOGFILE"
             echo '-------------------'
             cat "$ERRFILE"
-        } | email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup@bkit.pt" "$TO"
+        } | email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$TO"
     }
 }
 

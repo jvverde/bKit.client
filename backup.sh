@@ -399,7 +399,7 @@ bg_upload_manifest(){
   } | tee "$STATSFILE"
 
   #Sent email if required
-  [[ -n $NOTIFY && -e $STATSFILE ]] && (
+  [[ -n $NOTIFY && -s $STATSFILE ]] && (
     SMTP="$SDIR/conf/smtp.conf"
     [[ -f $SMTP ]] || die "Email not sent because configuration file '$SMTP' is missing"
     exists email && {

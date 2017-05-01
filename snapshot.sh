@@ -20,7 +20,7 @@ getdev(){
 redirectlogs() {
     local LOGDIR=$1
     [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
-    STARTDATE=$(date +%Y-%m-%dT%H-%M-%S)
+    local STARTDATE=$(date +%Y-%m-%dT%H-%M-%S)
     LOGFILE="$LOGDIR/log-$STARTDATE"
     ERRFILE="$LOGDIR/err-$STARTDATE"
     :> $LOGFILE

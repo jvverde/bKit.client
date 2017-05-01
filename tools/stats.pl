@@ -61,19 +61,19 @@ print "Number of deleted files or directories:", scalar @dels;
 	print "Total size of backed up files: $bytes$u";
 } 
 
-{
-	my @tmp = split /\|/, $lines[0];
-	my $start = pop @tmp;
-	my @tmp = split /\|/, $lines[$#lines];
-	my $stop = pop @tmp;
-	my $start = 0 | qx/date +%s -d "$start"/;
-	my $stop = 0 | qx/date +%s -d "$stop"/;
-	my $delta = $stop - $start;
-	my ($sec,$min,$hour) = ("${delta}s", '0m', '0h');
-	$sec = ($delta % 60) . 's' and $delta = 0 | $delta / 60 and $min = "${delta}m" if $delta > 59;
-	$min = ($delta % 60) . 'm' and $delta = 0 | $delta / 60 and $hour = "${delta}h" if $delta > 59;
-	print "Total time spent: $hour$min$sec";
-}
+# {
+# 	my @tmp = split /\|/, $lines[0];
+# 	my $start = pop @tmp;
+# 	my @tmp = split /\|/, $lines[$#lines];
+# 	my $stop = pop @tmp;
+# 	my $start = 0 | qx/date +%s -d "$start"/;
+# 	my $stop = 0 | qx/date +%s -d "$stop"/;
+# 	my $delta = $stop - $start;
+# 	my ($sec,$min,$hour) = ("${delta}s", '0m', '0h');
+# 	$sec = ($delta % 60) . 's' and $delta = 0 | $delta / 60 and $min = "${delta}m" if $delta > 59;
+# 	$min = ($delta % 60) . 'm' and $delta = 0 | $delta / 60 and $hour = "${delta}h" if $delta > 59;
+# 	print "Total time spent: $hour$min$sec";
+# }
 
 {
 	my %sizes;
@@ -85,7 +85,7 @@ print "Number of deleted files or directories:", scalar @dels;
 		pop @dirs;
 		my $dir = '';
 		foreach my $i (0..$#dirs) {
-			$dir = $dirs[$i] = "$dir$SEP$dirs[$i]"; 
+			$dir = $dirs[$i] = "$dir$dirs[$i]$SEP"; 
 		}
 		map { $sizes{$_} += $size } @dirs;
 	}
@@ -100,7 +100,7 @@ print "Number of deleted files or directories:", scalar @dels;
 			return $b cmp $a
 		} @keys){
 		my $size = $sizes{$dir};
-		printf("\t%-12d\t%s\n", $size, $dir) unless $size == $last->{size} and $last->{dir} =~ m#\Q$dir\E/#;
+		printf("\t%-12d\t%s\n", $size, $dir) unless $size == $last->{size} and $last->{dir} =~ /\Q$dir\E/;
 		$last->{size} = $size;
 		$last->{dir} = $dir;
 	}
@@ -113,7 +113,8 @@ print "Number of deleted files or directories:", scalar @dels;
 		next and print STDERR "Strange situation with $line" if defined $sizes{$file};
 		$sizes{$file} = $size;
 	}
-	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes)[0..9];
+	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
+	$#topkeys = 9 if scalar @topkeys > 10;
 	print "10 biggest transfers:" if scalar @topkeys;
-	printf("\t%-12d\t%s\n", $sizes{$_}, "$SEP$_") foreach (@topkeys);
+	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
 }

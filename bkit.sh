@@ -54,6 +54,9 @@ do
 		-h|--help)
 			usage
 		;;
+		--stats|--sendlogs|--notify)
+			OPTIONS+=( "$KEY")
+		;;
 		*=*)
 			OPTIONS+=( "$KEY")
 		;;

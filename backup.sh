@@ -124,6 +124,7 @@ DLIST=$RUNDIR/dir-list.$$
 MANIFEST=$RUNDIR/manifest.$$
 ENDFLAG=$RUNDIR/endflag.$$
 LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
+STATS=$RUNDIR/stats.$$
 
 
 trap "rm -f $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK" EXIT
@@ -293,70 +294,85 @@ bg_upload_manifest(){
 #		rm -fv "$LOCK"
 #		die Volume $VOLUMESERIALNUMBER was locked for 1 day
 #	}
-
-	prepare
-
-	bg_upload_manifest "$MAPDRIVE"
+	
 	ITIME=$(date -R)
-	echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
 
-	echo -e "\nPhase 1 - Backup new/modified files\n"
+	{
+		prepare
 
-	bash "$SDIR/hash.sh" --rvid="$RVID" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+		bg_upload_manifest "$MAPDRIVE"
+		echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
 
-	touch "$ENDFLAG"
-	wait4jobs
-	rm -f "$MANIFEST" "$ENDFLAG"
+		echo -e "\nPhase 1 - Backup new/modified files\n"
 
-	echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
+		bash "$SDIR/hash.sh" --rvid="$RVID" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
-	bg_upload_manifest "$MAPDRIVE"
+		touch "$ENDFLAG"
+		wait4jobs
+		rm -f "$MANIFEST" "$ENDFLAG"
 
-	backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+		echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
 
-	[[ -n $HLINK ]] && {
-		echo -e "\n\tPhase 2.1 update delayed hardlinks"
+		bg_upload_manifest "$MAPDRIVE"
+
 		backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
-	}
 
-	touch "$ENDFLAG"
-	wait4jobs
-	rm -f "$MANIFEST" "$ENDFLAG"
+		[[ -n $HLINK ]] && {
+			echo -e "\n\tPhase 2.1 update delayed hardlinks"
+			backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+		}
+
+		touch "$ENDFLAG"
+		wait4jobs
+		rm -f "$MANIFEST" "$ENDFLAG"
 
 
-	echo -e "\nPhase 3 - Clean deleted files from backup\n"
+		echo -e "\nPhase 3 - Clean deleted files from backup\n"
 
-	clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+		clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
-	echo -e "\nPhase 4 - Create a readonly snapshot on server\n"
-	snapshot
+		echo -e "\nPhase 4 - Create a readonly snapshot on server\n"
+		snapshot
 
-	ETIME=$(date -R)
-	echo "Backup done on $ETIME for:"
-	for I in ${!ORIGINALDIR[@]}
-	do
-		echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
-		echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
-	done
-	let DTIME=$(date +%s -d "$ETIME")-$(date +%s -d "$ITIME")
-	SEC=${DTIME}s
-	(($DTIME>59)) && {
-		let SEC=DTIME%60
-		let DTIME=DTIME/60
-		SEC=${SEC}s
-		MIN=${DTIME}m
+		echo "Backup done on $(date -R) for:"
+		for I in ${!ORIGINALDIR[@]}
+		do
+			echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
+			echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
+		done
+	} | tee "$STATS"
+	
+	#Now some stats
+	deltatime(){
+		let DTIME=$(date +%s -d "$1")-$(date +%s -d "$2")
+		SEC=${DTIME}s
 		(($DTIME>59)) && {
-			let MIN=DTIME%60
+			let SEC=DTIME%60
 			let DTIME=DTIME/60
-			MIN=${MIN}m
-			HOUR=${DTIME}h
-			(($DTIME>23)) && {
-				let HOUR=DTIME%24
-				let DTIME=DTIME/24
-				DAYS=${DTIME}d
+			SEC=${SEC}s
+			MIN=${DTIME}m
+			(($DTIME>59)) && {
+				let MIN=DTIME%60
+				let DTIME=DTIME/60
+				MIN=${MIN}m
+				HOUR=${DTIME}h
+				(($DTIME>23)) && {
+					let HOUR=DTIME%24
+					let DTIME=DTIME/24
+					DAYS=${DTIME}d
+				}
 			}
 		}
+		DELTATIME="$DAYS$HOUR$MIN$SEC"
 	}
-	echo "Backup done in $DAYS$HOUR$MIN$SEC"
+	deltatime "$(date -R)" "$ITIME"
+	[[ -n $STATS && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
+    echo "------------Stats------------"
+		echo "Total time spent: $DELTATIME"
+    grep -Pio '^".+"$' "$STATS" | awk -vA="$MAPDRIVE" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
+    echo "------------End of Stats------------"
+  }
+	deltatime "$(date -R)" "$ITIME"
+	echo "Backup done in $DELTATIME"
 #) 9>"$LOCK"
 

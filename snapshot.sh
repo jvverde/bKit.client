@@ -147,11 +147,6 @@ do
     } || {
         backup "${BACKUPDIR[@]}"
     }
-    [[ -n $LOGFILE && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
-        echo "------------Stats for '$ROOT'------------"
-        perl "$SDIR/tools/stats.pl" "$LOGFILE"
-        echo "------------End of Stats------------"
-    }
 done
 
 [[ -n $LOGFILE || -n $ERRFILE ]] && {

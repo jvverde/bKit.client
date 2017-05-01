@@ -18,7 +18,7 @@ print 'Number of files touched:', scalar @files;
 my @dirs = grep {/^send\|.d/} @sends;
 print 'Number of dirs touched:', scalar @dirs;
 
-{ #compute number of tranfered bytes
+{ #compute number of transfered bytes
 	my @bytes = map{my @fields = split /\|/; $fields[4]} @files;
 	my $bytes = 0;
 	$bytes += $_ foreach (@bytes);
@@ -69,4 +69,27 @@ print "Number of deleted files or directories:", scalar @dels;
 	$sec = ($delta % 60) . 's' and $delta = 0 | $delta / 60 and $min = "${delta}m" if $delta > 59;
 	$min = ($delta % 60) . 'm' and $delta = 0 | $delta / 60 and $hour = "${delta}h" if $delta > 59;
 	print "Total time spent: $hour$min$sec";
+}
+
+{
+	my %sizes;
+	foreach my $line (@files){
+		my @fields = split /\|/, $line;
+		my $size = $fields[4];
+		next unless $size > 0;
+		my @dirs = split /\//, $fields[2];
+		pop @dirs;
+		my $dir = '';
+		foreach my $i (0..$#dirs) {
+			$dir = $dirs[$i] = "$dir/$dirs[$i]"; 
+		}
+		map { $sizes{$_} += $size } @dirs;
+	}
+	print "Bytes sent by directory";
+	foreach my $dir (sort { 
+			return $sizes{$b} <=> $sizes{$a} unless $sizes{$b} == $sizes{$a};
+			return $a cmp $b
+		} grep {$sizes{$_} > 1024*1024} keys %sizes){
+		printf(" %-12d\t%s\n", $sizes{$dir}, $dir);
+	}
 }

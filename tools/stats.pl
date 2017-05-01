@@ -17,28 +17,6 @@ my $string = q#send|#;
 my @sends = grep {/^\Q$string\E/} @lines;
 my @files = grep {/^send\|.f/} @sends;
 
-print 'Number of files touched:', scalar @files;
-
-my @dirs = grep {/^send\|.d/} @sends;
-print 'Number of dirs touched:', scalar @dirs;
-
-my $string = q#send|<f+++++++++|#; 
-my @newfiles = grep {/^\Q$string\E/} @sends;
-print 'Number of new files:', scalar @newfiles;
-
-my @updfiles = grep {/^send\|<f[^+]{9}\|/} @sends;
-print 'Number of updated files:', scalar @updfiles;
-
-my @permfiles = grep {/^send\|\.f[^+]{9}\|/} @sends;
-print 'Number of files updated with permissions/attributes only:', scalar @permfiles;
-
-my $string = q#send|cd+++++++++|#; 
-my @newdirs = grep {/^\Q$string\E/} @sends;
-print "Number of created directories:", scalar @newdirs;
-
-my @dels = grep {/^del\./} @lines;
-print "Number of deleted files or directories:", scalar @dels;
-
 { #compute number of transfered bytes
 	my @bytes = map{my @fields = split /\|/; $fields[4]} @files;
 	my $bytes = 0;
@@ -53,13 +31,35 @@ print "Number of deleted files or directories:", scalar @dels;
 {	#compute size of files touched
 	my @bytes = map{my @fields = split /\|/; $fields[5]} @files;
 	my $bytes = 0;
-	$bytes += $_ foreach (@bytes);	
+	$bytes += $_ foreach (@bytes);
 	my $u = 'B';
 	$bytes = 0 | $bytes / 1024 and $u = 'Kb' if $bytes > 2048;
 	$bytes = 0 | $bytes / 1024 and $u = 'Mb' if $bytes > 2048;
 	$bytes = 0 | $bytes / 1024 and $u = 'Gb' if $bytes > 2048;
 	print "Total size of backed up files: $bytes$u";
-} 
+}
+
+print 'Number of files touched:', scalar @files;
+
+my @dirs = grep {/^send\|.d/} @sends;
+print 'Number of dirs touched:', scalar @dirs;
+
+my $string = q#send|<f+++++++++|#;
+my @newfiles = grep {/^\Q$string\E/} @sends;
+print 'Number of new files:', scalar @newfiles;
+
+my @updfiles = grep {/^send\|<f[^+]{9}\|/} @sends;
+print 'Number of updated files:', scalar @updfiles;
+
+my @permfiles = grep {/^send\|\.f[^+]{9}\|/} @sends;
+print 'Number of files updated with permissions/attributes only:', scalar @permfiles;
+
+my $string = q#send|cd+++++++++|#;
+my @newdirs = grep {/^\Q$string\E/} @sends;
+print "Number of created directories:", scalar @newdirs;
+
+my @dels = grep {/^del\./} @lines;
+print "Number of deleted files or directories:", scalar @dels;
 
 # {
 # 	my @tmp = split /\|/, $lines[0];
@@ -85,7 +85,7 @@ print "Number of deleted files or directories:", scalar @dels;
 		pop @dirs;
 		my $dir = '';
 		foreach my $i (0..$#dirs) {
-			$dir = $dirs[$i] = "$dir$dirs[$i]$SEP"; 
+			$dir = $dirs[$i] = "$dir$dirs[$i]$SEP";
 		}
 		map { $sizes{$_} += $size } @dirs;
 	}
@@ -95,7 +95,7 @@ print "Number of deleted files or directories:", scalar @dels;
 		size => 0,
 		dir => ''
 	};
-	foreach my $dir (sort { 
+	foreach my $dir (sort {
 			return $sizes{$b} <=> $sizes{$a} unless $sizes{$b} == $sizes{$a};
 			return $b cmp $a
 		} @keys){
@@ -114,7 +114,8 @@ print "Number of deleted files or directories:", scalar @dels;
 		$sizes{$file} = $size;
 	}
 	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
+	next unless scalar @topkeys > 1;
 	$#topkeys = 9 if scalar @topkeys > 10;
-	print "10 biggest transfers:" if scalar @topkeys;
+	print scalar @topkeys, "biggest transfers:";
 	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
 }

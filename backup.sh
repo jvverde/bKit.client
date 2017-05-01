@@ -24,6 +24,23 @@ do
 			MAPDRIVE="$1" && shift
 			exists cygpath && MAPDRIVE=$(cygpath "$MAPDRIVE")
 		;;
+    --stats)
+      STATS=1
+    ;;
+    --sendlogs)
+      FULLREPORT=1
+      NOTIFY=1
+      STATS=1
+    ;;
+    --notify)
+      NOTIFY=1
+      STATS=1
+    ;;
+    --email=*)
+      EMAIL="${KEY#*=}"
+      NOTIFY=1
+      STATS=1
+    ;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
@@ -124,10 +141,17 @@ DLIST=$RUNDIR/dir-list.$$
 MANIFEST=$RUNDIR/manifest.$$
 ENDFLAG=$RUNDIR/endflag.$$
 LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
-STATS=$RUNDIR/stats.$$
+LOGFILE=$RUNDIR/logs.$$
+ERRFILE=$RUNDIR/errors.$$
+STATSFILE=$RUNDIR/stats.$$
 
+exec 3>&2
+exec 2>"$ERRFILE"
 
-trap "rm -f $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK" EXIT
+trap "
+  cat \"$ERRFILE\" >&3
+  rm -f $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK
+" EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -340,7 +364,7 @@ bg_upload_manifest(){
 			echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
 			echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 		done
-	} | tee "$STATS"
+	} | tee "$LOGFILE"
 
 	#Now some stats
 	deltatime(){
@@ -365,14 +389,54 @@ bg_upload_manifest(){
 		}
 		DELTATIME="$DAYS$HOUR$MIN$SEC"
 	}
-	deltatime "$(date -R)" "$ITIME"
-	[[ -n $STATS && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
+	[[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
+    deltatime "$(date -R)" "$ITIME"
 		echo "Total time spent: $DELTATIME"
     exists cygpath && MAPDRIVE=$(cygpath -w "$MAPDRIVE")
-    grep -Pio '^".+"$' "$STATS" | awk -vA="$MAPDRIVE" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
+    grep -Pio '^".+"$' "$LOGFILE" | awk -vA="$MAPDRIVE" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
     echo "------------End of Stats------------"
-  }
+  } | tee "$STATSFILE"
+
+  #Sent email if required
+  [[ -n $NOTIFY && -e $STATSFILE ]] && (
+    SMTP="$SDIR/conf/smtp.conf"
+    [[ -f $SMTP ]] || die "Email not sent because configuration file '$SMTP' is missing"
+    exists email && {
+      ME=$(uname -n)
+      TIME=$(date +%Hh%Mm)
+      FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
+      exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
+      printf -v DIRS "%s, " "${FULLDIRS[@]}"
+      DIRS=${DIRS%, }
+      WHAT=$DIRS
+      let NUMBEROFDIRS=${#FULLDIRS[@]}
+      let LIMIT=3
+      let EXTRADIRS=NUMBEROFDIRS-LIMIT
+      ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
+      STATUS="success"
+      [[ -s $ERRFILE ]] && STATUS="errors"
+      SUBJECT="Backup of $WHAT on $ME ended at $TIME with $STATUS"
+      source "$SMTP"
+      DEST=${EMAIL:-$TO}
+      {
+        echo "Backup of $DIRS"
+        cat "$STATSFILE"
+
+        [[ -s $ERRFILE ]] && {
+          echo -e "\n------------Errors found------------"
+          cat "$ERRFILE"
+          echo "------------End of Errors------------"
+        }
+
+        [[ -n $FULLREPORT ]] && {
+          echo -e "\n------------Full Logs------------"
+          cat "$LOGFILE"
+          echo "------------End of Logs------------"
+        }
+      } | email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
+    }
+  )
 	deltatime "$(date -R)" "$ITIME"
 	echo "Backup done in $DELTATIME"
 #) 9>"$LOCK"

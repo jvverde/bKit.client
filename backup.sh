@@ -294,7 +294,7 @@ bg_upload_manifest(){
 #		rm -fv "$LOCK"
 #		die Volume $VOLUMESERIALNUMBER was locked for 1 day
 #	}
-	
+
 	ITIME=$(date -R)
 
 	{
@@ -341,7 +341,7 @@ bg_upload_manifest(){
 			echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
 		done
 	} | tee "$STATS"
-	
+
 	#Now some stats
 	deltatime(){
 		let DTIME=$(date +%s -d "$1")-$(date +%s -d "$2")
@@ -369,6 +369,7 @@ bg_upload_manifest(){
 	[[ -n $STATS && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
 		echo "Total time spent: $DELTATIME"
+    exists cygpath && MAPDRIVE=$(cygpath -w "$MAPDRIVE")
     grep -Pio '^".+"$' "$STATS" | awk -vA="$MAPDRIVE" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
     echo "------------End of Stats------------"
   }

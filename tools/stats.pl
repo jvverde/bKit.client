@@ -114,8 +114,7 @@ print "Number of deleted files or directories:", scalar @dels;
 		$sizes{$file} = $size;
 	}
 	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
-	next unless scalar @topkeys > 1;
 	$#topkeys = 9 if scalar @topkeys > 10;
-	print scalar @topkeys, "biggest transfers:";
+	print scalar @topkeys, "biggest transfers:" if scalar @topkeys;
 	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
 }

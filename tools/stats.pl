@@ -4,6 +4,8 @@ use utf8;
 use strict;
 
 my $LIMIT = 0; #Size limit for output directores usage
+my $SEP = '/';
+$SEP = '\\' if $^O eq 'cygwin' or $^O eq 'MSWin32';
 
 $\ = "\n";
 $, = ' ';
@@ -83,12 +85,12 @@ print "Number of deleted files or directories:", scalar @dels;
 		pop @dirs;
 		my $dir = '';
 		foreach my $i (0..$#dirs) {
-			$dir = $dirs[$i] = "$dir/$dirs[$i]"; 
+			$dir = $dirs[$i] = "$dir$SEP$dirs[$i]"; 
 		}
 		map { $sizes{$_} += $size } @dirs;
 	}
 	my @keys = grep {$sizes{$_} > $LIMIT} keys %sizes;
-	print "Bytes sent by directory" if scalar @keys;
+	print "Bytes sent by directory:" if scalar @keys;
 	my $last = {
 		size => 0,
 		dir => ''
@@ -102,4 +104,16 @@ print "Number of deleted files or directories:", scalar @dels;
 		$last->{size} = $size;
 		$last->{dir} = $dir;
 	}
+}
+
+{
+	my %sizes;
+	foreach my $line (@updfiles){
+		my ($file,$size) = (split /\|/, $line)[2,4];
+		next and print STDERR "Strange situation with $line" if defined $sizes{$file};
+		$sizes{$file} = $size;
+	}
+	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes)[0..9];
+	print "10 biggest transfers:" if scalar @topkeys;
+	printf("\t%-12d\t%s\n", $sizes{$_}, "$SEP$_") foreach (@topkeys);
 }

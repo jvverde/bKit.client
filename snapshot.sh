@@ -25,6 +25,8 @@ redirectlogs() {
     ERRFILE="$LOGDIR/err-$STARTDATE"
     :> $LOGFILE
     :> $ERRFILE
+    echo "Logs go to $LOGFILE"
+    echo "Errors go to $ERRFILE"
     exec 1>"$LOGFILE"
     exec 2>"$ERRFILE"
 }
@@ -144,6 +146,11 @@ do
         fi
     } || {
         backup "${BACKUPDIR[@]}"
+    }
+    [[ -n $LOGFILE && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
+        echo "------------Stats for '$ROOT'------------"
+        perl "$SDIR/tools/stats.pl" "$LOGFILE"
+        echo "------------End of Stats------------"
     }
 done
 

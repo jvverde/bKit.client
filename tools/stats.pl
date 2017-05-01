@@ -3,6 +3,8 @@ use Data::Dumper;
 use utf8;
 use strict;
 
+my $LIMIT = 0; #Size limit for output directores usage
+
 $\ = "\n";
 $, = ' ';
 my @logfile = <>;
@@ -17,6 +19,23 @@ print 'Number of files touched:', scalar @files;
 
 my @dirs = grep {/^send\|.d/} @sends;
 print 'Number of dirs touched:', scalar @dirs;
+
+my $string = q#send|<f+++++++++|#; 
+my @newfiles = grep {/^\Q$string\E/} @sends;
+print 'Number of new files:', scalar @newfiles;
+
+my @updfiles = grep {/^send\|<f[^+]{9}\|/} @sends;
+print 'Number of updated files:', scalar @updfiles;
+
+my @permfiles = grep {/^send\|\.f[^+]{9}\|/} @sends;
+print 'Number of files updated with permissions/attributes only:', scalar @permfiles;
+
+my $string = q#send|cd+++++++++|#; 
+my @newdirs = grep {/^\Q$string\E/} @sends;
+print "Number of created directories:", scalar @newdirs;
+
+my @dels = grep {/^del\./} @lines;
+print "Number of deleted files or directories:", scalar @dels;
 
 { #compute number of transfered bytes
 	my @bytes = map{my @fields = split /\|/; $fields[4]} @files;
@@ -40,23 +59,6 @@ print 'Number of dirs touched:', scalar @dirs;
 	print "Total size of backed up files: $bytes$u";
 } 
 
-my $string = q#send|<f+++++++++|#; 
-my @newfiles = grep {/^\Q$string\E/} @sends;
-print 'Number of new files:', scalar @newfiles;
-
-my @updfiles = grep {/^send\|<f[^+]{9}\|/} @sends;
-print 'Number updated existing files:', scalar @updfiles;
-
-my @permfiles = grep {/^send\|\.f[^+]{9}\|/} @sends;
-print 'Number of files updated with permissions/attributes only:', scalar @permfiles;
-
-my $string = q#send|cd+++++++++|#; 
-my @newdirs = grep {/^\Q$string\E/} @sends;
-print "Number of created directories:", scalar @newdirs;
-
-my @dels = grep {/^del\./} @lines;
-print "Number of deleted files or directories:", scalar @dels;
-
 {
 	my @tmp = split /\|/, $lines[0];
 	my $start = pop @tmp;
@@ -73,11 +75,11 @@ print "Number of deleted files or directories:", scalar @dels;
 
 {
 	my %sizes;
-	foreach my $line (@files){
+	foreach my $line (@newfiles,@updfiles){
 		my @fields = split /\|/, $line;
 		my $size = $fields[4];
 		next unless $size > 0;
-		my @dirs = split /\//, $fields[2];
+		my @dirs = split '/', $fields[2];
 		pop @dirs;
 		my $dir = '';
 		foreach my $i (0..$#dirs) {
@@ -85,11 +87,19 @@ print "Number of deleted files or directories:", scalar @dels;
 		}
 		map { $sizes{$_} += $size } @dirs;
 	}
-	print "Bytes sent by directory";
+	my @keys = grep {$sizes{$_} > $LIMIT} keys %sizes;
+	print "Bytes sent by directory" if scalar @keys;
+	my $last = {
+		size => 0,
+		dir => ''
+	};
 	foreach my $dir (sort { 
 			return $sizes{$b} <=> $sizes{$a} unless $sizes{$b} == $sizes{$a};
-			return $a cmp $b
-		} grep {$sizes{$_} > 1024*1024} keys %sizes){
-		printf(" %-12d\t%s\n", $sizes{$dir}, $dir);
+			return $b cmp $a
+		} @keys){
+		my $size = $sizes{$dir};
+		printf("\t%-12d\t%s\n", $size, $dir) unless $size == $last->{size} and $last->{dir} =~ m#\Q$dir\E/#;
+		$last->{size} = $size;
+		$last->{dir} = $dir;
 	}
 }

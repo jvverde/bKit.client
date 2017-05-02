@@ -419,6 +419,7 @@ bg_upload_manifest(){
       SUBJECT="Backup of $WHAT on $ME ended at $TIME with $STATUS"
       source "$SMTP"
       DEST=${EMAIL:-$TO}
+      [[ -n $DEST ]] || die "Email destination not defined"
       {
         echo "Backup of $DIRS"
         cat "$STATSFILE"

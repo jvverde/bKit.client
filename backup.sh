@@ -356,7 +356,8 @@ bg_upload_manifest(){
 		clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
 		echo -e "\nPhase 4 - Create a readonly snapshot on server\n"
-		snapshot
+		
+    snapshot
 
 		echo "Backup done on $(date -R) for:"
 		for I in ${!ORIGINALDIR[@]}

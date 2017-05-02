@@ -136,6 +136,7 @@ RDIR="$SDIR"
 	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
+	DOSBASH=${DOSBASH%.exe} #just in case
 	CMD='"'${DOSBASH}.exe'" "'${RDIR}/skit.sh'"'
 	echo '@echo OFF'> "$JOBFILE"
 }

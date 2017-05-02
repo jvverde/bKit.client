@@ -178,19 +178,38 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
-getacls(){
-	FILE="$1"
-	[[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-		METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}
-		DIRS=()
-		while read DIR
-		do
-			DIRS+=( "$MAPDRIVE/$DIR" )
-		done < "$FILE"
-		bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR" |  xargs -d '\n' -I{} echo {}
-		dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
-	)
+
+localacls(){
+  local SRCS=("${@:1:$#-1}")
+  local DST="${@: -1}" #last argument
+  while IFS='|' read -r I FILE LINK FULLPATH LEN
+  do
+    echo acls "$I|$FILE|$LINK|$LEN"
+  done < <(dorsync --dry-run --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
 }
+
+getacls(){
+  local BASE=$1 && shift
+  #local SRC="$1/./$2"
+  local SRCS=()
+  for DIR in "${@:1:$#-1}"
+  do
+    SRCS+=( "$BASE/./$DIR" )
+  done
+  local DST="${@: -1}" #last argument
+
+	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
+  [[ -d $METADATADIR ]] || mkdir -pv "$METADATADIR"
+  localacls "${SRCS[@]}" "$METADATADIR"
+	# DIRS=()
+	# while read DIR
+	# do
+	# 	DIRS+=( "$MAPDRIVE/$DIR" )
+	# done < "$FILE"
+	# bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR" |  xargs -d '\n' -I{} echo {}
+	# dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
+}
+
 
 update_hardlinks(){
 	FILE="${HLIST}.sort"
@@ -258,6 +277,7 @@ backup(){
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
 }
+
 clean(){
 	local BASE=$1 && shift
 	#local SRC="$1/./$2"
@@ -355,8 +375,13 @@ bg_upload_manifest(){
 
 		clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
+    [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+      echo -e "\nPhase 3.1 - Backup ACLS\n"
+      getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
+    )
+
 		echo -e "\nPhase 4 - Create a readonly snapshot on server\n"
-		
+
     snapshot
 
 		echo "Backup done on $(date -R) for:"

@@ -402,41 +402,42 @@ bg_upload_manifest(){
   [[ -n $NOTIFY && -s $STATSFILE ]] && (
     SMTP="$SDIR/conf/smtp.conf"
     [[ -f $SMTP ]] || die "Email not sent because configuration file '$SMTP' is missing"
-    exists email && {
-      ME=$(uname -n)
-      TIME=$(date +%Hh%Mm)
-      FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
-      exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
-      printf -v DIRS "%s, " "${FULLDIRS[@]}"
-      DIRS=${DIRS%, }
-      WHAT=$DIRS
-      let NUMBEROFDIRS=${#FULLDIRS[@]}
-      let LIMIT=3
-      let EXTRADIRS=NUMBEROFDIRS-LIMIT
-      ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
-      STATUS="success"
-      [[ -s $ERRFILE ]] && STATUS="errors"
-      SUBJECT="Backup of $WHAT on $ME ended at $TIME with $STATUS"
-      source "$SMTP"
-      DEST=${EMAIL:-$TO}
-      [[ -n $DEST ]] || die "Email destination not defined"
-      {
-        echo "Backup of $DIRS"
-        cat "$STATSFILE"
+    ME=$(uname -n)
+    TIME=$(date +%Hh%Mm)
+    FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
+    exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
+    printf -v DIRS "%s, " "${FULLDIRS[@]}"
+    DIRS=${DIRS%, }
+    WHAT=$DIRS
+    let NUMBEROFDIRS=${#FULLDIRS[@]}
+    let LIMIT=3
+    let EXTRADIRS=NUMBEROFDIRS-LIMIT
+    ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
+    STATUS="success"
+    [[ -s $ERRFILE ]] && STATUS="errors"
+    SUBJECT="Backup of $WHAT on $ME ended at $TIME with $STATUS"
+    source "$SMTP"
+    DEST=${EMAIL:-$TO}
+    [[ -n $DEST ]] || die "Email destination not defined"
+    {
+      echo "Backup of $DIRS"
+      cat "$STATSFILE"
 
-        [[ -s $ERRFILE ]] && {
-          echo -e "\n------------Errors found------------"
-          cat "$ERRFILE"
-          echo "------------End of Errors------------"
-        }
+      [[ -s $ERRFILE ]] && {
+        echo -e "\n------------Errors found------------"
+        cat "$ERRFILE"
+        echo "------------End of Errors------------"
+      }
 
-        [[ -n $FULLREPORT ]] && {
-          echo -e "\n------------Full Logs------------"
-          cat "$LOGFILE"
-          echo "------------End of Logs------------"
-        }
-      } | email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
-    }
+      [[ -n $FULLREPORT ]] && {
+        echo -e "\n------------Full Logs------------"
+        cat "$LOGFILE"
+        echo "------------End of Logs------------"
+      }
+    } | (
+      exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST" && exit
+      exists mail && mail -s "$ME" "$DEST" && exit
+    )
   )
 	deltatime "$(date -R)" "$ITIME"
 	echo "Backup done in $DELTATIME"

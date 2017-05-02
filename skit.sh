@@ -64,6 +64,9 @@ do
 		-h|--help)
 			usage
 		;;
+		--stats|--sendlogs|--notify)
+			OPTIONS+=( "$KEY")
+		;;
 		*=*)
 			OPTIONS+=( "$KEY")
 		;;
@@ -76,7 +79,7 @@ done
 [[ $# -eq 0 ]] && usage
 
 #Don't move up in order to allow help/usage msg
-[[ -n $NOASK ]] || { 
+[[ -n $NOASK ]] || {
 	[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
 	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
 		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html

@@ -31,6 +31,7 @@ redirectlogs() {
     exec 2>"$ERRFILE"
 }
 RSYNCOPTIONS=()
+OPTIONS=()
 while [[ $1 =~ ^- ]]
 do
     KEY="$1" && shift

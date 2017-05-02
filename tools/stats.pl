@@ -39,10 +39,10 @@ my @files = grep {/^send\|.f/} @sends;
 	print "Total size of touched files: $bytes$u";
 }
 
-print 'Number of files touched:', scalar @files;
+print 'Number of touched files:', scalar @files;
 
 my @dirs = grep {/^send\|.d/} @sends;
-print 'Number of dirs touched:', scalar @dirs;
+print 'Number of touched dirs:', scalar @dirs;
 
 my $string = q#send|<f+++++++++|#;
 my @newfiles = grep {/^\Q$string\E/} @sends;
@@ -52,7 +52,7 @@ my @updfiles = grep {/^send\|<f[^+]{9}\|/} @sends;
 print 'Number of updated files:', scalar @updfiles;
 
 my @permfiles = grep {/^send\|\.f[^+]{9}\|/} @sends;
-print 'Number of files updated with permissions/attributes only:', scalar @permfiles;
+print 'Number of updated permissions/attributes only :', scalar @permfiles;
 
 my $string = q#send|cd+++++++++|#;
 my @newdirs = grep {/^\Q$string\E/} @sends;

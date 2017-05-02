@@ -393,8 +393,8 @@ bg_upload_manifest(){
     echo "------------Stats------------"
     deltatime "$(date -R)" "$ITIME"
 		echo "Total time spent: $DELTATIME"
-    exists cygpath && MAPDRIVE=$(cygpath -w "$MAPDRIVE")
-    grep -Pio '^".+"$' "$LOGFILE" | awk -vA="$MAPDRIVE" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
+    exists cygpath && ROOT=$(cygpath -w "$ROOT")
+    grep -Pio '^".+"$' "$LOGFILE" | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
 

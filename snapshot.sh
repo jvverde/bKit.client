@@ -58,8 +58,14 @@ do
                 shift
             done
         ;;
+        --stats|--sendlogs|--notify)
+            OPTIONS+=( "$KEY")
+        ;;
+        *=*)
+            OPTIONS+=( "$KEY")
+        ;;
         *)
-            die Unknown  option $KEY
+            OPTIONS+=( "$KEY" "$1" ) && shift
         ;;
     esac
 done
@@ -82,7 +88,7 @@ done
 
 backup() {
     echo Backup directly -- without shadow copy
-    bash "$SDIR/backup.sh" -- "${RSYNCOPTIONS[@]}" "$@"
+    bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${RSYNCOPTIONS[@]}" "$@"
 }
 
 ntfssnap(){
@@ -104,7 +110,7 @@ ntfssnap(){
             RMFILES+=( "$NEWFILE" )
         }
     done
-    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
+    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" "${OPTIONS[@]}" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
 
 RMFILES=()
@@ -149,20 +155,4 @@ do
     }
 done
 
-[[ -n $LOGFILE || -n $ERRFILE ]] && {
-    exists email && {
-        ME=$(uname -n)
-        TIME=$(date +%Hh%Mm)
-        SUBJECT="Backup on $ME ended at $TIME successful"
-        [[ -s $ERRFILE ]] && SUBJECT="Backup on $ME ended at $TIME with errors"
-        SMTP="$SDIR/conf/smtp.conf"
-        [[ -f $SMTP ]] || die Cannot found configuration file at $SMTP
-        source "$SMTP"
-        {
-            cat "$LOGFILE"
-            echo '-------------------'
-            cat "$ERRFILE"
-        } | email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$TO"
-    }
-}
 

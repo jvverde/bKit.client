@@ -13,4 +13,5 @@ testar/
 old
 not-used-anymore/
 .backups
-lixo.txtgit
+lixo.txt
+*.log

@@ -36,7 +36,7 @@ my @files = grep {/^send\|.f/} @sends;
 	$bytes = 0 | $bytes / 1024 and $u = 'Kb' if $bytes > 2048;
 	$bytes = 0 | $bytes / 1024 and $u = 'Mb' if $bytes > 2048;
 	$bytes = 0 | $bytes / 1024 and $u = 'Gb' if $bytes > 2048;
-	print "Total size of backed up files: $bytes$u";
+	print "Total size of touched files: $bytes$u";
 }
 
 print 'Number of files touched:', scalar @files;

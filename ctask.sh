@@ -212,6 +212,8 @@ do
 		'--no-ask'
 		'--uuid "'$UUID'"'
 		'--logdir "'$LOGDIR'"'
+		'--compile'
+		'--notify'
 	)
 
 	#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")

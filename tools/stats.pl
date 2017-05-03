@@ -3,7 +3,8 @@ use Data::Dumper;
 use utf8;
 use strict;
 
-my $LIMIT = 0; #Size limit for output directores usage
+my $SIZELIMIT = 0; #Size limit for output directores usage
+my $DIRSLIMIT = 50;
 my $SEP = '/';
 $SEP = '\\' if $^O eq 'cygwin' or $^O eq 'MSWin32';
 
@@ -89,21 +90,27 @@ print "Number of deleted files or directories:", scalar @dels;
 		}
 		map { $sizes{$_} += $size } @dirs;
 	}
-	my @keys = grep {$sizes{$_} > $LIMIT} keys %sizes;
+	my @keys = grep {$sizes{$_} > $SIZELIMIT} keys %sizes;
 	print "Bytes sent by directory:" if scalar @keys;
 	my $last = {
 		size => 0,
 		dir => ''
 	};
+	my @lines = ();
 	foreach my $dir (sort {
 			return $sizes{$b} <=> $sizes{$a} unless $sizes{$b} == $sizes{$a};
 			return $b cmp $a
 		} @keys){
 		my $size = $sizes{$dir};
-		printf("\t%-12d\t%s\n", $size, $dir) unless $size == $last->{size} and $last->{dir} =~ /\Q$dir\E/;
+		push @lines, sprintf("\t%-12d\t%s", $size, $dir) unless $size == $last->{size} and $last->{dir} =~ /\Q$dir\E/;
 		$last->{size} = $size;
 		$last->{dir} = $dir;
 	}
+	my $diff = scalar @lines - $DIRSLIMIT;
+	$#lines = $DIRSLIMIT - 1;
+	local $, = "\n";
+	print @lines;
+	print "\t+ $diff directories. See Logs" if $diff > 0;	
 }
 
 {
@@ -111,10 +118,23 @@ print "Number of deleted files or directories:", scalar @dels;
 	foreach my $line (@updfiles){
 		my ($file,$size) = (split /\|/, $line)[2,4];
 		next and print STDERR "Strange situation with $line" if defined $sizes{$file};
-		$sizes{$file} = $size;
+		$sizes{$file} += $size;
 	}
 	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
 	$#topkeys = 9 if scalar @topkeys > 10;
-	print scalar @topkeys, "biggest transfers:" if scalar @topkeys;
+	print scalar @topkeys, "Biggest updates:" if scalar @topkeys;
+	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
+}
+
+{
+	my %sizes;
+	foreach my $line (@newfiles){
+		my ($file,$size) = (split /\|/, $line)[2,4];
+		next and print STDERR "Strange situation with $line" if defined $sizes{$file};
+		$sizes{$file} += $size;
+	}
+	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
+	$#topkeys = 9 if scalar @topkeys > 10;
+	print scalar @topkeys, "Biggest new files:" if scalar @topkeys;
 	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
 }

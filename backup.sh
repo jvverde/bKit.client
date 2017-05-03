@@ -148,10 +148,10 @@ STATSFILE=$RUNDIR/stats.$$
 exec 3>&2
 exec 2>"$ERRFILE"
 
-trap "
-  cat \"$ERRFILE\" >&3
+trap '
+  cat "$ERRFILE" >&3
   rm -f $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK
-" EXIT
+' EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"
@@ -320,8 +320,7 @@ getacls(){
   local DST="${@: -1}" #last argument
 
   METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  [[ -d $METADATADIR ]] || mkdir -pv "$METADATADIR"
-  local FILES=()
+  echo "a)  Update ACLs in local cache"
   while IFS='|' read -r I FILE
   do
     echo acls "$I|$FILE"
@@ -330,22 +329,26 @@ getacls(){
   bash "$SDIR/storeACLs.sh" "${FILES[@]}" "$METADATADIR"
   #update primessions and attributes only
   dorsync --ignore-existing --existing --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR"
+exit
+  echo "b)  Backup ACLs local cache to remote server"
+  bg_upload_manifest "$METADATADIR" 'metadata'
+  bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" -- "${RSYNCOPTIONS[@]}" "$METADATADIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
-  #bg_upload_manifest "$MAPDRIVE" 'metadata'
-  #bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+  touch "$ENDFLAG"
+  wait4jobs
+  rm -f "$MANIFEST" "$ENDFLAG"
 
-  #touch "$ENDFLAG"
-  #wait4jobs
-  #rm -f "$MANIFEST" "$ENDFLAG"
+  # echo "c)  Update ACLs attributes"
+  # bg_upload_manifest "$METADATADIR" 'metadata'
 
-  # DIRS=()
-  # while read DIR
-  # do
-  #   DIRS+=( "$MAPDRIVE/$DIR" )
-  # done < "$FILE"
-  # bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR" |  xargs -d '\n' -I{} echo {}
-  # dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
+  # backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
+
+  # touch "$ENDFLAG"
+  # wait4jobs
+  # rm -f "$MANIFEST" "$ENDFLAG"
 }
+
+
 #(
 #	flock -w $((3600*24)) 9 || {
 #		rm -fv "$LOCK"

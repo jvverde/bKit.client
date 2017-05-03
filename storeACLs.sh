@@ -16,12 +16,12 @@ SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
 getacl(){
-	local SRC=$(cygpath -w "$1")
+	local SRC=$1
 	local DST=$2
-	[[ -d $SRC ]] && DST="$DST\\.bkit-dir-acl"
-	local PARENT=${DST%\\*}
+	[[ -d $SRC ]] && DST="$DST/.bkit-dir-acl"
+	local PARENT=${DST%/*}
 	[[ -d $PARENT ]] || mkdir -pv "$PARENT"
-	"$SUBINACL" /noverbose /nostatistic /output="$DST" /onlyfile "$SRC"
+	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
 }
 
 for DIR in "${@:1:$#-1}"
@@ -29,6 +29,6 @@ do
 	DIR=$(readlink -nm "$DIR")
 	FULLPATH=$(cygpath -w "$DIR")
 	RPATH=$(cygpath -u "${FULLPATH#?:\\}")
-	DST=$(cygpath -w "$TARGETDIR/$RPATH")
+	DST=$TARGETDIR/$RPATH
 	getacl "$FULLPATH" "$DST"
 done

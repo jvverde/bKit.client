@@ -377,7 +377,7 @@ bg_upload_manifest(){
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 3.1 - Backup ACLS\n"
-      getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
+      #getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
     )
 
 		echo -e "\nPhase 4 - Create a readonly snapshot on server\n"

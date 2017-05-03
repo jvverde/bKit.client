@@ -178,39 +178,6 @@ FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
-
-localacls(){
-  local SRCS=("${@:1:$#-1}")
-  local DST="${@: -1}" #last argument
-  while IFS='|' read -r I FILE LINK FULLPATH LEN
-  do
-    echo acls "$I|$FILE|$LINK|$LEN"
-  done < <(dorsync --dry-run --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
-}
-
-getacls(){
-  local BASE=$1 && shift
-  #local SRC="$1/./$2"
-  local SRCS=()
-  for DIR in "${@:1:$#-1}"
-  do
-    SRCS+=( "$BASE/./$DIR" )
-  done
-  local DST="${@: -1}" #last argument
-
-	METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  [[ -d $METADATADIR ]] || mkdir -pv "$METADATADIR"
-  localacls "${SRCS[@]}" "$METADATADIR"
-	# DIRS=()
-	# while read DIR
-	# do
-	# 	DIRS+=( "$MAPDRIVE/$DIR" )
-	# done < "$FILE"
-	# bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR" |  xargs -d '\n' -I{} echo {}
-	# dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
-}
-
-
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
@@ -221,7 +188,6 @@ update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
 	dorsync --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
-	#getacls "$FILE"
 	rm -f "$FILE"
 }
 update_file(){
@@ -306,6 +272,7 @@ wait4jobs(){
 
 bg_upload_manifest(){
 	local BASE="$1"
+  local PREFIX="$2"
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
 	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
 
@@ -321,11 +288,11 @@ bg_upload_manifest(){
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 			(( CNT == 0 )) && sleep 1 && continue
 			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/data/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/data/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/$PREFIX/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/manifest.lst"
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$RVID/@seed/data"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/data/manifest.lst"
+			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
+			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
@@ -333,6 +300,52 @@ bg_upload_manifest(){
 	)&
 }
 
+
+localacls(){
+  local SRCS=("${@:1:$#-1}")
+  local DST="${@: -1}" #last argument
+  #echo "${FILES[@]}"
+  #"SDIR/storeACLs.sh" "${FILES[@]}"
+}
+
+getacls(){
+  local FMT_QUERY='--out-format=%i|/%f'
+  local BASE=$1 && shift
+  #local SRC="$1/./$2"
+  local SRCS=()
+  for DIR in "${@:1:$#-1}"
+  do
+    SRCS+=( "$BASE/./$DIR" )
+  done
+  local DST="${@: -1}" #last argument
+
+  METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
+  [[ -d $METADATADIR ]] || mkdir -pv "$METADATADIR"
+  local FILES=()
+  while IFS='|' read -r I FILE
+  do
+    echo acls "$I|$FILE"
+    FILES+=( "$FILE" )
+  done < <(dorsync --dry-run --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR")
+  bash "$SDIR/storeACLs.sh" "${FILES[@]}" "$METADATADIR"
+  #update primessions and attributes only
+  dorsync --ignore-existing --existing --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR"
+
+  #bg_upload_manifest "$MAPDRIVE" 'metadata'
+  #bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+
+  #touch "$ENDFLAG"
+  #wait4jobs
+  #rm -f "$MANIFEST" "$ENDFLAG"
+
+  # DIRS=()
+  # while read DIR
+  # do
+  #   DIRS+=( "$MAPDRIVE/$DIR" )
+  # done < "$FILE"
+  # bash "$SDIR/diracls.sh" "${DIRS[@]}" "$METADATADIR" |  xargs -d '\n' -I{} echo {}
+  # dorsync -aizR --inplace "${PERM[@]}" "$FMT" "$METADATADIR/./" "$BACKUPURL/$RVID/@current/metadata/"
+}
 #(
 #	flock -w $((3600*24)) 9 || {
 #		rm -fv "$LOCK"
@@ -344,12 +357,12 @@ bg_upload_manifest(){
 	{
 		prepare
 
-		bg_upload_manifest "$MAPDRIVE"
+		bg_upload_manifest "$MAPDRIVE" 'data'
 		echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
 
 		echo -e "\nPhase 1 - Backup new/modified files\n"
 
-		bash "$SDIR/hash.sh" --rvid="$RVID" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+		bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
 		touch "$ENDFLAG"
 		wait4jobs
@@ -357,19 +370,18 @@ bg_upload_manifest(){
 
 		echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
 
-		bg_upload_manifest "$MAPDRIVE"
+		bg_upload_manifest "$MAPDRIVE" 'data'
 
 		backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+
+    touch "$ENDFLAG"
+    wait4jobs
+    rm -f "$MANIFEST" "$ENDFLAG"
 
 		[[ -n $HLINK ]] && {
 			echo -e "\n\tPhase 2.1 update delayed hardlinks"
 			backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 		}
-
-		touch "$ENDFLAG"
-		wait4jobs
-		rm -f "$MANIFEST" "$ENDFLAG"
-
 
 		echo -e "\nPhase 3 - Clean deleted files from backup\n"
 
@@ -377,7 +389,7 @@ bg_upload_manifest(){
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 3.1 - Backup ACLS\n"
-      #getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
+      getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
     )
 
 		echo -e "\nPhase 4 - Create a readonly snapshot on server\n"

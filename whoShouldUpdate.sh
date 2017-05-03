@@ -24,8 +24,8 @@ do
 		--out-format=*)
 			FMT="$KEY"
 		;;
-		--rvid=*)
-			RVID="${KEY#*=}"
+		--remotedir=*)
+			REMOTEDIR="${KEY#*=}"
 		;;
 		*)
 			die Unknow	option $KEY
@@ -46,12 +46,12 @@ STARTDIR=(${BACKUPDIR[@]#$ROOT}) #remove mount pointfrom path
 STARTDIR=(${STARTDIR[@]#/}) #remove leading slash if any
 
 
-[[ -n $RVID ]] || {
+[[ -n $REMOTEDIR ]] || {
 	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
 	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
 	DRIVE=${DRIVE%%:*}
-	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+	REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/data"
 }
 
 CONF="$SDIR/conf/conf.init"
@@ -87,4 +87,4 @@ dorsync "${RSYNCOPTIONS[@]}" \
 	--itemize-changes \
 	$FMT \
 	"${SRCS[@]}" \
-	"$BACKUPURL/$RVID/@current/data"
+	"$BACKUPURL/$REMOTEDIR"

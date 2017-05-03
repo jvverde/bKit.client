@@ -114,7 +114,7 @@ print "Number of deleted files or directories:", scalar @dels;
 }
 
 {
-	my %sizes;
+	my %sizes = ();
 	foreach my $line (@updfiles){
 		my ($file,$size) = (split /\|/, $line)[2,4];
 		next and print STDERR "Strange situation with $line" if defined $sizes{$file};
@@ -127,7 +127,7 @@ print "Number of deleted files or directories:", scalar @dels;
 }
 
 {
-	my %sizes;
+	my %sizes = ();
 	foreach my $line (@newfiles){
 		my ($file,$size) = (split /\|/, $line)[2,4];
 		next and print STDERR "Strange situation with $line" if defined $sizes{$file};

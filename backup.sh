@@ -221,7 +221,8 @@ backup(){
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 
 		#if it is a directory, symlink, device or special
-		[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
+    #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
+    [[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
 
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
@@ -304,6 +305,7 @@ bg_upload_manifest(){
 
 getacls(){
   local FMT_QUERY='--out-format=%i|/%f'
+  local ACLNAME='.bkit-dir-acl'
   local BASE=$1 && shift
   #local SRC="$1/./$2"
   local SRCS=()
@@ -314,19 +316,33 @@ getacls(){
   local DST="${@: -1}" #last argument
 
   METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  echo "    a) Create missing ACLs metafiles in local cache"
+  ACLSOPTIONS=(
+    --update
+    --no-verbose
+    --archive
+    --hard-links
+    --relative
+    --itemize-changes
+    --exclude="$ACLNAME"
+    --exclude=".rsync-filter"
+    "${PERM[@]}"
+    $FMT_QUERY
+  )
+  echo "    a) Remove from local cache any ACL metafile older than 30 days => Force renew"
+  find "$METADATADIR" -mindepth 1 -type f -mtime +30 -delete
+  echo "    b) Create missing ACLs metafiles in local cache"
   while IFS='|' read -r I FILE
   do
     echo acls "$I|$FILE"
     FILES+=( "$FILE" )
-  done < <(dorsync --dry-run --update --no-verbose --archive --hard-links --relative --itemize-changes --exclude=".rsync-filter" "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR")
-  bash "$SDIR/storeACLs.sh" "${FILES[@]}" "$METADATADIR"
+  done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR")
+  bash "$SDIR/storeACLs.sh" --diracl="$ACLNAME" "${FILES[@]}" "$METADATADIR"
   #update primessions and attributes only
 
-  echo "    b) Update attributes of ACLs metafiles in local cache"
-  dorsync --existing --ignore-existing --update --delete --no-verbose --archive --hard-links --relative --itemize-changes --exclude=".rsync-filter" "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR"
+  echo "    c) Update attributes of ACLs metafiles in local cache"
+  dorsync --existing --ignore-existing --delete "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
 
-  echo "    c) Backup ACLs metafiles from local cache to remote server"
+  echo "    d) Backup ACLs metafiles from local cache to backup server"
   bg_upload_manifest "$METADATADIR" 'metadata'
   {
     bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
@@ -336,7 +352,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    d) Update ACL metafiles attributes"
+  echo "    e) Update ACL metafiles attributes"
   bg_upload_manifest "$METADATADIR" 'metadata'
 
   backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
@@ -345,7 +361,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    e) Clean deleted ACLs metafiles"
+  echo "    f) Clean deleted ACLs metafiles from backup"
   clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 
@@ -392,11 +408,11 @@ getacls(){
 		clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-      echo -e "\nPhase 3.1 - Backup ACLS\n"
+      echo -e "\nPhase 4 - Backup ACLS\n"
       getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
     )
 
-		echo -e "\nPhase 4 - Create a readonly snapshot on server\n"
+		echo -e "\nPhase 5 - Create a readonly snapshot on server\n"
 
     snapshot
 

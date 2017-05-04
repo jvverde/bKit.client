@@ -16,6 +16,10 @@ do
 				shift
 			done
 		;;
+		--root=*)
+			ROOT="${KEY#*=}"
+			OPTIONS+=( "$KEY" )
+		;;
 		*=*)
 			OPTIONS+=( "$KEY" )
 		;;
@@ -31,17 +35,19 @@ IFS="
 "
 FULLPATHS=( $(readlink -e "$@") )
 
-MOUNT=( $(stat -c %m "${FULLPATHS[@]}") )
+[[ -n $ROOT ]] || {
+	MOUNT=( $(stat -c %m "${FULLPATHS[@]}") )
 
-ROOT=${MOUNT[0]}
-for M in "${MOUNT[@]}"
-do
-	[[ $M == $ROOT ]] || die 'All directories/file must belongs to same logical disk'
-done
+	ROOT=${MOUNT[0]}
+	for M in "${MOUNT[@]}"
+	do
+		[[ $M == $ROOT ]] || die 'All directories/file must belongs to same logical disk'
+	done
+}
 
 #pushd "$MOUNT" > /dev/null
 bash "$SDIR/whoShouldUpdate.sh" "${OPTIONS[@]}" -- "${RSYNCOPTIONS[@]}" "${FULLPATHS[@]}"|
-awk -F'|' '$1 ~ /^<f/ {print $4}' | tr '\n' '\0' |
+awk -F'|' '$1 ~ /^<f/ {print $3}' | tr '\n' '\0' |
 xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/' |
 while IFS='|' read -r HASH FILE
 do

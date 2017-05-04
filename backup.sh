@@ -202,16 +202,18 @@ update_files(){
 }
 
 backup(){
-	local BASE=$1 && shift
+	local BASE=$(readlink -e "$1") && shift
 	#local SRC="$1/./$2"
 	local SRCS=()
 	for DIR in "${@:1:$#-1}"
 	do
+    DIR=${DIR#/}    #remove any leading slash if any}
 		SRCS+=( "$BASE/./$DIR" )
 	done
 	local DST="${@: -1}" #last argument
 	unset HLINK
 	set_postpone_files
+  echo SRCS="${SRCS[@]}"
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -320,32 +322,34 @@ getacls(){
   local DST="${@: -1}" #last argument
 
   METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  echo "a)  Update ACLs in local cache"
+  echo "    a) Update ACLs in local cache"
   while IFS='|' read -r I FILE
   do
     echo acls "$I|$FILE"
     FILES+=( "$FILE" )
-  done < <(dorsync --dry-run --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR")
+  done < <(dorsync --dry-run --update --no-verbose --archive --hard-links --relative --itemize-changes --exclude=".rsync-filter" "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR")
   bash "$SDIR/storeACLs.sh" "${FILES[@]}" "$METADATADIR"
   #update primessions and attributes only
-  dorsync --ignore-existing --existing --update --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR"
-exit
-  echo "b)  Backup ACLs local cache to remote server"
+
+  echo "    b) Backup ACLs local cache to remote server"
   bg_upload_manifest "$METADATADIR" 'metadata'
-  bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" -- "${RSYNCOPTIONS[@]}" "$METADATADIR" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+  #bash "$SDIR/whoShouldUpdate.sh" --remotedir="$RVID/@current/metadata" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
+  {
+    bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
+  } | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
   touch "$ENDFLAG"
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  # echo "c)  Update ACLs attributes"
-  # bg_upload_manifest "$METADATADIR" 'metadata'
+  echo "    c) Update ACLs attributes"
+  bg_upload_manifest "$METADATADIR" 'metadata'
 
-  # backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
+  backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 
-  # touch "$ENDFLAG"
-  # wait4jobs
-  # rm -f "$MANIFEST" "$ENDFLAG"
+  touch "$ENDFLAG"
+  wait4jobs
+  rm -f "$MANIFEST" "$ENDFLAG"
 }
 
 

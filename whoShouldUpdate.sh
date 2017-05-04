@@ -8,7 +8,7 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 RSYNCOPTIONS=()
-FMT='--out-format=%i|%n|%L|/%f|%l'
+FMT='--out-format=%i|%n|/%f|%l'
 
 while [[ $1 =~ ^- ]]
 do
@@ -20,6 +20,9 @@ do
 				RSYNCOPTIONS+=("$1")
 				shift
 			done
+		;;
+		--root=*)
+			ROOT=$(readlink -e "${KEY#*=}")
 		;;
 		--out-format=*)
 			FMT="$KEY"
@@ -36,15 +39,20 @@ done
 IFS="
 "
 BACKUPDIR=( $(readlink -e "$@") )
-MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
-ROOT=${MOUNT[0]}
-for M in "${MOUNT[@]}"
-do
-	[[ $M == $ROOT ]] || die 'All directories/file must belongs to same logical disk'
-done
-STARTDIR=(${BACKUPDIR[@]#$ROOT}) #remove mount pointfrom path
-STARTDIR=(${STARTDIR[@]#/}) #remove leading slash if any
 
+[[ -n $ROOT ]] || {
+	MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
+	ROOT=${MOUNT[0]}
+	for M in "${MOUNT[@]}"
+	do
+		[[ $M == $ROOT ]] || die 'All directories/file must belongs to same logical disk'
+	done
+}
+
+STARTDIR=("${BACKUPDIR[@]#$ROOT}") #remove mount pointfrom path
+STARTDIR=("${STARTDIR[@]#/}") #remove leading slash if any
+
+[[ ${#STARTDIR[@]} -eq 0 ]] && STARTDIR=("")
 
 [[ -n $REMOTEDIR ]] || {
 	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")

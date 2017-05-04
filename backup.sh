@@ -174,7 +174,6 @@ postpone_update(){
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 CLEAN=(--delete --force --delete-excluded --ignore-non-existing --ignore-existing)
-FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
@@ -202,6 +201,7 @@ update_files(){
 }
 
 backup(){
+  local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 	local BASE=$(readlink -e "$1") && shift
 	#local SRC="$1/./$2"
 	local SRCS=()
@@ -300,14 +300,6 @@ bg_upload_manifest(){
 		done
 		rm -f "$SEGMENT" "$SEGFILES"
 	)&
-}
-
-
-localacls(){
-  local SRCS=("${@:1:$#-1}")
-  local DST="${@: -1}" #last argument
-  #echo "${FILES[@]}"
-  #"SDIR/storeACLs.sh" "${FILES[@]}"
 }
 
 getacls(){

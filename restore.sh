@@ -8,7 +8,7 @@ ERROR=0
 
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@" >&2; exit 1;}
-warn() { 
+warn() {
   ERROR=1
   echo -e "$@" >&2
 }
@@ -179,7 +179,7 @@ do
 
     if [[ -n $DST ]]
     then
-      SRCS+=( "$SRC" ) #In case we are importing all srcs to a single locatuion, do it later, all in one single rsync call
+      SRCS+=( "$SRC" ) #In case we are importing all srcs to a single location, do it later, all in one single rsync call
       LINKTO["$LOCALCOPY=$DIR/"]=1
     else
       dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
@@ -189,22 +189,22 @@ do
         [[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
         rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
           warn "Problemas ao recuperar $METADATADST/$BASE/"
-        DRIVE=$(cygpath -w "$ROOT")
-        : > "$RESULT/acls"
-        cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
-        while read FILE
-        do
-          ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
-          echo $ACLFILE
-          iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
-            sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
-            iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
-          cat
-        done
-        [[ -s "$RESULT/acls" ]] && {
-          echo 'Apply ACLS now'
-          bash "$SDIR/applyacls.sh" "$RESULT/acls"
-        }
+        # DRIVE=$(cygpath -w "$ROOT")
+        # : > "$RESULT/acls"
+        # cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
+        # while read FILE
+        # do
+        #   ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
+        #   echo $ACLFILE
+        #   iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
+        #     sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
+        #     iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
+        #   cat
+        # done
+        # [[ -s "$RESULT/acls" ]] && {
+        #   echo 'Apply ACLS now'
+        #   bash "$SDIR/applyacls.sh" "$RESULT/acls"
+        # }
       )
     fi
   fi

@@ -213,7 +213,7 @@ backup(){
 	local DST="${@: -1}" #last argument
 	unset HLINK
 	set_postpone_files
-  echo SRCS="${SRCS[@]}"
+
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
 	do
 		echo miss "$I|$FILE|$LINK|$LEN"
@@ -314,7 +314,7 @@ getacls(){
   local DST="${@: -1}" #last argument
 
   METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  echo "    a) Update ACLs in local cache"
+  echo "    a) Create missing ACLs metafiles in local cache"
   while IFS='|' read -r I FILE
   do
     echo acls "$I|$FILE"
@@ -323,9 +323,11 @@ getacls(){
   bash "$SDIR/storeACLs.sh" "${FILES[@]}" "$METADATADIR"
   #update primessions and attributes only
 
-  echo "    b) Backup ACLs local cache to remote server"
+  echo "    b) Update attributes of ACLs metafiles in local cache"
+  dorsync --existing --ignore-existing --update --delete --no-verbose --archive --hard-links --relative --itemize-changes --exclude=".rsync-filter" "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$METADATADIR"
+
+  echo "    c) Backup ACLs metafiles from local cache to remote server"
   bg_upload_manifest "$METADATADIR" 'metadata'
-  #bash "$SDIR/whoShouldUpdate.sh" --remotedir="$RVID/@current/metadata" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
   {
     bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
   } | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
@@ -334,7 +336,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    c) Update ACLs attributes"
+  echo "    d) Update ACL metafiles attributes"
   bg_upload_manifest "$METADATADIR" 'metadata'
 
   backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
@@ -342,6 +344,9 @@ getacls(){
   touch "$ENDFLAG"
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
+
+  echo "    e) Clean deleted ACLs metafiles"
+  clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 
 

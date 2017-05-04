@@ -10,7 +10,7 @@ SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
 TARGETDIR=$(readlink -nm "$(cygpath "${@: -1}")")
 
-[[ -d $TARGETDIR ]]  || mkdir -pv "$TARGETDIR" || die Cannot create dir $ACLSDIR
+[[ -d $TARGETDIR ]]  || mkdir -p "$TARGETDIR" || die Cannot create dir $ACLSDIR
 
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
@@ -20,7 +20,7 @@ getacl(){
 	local DST=$2
 	[[ -d $SRC ]] && DST="$DST/.bkit-dir-acl"
 	local PARENT=${DST%/*}
-	[[ -d $PARENT ]] || mkdir -pv "$PARENT"
+	[[ -d $PARENT ]] || mkdir -p "$PARENT"
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
 }
 

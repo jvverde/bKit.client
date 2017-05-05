@@ -305,17 +305,22 @@ bg_upload_manifest(){
 
 getacls(){
   local FMT_QUERY='--out-format=%i|/%f'
-  local ACLNAME='.bkit-dir-acl'
+  local ACLFILE='.bkit-dir-acl'
   local BASE=$1 && shift
   #local SRC="$1/./$2"
   local SRCS=()
-  for DIR in "${@:1:$#-1}"
+  local MDIRS=()
+  local METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
+  local DST="${@: -1}" #last argument
+  local DIRS="${@:1:$#-1}"
+  local FILES=()
+
+  for DIR in "${DIRS[@]}"
   do
     SRCS+=( "$BASE/./$DIR" )
+    MDIRS+=( "$METADATADIR$DIR" )
   done
-  local DST="${@: -1}" #last argument
 
-  METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
   ACLSOPTIONS=(
     --update
     --no-verbose
@@ -323,22 +328,28 @@ getacls(){
     --hard-links
     --relative
     --itemize-changes
-    --exclude="$ACLNAME"
+    --exclude="$ACLFILE"
     --exclude=".rsync-filter"
     "${PERM[@]}"
     $FMT_QUERY
   )
   echo "    a) Remove from local cache any ACL metafile older than 30 days => Force renew"
   find "$METADATADIR" -mindepth 1 -type f -mtime +30 -delete
+
   echo "    b) Create missing ACLs metafiles in local cache"
+  #but first remove the first descendent file of any directory missing a metafile ACLFILE => Force renew
+  find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
+    xargs -rt0I{} find "{}" -type f -delete -quit
+
   while IFS='|' read -r I FILE
   do
     echo acls "$I|$FILE"
     FILES+=( "$FILE" )
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR")
-  bash "$SDIR/storeACLs.sh" --diracl="$ACLNAME" "${FILES[@]}" "$METADATADIR"
-  #update primessions and attributes only
 
+  bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "${FILES[@]}" "$METADATADIR"
+
+  #update primessions and attributes only
   echo "    c) Update attributes of ACLs metafiles in local cache"
   dorsync --existing --ignore-existing --delete "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
 

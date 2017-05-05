@@ -39,12 +39,16 @@ OPTIONS=(
 )
 
 #Don't try to chown or chgrp if not root or Administrator
+
 [[ $OS == cygwin ]] && {
     $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
 }
 [[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 
-RSYNCOPTIONS=()
+RSYNCOPTIONS=(
+  --groupmap=4294967295:$(id -u)
+  --usermap=4294967295:$(id -g)
+)
 
 dorsync() {
   local BACKUP="${@: -1}$BACKUPDIR"
@@ -185,30 +189,49 @@ do
       dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 
       [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-        echo "Restore ACLs..."
-        METADATADST="$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/"
+        echo "Restore ACLs"
+        METADATADIR="$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}"
+        METADATADST="$METADATADIR$BASE/"
         [[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
         rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
           warn "Problemas ao recuperar $METADATADST/$BASE/"
-        echo "ENTRY:$ENTRY"
-        find "$DIR/$ENTRY" -type f
-        find "$DIR/$ENTRY" -type d
-        # DRIVE=$(cygpath -w "$ROOT")
-        # : > "$RESULT/acls"
-        # cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|
-        # while read FILE
-        # do
-        #   ACLFILE=$(dirname "$METADATADST$FILE")/.bkit-acls
-        #   echo $ACLFILE
-        #   iconv -f UTF-16LE -t UTF-8 "$ACLFILE" |
-        #     sed -E 's#^\+File [A-Z]:#+File '${DRIVE:0:1}':#i' |
-        #     iconv  -f UTF-8 -t UTF-16LE >> "$RESULT/acls"
-        #   cat
-        # done
-        # [[ -s "$RESULT/acls" ]] && {
-        #   echo 'Apply ACLS now'
-        #   bash "$SDIR/applyacls.sh" "$RESULT/acls"
-        # }
+        {
+          grep -Pi 'recv\|[>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f5|
+          while read -r FILE
+          do
+            echo -e "\n"
+            echo "+FILE $(cygpath -w "$DIR/$FILE")"
+            cat "$METADATADST/$FILE"
+          done
+          grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f5|
+          while read -r FILE
+          do
+            echo -e "\n"
+            echo "+FILE $(cygpath -w "$DIR/$FILE")"
+            cat "$METADATADST/$FILE/.bkit-dir-acl"
+          done
+          # find "$DIR/$ENTRY" -type f |
+          #   while read -r FILE
+          #   do
+          #     REL=${FILE#$ROOT}
+          #     WFILE="+FILE $(cygpath -w "$FILE")"
+          #     echo -e "\n"
+          #     echo "$WFILE"
+          #     cat "$METADATADIR$REL"
+          #   done
+          # find "$DIR/$ENTRY" -type d |
+          #   while read -r FOLDER
+          #   do
+          #     REL=${FOLDER#$ROOT}
+          #     WFOLDER="+FILE $(cygpath -w "$FOLDER")"
+          #     echo -e "\n"
+          #     echo "$WFOLDER"
+          #     cat "$METADATADIR$REL/.bkit-dir-acl"
+          #   done
+        }| iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
+        SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
+        [[ -f $SUBINACL ]] || die SUBINACL.exe not found
+        "$SUBINACL" /playfile "$(cygpath -w "$RESULT/acls")"
       )
     fi
   fi

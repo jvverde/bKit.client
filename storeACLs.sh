@@ -33,13 +33,25 @@ TARGETDIR=$(readlink -nm "$(cygpath "${@: -1}")")
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
+RESULT="$SDIR/run/store-$$/"
+trap "rm -rf '$RESULT'" EXIT
+mkdir -p "$RESULT"
+
 getacl(){
 	local SRC=$1
 	local DST=$2
-	[[ -d $SRC ]] && DST="$DST/$DIRACL"
-	local PARENT=${DST%/*}
+	local FILE=$DST
+	[[ -d $SRC ]] && FILE="$DST/$DIRACL"
+	local PARENT=${FILE%/*}
 	[[ -d $PARENT ]] || mkdir -p "$PARENT"
-	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
+	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$FILE"
+	#apply same attributes to files and directories
+	{
+		echo -e "\n"
+    echo "+FILE $(cygpath -w "$DST")"
+    cat "$FILE"
+	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
+  "$SUBINACL" /noverbose /playfile "$(cygpath -w "$RESULT/acls")"
 }
 
 for DIR in "${@:1:$#-1}"

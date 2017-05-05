@@ -7,7 +7,11 @@ warn() { echo -e "$@">&2; }
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
-RSYNCOPTIONS=()
+RSYNCOPTIONS=(
+  --groupmap=4294967295:$(id -u)
+  --usermap=4294967295:$(id -g)
+  --numeric-ids
+)
 
 while [[ $1 =~ ^- ]]
 do
@@ -304,6 +308,7 @@ bg_upload_manifest(){
 }
 
 getacls(){
+  local FMT='--out-format=ACL:"%o|%i|%f|%c|%b|%l|%t"'
   local FMT_QUERY='--out-format=%i|/%f'
   local ACLFILE='.bkit-dir-acl'
   local BASE=$1 && shift
@@ -333,27 +338,27 @@ getacls(){
     "${PERM[@]}"
     $FMT_QUERY
   )
-  echo "    a) Remove from local cache any ACL metafile older than 30 days => Force renew"
+  echo "    a) Remove from local cache any metafile older than 30 days => Force renew"
   find "$METADATADIR" -mindepth 1 -type f -mtime +30 -delete
 
-  echo "    b) Create missing ACLs metafiles in local cache"
+  echo "    b) Create missing metafiles in local cache"
   #but first remove the first descendent file of any directory missing a metafile ACLFILE => Force renew
-  find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
-    xargs -rt0I{} find "{}" -type f -delete -quit
+  find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 2>/dev/null |
+    xargs -r0I{} find "{}" -type f -delete -quit
 
   while IFS='|' read -r I FILE
   do
-    echo acls "$I|$FILE"
+    echo miss ACL "$I|$FILE"
     FILES+=( "$FILE" )
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR")
 
   bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "${FILES[@]}" "$METADATADIR"
 
   #update primessions and attributes only
-  echo "    c) Update attributes of ACLs metafiles in local cache"
-  dorsync --existing --ignore-existing --delete "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+  echo "    c) Update attributes of metafiles in local cache"
+  dorsync --ignore-non-existing --ignore-existing --delete-delay "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
 
-  echo "    d) Backup ACLs metafiles from local cache to backup server"
+  echo "    d) Backup metafiles from local cache to backup server"
   bg_upload_manifest "$METADATADIR" 'metadata'
   {
     bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
@@ -363,7 +368,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    e) Update ACL metafiles attributes"
+  echo "    e) Update metafiles attributes"
   bg_upload_manifest "$METADATADIR" 'metadata'
 
   backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
@@ -372,7 +377,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    f) Clean deleted ACLs metafiles from backup"
+  echo "    f) Clean deleted metafiles from backup"
   clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 

@@ -327,7 +327,6 @@ getacls(){
   done
 
   ACLSOPTIONS=(
-    --update
     --no-verbose
     --archive
     --hard-links
@@ -349,9 +348,10 @@ getacls(){
   while IFS='|' read -r I FILE
   do
     echo miss ACL "$I|$FILE"
-    FILES+=( "$FILE" )
+    I=${I#?????}
+    echo I=$I
+    [[ $I =~ [^.] ]] && FILES+=( "$FILE" )
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR")
-
   bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "${FILES[@]}" "$METADATADIR"
 
   #update primessions and attributes only

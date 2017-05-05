@@ -185,11 +185,14 @@ do
       dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
 
       [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-        echo "Restore ACLs"
-        METADATADST=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/
+        echo "Restore ACLs..."
+        METADATADST="$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/"
         [[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
         rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
           warn "Problemas ao recuperar $METADATADST/$BASE/"
+        echo "ENTRY:$ENTRY"
+        find "$DIR/$ENTRY" -type f
+        find "$DIR/$ENTRY" -type d
         # DRIVE=$(cygpath -w "$ROOT")
         # : > "$RESULT/acls"
         # cat "$RESULT/index"|grep 'recv[|][.>]f'|cut -d'|' -f5|

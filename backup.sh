@@ -312,18 +312,16 @@ getacls(){
   local FMT_QUERY='--out-format=%i|/%f'
   local ACLFILE='.bkit-dir-acl'
   local BASE=$1 && shift
-  #local SRC="$1/./$2"
   local SRCS=()
   local MDIRS=()
-  local METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  local DST="${@: -1}" #last argument
-  local DIRS="${@:1:$#-1}"
-  local FILES=()
 
-  for DIR in "${DIRS[@]}"
+  local METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
+  [[ -d $METADATADIR ]] || mkdir -p "$METADATADIR"
+
+  for DIR in "$@"
   do
     SRCS+=( "$BASE/./$DIR" )
-    MDIRS+=( "$METADATADIR$DIR" )
+    [[ -d "$METADATADIR$DIR" ]] && MDIRS+=( "$METADATADIR$DIR" )
   done
 
   ACLSOPTIONS=(
@@ -338,21 +336,24 @@ getacls(){
     $FMT_QUERY
   )
   echo "    a) Remove from local cache any metafile older than 30 days => Force renew"
-  find "$METADATADIR" -mindepth 1 -type f -mtime +30 -delete
+  [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -mtime +30 -delete
 
   echo "    b) Create missing metafiles in local cache"
-  #but first remove the first descendent file of any directory missing a metafile ACLFILE => Force renew
-  find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 2>/dev/null |
-    xargs -r0I{} find "{}" -type f -delete -quit
+  #but first remove the first descendent file of any directory missing a metafile ACLFILE to force a renew
+  [[ ${#MDIRS[@]} -gt 0 ]] && {
+    find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
+      xargs -r0I{} find "{}" -type f -delete -quit
+  }
 
   while IFS='|' read -r I FILE
   do
     I=${I#?????}
     [[ $I =~ [^.] ]] || continue
-    echo miss ACL "$I|$FILE"
-    FILES+=( "$FILE" )
-  done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR")
-  bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "${FILES[@]}" "$METADATADIR"
+    echo ACLS: "$I|$FILE" >&2
+    echo "$FILE"
+  done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
+    bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
+
 
   #update primessions and attributes only
   echo "    c) Update attributes of metafiles in local cache"
@@ -425,7 +426,7 @@ getacls(){
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 4 - Backup ACLS\n"
-      getacls "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/metadata"
+      getacls "$MAPDRIVE" "${STARTDIR[@]}"
     )
 
 		echo -e "\nPhase 5 - Create a readonly snapshot on server\n"

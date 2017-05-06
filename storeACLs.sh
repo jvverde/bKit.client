@@ -26,7 +26,7 @@ done
 
 DIRACL=${DIRACL:-'.bkit-dir-acl'}
 
-TARGETDIR=$(readlink -nm "$(cygpath "${@: -1}")")
+TARGETDIR=$(readlink -nm "$(cygpath "$1")")
 
 [[ -d $TARGETDIR ]]  || mkdir -p "$TARGETDIR" || die Cannot create dir $ACLSDIR
 
@@ -40,20 +40,24 @@ mkdir -p "$RESULT"
 getacl(){
 	local SRC=$1
 	local DST=$2
-	local FILE=$DST
-	[[ -d $SRC ]] && FILE="$DST/$DIRACL"
-	local PARENT=${FILE%/*}
+	[[ -d $SRC ]] && DST="$DST/$DIRACL"
+	local PARENT=${DST%/*}
 	[[ -d $PARENT ]] || mkdir -p "$PARENT"
-	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$FILE"
-	#copy attributes
-	cp -v --attributes-only --preserve=all "$(cygpath -u "$SRC")" "$FILE"
+	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
+	#copy attributes, but only for files, not directories
+	[[ $2 == $DST ]] && cp -v --attributes-only --preserve=all "$(cygpath -u "$SRC")" "$DST"
+	{
+		echo "+FILE $(cygpath -w "$2")"
+		cat "$DST"
+	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
+	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 }
 
-for DIR in "${@:1:$#-1}"
+while read -r DIR
 do
 	DIR=$(readlink -nm "$DIR")
-	FULLPATH=$(cygpath -w "$DIR")
-	RPATH=$(cygpath -u "${FULLPATH#?:\\}")
+	WFULLPATH=$(cygpath -w "$DIR")
+	RPATH=$(cygpath -u "${WFULLPATH#?:\\}")
 	DST=$TARGETDIR/$RPATH
-	getacl "$FULLPATH" "$DST"
+	getacl "$WFULLPATH" "$DST"
 done

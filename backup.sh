@@ -347,10 +347,10 @@ getacls(){
 
   while IFS='|' read -r I FILE
   do
-    echo miss ACL "$I|$FILE"
     I=${I#?????}
-    echo I=$I
-    [[ $I =~ [^.] ]] && FILES+=( "$FILE" )
+    [[ $I =~ [^.] ]] || continue
+    echo miss ACL "$I|$FILE"
+    FILES+=( "$FILE" )
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR")
   bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "${FILES[@]}" "$METADATADIR"
 

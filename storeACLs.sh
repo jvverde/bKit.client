@@ -45,13 +45,8 @@ getacl(){
 	local PARENT=${FILE%/*}
 	[[ -d $PARENT ]] || mkdir -p "$PARENT"
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$FILE"
-	#apply same attributes to files and directories
-	{
-		echo -e "\n"
-    echo "+FILE $(cygpath -w "$DST")"
-    cat "$FILE"
-	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
-  "$SUBINACL" /noverbose /playfile "$(cygpath -w "$RESULT/acls")"
+	#copy attributes
+	cp -v --attributes-only --preserve=all "$(cygpath -u "$SRC")" "$FILE"
 }
 
 for DIR in "${@:1:$#-1}"

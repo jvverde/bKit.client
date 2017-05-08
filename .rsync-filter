@@ -6,7 +6,6 @@
 - /tmp
 - /schtasks
 - /filters
-- /rules
 - *~
 - /old
 - /not-used-anymore

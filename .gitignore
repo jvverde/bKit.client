@@ -5,6 +5,7 @@ run/
 conf/
 tmp/
 gui/
+rules/
 schtasks/
 cronjobs/
 filters/

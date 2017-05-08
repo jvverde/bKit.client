@@ -16,3 +16,4 @@ find "$EXCLUDESDIR/all" -type f -print0 |xargs -r0I{} cat "{}" | sed -E 's#.+#-/
 [[ $OS != cygwin ]] && {
 	find "$EXCLUDESDIR/unix" -type f -print0 | xargs -r0I{} cat "{}" | sed -E 's#.+#-/ &#'
 }
+

@@ -25,7 +25,6 @@ CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 . "$CONF"                                                                     #get configuration parameters
 
-#ask "Vai actualizar o bKit para a versao actual no servidor ($UPDATERURL)\n\nDeseja continuar?" || die 'Asking question'
 export RSYNC_PASSWORD="4dm1n"
-rsync -rlcRb "${OPTIONS[@]}" --backup-dir=".backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$UPDATERSRC" . || die "Problemas ao actualizar"
+rsync -rlcRb "${OPTIONS[@]}" --backup-dir=".backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$UPDATERSRC$1" . || die "Problemas ao actualizar"
 [[ $? -eq 0 ]] && echo "Actualizaçao feita com com sucesso"

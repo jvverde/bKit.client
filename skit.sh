@@ -43,7 +43,7 @@ trap '
 ' EXIT
 
 importrules(){
-	bash "$SDIR/update.sh" "rules/global"
+	bash "$SDIR/update.sh" "rules/global" >/dev/null
 	for F in $(ls "$SDIR/rules/global")
 	do
 		FILTERS+=( --filter=". $SDIR/rules/global/$F" )

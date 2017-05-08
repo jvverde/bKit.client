@@ -98,12 +98,10 @@ ntfssnap(){
     for I in "${!RSYNCOPTIONS[@]}"
     do
         [[ ${RSYNCOPTIONS[$I]} =~ --filter=\.[[:space:]]+ ]] && { # map rules from original root to mapped root
-            FILE=${RSYNCOPTIONS[$I]#--filter=\.}
-            FILE=${FILE#${FILE%%[![:space:]]*}}  #remoce leading spaces
-            EXT=${FILE##*.}
-            NEWFILE=${FILE%.$EXT}-$$.$EXT
-            OLDROOT=$(cygpath -u "$1")
-            NEWROOT=$(cygpath -u "$2")
+            local FILE="$(echo ${RSYNCOPTIONS[$I]} | cut -d' ' -f2-)"
+            local NEWFILE="$RUNDIR/rule-$$.$I"
+            local OLDROOT=$(cygpath -u "$1")
+            local NEWROOT=$(cygpath -u "$2")
             OLDROOT=${OLDROOT%/}
             NEWROOT=${NEWROOT%/}
             cat "$FILE" |sed -E "s#([+-]/?\s+)$OLDROOT#\\1$NEWROOT#" > "$NEWFILE"
@@ -114,6 +112,7 @@ ntfssnap(){
     "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" "${OPTIONS[@]}" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
 
+RUNDIR="$SDIR/run"
 RMFILES=()
 trap '
     rm -f "${RMFILES[@]}"

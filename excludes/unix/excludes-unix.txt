@@ -1,6 +1,9 @@
 Logs/*
 logs/*
-/home/*/.*/*
+/home/*/.cache/*
+/home/*/.cpan/*
+/home/*/.cpanm/*
+/home/*/.npm/*
 npm_cache/*
 tmp/*
 /dev/* 

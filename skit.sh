@@ -20,16 +20,30 @@ excludes(){
 
 	EXCL=$EXCDIR/exclude.lst
 
-	[[ -e "$EXCL" ]] || {
+	[[ -e "$EXCL" ]] || { #if not exist yet
 		echo Compile exclude list
 		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 	}
-	[[ -z $(find "$EXCL" -mtime +30) && -z $COMPILE ]] || {
+
+	[[ -n $COMPILE || -n $(find "$EXCL" -mtime +30) ]] && {
 		echo Recompile exclude list
 		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 	}
 
 	FILTERS+=( --filter=". $EXCL" )
+}
+
+RUNDIR="$SDIR/run"
+RULESFILE="$RUNDIR/filter-$$"
+
+[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
+
+trap '
+    [[ -e $RULESFILE ]] && rm -f "$RULESFILE"
+' EXIT
+
+importrules(){
+	bash
 }
 
 ARGS=("$@")

@@ -46,7 +46,7 @@ importrules(){
 	bash "$SDIR/update.sh" "rules/global"
 	for F in $(ls "$SDIR/rules/global")
 	do
-
+		FILTERS+=( --filter=". $SDIR/rules/global/$F" )
 	done
 }
 
@@ -66,6 +66,9 @@ do
 		;;
 		-a|--all)
 			ALL=1
+		;;
+		--no-import)
+			NO_IMPORT=1
 		;;
 		-c|--compile)
 			COMPILE=1
@@ -109,6 +112,7 @@ done
 }
 
 [[ -n $ALL ]] || excludes
+[[ -n $NO_IMPORT ]] || importrules
 
 [[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 

@@ -55,7 +55,7 @@ do
         -- )
             while [[ $1 =~ ^- ]]
             do
-                RSYNCOPTIONS+=("$1")
+                RSYNCOPTIONS+=( "$1" )
                 shift
             done
         ;;
@@ -94,7 +94,7 @@ backup() {
 
 ntfssnap(){
     echo Backup a ntfs shadow copy
-    SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
+    local SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
     for I in "${!RSYNCOPTIONS[@]}"
     do
         [[ ${RSYNCOPTIONS[$I]} =~ --filter=\.[[:space:]]+ ]] && { # map rules from original root to mapped root

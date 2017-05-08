@@ -51,7 +51,7 @@ getacl(){
 	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
 	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 	#don't change the order
-	[[ $2 == $DST ]] && cp  --attributes-only --preserve=all "$(cygpath -u "$SRC")" "$DST"
+	[[ $2 == $DST ]] && cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST"
 }
 
 while read -r DIR

@@ -79,7 +79,7 @@ declare -A ROOTOF
 for DIR in "${DIRS[@]}"
 do
     DIR=${DIR#/} # remove leading slash if any
-    [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/$DIR || FULL=$DIR
+    [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/$DIR || FULL="/$DIR"
     FULL=$(readlink -ne "$FULL") || continue
     exists cygpath && FULL=$(cygpath -u "$FULL")
     ROOT=$(stat -c%m "$FULL")

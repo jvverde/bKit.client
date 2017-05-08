@@ -97,7 +97,7 @@ ntfssnap(){
     SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
     for I in "${!RSYNCOPTIONS[@]}"
     do
-        [[ ${RSYNCOPTIONS[$I]} =~ --filter=\.[[:space:]]+ ]] && {
+        [[ ${RSYNCOPTIONS[$I]} =~ --filter=\.[[:space:]]+ ]] && { # map rules from original root to mapped root
             FILE=${RSYNCOPTIONS[$I]#--filter=\.}
             FILE=${FILE#${FILE%%[![:space:]]*}}  #remoce leading spaces
             EXT=${FILE##*.}
@@ -106,9 +106,9 @@ ntfssnap(){
             NEWROOT=$(cygpath -u "$2")
             OLDROOT=${OLDROOT%/}
             NEWROOT=${NEWROOT%/}
-            cat "$FILE" |sed -E "s#([+-]/\s+)$OLDROOT#\\1$NEWROOT#" > "$NEWFILE"
-            RSYNCOPTIONS[$I]=${RSYNCOPTIONS[$I]/$FILE/$NEWFILE}
-            RMFILES+=( "$NEWFILE" )
+            cat "$FILE" |sed -E "s#([+-]/?\s+)$OLDROOT#\\1$NEWROOT#" > "$NEWFILE"
+            RSYNCOPTIONS[$I]=${RSYNCOPTIONS[$I]/$FILE/$NEWFILE} #replace original rule file by a temporary rule file
+            RMFILES+=( "$NEWFILE" ) #include temporary rule in a list of files to remove at the end.
         }
     done
     "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" "${OPTIONS[@]}" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"

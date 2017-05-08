@@ -20,16 +20,34 @@ excludes(){
 
 	EXCL=$EXCDIR/exclude.lst
 
-	[[ -e "$EXCL" ]] || {
+	[[ -e "$EXCL" ]] || { #if not exist yet
 		echo Compile exclude list
 		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 	}
-	[[ -z $(find "$EXCL" -mtime +30) && -z $COMPILE ]] || {
+
+	[[ -n $COMPILE || -n $(find "$EXCL" -mtime +30) ]] && {
 		echo Recompile exclude list
 		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 	}
 
 	FILTERS+=( --filter=". $EXCL" )
+}
+
+RUNDIR="$SDIR/run"
+RULESFILE="$RUNDIR/filter-$$"
+
+[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
+
+trap '
+    [[ -e $RULESFILE ]] && rm -f "$RULESFILE"
+' EXIT
+
+importrules(){
+	bash "$SDIR/update.sh" "rules/global" >/dev/null
+	for F in $(ls "$SDIR/rules/global")
+	do
+		FILTERS+=( --filter=". $SDIR/rules/global/$F" )
+	done
 }
 
 ARGS=("$@")
@@ -48,6 +66,9 @@ do
 		;;
 		-a|--all)
 			ALL=1
+		;;
+		--no-import)
+			NO_IMPORT=1
 		;;
 		-c|--compile)
 			COMPILE=1
@@ -91,6 +112,7 @@ done
 }
 
 [[ -n $ALL ]] || excludes
+[[ -n $NO_IMPORT ]] || importrules
 
 [[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 

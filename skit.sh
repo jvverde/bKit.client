@@ -43,7 +43,7 @@ trap '
 ' EXIT
 
 importrules(){
-	bash "$SDIR/update.sh" "excludes/server"
+	bash "$SDIR/update.sh" "excludes/global"
 }
 
 ARGS=("$@")

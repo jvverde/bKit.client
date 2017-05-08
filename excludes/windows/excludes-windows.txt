@@ -48,8 +48,6 @@ Opera/cache/*
 %TEMP%/
 %TMP%/
 c:\tmp
-Users/*/AppData/Local/Temp/
-
 
 Microsoft SQL Server/**/Update Cache/*
 #System32/LogFiles/*

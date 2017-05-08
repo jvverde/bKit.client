@@ -107,10 +107,10 @@ print "Number of deleted files or directories:", scalar @dels;
 		$last->{dir} = $dir;
 	}
 	my $diff = scalar @lines - $DIRSLIMIT;
-	$#lines = $DIRSLIMIT - 1;
+	$#lines = $DIRSLIMIT - 1 if $diff > 0;
 	local $, = "\n";
 	print @lines;
-	print "\t+ $diff directories. See Logs" if $diff > 0;	
+	print "\t+ $diff directories. See Logs" if $diff > 0;
 }
 
 {

@@ -45,12 +45,13 @@ getacl(){
 	[[ -d $PARENT ]] || mkdir -p "$PARENT"
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
 	#copy attributes, but only for files, not directories
-	[[ $2 == $DST ]] && cp -v --attributes-only --preserve=all "$(cygpath -u "$SRC")" "$DST"
 	{
 		echo "+FILE $(cygpath -w "$2")"
 		cat "$DST"
 	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
 	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
+	#don't change the order
+	[[ $2 == $DST ]] && cp  --attributes-only --preserve=all "$(cygpath -u "$SRC")" "$DST"
 }
 
 while read -r DIR

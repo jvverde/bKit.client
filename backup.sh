@@ -345,11 +345,13 @@ getacls(){
       xargs -r0I{} find "{}" -type f -delete -quit
   }
 
+  exec 11>&1
+
   while IFS='|' read -r I FILE
   do
-    I=${I#?????}
-    [[ $I =~ [^.] ]] || continue
-    echo ACLS: "$I|$FILE" >&2
+    J=${I#?????}
+    [[ $J =~ [^.] ]] || continue
+    echo ACLS: "$I|$FILE" >&11
     echo "$FILE"
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
     bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
@@ -378,7 +380,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    f) Clean deleted metafiles from backup"
+  echo "    f) Clean metafiles deleted"
   clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 

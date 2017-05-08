@@ -43,7 +43,11 @@ trap '
 ' EXIT
 
 importrules(){
-	bash "$SDIR/update.sh" "excludes/global"
+	bash "$SDIR/update.sh" "rules/global"
+	for F in $(ls "$SDIR/rules/global")
+	do
+
+	done
 }
 
 ARGS=("$@")

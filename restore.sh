@@ -36,6 +36,9 @@ OPTIONS=(
   --partial
   --partial-dir=".bkit.rsync-partial"
   --delay-updates
+  --groupmap=4294967295:$(id -u)
+  --usermap=4294967295:$(id -g)
+  --numeric-ids
 )
 
 #Don't try to chown or chgrp if not root or Administrator
@@ -45,10 +48,7 @@ OPTIONS=(
 }
 [[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 
-RSYNCOPTIONS=(
-  --groupmap=4294967295:$(id -u)
-  --usermap=4294967295:$(id -g)
-)
+RSYNCOPTIONS=()
 
 dorsync() {
   local BACKUP="${@: -1}$BACKUPDIR"
@@ -78,7 +78,7 @@ usage() {
 
 SRCS=()
 declare -A LINKTO
-LOCALCOPY="--link-dest" #rsync option
+LOCALACTION="--link-dest" #rsync option
 while [[ $1 =~ ^- ]]
 do
   KEY="$1" && shift
@@ -105,7 +105,7 @@ do
       OPTIONS+=( '--delete-delay' )
     ;;
     --local-copy)
-      LOCALCOPY="--copy-dest"
+      LOCALACTION="--copy-dest"
     ;;
     --link-dest=*)
       LINKTO["--link-dest=${KEY#*=}"]=1
@@ -141,6 +141,34 @@ RESULT="$SDIR/run/restore-$$/"
 trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 
+NTFS_acls(){
+  local SRC=$1
+  local CACHEDST=$2
+  local DST=$3
+  echo "Restore ACLs"
+  [[ -d $CACHEDST ]] || mkdir -pv "$CACHEDST"
+  rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$SRC" "$CACHEDST" ||
+    warn "Problemas ao recuperar $CACHEDST"
+  {
+    grep -Pi 'recv\|[>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f5|
+    while read -r FILE
+    do
+      echo -e "\n"
+      echo "+FILE $(cygpath -w "$DST/$FILE")"
+      cat "$CACHEDST/$FILE"
+    done
+    grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f5|
+    while read -r FILE
+    do
+      echo -e "\n"
+      echo "+FILE $(cygpath -w "$DST/$FILE")"
+      cat "$CACHEDST/$FILE/.bkit-dir-acl"
+    done
+  }| iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
+  SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
+  [[ -f $SUBINACL ]] || die SUBINACL.exe not found
+  "$SUBINACL" /playfile "$(cygpath -w "$RESULT/acls")"
+}
 
 for RESOURCE in "${RESOURCES[@]}"
 do
@@ -183,64 +211,17 @@ do
 
     if [[ -n $DST ]]
     then
-      SRCS+=( "$SRC" ) #In case we are importing all srcs to a single location, do it later, all in one single rsync call
-      LINKTO["$LOCALCOPY=$DIR/"]=1
+      dorsync "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $ST"
     else
       dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
-
-      [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-        echo "Restore ACLs"
-        METADATADIR="$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}"
-        METADATADST="$METADATADIR$BASE/"
-        [[ -d $METADATADST ]] || mkdir -pv "$METADATADST"
-        rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$METASRC" "$METADATADST" ||
-          warn "Problemas ao recuperar $METADATADST/$BASE/"
-        {
-          grep -Pi 'recv\|[>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f5|
-          while read -r FILE
-          do
-            echo -e "\n"
-            echo "+FILE $(cygpath -w "$DIR/$FILE")"
-            cat "$METADATADST/$FILE"
-          done
-          grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f5|
-          while read -r FILE
-          do
-            echo -e "\n"
-            echo "+FILE $(cygpath -w "$DIR/$FILE")"
-            cat "$METADATADST/$FILE/.bkit-dir-acl"
-          done
-          # find "$DIR/$ENTRY" -type f |
-          #   while read -r FILE
-          #   do
-          #     REL=${FILE#$ROOT}
-          #     WFILE="+FILE $(cygpath -w "$FILE")"
-          #     echo -e "\n"
-          #     echo "$WFILE"
-          #     cat "$METADATADIR$REL"
-          #   done
-          # find "$DIR/$ENTRY" -type d |
-          #   while read -r FOLDER
-          #   do
-          #     REL=${FOLDER#$ROOT}
-          #     WFOLDER="+FILE $(cygpath -w "$FOLDER")"
-          #     echo -e "\n"
-          #     echo "$WFOLDER"
-          #     cat "$METADATADIR$REL/.bkit-dir-acl"
-          #   done
-        }| iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
-        SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
-        [[ -f $SUBINACL ]] || die SUBINACL.exe not found
-        "$SUBINACL" /playfile "$(cygpath -w "$RESULT/acls")"
-      )
     fi
+    [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+      NTFS_acls "$METASRC" "$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
+    )
   fi
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
-  [[ $OS == cygwin ]] && {
-    OPTIONS+=( "--no-group" "--no-owner" )
-  }
   LINKS=( "${!LINKTO[@]}" )                   #get different link-dest/copy-dest
   FIRST20=( "${LINKS[@]:0:20}" )              #a rsync limitation
   dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"

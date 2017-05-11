@@ -3,7 +3,7 @@
 *.BAK
 *.dmp
 *.tmp
-*.log
+#*.log
 .git/
 .svn/
 CVS/

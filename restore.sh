@@ -130,6 +130,8 @@ do
     ;;
   esac
 done
+LINKS=( "${!LINKTO[@]}" )                 #get different link-dest/copy-dest
+LINKS=( "${LINKS[@]:0:20}" )              #a rsync limitation
 
 RESOURCES=("$@")
 
@@ -141,33 +143,54 @@ RESULT="$SDIR/run/restore-$$/"
 trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
 
+
+aclparents(){
+  local DST=$(readlink -e "$DST")
+  local FILE=$(readlink -e "$DST/$FILE")
+  until [[ $FILE == $DST ]]
+  do
+    FILE=$(readlink -e "$FILE") || break
+    FILE=${FILE%/*} #parent
+    PARENT="+FILE $(cygpath -w "$FILE")"
+    ACLSOF["$PARENT"]=$(readlink -e "$CACHEDST/${FILE#$DST}/.bkit-dir-acl")
+  done
+}
+
 NTFS_acls(){
   local SRC=$1
-  local CACHEDST=$2
-  local DST=$3
+  local CACHEDST=$(readlink -mn "$2")
+  local DST=$(readlink -e "$3")
   echo "Restore ACLs"
   [[ -d $CACHEDST ]] || mkdir -pv "$CACHEDST"
   rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$SRC" "$CACHEDST" ||
     warn "Problemas ao recuperar $CACHEDST"
   {
-    grep -Pi 'recv\|[>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f5|
+    declare -A ACLSOF
+
     while read -r FILE
     do
-      echo -e "\n"
-      echo "+FILE $(cygpath -w "$DST/$FILE")"
-      cat "$CACHEDST/$FILE"
-    done
-    grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f5|
+      aclparents
+      local TARGET=$(cygpath -w "$(readlink -e "$DST/$FILE")")
+      ACLSOF["+FILE $TARGET"]=$(readlink -e "$CACHEDST/$FILE")
+    done < <(grep -Pi 'recv\|[ch>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f5)
+
     while read -r FILE
     do
+      aclparents
+      local TARGET=$(cygpath -w "$(readlink -e "$DST/$FILE")")
+      ACLSOF["+FILE $TARGET"]=$(readlink -e "$CACHEDST/$FILE/.bkit-dir-acl")
+    done < <(grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f5)
+
+    for P in "${!ACLSOF[@]}"
+    do
       echo -e "\n"
-      echo "+FILE $(cygpath -w "$DST/$FILE")"
-      cat "$CACHEDST/$FILE/.bkit-dir-acl"
+      echo $P
+      cat "${ACLSOF["$P"]}"
     done
-  }| iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
+  } | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
   SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
   [[ -f $SUBINACL ]] || die SUBINACL.exe not found
-  "$SUBINACL" /playfile "$(cygpath -w "$RESULT/acls")"
+  "$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 }
 
 for RESOURCE in "${RESOURCES[@]}"
@@ -211,9 +234,9 @@ do
 
     if [[ -n $DST ]]
     then
-      dorsync "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $ST"
+      dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $ST"
     else
-      dorsync "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+      dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
     fi
     [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       NTFS_acls "$METASRC" "$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
@@ -222,9 +245,7 @@ do
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
-  LINKS=( "${!LINKTO[@]}" )                   #get different link-dest/copy-dest
-  FIRST20=( "${LINKS[@]:0:20}" )              #a rsync limitation
-  dorsync "${FIRST20[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"
+  dorsync "${LINKS[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"
   exists cygpath && DST=$(cygpath -w "$DST")
   echo "Files restored to $DST"
   exit 0

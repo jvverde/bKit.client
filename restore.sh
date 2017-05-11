@@ -4,14 +4,8 @@ SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 set -o pipefail
-ERROR=0
 
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@" >&2; exit 1;}
-warn() {
-  ERROR=1
-  echo -e "$@" >&2
-}
+source "$SDIR/functions/all.sh"
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
@@ -83,6 +77,13 @@ while [[ $1 =~ ^- ]]
 do
   KEY="$1" && shift
   case "$KEY" in
+    -l|-log|--log)
+      exec 1>"$1"
+      shift
+    ;;
+    -l=*|-log=*|--log=*)
+      exec 1>"${KEY#*=}"
+    ;;
     -s=*|--snap=*|--snapshot=*)
         SNAP="${KEY#*=}"
     ;;
@@ -113,6 +114,23 @@ do
     --copy-dest=*)
       LINKTO["--copy-dest=${KEY#*=}"]=1
     ;;
+    --stats)
+      STATS=1
+    ;;
+    --sendlogs)
+      FULLREPORT=1
+      NOTIFY=1
+      STATS=1
+    ;;
+    --notify)
+      NOTIFY=1
+      STATS=1
+    ;;
+    --email=*)
+      EMAIL="${KEY#*=}"
+      NOTIFY=1
+      STATS=1
+    ;;
     -h|--help)
         usage
     ;;
@@ -140,8 +158,12 @@ CONF=$SDIR/conf/conf.init
 . "$CONF"                                                                     #get configuration parameters
 
 RESULT="$SDIR/run/restore-$$/"
-trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
+
+LOGFILE="$RESULT/logfile.tmp"
+STATSFILE="$RESULT/stats.tmp"
+
+trap "rm -rf '$RESULT'" EXIT
 
 
 aclparents(){
@@ -193,6 +215,18 @@ NTFS_acls(){
   "$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 }
 
+makestats(){
+  local DELTATIME=$1
+  local ROOT=$2
+  [[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/recv-stats.pl" ]] && exists perl && {
+    echo "------------Stats------------"
+    echo "Total time spent: $DELTATIME"
+    exists cygpath && ROOT=$(cygpath -w "$ROOT")
+    grep -Pio '^".+"$' "$LOGFILE" | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/recv-stats.pl"
+    echo "------------End of Stats------------"
+  } | tee "$STATSFILE"
+}
+
 for RESOURCE in "${RESOURCES[@]}"
 do
   if [[ $RESOURCE =~ ^rsync://[^@]+@ ]]
@@ -232,15 +266,21 @@ do
       METASRC="$BACKUPURL/$RVID/@current/metadata$BASE/./$ENTRY"
     }
 
-    if [[ -n $DST ]]
-    then
-      dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $ST"
-    else
-      dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
-    fi
-    [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-      NTFS_acls "$METASRC" "$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
-    )
+    INIT=$(date -R)
+    {
+      if [[ -n $DST ]]
+      then
+        dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $ST"
+      else
+        dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+      fi
+      [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+        NTFS_acls "$METASRC" "$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
+      )
+    } | tee "$LOGFILE"
+    STOP=$(date -R)
+    deltatime "$STOP" "$INIT"
+    makestats "$DELTATIME" "$ROOT"
   fi
 done
 

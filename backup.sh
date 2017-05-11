@@ -1,12 +1,12 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
-warn() { echo -e "$@">&2; }
-
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+
+source "$SDIR/functions/all.sh"
+
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
+
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)
   --usermap=4294967295:$(id -g)
@@ -444,34 +444,13 @@ getacls(){
 	} | tee "$LOGFILE"
 
 	#Now some stats
-	deltatime(){
-		let DTIME=$(date +%s -d "$1")-$(date +%s -d "$2")
-		SEC=${DTIME}s
-		(($DTIME>59)) && {
-			let SEC=DTIME%60
-			let DTIME=DTIME/60
-			SEC=${SEC}s
-			MIN=${DTIME}m
-			(($DTIME>59)) && {
-				let MIN=DTIME%60
-				let DTIME=DTIME/60
-				MIN=${MIN}m
-				HOUR=${DTIME}h
-				(($DTIME>23)) && {
-					let HOUR=DTIME%24
-					let DTIME=DTIME/24
-					DAYS=${DTIME}d
-				}
-			}
-		}
-		DELTATIME="$DAYS$HOUR$MIN$SEC"
-	}
-	[[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/stats.pl" ]] && exists perl && {
+
+	[[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     deltatime "$(date -R)" "$ITIME"
 		echo "Total time spent: $DELTATIME"
     exists cygpath && ROOT=$(cygpath -w "$ROOT")
-    grep -Pio '^".+"$' "$LOGFILE" | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/stats.pl"
+    cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/send-stats.pl"
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
 

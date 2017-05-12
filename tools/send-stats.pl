@@ -7,12 +7,13 @@ my $SIZELIMIT = 0; #Size limit for output directores usage
 my $DIRSLIMIT = 50;
 my $SEP = '/';
 $SEP = '\\' if $^O eq 'cygwin' or $^O eq 'MSWin32';
+my $RESEP= qr/\Q$SEP\E/;
 
 $\ = "\n";
 $, = ' ';
 my @logfile = <>;
 
-my @lines = map{s/^"|"$//g;chomp;$_} grep {/^".+"$/ && !m#/run/manifest-segment\.\d+\|#} @logfile;
+my @lines = map{s/^"|"$//g;s!/!$SEP!g;chomp;$_} grep {/^".+"$/ && !m#/run/manifest-segment\.\d+\|#} @logfile;
 
 my $string = q#send|#;
 my @sends = grep {/^\Q$string\E/} @lines;
@@ -82,7 +83,7 @@ print "Number of deleted files or directories:", scalar @dels;
 		my @fields = split /\|/, $line;
 		my $size = $fields[4];
 		next unless $size > 0;
-		my @dirs = split '/', $fields[2];
+		my @dirs = split $RESEP, $fields[2];
 		pop @dirs;
 		my $dir = '';
 		foreach my $i (0..$#dirs) {

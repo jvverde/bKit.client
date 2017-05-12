@@ -49,7 +49,7 @@ getacl(){
 		echo "+FILE $(cygpath -w "$2")"
 		cat "$DST"
 	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
-	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")" >&2
+	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 	#don't change the order
 	[[ $2 == $DST ]] && cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST"
 }

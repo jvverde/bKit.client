@@ -9,7 +9,7 @@ source "$SDIR/functions/all.sh"
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
-FMT='--out-format=%o|%i|%b|%l|%f|%M|%t'
+FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 PERM=(--perms --acls --super --numeric-ids)
 BACKUP=".bkit-before-restore-on"
 BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S")"
@@ -194,14 +194,14 @@ NTFS_acls(){
       aclparents
       local TARGET=$(cygpath -w "$(readlink -e "$DST/$FILE")")
       ACLSOF["+FILE $TARGET"]=$(readlink -e "$CACHEDST/$FILE")
-    done < <(grep -Pi 'recv\|[ch>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f5)
+    done < <(grep -Pi 'recv\|[ch>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f3)
 
     while read -r FILE
     do
       aclparents
       local TARGET=$(cygpath -w "$(readlink -e "$DST/$FILE")")
       ACLSOF["+FILE $TARGET"]=$(readlink -e "$CACHEDST/$FILE/.bkit-dir-acl")
-    done < <(grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f5)
+    done < <(grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f3)
 
     for P in "${!ACLSOF[@]}"
     do
@@ -213,6 +213,7 @@ NTFS_acls(){
   SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
   [[ -f $SUBINACL ]] || die SUBINACL.exe not found
   "$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
+  #"$SUBINACL" /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 }
 
 makestats(){
@@ -222,7 +223,9 @@ makestats(){
     echo "------------Stats------------"
     echo "Total time spent: $DELTATIME"
     exists cygpath && ROOT=$(cygpath -w "$ROOT")
-    grep -Pio '^".+"$' "$LOGFILE" | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/recv-stats.pl"
+    ROOT="${ROOT//\\/\\\\}\\\\"
+    echo root=$ROOT
+    cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/recv-stats.pl"
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
 }
@@ -270,7 +273,7 @@ do
     {
       if [[ -n $DST ]]
       then
-        dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $ST"
+        dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $DST"
       else
         dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi
@@ -280,7 +283,7 @@ do
     } | tee "$LOGFILE"
     STOP=$(date -R)
     deltatime "$STOP" "$INIT"
-    makestats "$DELTATIME" "$ROOT"
+    makestats "$DELTATIME" "${DST:-$DIR}"
   fi
 done
 

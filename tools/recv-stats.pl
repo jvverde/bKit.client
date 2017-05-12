@@ -7,12 +7,13 @@ my $SIZELIMIT = 0; #Size limit for output directores usage
 my $DIRSLIMIT = 50;
 my $SEP = '/';
 $SEP = '\\' if $^O eq 'cygwin' or $^O eq 'MSWin32';
+my $RESEP= qr/\Q$SEP\E/;
 
 $\ = "\n";
 $, = ' ';
 my @logfile = <>;
 
-my @lines = map{s/^"|"$//g;chomp;$_} grep {/^".+"$/ && !m#/run/manifest-segment\.\d+\|#} @logfile;
+my @lines = map{s/^"|"$//g;s!/!$SEP!g;chomp;$_} grep {/^".+"$/ && !m#/run/manifest-segment\.\d+\|#} @logfile;
 
 my $string = q#recv|#;
 my @recvs = grep {/^\Q$string\E/} @lines;
@@ -82,7 +83,7 @@ print "Number of deleted files or directories:", scalar @dels;
 		my @fields = split /\|/, $line;
 		my $size = $fields[4];
 		next unless $size > 0;
-		my @dirs = split '/', $fields[2];
+		my @dirs = split $RESEP, $fields[2];
 		pop @dirs;
 		my $dir = '';
 		foreach my $i (0..$#dirs) {
@@ -102,7 +103,9 @@ print "Number of deleted files or directories:", scalar @dels;
 			return $b cmp $a
 		} @keys){
 		my $size = $sizes{$dir};
-		push @lines, sprintf("\t%-12d\t%s", $size, $dir) unless $size == $last->{size} and $last->{dir} =~ /\Q$dir\E/;
+		my $wdir = $dir;
+		$wdir =~ s#/#\\#;
+		push @lines, sprintf("\t%-12d\t%s", $size, $wdir) unless $size == $last->{size} and $last->{dir} =~ /\Q$dir\E/;
 		$last->{size} = $size;
 		$last->{dir} = $dir;
 	}
@@ -123,7 +126,7 @@ print "Number of deleted files or directories:", scalar @dels;
 	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
 	$#topkeys = 9 if scalar @topkeys > 10;
 	print scalar @topkeys, "Biggest updates:" if scalar @topkeys;
-	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
+	printf("\t%-12d\t%s\n", $sizes{$_}, $_) foreach (@topkeys);
 }
 
 {
@@ -136,5 +139,5 @@ print "Number of deleted files or directories:", scalar @dels;
 	my @topkeys = (sort { $sizes{$b} <=> $sizes{$a} }  keys %sizes);
 	$#topkeys = 9 if scalar @topkeys > 10;
 	print scalar @topkeys, "Biggest new files:" if scalar @topkeys;
-	printf("\t%-12d\t%s\n", $sizes{$_}, "$_") foreach (@topkeys);
+	printf("\t%-12d\t%s\n", $sizes{$_}, $_) foreach (@topkeys);
 }

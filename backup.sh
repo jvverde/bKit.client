@@ -326,8 +326,7 @@ getacls(){
 
   ACLSOPTIONS=(
     --no-verbose
-    --archive
-    --hard-links
+    --recursive
     --relative
     --itemize-changes
     --exclude="$ACLFILE"
@@ -335,7 +334,7 @@ getacls(){
     "${PERM[@]}"
     $FMT_QUERY
   )
-  echo "    a) Remove from local cache any metafile older than 30 days => Force renew"
+  echo "    a) Delete older files from local cache"
   [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -mtime +30 -delete
 
   echo "    b) Create missing metafiles in local cache"
@@ -349,6 +348,7 @@ getacls(){
 
   while IFS='|' read -r I FILE
   do
+    [[ $I =~ skipping ]] && continue
     J=${I#?????}
     [[ $J =~ [^.] ]] || continue
     echo ACLS: "$I|$FILE" >&11
@@ -356,12 +356,11 @@ getacls(){
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
     bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
 
-
-  #update primessions and attributes only
+  update permissions and attributes only
   echo "    c) Update attributes of metafiles in local cache"
-  dorsync --ignore-non-existing --ignore-existing --delete-delay "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+  dorsync --ignore-non-existing --ignore-existing --delete --force "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
 
-  echo "    d) Backup metafiles from local cache to backup server"
+  echo "    c) Backup metafiles from local cache to backup server"
   bg_upload_manifest "$METADATADIR" 'metadata'
   {
     bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
@@ -371,7 +370,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    e) Update metafiles attributes"
+  echo "    d) Update metafiles attributes"
   bg_upload_manifest "$METADATADIR" 'metadata'
 
   backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
@@ -380,7 +379,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    f) Clean metafiles deleted"
+  echo "    e) Clean metafiles deleted"
   clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 

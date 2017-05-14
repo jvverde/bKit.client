@@ -59,8 +59,10 @@ dorsync() {
 
 destination() {
   DST="$1"
+  [[ -e $DST ]] || mkdir -pv "$DST"
   exists cygpath && DST=$(cygpath -u "$DST")
-  DST=$(readlink -ne "$DST") || die "'$1' should be a directory"
+  DST=$(readlink -ne "$DST")
+  [[ -d $DST ]] || die "'$1' should be a directory"
   [[ ${DST: -1} == / ]] || DST="$DST/"
 }
 
@@ -222,9 +224,10 @@ makestats(){
   [[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/recv-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     echo "Total time spent: $DELTATIME"
-    exists cygpath && ROOT=$(cygpath -w "$ROOT")
-    ROOT="${ROOT//\\/\\\\}\\\\"
-    echo root=$ROOT
+    exists cygpath && {
+      ROOT=$(cygpath -w "$ROOT")
+      ROOT="${ROOT//\\/\\\\}\\\\"
+    }
     cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/recv-stats.pl"
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
@@ -273,7 +276,7 @@ do
     {
       if [[ -n $DST ]]
       then
-        dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST/" | tee "$RESULT/index" || warn "Problems restoring to $DST"
+        dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST" | tee "$RESULT/index" || warn "Problems restoring to $DST"
       else
         dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi
@@ -288,10 +291,13 @@ do
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
+  INIT=$(date -R)
   dorsync "${LINKS[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"
   exists cygpath && DST=$(cygpath -w "$DST")
   echo "Files restored to $DST"
-  exit 0
+  STOP=$(date -R)
+  deltatime "$STOP" "$INIT"
+  makestats "$DELTATIME" "$DST"
 }
 
 exit $ERROR

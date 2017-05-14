@@ -39,11 +39,13 @@ mkdir -p "$RESULT"
 
 getacl(){
 	local SRC=$1
+	[[ -L $SRC ]] && return 0
 	local DST=$2
 	[[ -d $SRC ]] && DST="$DST/$DIRACL"
 	local PARENT=${DST%/*}
 	[[ -d $PARENT ]] || mkdir -p "$PARENT"
-	"$SUBINACL" /noverbose /nostatistic /onlyfile "$SRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
+	DOSSRC="$(cygpath -w "${SRC%/*}")\\${SRC##*/}" #we need go this way because symbolic links
+	"$SUBINACL" /noverbose /nostatistic /onlyfile "$DOSSRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
 	#copy attributes, but only for files, not directories
 	{
 		echo "+FILE $(cygpath -w "$2")"
@@ -51,14 +53,20 @@ getacl(){
 	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
 	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
 	#don't change the order
-	[[ $2 == $DST ]] && cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST"
+	[[ $2 == $DST ]] && {
+		cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST" || warn "Cannot copy attributes from $SRC to $DST"
+	}
 }
 
 while read -r DIR
 do
-	DIR=$(readlink -nm "$DIR")
-	WFULLPATH=$(cygpath -w "$DIR")
-	RPATH=$(cygpath -u "${WFULLPATH#?:\\}")
+	#echo DIR=$DIR
+	#DIR=$(readlink -nm "$DIR")
+	#echo DIR2=$DIR
+	#WFULLPATH=$(cygpath -w "$DIR")
+	#echo WFULL=$WFULLPATH
+	RPATH=${DIR#/cygdrive/?/}
 	DST=$TARGETDIR/$RPATH
-	getacl "$WFULLPATH" "$DST"
+	#echo DST=$DST
+	getacl "$DIR" "$DST"
 done

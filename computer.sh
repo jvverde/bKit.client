@@ -1,11 +1,12 @@
 #!/bin/bash
 exists() { type "$1" >/dev/null 2>&1;}
+
+
 exists wmic && {
-	UUID="$(wmic csproduct get uuid /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~ /uuid/ {print $2}' | sed 's#\r+##g' | sed -E 's#\s#_#g')"
-	DOMAIN="$(wmic computersystem get domain /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /domain/ {print $2}' | sed 's#\r+##g' | sed -E 's#\s#_#g')"
-	#get computer name and replace any occurency of a 'white space' by '_', a dot by '-' and suppress any '\r'
-	NAME="$(wmic computersystem get name /format:textvaluelist.xsl |awk -F "=" 'tolower($1) ~  /name/ {print $2}' | sed 's#\r+##g' | sed 's#\.#-#g' | sed -E 's#\s#_#g')"
-	true
+	UUID="$(wmic csproduct get uuid /format:textvaluelist.xsl |tr -d '\r'|sed -E '/^$/d;s/^\s+|\s+$//;s/\s+/_/g'| awk -F "=" 'tolower($1) ~ /uuid/ {print $2}')"
+	DOMAIN="$(wmic computersystem get domain /format:textvaluelist.xsl |tr -d '\r'|sed -E '/^$/d;s/^\s+|\s+$//;s/\s+/_/g' | awk -F "=" 'tolower($1) ~  /domain/ {print $2}')"
+	NAME="$(wmic computersystem get name /format:textvaluelist.xsl |tr -d '\r'|sed -E '/^$/d;s/^\s+|\s+$//;s/\s+/_/g' | awk -F "=" 'tolower($1) ~  /name/ {print $2}')"
+	echo "$DOMAIN|$NAME|$UUID"
 } || {
 	UUID="$(dmidecode -s system-uuid 2>/dev/null)"
 	true ${UUID:=$(cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null)}
@@ -15,8 +16,6 @@ exists wmic && {
 	true ${DOMAIN:=local}
 	NAME="$(hostname -s)"
 	true ${NAME:=noname}
-	#echo UUID $UUID
-	#echo DOMAIN $DOMAIN
-	#echo NAME $NAME
+	echo "$DOMAIN|$NAME|$UUID"
 }
 

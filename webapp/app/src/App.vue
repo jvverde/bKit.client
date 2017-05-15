@@ -34,16 +34,16 @@
         console.error(e)
       }
       try {
-        const fd = spawn(BASH, ['./getComputerName.sh'], {cwd: '..'})
+        const fd = spawn(BASH, ['./computer.sh'], {cwd: '..'})
         fd.stdout.on('data', (data) => {
-          const name = (`${data}` || '').replace(/(\n|\r)+$/, '')
+          const name = (`${data}` || '').replace(/(\n|\r)+$/g, '').replace(/\|/g, '.')
           this.$nextTick(() => {
             store.dispatch('setComputerName', name)
           })
         })
         fd.stderr.on('data', (msg) => {
           this.$notify.error({
-            title: 'Error in App doing ./getComputerName',
+            title: 'Error in App getting computer information',
             message: `${BASH}:${msg}`,
             customClass: 'message error'
           })

@@ -327,6 +327,10 @@ getacls(){
   ACLSOPTIONS=(
     --no-verbose
     --recursive
+    --acls
+    --owner
+    --group
+    --perms
     --relative
     --itemize-changes
     --exclude="$ACLFILE"
@@ -337,11 +341,11 @@ getacls(){
   echo "    a) Delete older files from local cache"
   [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -mtime +30 -delete
 
-  echo "    b) Create missing metafiles in local cache"
-  #but first remove the first descendent file of any directory missing a metafile ACLFILE to force a renew
+  echo "    b) Generate missing metafiles in local cache"
+  #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
   [[ ${#MDIRS[@]} -gt 0 ]] && {
     find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
-      xargs -r0I{} find "{}" -type f -delete -quit
+      xargs -r0I{} chmod 000 "{}"
   }
 
   exec 11>&1
@@ -350,14 +354,15 @@ getacls(){
   do
     [[ $I =~ skipping ]] && continue
     J=${I#?????}
-    [[ $J =~ [^.] ]] || continue
-    echo ACLS: "$I|$FILE" >&11
-    echo "$FILE"
+    [[ $J =~ [^.] ]] && {
+      echo ACL: "$I|$FILE" >&11
+      echo "$FILE"
+    }
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
     bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
 
-  update permissions and attributes only
-  echo "    c) Update attributes of metafiles in local cache"
+  #clean local cache
+  echo "    c) Update attributes and Clean metafiles on local cache"
   dorsync --ignore-non-existing --ignore-existing --delete --force "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
 
   echo "    c) Backup metafiles from local cache to backup server"
@@ -379,7 +384,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    e) Clean metafiles deleted"
+  echo "    e) Clean metafiles on server"
   clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 

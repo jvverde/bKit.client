@@ -91,7 +91,7 @@ done
 
 #we need ROOT, BACKUPDIR and STARTDIR
 #source "$SDIR/drive.sh" "$DEV"
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
 IFS=$OLDIFS
 

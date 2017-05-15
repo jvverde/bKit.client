@@ -23,7 +23,7 @@ usage() {
 echo Contacting the server ... please wait!
 exists nc && { nc -z $SERVER $PORT 2>&1 || die Server $SERVER not found;}
 
-source "$SDIR/computer.sh"
+IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
 
 CONFDIR="$SDIR/conf"
 mkdir -p "$CONFDIR"

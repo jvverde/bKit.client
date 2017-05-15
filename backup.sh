@@ -113,7 +113,7 @@ dorsync2(){
 	local RETRIES=1000
 	while true
 	do
-		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -307,7 +307,7 @@ bg_upload_manifest(){
 	)&
 }
 
-getacls(){
+backupACLS(){
   local FMT='--out-format=ACL:"%o|%i|%f|%c|%b|%l|%t"'
   local FMT_QUERY='--out-format=%i|/%f'
   local ACLFILE='.bkit-dir-acl'
@@ -335,13 +335,12 @@ getacls(){
     --itemize-changes
     --exclude="$ACLFILE"
     --exclude=".rsync-filter"
-    "${PERM[@]}"
     $FMT_QUERY
   )
-  echo "    a) Delete older files from local cache"
-  [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -mtime +30 -delete
+  echo "a) Delete older files from local cache"
+  [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -mtime +30 -printf "Removed %P\n" -delete
 
-  echo "    b) Generate missing metafiles in local cache"
+  echo "b) Generate missing metafiles in local cache"
   #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
   [[ ${#MDIRS[@]} -gt 0 ]] && {
     find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
@@ -349,23 +348,22 @@ getacls(){
   }
 
   exec 11>&1
-
   while IFS='|' read -r I FILE
   do
     [[ $I =~ skipping ]] && continue
     J=${I#?????}
     [[ $J =~ [^.] ]] && {
-      echo ACL: "$I|$FILE" >&11
+      echo "ACL:$I|$FILE" >&11
       echo "$FILE"
     }
   done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
     bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
 
   #clean local cache
-  echo "    c) Update attributes and Clean metafiles on local cache"
+  echo "c) Update attributes and Clean metafiles on local cache"
   dorsync --ignore-non-existing --ignore-existing --delete --force "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
 
-  echo "    c) Backup metafiles from local cache to backup server"
+  echo "d) Backup metafiles from local cache to backup server"
   bg_upload_manifest "$METADATADIR" 'metadata'
   {
     bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
@@ -375,7 +373,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    d) Update metafiles attributes"
+  echo "e) Update metafiles attributes"
   bg_upload_manifest "$METADATADIR" 'metadata'
 
   backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
@@ -384,7 +382,7 @@ getacls(){
   wait4jobs
   rm -f "$MANIFEST" "$ENDFLAG"
 
-  echo "    e) Clean metafiles on server"
+  echo "f) Clean metafiles on server"
   clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 }
 
@@ -432,7 +430,7 @@ getacls(){
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 4 - Backup ACLS\n"
-      getacls "$MAPDRIVE" "${STARTDIR[@]}"
+      backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
     )
 
 		echo -e "\nPhase 5 - Create a readonly snapshot on server\n"

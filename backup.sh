@@ -337,53 +337,65 @@ backupACLS(){
     --exclude=".rsync-filter"
     $FMT_QUERY
   )
+
   echo "a) Delete older files from local cache"
-  [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -mtime +30 -printf "Removed %P\n" -delete
+  {
+    [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -ctime +30 -printf "Removed %P\n" -delete
+  } | sed -e 's/^/\t/'
 
   echo "b) Generate missing metafiles in local cache"
-  #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
-  [[ ${#MDIRS[@]} -gt 0 ]] && {
-    find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
-      xargs -r0I{} chmod 000 "{}"
-  }
-
-  exec 11>&1
-  while IFS='|' read -r I FILE
-  do
-    [[ $I =~ skipping ]] && continue
-    J=${I#?????}
-    [[ $J =~ [^.] ]] && {
-      echo "ACL:$I|$FILE" >&11
-      echo "$FILE"
+  {
+    #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
+    [[ ${#MDIRS[@]} -gt 0 ]] && {
+      find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
+        xargs -r0I{} chmod 000 "{}"
     }
-  done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
-    bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
 
-  #clean local cache
+    exec 11>&1
+    while IFS='|' read -r I FILE
+    do
+      [[ $I =~ skipping ]] && continue
+      J=${I#?????}
+      [[ $J =~ [^.] ]] && {
+        echo "ACL:$I|$FILE" >&11
+        echo "$FILE"
+      }
+    done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
+      bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
+  } | sed -e 's/^/\t/'
+
   echo "c) Update attributes and Clean metafiles on local cache"
-  dorsync --ignore-non-existing --ignore-existing --delete --force "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+  {
+    dorsync --ignore-non-existing --ignore-existing --delete --force "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+  } | sed -e 's/^/\t/'
 
   echo "d) Backup metafiles from local cache to backup server"
-  bg_upload_manifest "$METADATADIR" 'metadata'
   {
-    bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
-  } | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+    bg_upload_manifest "$METADATADIR" 'metadata'
+    {
+      bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
+    } | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
-  touch "$ENDFLAG"
-  wait4jobs
-  rm -f "$MANIFEST" "$ENDFLAG"
+    touch "$ENDFLAG"
+    wait4jobs
+    rm -f "$MANIFEST" "$ENDFLAG"
+  } | sed -e 's/^/\t/'
 
   echo "e) Update metafiles attributes"
-  bg_upload_manifest "$METADATADIR" 'metadata'
+  {
+    bg_upload_manifest "$METADATADIR" 'metadata'
 
-  backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
+    backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
 
-  touch "$ENDFLAG"
-  wait4jobs
-  rm -f "$MANIFEST" "$ENDFLAG"
+    touch "$ENDFLAG"
+    wait4jobs
+    rm -f "$MANIFEST" "$ENDFLAG"
+  } | sed -e 's/^/\t/'
 
   echo "f) Clean metafiles on server"
-  clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
+  {
+    clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
+  } | sed -e 's/^/\t/'
 }
 
 

@@ -41,7 +41,7 @@
         </el-button>
       </section>
     </div>
-    <div class="resources">
+    <div class="resources" v-if="includes.length > 0">
       <div v-if="includes.length > 0 ">Backup</div>
       <div class="includes list">
         <span v-for="f in includes">
@@ -57,11 +57,18 @@
         </span>
       </div>
       <div class="addrules">
-        <label>Add an Exclude Rule</label>
-        <input v-model="newExcludeRule !== null" @keyup.enter="addExcludeRule" type="text"></input>
-        <i v-show="newExcludeRule"
+        <label>Add this Exclude Rule:</label>
+        <input v-model="newExcludeRule" @keyup.enter="addExcludeRule" type="text"></input>
+        <i v-show="newExcludeRule !== null"
           class="fa fa-check-circle-o enter" aria="hidden" @click="addExcludeRule">
         </i>
+      </div>
+      <div v-if="excludeRules.length > 0 ">Exclude Rules</div>
+      <div class="rules list">
+        <span v-for="r in excludeRules">
+          {{r}}
+          <i class="fa fa-times-circle" aria="hidden" @click="removeRule(r)"></i>
+        </span>
       </div>
     </div>
     <section v-if="show" class="output">
@@ -150,6 +157,10 @@
         console.log('val', this.newExcludeRule)
         this.excludeRules.push(this.newExcludeRule)
         this.newExcludeRule = null
+      },
+      removeRule (r) {
+        const index = this.excludeRules.indexOf(r)
+        if (index !== -1) this.excludeRules.splice(index, 1)
       },
       remove (entry) {
         this.$store.dispatch('rmBackupDir', entry)
@@ -355,6 +366,13 @@
       }
       .addrules{
         display: flex;
+        align-items: center;
+        >*{
+          display: inline-block;
+        }
+        >*:not(first-child){
+          margin-left: 5px;
+        }
         input{
           border: 1px solid $bkit-color;
           border-radius: 5px;

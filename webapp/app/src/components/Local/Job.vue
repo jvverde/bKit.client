@@ -42,13 +42,19 @@
       </section>
     </div>
     <div class="resources">
-      <span v-if="includes.length > 0 ">Backup</span>
-      <div v-for="f in includes">
-        {{f.path}}
+      <div v-if="includes.length > 0 ">Backup</div>
+      <div class="includes list">
+        <span v-for="f in includes">
+          {{f.path}}
+          <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
+        </span>
       </div>
-      <span v-if="excludes.length > 0 ">Excluding</span>
-      <div v-for="f in excludes">
-        {{f.path}}
+      <div v-if="excludes.length > 0 ">Excluding</div>
+      <div class="excludes list">
+        <span v-for="f in excludes">
+          {{f.path}}
+          <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
+        </span>
       </div>
     </div>
     <section v-if="show" class="output">
@@ -130,6 +136,9 @@
       }
     },
     methods: {
+      remove (entry) {
+        this.$store.dispatch('rmBackupDir', entry)
+      },
       create () {
         const options = [
           '--name', this.taskname,
@@ -300,8 +309,34 @@
       padding: 1em;
       overflow: auto;
       flex-grow: 1;
-      div{
+      div.list{
         margin-left: 1em;
+        span{
+          display: inline-block;
+          margin-left: 5px;
+          margin-bottom: 5px;
+          min-width: 2em;
+          padding: 5px;
+          background-color:#eee;
+          background-color:rgba(224,224,224,.9);
+          border-radius:5px;
+
+          i{
+            float: right;
+            display: inline-block;
+            margin-left: 5px;
+            visibility: hidden;
+          }
+          &:hover {
+            background-color:rgba(192,192,192,.9);
+            i{
+              visibility: visible;
+            }
+            i:hover{
+              color:darkred;
+            }
+          }
+        }
       }
     }
     .output{

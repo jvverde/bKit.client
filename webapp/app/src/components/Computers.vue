@@ -13,6 +13,12 @@
       </ul>
       <h2 v-if="server">Restore from {{server}}</h2>
       <h2 v-else class="alert">Server not set yet</h2>
+      <div class="help" v-if="driveover">
+        <span>Label: {{driveover.label}}</span>
+        <span>FS: {{driveover.fs}}</span>
+        <span>Type: {{driveover.type}}</span>
+        <span>ID: {{driveover.uuid}}</span>
+      </div>
     </header>
     <div class="computers" :class="{onlyone:onlyone}">
       <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
@@ -21,7 +27,10 @@
         @click.stop="select(index)">
         <div class="name">{{computer.name}}</div>
         <div class="uuid">uuid:{{computer.uuid}}</div>
-        <drives :computer="computer" class="components"></drives>
+        <drives :computer="computer" class="components"
+          @outdrive="outdrive"
+          @overdrive="overdrive">
+        </drives>
       </div>
     </div>
   </div>
@@ -33,6 +42,7 @@
   export default {
     data () {
       return {
+        driveover: null,
         onlyone: false,
         computers: []
       }
@@ -77,6 +87,12 @@
         } else {
           this.onlyone = computer.selected = true
         }
+      },
+      overdrive (drive) {
+        this.driveover = drive
+      },
+      outdrive () {
+        this.driveover = null
       }
     }
   }
@@ -91,6 +107,27 @@
     align-self:flex-start;
     .logo{
       float:left;
+    }
+    .help {
+      position:absolute;
+      right: 1px;
+      top:1px;
+      z-index: 50000;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      font-size: 8pt;
+      background-color: #EEE;
+      background-color: rgba(240,240,240,0.9);
+      border-radius: 5px;
+      padding: 5px;
+      span{
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        text-align: left;
+      }
     }
   }
   .computers{

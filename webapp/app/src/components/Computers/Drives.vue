@@ -1,18 +1,14 @@
 <template>
   <div class="drives">
-    <div class="drive" v-for="(drive, index) in drives">
+    <div class="drive" v-for="(drive, index) in drives"
+      @mouseout="mouseout"
+      @mouseover="mouseover(drive)" >
       <router-link :to="{name: 'Backups-page', params: {
           computer: computer.id,
           disk:drive.id
       }}" class="link">
         {{drive.name}}
       </router-link>
-      <div class="help">
-        <span>Label: {{drive.label}}</span>
-        <span>FS: {{drive.fs}}</span>
-        <span>Type: {{drive.type}}</span>
-        <span>ID: {{drive.uuid}}</span>
-      </div>
     </div>
   </div>
 </template>
@@ -53,6 +49,12 @@
     methods: {
       toggle_drive (index) {
         this.drives[index].open = !this.drives[index].open
+      },
+      mouseover (disk) {
+        this.$emit('overdrive', disk)
+      },
+      mouseout () {
+        this.$emit('outdrive')
       }
     }
   }
@@ -84,31 +86,6 @@
         border-radius: 50px;
         border:2px solid green;
         margin-left: -2px;
-      }
-      .help{
-        display: none;
-        position: absolute;
-        right: 1px;
-        bottom: 1px;
-        z-index: 5;
-        max-width:12em;
-        font-size: 8pt;
-        background-color: #999;
-        background-color: rgba(128,128,128,0.3);
-        border-radius: 5px;
-        padding: 2px;
-        span{
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-          text-align: left;
-        }
-      }
-      &:hover .help{
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: flex-start;
       }
       .link {
         text-decoration: none;

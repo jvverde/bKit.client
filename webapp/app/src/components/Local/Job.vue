@@ -56,6 +56,13 @@
           <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
         </span>
       </div>
+      <div class="addrules">
+        <label>Add an Exclude Rule</label>
+        <input v-model="newExcludeRule !== null" @keyup.enter="addExcludeRule" type="text"></input>
+        <i v-show="newExcludeRule"
+          class="fa fa-check-circle-o enter" aria="hidden" @click="addExcludeRule">
+        </i>
+      </div>
     </div>
     <section v-if="show" class="output">
       <div class="stdout">{{stdout}}</div>
@@ -86,6 +93,8 @@
     name: 'job',
     data () {
       return {
+        newExcludeRule: null,
+        excludeRules: [],
         taskname: '',
         every: 1,
         periods: {
@@ -136,6 +145,12 @@
       }
     },
     methods: {
+      addExcludeRule (val) {
+        console.log(val)
+        console.log('val', this.newExcludeRule)
+        this.excludeRules.push(this.newExcludeRule)
+        this.newExcludeRule = null
+      },
       remove (entry) {
         this.$store.dispatch('rmBackupDir', entry)
       },
@@ -336,6 +351,25 @@
               color:darkred;
             }
           }
+        }
+      }
+      .addrules{
+        display: flex;
+        input{
+          border: 1px solid $bkit-color;
+          border-radius: 5px;
+          background-color: beige;
+          padding: .5em;
+          &:hover{
+            background-color: bisque;
+          }
+        }
+        .enter{
+          font-size: 125%;
+        }
+        .enter:hover {
+          cursor: pointer;
+          color: darkgreen;
         }
       }
     }

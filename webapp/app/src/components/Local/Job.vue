@@ -9,21 +9,21 @@
       No directories or files has been selected
     </div>
     <div class="resources" v-if="includes.length > 0">
-      <div v-if="includes.length > 0 ">Backup</div>
+      <div v-if="includes.length > 0 " class="head">Backup</div>
       <div class="includes list">
         <span v-for="f in includes">
           {{f.path}}
           <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
         </span>
       </div>
-      <div v-if="excludes.length > 0 ">Excluding</div>
+      <div v-if="excludes.length > 0 "  class="head">Excluding</div>
       <div class="excludes list">
         <span v-for="f in excludes">
           {{f.path}}
           <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
         </span>
       </div>
-      <div v-if="excludeRules.length > 0 ">Exclude Rules</div>
+      <div v-if="excludeRules.length > 0 " class="head">Exclude Rules</div>
       <div class="rules list">
         <span v-for="r in excludeRules">
           {{r}}
@@ -31,7 +31,7 @@
         </span>
       </div>
       <div class="addrules">
-        <label>Add this Exclude Rule:</label>
+        <label>Add an Exclude Rule:</label>
         <input v-model="newExcludeRule" @keyup.enter="addExcludeRule" type="text"></input>
         <i v-show="newExcludeRule !== null"
           class="fa fa-check-circle-o enter" aria="hidden" @click="addExcludeRule">
@@ -174,8 +174,12 @@
         const filters = this.filters.map(e => {
           return `--filter=${e}`
         })
+        const excludesrules = this.excludeRules.map(r => {
+          return `--filter=- ${r}`
+        })
         const cmd = ['./ctask.sh',
           ...options,
+          ...excludesrules,
           ...filters,
           ...includes
         ]
@@ -333,25 +337,28 @@
       }
     }
     .resources{
-      padding: 1em;
+      padding: .5em;
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      :not(.head) + div.list{
+        display: none;
+      }
       div.list{
         margin-left: 1em;
         margin-bottom: 5px;
+        min-height: 2.5em;
         overflow-y: auto;
-        background-color:#888;
+        background-color:gainsboro;
         padding: 5px;
-        color: #AAA;
+        color: forestgreen;
         border-radius:5px;
         span{
           display: inline-block;
-          margin-left: 5px;
-          margin-bottom: 5px;
-          min-width: 2em;
-          padding: 4px;
-          background-color:#111;
+          margin: 3px;
+          min-width: 3em;
+          padding: 3px;
+          background-color:oldlace;
           border-radius:5px;
 
           i{
@@ -361,7 +368,7 @@
             visibility: hidden;
           }
           &:hover {
-            background-color:#aaa;
+            background-color:darkgrey;
             color: white;
             i{
               visibility: visible;
@@ -374,8 +381,8 @@
       }
       .addrules{
         border-top:1px solid black;
-        padding-top:5px;
-        margin-top: 5px;
+        padding-top:.5em;
+        margin-top: 1px;
         display: flex;
         align-items: center;
         >*{

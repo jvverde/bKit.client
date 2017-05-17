@@ -171,15 +171,15 @@ do
   do
   	#echo F:$F
   	#DIR=${F:2}
-  	DIR=${F#* }
-  	P=${F%% *}
+  	DIR=${F#* } #STAR AFTER FIRST SPACE
+  	P=${F%% *}	#P is the rule
   	set -f
   	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
 
   	#echo B:$DIR
   	[[ ! $DIR =~ ^/ ]] && ROOTFILTERS+=( "${P} $DIR" ) && continue #if not start on root
   	BASE=${DIR%\**}
-		until [[ -d $BASE ]]
+		until [[ -d $BASE ]]			#find a path base if $BASE not exist at this time
 		do
 			BASE=$(dirname "$BASE")
 		done
@@ -217,33 +217,31 @@ do
 		'--notify'
 	)
 
-	#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
-	FILTERLOCATION="$FILTERFILE"
-
-	if [[ $OS == cygwin ]]
-	then
-		FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
-		{
+	{
+		#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
+		FILTERLOCATION="$FILTERFILE"
+		if [[ $OS == cygwin ]]
+		then
+			FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
 			echo 'pushd "%~dp0"'
 			echo $CMD "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
 			echo 'popd'
-		} >> "$JOBFILE"
-	else
-		{
+		else
 			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"
 			echo "#Logs on folder $LOGDIR"
 			echo 'pushd "$(dirname "$(readlink -f "$0")")"'
 			echo "/bin/bash \"$SDIR/skit.sh\"" "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
 			echo 'popd'
-		} >> "$JOBFILE"
-	fi
+		fi
+	} >> "$JOBFILE"
 done
-if [[ $OS == cygwin ]]
-then
-	echo "Create a batch file in $JOBFILE"
-	[[ -n $INSTALL ]] && {
+
+[[ -n $INSTALL ]] && {
+	if [[ $OS == cygwin ]]
+	then
+		echo "Create a batch file in $JOBFILE"
 		TASCMD='"'$(cygpath -w "$JOBFILE")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
 		#http://www.robvanderwoude.com/datetimentparse.php
@@ -255,10 +253,8 @@ then
 		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
 		echo "These are your bKit schedule tasks now"
 		schtasks /QUERY|fgrep BKIT
-	}
-else
-	echo "Create a job file in $JOBFILE"
-	[[ -n $INSTALL ]] && {
+	else
+		echo "Create a job file in $JOBFILE"
 		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
 		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
@@ -266,8 +262,8 @@ else
 		}| sort -u | crontab
 		echo "These are your bKit jobs now"
 		crontab -l|fgrep BKIT #show all BKIT jobs
-	}
-fi
+	fi
+}
 echo done
 exit 0
 #cat "$JOBFILE"

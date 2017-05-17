@@ -8,7 +8,37 @@
     <div class="alert" v-if="includes.length === 0">
       No directories or files has been selected
     </div>
-    <div class="main" v-if="includes.length > 0">
+    <div class="resources" v-if="includes.length > 0">
+      <div v-if="includes.length > 0 ">Backup</div>
+      <div class="includes list">
+        <span v-for="f in includes">
+          {{f.path}}
+          <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
+        </span>
+      </div>
+      <div v-if="excludes.length > 0 ">Excluding</div>
+      <div class="excludes list">
+        <span v-for="f in excludes">
+          {{f.path}}
+          <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
+        </span>
+      </div>
+      <div v-if="excludeRules.length > 0 ">Exclude Rules</div>
+      <div class="rules list">
+        <span v-for="r in excludeRules">
+          {{r}}
+          <i class="fa fa-times-circle" aria="hidden" @click="removeRule(r)"></i>
+        </span>
+      </div>
+      <div class="addrules">
+        <label>Add this Exclude Rule:</label>
+        <input v-model="newExcludeRule" @keyup.enter="addExcludeRule" type="text"></input>
+        <i v-show="newExcludeRule !== null"
+          class="fa fa-check-circle-o enter" aria="hidden" @click="addExcludeRule">
+        </i>
+      </div>
+    </div>
+    <div class="task" v-if="includes.length > 0">
       <section class="select">
         <span>Task Name</span>
         <input v-model="taskname" type="text" class="name"></input>
@@ -40,36 +70,6 @@
           <i class="el-icon-arrow-right el-icon-right"></i>
         </el-button>
       </section>
-    </div>
-    <div class="resources" v-if="includes.length > 0">
-      <div v-if="includes.length > 0 ">Backup</div>
-      <div class="includes list">
-        <span v-for="f in includes">
-          {{f.path}}
-          <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
-        </span>
-      </div>
-      <div v-if="excludes.length > 0 ">Excluding</div>
-      <div class="excludes list">
-        <span v-for="f in excludes">
-          {{f.path}}
-          <i class="fa fa-times-circle" aria="hidden" @click="remove(f)"></i>
-        </span>
-      </div>
-      <div class="addrules">
-        <label>Add this Exclude Rule:</label>
-        <input v-model="newExcludeRule" @keyup.enter="addExcludeRule" type="text"></input>
-        <i v-show="newExcludeRule !== null"
-          class="fa fa-check-circle-o enter" aria="hidden" @click="addExcludeRule">
-        </i>
-      </div>
-      <div v-if="excludeRules.length > 0 ">Exclude Rules</div>
-      <div class="rules list">
-        <span v-for="r in excludeRules">
-          {{r}}
-          <i class="fa fa-times-circle" aria="hidden" @click="removeRule(r)"></i>
-        </span>
-      </div>
     </div>
     <section v-if="show" class="output">
       <div class="stdout">{{stdout}}</div>
@@ -152,9 +152,7 @@
       }
     },
     methods: {
-      addExcludeRule (val) {
-        console.log(val)
-        console.log('val', this.newExcludeRule)
+      addExcludeRule () {
         this.excludeRules.push(this.newExcludeRule)
         this.newExcludeRule = null
       },
@@ -251,7 +249,7 @@
   @import "../../config.scss";
   .job{
     text-align: left;
-    overflow: auto;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -269,13 +267,16 @@
       flex-grow: 4;
       align-self: center;
     }
-    .main{
+    .task{
       flex-grow: 2;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      border-top:1px solid black;
+      padding-top:5px;
+      margin-top: 1px;
       section:not(.action) {
         width: 80%;
         margin: .5em;
@@ -333,18 +334,24 @@
     }
     .resources{
       padding: 1em;
-      overflow: auto;
       flex-grow: 1;
+      display: flex;
+      flex-direction: column;
       div.list{
         margin-left: 1em;
+        margin-bottom: 5px;
+        overflow-y: auto;
+        background-color:#888;
+        padding: 5px;
+        color: #AAA;
+        border-radius:5px;
         span{
           display: inline-block;
           margin-left: 5px;
           margin-bottom: 5px;
           min-width: 2em;
-          padding: 5px;
-          background-color:#eee;
-          background-color:rgba(224,224,224,.9);
+          padding: 4px;
+          background-color:#111;
           border-radius:5px;
 
           i{
@@ -354,7 +361,8 @@
             visibility: hidden;
           }
           &:hover {
-            background-color:rgba(192,192,192,.9);
+            background-color:#aaa;
+            color: white;
             i{
               visibility: visible;
             }
@@ -365,6 +373,9 @@
         }
       }
       .addrules{
+        border-top:1px solid black;
+        padding-top:5px;
+        margin-top: 5px;
         display: flex;
         align-items: center;
         >*{

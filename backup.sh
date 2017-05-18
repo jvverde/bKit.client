@@ -468,6 +468,21 @@ backupACLS(){
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
 
+  sendnotify(){
+    local SUBJECT=$1
+    local DEST=$2
+    local ME=$3
+    SMTP="$SDIR/conf/smtp.conf"
+    [[ -f $SMTP ]] && source "$SMTP"
+    DEST=${EMAIL:-$TO}
+    [[ -n $DEST ]] || {
+      warn "Email destination not defined"
+      return 1
+    }
+    exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
+    exists mail && mail -s "$SUBJECT" "$DEST"    
+  }
+
   #Sent email if required
   [[ -n $NOTIFY && -s $STATSFILE ]] && (
     SMTP="$SDIR/conf/smtp.conf"
@@ -505,8 +520,9 @@ backupACLS(){
         echo "------------End of Logs------------"
       }
     } | (
-      exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST" && exit
-      exists mail && mail -s "$ME" "$DEST" && exit
+      #exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST" && exit
+      #exists mail && mail -s "$SUBJECT" "$DEST" && exit
+      sendnotify "$SUBJECT" "$DEST" "$ME"
     )
   )
 	deltatime "$(date -R)" "$ITIME"

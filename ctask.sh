@@ -9,7 +9,7 @@ usage(){
 	[[ $OS == cygwin ]] && {
 		die "Usage:\n\t$0 --name taskname [-m|-h|-d|-w [every]] [-f|--filter=rules] [-s|--start=stardatetime] [--install] [--force] dirs"
 	}
-	[[ $OS == cygwin ]] || {
+	[[ $OS != cygwin ]] && {
 		die "Usage:\n\t$0 --name taskname [-m onminute] [-h onhour] -[d onday ] [-w onweek ] [-f|--filter=rules] [-s|--start=stardatetime] [--install] [--force] dirs"
 	}
 }
@@ -273,8 +273,8 @@ done
 		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
 		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
-			echo $JOB
-		}| sort -u | crontab
+			echo "$JOB"
+		} | sort -u | crontab
 		echo "These are your bKit jobs now"
 		crontab -l|fgrep BKIT #show all BKIT jobs
 	fi

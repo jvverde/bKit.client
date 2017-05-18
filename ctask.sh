@@ -38,6 +38,12 @@ FILTERS=()
 OLDIFS=$IFS
 IFS="
 "
+OPTIONS=(
+  '--no-ask'
+  '--compile'
+  '--notify'
+)
+
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -81,6 +87,12 @@ do
 			HOUR=ONHOURS
 			DAYOFMONTH=ONDAYOFMONTH
 		;;
+    --email)
+      OPTIONS+=( "$KEY=$1" ) && shift
+    ;;
+    --email=*)
+      OPTIONS+=( "$KEY" )
+    ;;
 		-n|--name)
 			NAME="$1" && shift
 		;;
@@ -224,12 +236,10 @@ do
 		echo "$F"
 	done >> "$FILTERFILE"
 	LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
-	OPTIONS=(
-		'--no-ask'
+  ROPTIONS=(
+    "${OPTIONS[@]}"
 		'--uuid "'$UUID'"'
 		'--logdir "'$LOGDIR'"'
-		'--compile'
-		'--notify'
 	)
 
 	{
@@ -241,13 +251,13 @@ do
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
 			echo 'pushd "%~dp0"'
-			echo $CMD "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
+			echo $CMD "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
 			echo 'popd'
 		else
 			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"
 			echo "#Logs on folder $LOGDIR"
 			echo 'pushd "$(dirname "$(readlink -f "$0")")"'
-			echo "/bin/bash \"$SDIR/skit.sh\"" "${OPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
+			echo "/bin/bash \"$SDIR/skit.sh\"" "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]}"
 			echo 'popd'
 		fi
 	} >> "$JOBFILE"

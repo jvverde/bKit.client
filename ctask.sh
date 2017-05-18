@@ -6,7 +6,12 @@ exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }
 warn() { echo -e "$@">&2;}
 usage(){
-	die "Usage:\n\t$0 [-m|-h|-d|-w [every]] dirs"
+	[[ $OS == cygwin ]] && {
+		die "Usage:\n\t$0 --name taskname [-m|-h|-d|-w [every]] [-f|--filter=rules] [-s|--start=stardatetime] [--install] [--force] dirs"
+	}
+	[[ $OS == cygwin ]] || {
+		die "Usage:\n\t$0 --name taskname [-m onminute] [-h onhour] -[d onday ] [-w onweek ] [-f|--filter=rules] [-s|--start=stardatetime] [--install] [--force] dirs"
+	}
 }
 
 # [[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "$@"
@@ -79,11 +84,17 @@ do
 		-n|--name)
 			NAME="$1" && shift
 		;;
+		-n=*|--name=*)
+			NAME=${KEY#*=}
+		;;
 		-s|--start)
 			START=$(date -d "$1" -u) && shift || die Wrong date format
 		;;
+		-s=*|--start=*)
+			START=$(date -d "${KEY#*=}" -u) || die Wrong date format
+		;;
 		-f|--filter)
-			FILTERS+=("$1")
+			FILTERS+=("$1") && shift
     ;;
     -f=*|--filter=*)
 			FILTERS+=("${KEY#*=}")
@@ -91,6 +102,7 @@ do
     --filters-from)
 			[[ -e $1 ]] || die "Can't find '$1'"
 			FILTERS+=( $(cat "$1") )
+			shift
 		;;
     --filters-from=*)
 			FILE="${KEY#*=}"
@@ -102,6 +114,9 @@ do
 		;;
 		--force)
 			FORCE="F"
+		;;
+		--help)
+			usage
 		;;
 		*)
 			echo Unknow	option $KEY && usage
@@ -250,7 +265,7 @@ done
 		(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
 		(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
 		(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
-		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO $EVERY /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
+		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO ${EVERY:-1} /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
 		echo "These are your bKit schedule tasks now"
 		schtasks /QUERY|fgrep BKIT
 	else
@@ -267,5 +282,3 @@ done
 echo done
 exit 0
 #cat "$JOBFILE"
-
-

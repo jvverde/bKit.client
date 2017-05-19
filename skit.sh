@@ -44,6 +44,7 @@ trap '
 ' EXIT
 
 importrules(){
+	[[ -e $SDIR/rules/global ]] || mkdir -pv "$SDIR/rules/global"
 	bash "$SDIR/update.sh" "rules/global" "$SDIR" >/dev/null
 	for F in $(ls "$SDIR/rules/global")
 	do

@@ -73,4 +73,4 @@ done
 [[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 
 echo Start backup
-bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "$@"
+bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"

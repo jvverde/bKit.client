@@ -119,4 +119,4 @@ done
 
 echo Start snapshot backup
 
-bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "$@"
+bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" $(readlink -e "$@")

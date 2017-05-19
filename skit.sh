@@ -16,16 +16,17 @@ FILTERS=()
 
 excludes(){
 	EXCDIR=$SDIR/cache/excludes
-	[[ -d $EXCDIR ]] || mkdir -p $EXCDIR
+	[[ -d $EXCDIR ]] || mkdir -p "$EXCDIR"
 
 	EXCL=$EXCDIR/exclude.lst
 
 	[[ -e "$EXCL" ]] || { #if not exist yet
 		echo Compile exclude list
+		:> "$EXCL"
 		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 	}
 
-	[[ -n $COMPILE || -n $(find "$EXCL" -mtime +30) ]] && {
+	[[ -e "$EXCL" ]] && [[ -n $COMPILE || -n $(find "$EXCL" -mtime +30) ]] && {
 		echo Recompile exclude list
 		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
 	}
@@ -43,7 +44,7 @@ trap '
 ' EXIT
 
 importrules(){
-	bash "$SDIR/update.sh" "rules/global" >/dev/null
+	bash "$SDIR/update.sh" "rules/global" "$SDIR" >/dev/null
 	for F in $(ls "$SDIR/rules/global")
 	do
 		FILTERS+=( --filter=". $SDIR/rules/global/$F" )

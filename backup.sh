@@ -485,8 +485,6 @@ backupACLS(){
 
   #Sent email if required
   [[ -n $NOTIFY && -s $STATSFILE ]] && (
-    SMTP="$SDIR/conf/smtp.conf"
-    [[ -f $SMTP ]] || die "Email not sent because configuration file '$SMTP' is missing"
     ME=$(uname -n)
     TIME=$(date +%Hh%Mm)
     FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
@@ -501,9 +499,6 @@ backupACLS(){
     STATUS="success"
     [[ -s $ERRFILE ]] && STATUS="errors"
     SUBJECT="Backup of $WHAT on $ME ended at $TIME with $STATUS"
-    source "$SMTP"
-    DEST=${EMAIL:-$TO}
-    [[ -n $DEST ]] || die "Email destination not defined"
     {
       echo "Backup of $DIRS"
       cat "$STATSFILE"

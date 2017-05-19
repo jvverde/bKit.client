@@ -181,7 +181,7 @@ do
     ROOTS["$ROOT"]=1
     REL=${FULL#$ROOT}	#path relative to root
     ROOTOF["$FULL"]="$ROOT"
-    RPATHS["$FULL"]="$REL"
+    RPATHS["$FULL"]="/$REL"
 done
 
 for ROOT in ${!ROOTS[@]}

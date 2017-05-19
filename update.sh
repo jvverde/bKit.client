@@ -26,5 +26,8 @@ CONF="$SDIR/conf/conf.init"
 . "$CONF"                                                                     #get configuration parameters
 
 export RSYNC_PASSWORD="4dm1n"
-rsync -rlcRb "${OPTIONS[@]}" --backup-dir=".backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$UPDATERSRC$1" "${2:-.}" || die "Problemas ao actualizar"
+DST="${2:-.}"
+[[ -e $DST ]] || mkdir -p "$DST"
+SRC="$UPDATERSRC$1"
+rsync -rlcRb "${OPTIONS[@]}" --backup-dir="$DST/.backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$SRC" "$DST/" || die "Problemas ao actualizar $DST"
 [[ $? -eq 0 ]] && echo "Actualizaçao feita com com sucesso"

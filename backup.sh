@@ -480,7 +480,8 @@ backupACLS(){
       return 1
     }
     exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
-    exists mail && mail -s "$SUBJECT" "$DEST"    
+    exists mail && mail -s "$SUBJECT" "$DEST"
+    echo "Notification sent to $DEST"   
   }
 
   #Sent email if required

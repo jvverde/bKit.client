@@ -18,19 +18,24 @@ exists fsutil &&{
 	echo -n "$DRIVE" && exit
 }
 
+exists findmnt && {
+	findmnt -S UUID=$UUID -nro SOURCE && exit
+}
+
+exists lsblk && {
+	NAME=$(lsblk -lno KNAME,UUID,MOUNTPOINT|awk '$3 ~ /^\// {print $0}'|grep -i "\b$UUID\b"|head -n 1|cut -d' ' -f1)
+	[[ -n $NAME ]] && {
+		DEV=${NAME:+/dev/$NAME}
+		[[ -e $DEV ]] && echo -n "$DEV" && exit
+	}
+}
+
 [[ -e /dev/disk/by-uuid ]] && {
 	readlink -ne "/dev/disk/by-uuid/$UUID" && exit
 }
 
 exists blkid && {
 	blkid -U "$UUID" && exit
-}
-
-exists lsblk && [[ $UID -eq 0 ]] && {
-	NAME=$(lsblk -lno KNAME,UUID|grep -i "\b$UUID\b"|head -n 1|cut -d' ' -f1)
-	DEV=${NAME:+/dev/$NAME}
-	[[ -e $DEV ]] || die "'$DEV' does not exists"
-	echo -n "$DEV" && exit
 }
 
 die "Device with id $UUID is not installed"

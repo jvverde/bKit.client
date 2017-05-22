@@ -181,7 +181,7 @@ do
     ROOTS["$ROOT"]=1
     REL=${FULL#$ROOT}	#path relative to root
     ROOTOF["$FULL"]="$ROOT"
-    RPATHS["$FULL"]="/$REL"
+    RPATHS["$FULL"]="/${REL#/}"
 done
 
 for ROOT in ${!ROOTS[@]}
@@ -218,11 +218,11 @@ do
 	UUID=$(bash "$SDIR/getUUID.sh" "$ROOT")
 	[[ $UUID == _ ]] && continue
 
-	DRIVE=${ROOT//\//_}
+	DRIVE=${ROOT//\//.}
 	[[ $OS == cygwin ]] && {
 		DRIVE=$(cygpath -w "$ROOT")
 		DRIVE=${DRIVE:0:1}
-		DRIVE=${DRIVE,}
+		DRIVE=${DRIVE^^}
 	}
 
 	FILTERNAME="${TASKNAME}-${DRIVE}-${UUID}.lst"
@@ -235,7 +235,7 @@ do
 	do
 		echo "$F"
 	done >> "$FILTERFILE"
-	LOGDIR="$RDIR/logs/${DRIVE,}/${TASKNAME,,}"
+	LOGDIR="$RDIR/logs/${TASKNAME,,}/${DRIVE}/"
   ROPTIONS=(
     "${OPTIONS[@]}"
 		'--uuid "'$UUID'"'

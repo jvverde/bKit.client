@@ -15,7 +15,7 @@ getdev(){
         }
     }
     [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
-    MOUNT=${MOUNT%%/} #remove trailing slash if any
+    MOUNT=${MOUNT%/} #remove trailing slash if any
 }
 redirectlogs() {
     local LOGDIR=$1

@@ -3,8 +3,8 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
-die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
+source "$SDIR/functions/all.sh"
+
 getdev(){
     DEV=$(bash "$SDIR/getdev.sh" "$1") || die "Volume $1 not found"
     MOUNT=$(df --output=target "$DEV"|tail -n 1)
@@ -17,19 +17,7 @@ getdev(){
     [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
     MOUNT=${MOUNT%/} #remove trailing slash if any
 }
-redirectlogs() {
-    local LOGDIR=$1
-    [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
-    local STARTDATE=$(date +%Y-%m-%dT%H-%M-%S)
-    LOGFILE="$LOGDIR/log-$STARTDATE"
-    ERRFILE="$LOGDIR/err-$STARTDATE"
-    :> $LOGFILE
-    :> $ERRFILE
-    echo "Logs go to $LOGFILE"
-    echo "Errors go to $ERRFILE"
-    exec 1>"$LOGFILE"
-    exec 2>"$ERRFILE"
-}
+
 RSYNCOPTIONS=()
 OPTIONS=()
 while [[ $1 =~ ^- ]]
@@ -40,11 +28,14 @@ do
             exec 1>"$1"
             shift
         ;;
+        -l=*|-log=*|--log=*)
+            exec 1>"${KEY#*=}"
+        ;;
         --logdir)
-            redirectlogs $1 && shift
+            redirectlogs $1 snapshot && shift
         ;;
         --logdir=*)
-            redirectlogs "${KEY#*=}"
+            redirectlogs "${KEY#*=}" snapshot
         ;;
         -u|--uuid)
             getdev "$1" && shift
@@ -78,8 +69,7 @@ declare -A ROOTOF
 
 for DIR in "${DIRS[@]}"
 do
-    DIR=${DIR#/} # remove leading slash if any
-    [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/$DIR || FULL="/$DIR"
+    [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/${DIR#/} || FULL="$DIR"
     FULL=$(readlink -ne "$FULL") || continue
     exists cygpath && FULL=$(cygpath -u "$FULL")
     ROOT=$(stat -c%m "$FULL")

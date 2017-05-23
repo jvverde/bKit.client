@@ -86,6 +86,12 @@ do
     -l=*|-log=*|--log=*)
       exec 1>"${KEY#*=}"
     ;;
+    --logdir)
+        redirectlogs $1 backup && shift
+    ;;
+    --logdir=*)
+        redirectlogs "${KEY#*=}" backup
+    ;;
     -s=*|--snap=*|--snapshot=*)
         SNAP="${KEY#*=}"
     ;;
@@ -162,10 +168,17 @@ CONF=$SDIR/conf/conf.init
 RESULT="$SDIR/run/restore-$$/"
 mkdir -p "$RESULT"
 
-LOGFILE="$RESULT/logfile.tmp"
+LOGFILE="$RESULT/logs.tmp"
 STATSFILE="$RESULT/stats.tmp"
+ERRFILE="$RESULT/errors.tmp"
 
-trap "rm -rf '$RESULT'" EXIT
+exec 3>&2
+exec 2>"$ERRFILE"
+
+trap '
+  cat "$ERRFILE" >&3
+  rm -rf "$RESULT"
+' EXIT
 
 
 aclparents(){
@@ -291,13 +304,47 @@ do
 done
 
 [[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
+  set -o pipefail
   INIT=$(date -R)
-  dorsync "${LINKS[@]}" "${SRCS[@]}" "$DST" || die "Problems restoring to $DST"
+  dorsync "${LINKS[@]}" "${SRCS[@]}" "$DST" | tee "$LOGFILE" || die "Problems restoring to $DST"
   exists cygpath && DST=$(cygpath -w "$DST")
   echo "Files restored to $DST"
   STOP=$(date -R)
   deltatime "$STOP" "$INIT"
   makestats "$DELTATIME" "$DST"
 }
+
+[[ -n $NOTIFY && -s $STATSFILE ]] && (
+  ME=$(uname -n)
+  FULLDIRS=( $(readlink -e "${RESOURCES[@]}") )     #get full paths
+  exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
+  printf -v DIRS "%s, " "${FULLDIRS[@]}"
+  DIRS=${DIRS%, }
+  WHAT=$DIRS
+  let NUMBEROFDIRS=${#FULLDIRS[@]}
+  let LIMIT=3
+  let EXTRADIRS=NUMBEROFDIRS-LIMIT
+  ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
+  [[ -n $DST ]] && exists cygpath && DST=$(cygpath -w "$DST")
+  [[ -s $ERRFILE ]] && SUBJECT="Some errors occurred while restoring $WHAT on $ME ${DST:+to $DST} at $(date +%Hh%Mm)" ||
+  SUBJECT="Restore of $WHAT ${DST:+to $DST} on $ME successfully finished at $(date +%Hh%Mm)"
+  {
+    echo "Restore of $DIRS"
+    cat "$STATSFILE"
+
+    [[ -s $ERRFILE ]] && {
+      echo -e "\n------------Errors found------------"
+      cat "$ERRFILE"
+      echo "------------End of Errors------------"
+    }
+
+    [[ -n $FULLREPORT ]] && {
+      echo -e "\n------------Full Logs------------"
+      cat "$LOGFILE"
+      echo "------------End of Logs------------"
+    }
+  } | sendnotify "$SUBJECT" "$DEST" "$ME"
+)
+
 
 exit $ERROR

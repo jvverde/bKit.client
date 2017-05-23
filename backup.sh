@@ -17,10 +17,19 @@ while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
-		-l|-log|--log)
-			exec 1>"$1"
-			shift
-		;;
+    -l|-log|--log)
+        exec 1>"$1"
+        shift
+    ;;
+    -l=*|-log=*|--log=*)
+      exec 1>"${KEY#*=}"
+    ;;
+    --logdir)
+        redirectlogs $1 backup && shift
+    ;;
+    --logdir=*)
+        redirectlogs "${KEY#*=}" backup
+    ;;
 		-f|--force)
 			FSW='-f' #check if we need it
 		;;
@@ -468,26 +477,9 @@ backupACLS(){
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
 
-  sendnotify(){
-    local SUBJECT=$1
-    local DEST=$2
-    local ME=$3
-    SMTP="$SDIR/conf/smtp.conf"
-    [[ -f $SMTP ]] && source "$SMTP"
-    DEST=${EMAIL:-$TO}
-    [[ -n $DEST ]] || {
-      warn "Email destination not defined"
-      return 1
-    }
-    exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
-    exists mail && mail -s "$SUBJECT" "$DEST"
-    echo "Notification sent to $DEST"   
-  }
-
   #Sent email if required
   [[ -n $NOTIFY && -s $STATSFILE ]] && (
     ME=$(uname -n)
-    TIME=$(date +%Hh%Mm)
     FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
     exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
     printf -v DIRS "%s, " "${FULLDIRS[@]}"
@@ -497,9 +489,8 @@ backupACLS(){
     let LIMIT=3
     let EXTRADIRS=NUMBEROFDIRS-LIMIT
     ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
-    STATUS="success"
-    [[ -s $ERRFILE ]] && STATUS="errors"
-    SUBJECT="Backup of $WHAT on $ME ended at $TIME with $STATUS"
+    [[ -s $ERRFILE ]] && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" ||
+    SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
     {
       echo "Backup of $DIRS"
       cat "$STATSFILE"
@@ -515,11 +506,7 @@ backupACLS(){
         cat "$LOGFILE"
         echo "------------End of Logs------------"
       }
-    } | (
-      #exists email && email -smtp-server $SERVER -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST" && exit
-      #exists mail && mail -s "$SUBJECT" "$DEST" && exit
-      sendnotify "$SUBJECT" "$DEST" "$ME"
-    )
+    } | sendnotify "$SUBJECT" "$DEST" "$ME"
   )
 	deltatime "$(date -R)" "$ITIME"
 	echo "Backup done in $DELTATIME"

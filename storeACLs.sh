@@ -53,7 +53,9 @@ getacl(){
 	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")" |tr -d '\0\r'|sed /^$/d
 	#don't change the order
 	[[ $2 == $DST ]] && {
-		cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST" || warn "Cannot copy attributes from $SRC to $DST"
+		cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST" 2>/dev/null || 
+			getfacl -cn "$SRC" | sed "s/group:4294967295/group:$(id -g)/g;s/user:4294967295/user:$(id -u)/g"| setfacl -f - "$DST" ||
+			warn "Cannot copy attributes from $SRC to $DST"
 	}
 }
 

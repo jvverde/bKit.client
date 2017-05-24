@@ -16,7 +16,7 @@ tmp/*
 /Temp/*
 /temp/*
 /home/*/.local/share/Trash 
-/var/log/*
+#/var/log/*
 /var/run/* 
 /var/lock/* 
 /lib/modules/*/volatile/.mounted

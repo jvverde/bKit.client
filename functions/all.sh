@@ -56,7 +56,7 @@ sendnotify(){
 }
 
 redirectlogs() {
-    local LOGDIR="$1"
+    local LOGDIR=$(readlink -nm "$1")
     local PREFIX="${2:+$2-}"
     [[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
     local STARTDATE=$(date +%Y-%m-%dT%H-%M-%S)

@@ -19,14 +19,15 @@ exists fsutil &&{
 }
 
 exists findmnt && {
-	findmnt -S UUID=$UUID -nro SOURCE && exit
+	#readlink -ne "$(findmnt -S UUID=$UUID -nro SOURCE)" && exit
+	readlink -ne "$(findmnt -S UUID=$UUID -nro TARGET)" && exit
 }
 
 exists lsblk && {
 	NAME=$(lsblk -lno KNAME,UUID,MOUNTPOINT|awk '$3 ~ /^\// {print $0}'|grep -i "\b$UUID\b"|head -n 1|cut -d' ' -f1)
 	[[ -n $NAME ]] && {
 		DEV=${NAME:+/dev/$NAME}
-		[[ -e $DEV ]] && echo -n "$DEV" && exit
+		[[ -b $DEV ]] && echo -n "$DEV" && exit
 	}
 }
 
@@ -35,7 +36,7 @@ exists lsblk && {
 }
 
 exists blkid && {
-	blkid -U "$UUID" && exit
+	readlink -ne "$(blkid -U "$UUID")" && exit
 }
 
 die "Device with id $UUID is not installed"

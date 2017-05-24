@@ -109,8 +109,10 @@ RMFILES=()
 trap '
     rm -f "${RMFILES[@]}"
     [[ -s $ERRFILE ]] || rm -f "$ERRFILE"
-    umount "${MOUNTED[@]}"
-    rmdir "${MOUNTED[@]}"
+    for M in ${MOUNTED[@]}
+    do 
+      umount "$M" && rmdir "$M"
+    done
 ' EXIT
 
 for ROOT in ${!ROOTS[@]}

@@ -109,7 +109,21 @@
   .ok{
     color: palegreen;
   }
-
+  .output{
+    overflow: auto;
+    font-family: monospace;
+    margin-bottom: 1px;
+    white-space: pre-line;
+    background-color: gainsboro;
+    border-radius: 5px;
+    color: darkgreen;
+    padding: 2px;
+    padding-left:1em;
+    .stderr {
+      color: darkred;
+    }
+    min-height: 2em;
+  }
 </style>
 
 <style lang="scss" scoped>

@@ -65,10 +65,15 @@
       </section>
       <section class="action">
         <el-button type="primary" @click.stop="create"
+          v-show="wait === false"
           :disabled="taskname === ''">
           Create Task
           <i class="el-icon-arrow-right el-icon-right"></i>
         </el-button>
+        <div v-show="wait === true">
+          <i class="fa fa-cog fa-spin fa-2x fa-fw"></i>
+          <span>Creating task...</span>
+        </div>
       </section>
     </div>
     <section v-if="show" class="output">
@@ -103,6 +108,7 @@
         newExcludeRule: null,
         excludeRules: [],
         taskname: '',
+        wait: false,
         every: 1,
         periods: {
           m: 'Min',
@@ -113,7 +119,7 @@
           y: 'Year'
         },
         period: 'd',
-        start: '',
+        start: 600000 + Date.now(),
         stdout: '',
         stderr: ''
       }
@@ -164,12 +170,13 @@
         this.$store.dispatch('rmBackupDir', entry)
       },
       create () {
+        const start = new Date(this.start || 3600000 + Date.now())
         const options = [
           '--name', this.taskname,
           `-${this.period}`, this.every,
-          '--install'
+          '--install',
+          '--start', start.toISOString()
         ]
-        if (this.start) options.push('--start', this.start)
         const includes = this.includes.map(e => e.path)
         const filters = this.filters.map(e => {
           return `--filter=${e}`
@@ -194,6 +201,7 @@
         })
 
         fd.on('close', (code) => {
+          this.wait = false
           code = 0 | code
           if (code === 0) {
             this.$notify.success({
@@ -208,6 +216,7 @@
             })
           }
         })
+        this.wait = true
       },
       makeFilters (includes, excludes) {
         let parents = {}
@@ -407,19 +416,6 @@
           cursor: pointer;
           color: darkgreen;
         }
-      }
-    }
-    .output{
-      overflow: auto;
-      font-family: monospace;
-      margin-bottom: 1px;
-      white-space: pre-line;
-      background-color: white;
-      color: darkgreen;
-      padding: 2px;
-      padding-left:1em;
-      .stderr {
-        color: darkred;
       }
     }
   }

@@ -243,18 +243,6 @@
     }
     .output{
       flex-grow: 2;
-      min-height: 2em;
-      overflow: auto;
-      font-family: monospace;
-      margin-bottom: 1px;
-      white-space: pre-line;
-      background-color: white;
-      color: darkgreen;
-      padding: 2px;
-      padding-left:1em;
-      .stderr {
-        color: darkred;
-      }
     }
   }
 </style>

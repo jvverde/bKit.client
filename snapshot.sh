@@ -5,6 +5,7 @@ OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 source "$SDIR/functions/all.sh"
 
+MOUNTED=()
 getdev(){
     DEV=$(bash "$SDIR/getdev.sh" "$1") || die "Device $1 not found"
     DEV=$(readlink -e "$DEV") || die "Device $1 doesn't exists"
@@ -12,12 +13,10 @@ getdev(){
     [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
         MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
             mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
-            trap "umount $DEV && rm -rvf $MOUNT" EXIT
+            MOUNTED+=( "$MOUNT" )
         }
     }
     [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
-    DEV=$(df --output=source "$MOUNT"|tail -n 1)
-    [[ -b $DEV ]] || die "Target $MOUNT is not a mounted block device"
     MOUNT=${MOUNT%/} #remove trailing slash if any
 }
 
@@ -110,6 +109,8 @@ RMFILES=()
 trap '
     rm -f "${RMFILES[@]}"
     [[ -s $ERRFILE ]] || rm -f "$ERRFILE"
+    umount "${MOUNTED[@]}"
+    rmdir "${MOUNTED[@]}"
 ' EXIT
 
 for ROOT in ${!ROOTS[@]}

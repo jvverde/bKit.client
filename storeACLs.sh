@@ -42,7 +42,11 @@ getacl(){
 	[[ -L $SRC ]] && return 0
 	local DST=$2
 	[[ -d $SRC ]] && DST="$DST/$DIRACL"
-	[[ -d "${DST%/*}" ]] || mkdir -p "${DST%/*}"
+	PARENT="${DST%/*}"
+	[[ -d $PARENT ]] || {
+		[[ -e $PARENT ]] && rm -rfv "$PARENT"
+		mkdir -p "$PARENT"
+	}
 	DOSSRC="$(cygpath -w "${SRC%/*}")\\${SRC##*/}" #we need go this way because symbolic links
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$DOSSRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
 	#copy attributes, but only for files, not directories

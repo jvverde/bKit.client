@@ -21,6 +21,28 @@ do
     ;;
   esac
 done
+
+TARGET=$(readlink -nm "$(cygpath -u "${1:-.}")")
+DIR=$(dirname "$TARGET")
+[[ -d $DIR ]] || mkdir -pv "$DIR"
+REL=${TARGET#$SDIR}
+[[ $REL == $SDIR ]] && die "Update dir must be $SDIR or a subdir"
+OIFS=$IFS
+IFS=/ STEPS=( $REL )
+IFS=OIFS
+
+set -f
+unset B
+FILTERS=()
+for S in ${STEPS[@]}
+do
+  [[ -z $S ]] && continue
+  C="$B/$S"
+  FILTERS+=( --filter="+ $C" )
+  FILTERS+=( --filter="- $B/*" )
+  B=$C
+done
+
 CONF="$SDIR/conf/conf.init"
 [[ -f $CONF ]] || die Cannot found configuration file at $CONF
 . "$CONF"                                                                     #get configuration parameters
@@ -28,6 +50,6 @@ CONF="$SDIR/conf/conf.init"
 export RSYNC_PASSWORD="4dm1n"
 DST="${2:-.}"
 [[ -e $DST ]] || mkdir -p "$DST"
-SRC="$UPDATERSRC$1"
-rsync -rlcRb "${OPTIONS[@]}" --backup-dir="$DST/.backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$SRC" "$DST/" || die "Problemas ao actualizar $DST"
+SRC="$UPDATERSRC"
+rsync -rlcRb "${FILTERS[@]}" "${OPTIONS[@]}" --backup-dir="${DST%/}/.backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$SRC" "${DST%/}/" || die "Problemas ao actualizar $DST"
 [[ $? -eq 0 ]] && echo "Actualizaçao feita com com sucesso"

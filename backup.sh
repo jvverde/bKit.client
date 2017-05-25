@@ -382,7 +382,7 @@ backupACLS(){
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
     {
-      bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "$METADATADIR"
+      bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
     } | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
     touch "$ENDFLAG"
@@ -393,9 +393,9 @@ backupACLS(){
   echo "e) Update metafiles attributes"
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
-
-    backup "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
-
+    
+    backup "$METADATADIR" "$@" "$BACKUPURL/$RVID/@current/metadata"
+    
     touch "$ENDFLAG"
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"
@@ -403,75 +403,75 @@ backupACLS(){
 
   echo "f) Clean metafiles on server"
   {
-    clean "$METADATADIR" "/" "$BACKUPURL/$RVID/@current/metadata"
+    clean "$METADATADIR" "$@" "$BACKUPURL/$RVID/@current/metadata"
   } | sed -e 's/^/\t/'
 }
 
 
 #(
-#	flock -w $((3600*24)) 9 || {
-#		rm -fv "$LOCK"
-#		die Volume $VOLUMESERIALNUMBER was locked for 1 day
-#	}
+#  flock -w $((3600*24)) 9 || {
+#    rm -fv "$LOCK"
+#    die Volume $VOLUMESERIALNUMBER was locked for 1 day
+#  }
 
-	ITIME=$(date -R)
+  ITIME=$(date -R)
 
-	{
-		prepare
+  {
+    prepare
 
-		bg_upload_manifest "$MAPDRIVE" 'data'
-		echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
+    bg_upload_manifest "$MAPDRIVE" 'data'
+    echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
 
-		echo -e "\nPhase 1 - Backup new/modified files\n"
+    echo -e "\nPhase 1 - Backup new/modified files\n"
 
-		bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-
-		touch "$ENDFLAG"
-		wait4jobs
-		rm -f "$MANIFEST" "$ENDFLAG"
-
-		echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
-
-		bg_upload_manifest "$MAPDRIVE" 'data'
-
-		backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+    bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
 
     touch "$ENDFLAG"
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"
 
-		[[ -n $HLINK ]] && {
-			echo -e "\n\tPhase 2.1 update delayed hardlinks"
-			backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
-		}
+    echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
 
-		echo -e "\nPhase 3 - Clean deleted files from backup\n"
+    bg_upload_manifest "$MAPDRIVE" 'data'
 
-		clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+    backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+
+    touch "$ENDFLAG"
+    wait4jobs
+    rm -f "$MANIFEST" "$ENDFLAG"
+
+    [[ -n $HLINK ]] && {
+      echo -e "\n\tPhase 2.1 update delayed hardlinks"
+      backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+    }
+
+    echo -e "\nPhase 3 - Clean deleted files from backup\n"
+
+    clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 4 - Backup ACLS\n"
       backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
     )
 
-		echo -e "\nPhase 5 - Create a readonly snapshot on server\n"
+    echo -e "\nPhase 5 - Create a readonly snapshot on server\n"
 
     snapshot
 
-		echo "Backup done on $(date -R) for:"
-		for I in ${!ORIGINALDIR[@]}
-		do
-			echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
-			echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
-		done
-	} | tee "$LOGFILE"
+    echo "Backup done on $(date -R) for:"
+    for I in ${!ORIGINALDIR[@]}
+    do
+      echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
+      echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
+    done
+  } | tee "$LOGFILE"
 
-	#Now some stats
+  #Now some stats
 
-	[[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
+  [[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     deltatime "$(date -R)" "$ITIME"
-		echo "Total time spent: $DELTATIME"
+    echo "Total time spent: $DELTATIME"
     exists cygpath && ROOT=$(cygpath -w "$ROOT")
     cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/send-stats.pl"
     echo "------------End of Stats------------"
@@ -508,7 +508,7 @@ backupACLS(){
       }
     } | sendnotify "$SUBJECT" "$DEST" "$ME"
   )
-	deltatime "$(date -R)" "$ITIME"
-	echo "Backup done in $DELTATIME"
+  deltatime "$(date -R)" "$ITIME"
+  echo "Backup done in $DELTATIME"
 #) 9>"$LOCK"
 

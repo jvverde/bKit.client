@@ -7,6 +7,9 @@ source "$SDIR/functions/all.sh"
 
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
+SNAP='@snap'
+CONFIG="$SDIR/conf/conf.init"
+
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)
   --usermap=4294967295:$(id -g)
@@ -37,6 +40,30 @@ do
 			MAPDRIVE="$1" && shift
 			exists cygpath && MAPDRIVE=$(cygpath "$MAPDRIVE")
 		;;
+    --snap)
+      SNAP="@snap/$1" && shift  
+    ;;
+    --snap=*)
+      SNAP="@snap/${KEY#*=}"
+    ;;
+    --backupurl)
+      BACKUPURL="$1" && shift
+    ;;
+    --backupurl=*)
+      BACKUPURL="${KEY#*=}"
+    ;;
+    --rvid)
+      RVID="$1" && shift
+    ;;
+    --rvid=*)
+      RVID="${KEY#*=}"
+    ;;
+    --config)
+      CONFIG="$1" && shift
+    ;;
+    --config=*)
+      CONFIG="${KEY#*=}"
+    ;;
     --stats)
       STATS=1
     ;;
@@ -99,21 +126,26 @@ do
 done
 
 #we need ROOT, BACKUPDIR and STARTDIR
-#source "$SDIR/drive.sh" "$DEV"
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
+[[ $RVID =~ .+\..+\..+\..+\..+ ]] || {
+  IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
-IFS=$OLDIFS
+  IFS=$OLDIFS
 
-[[ $DRIVETYPE =~ Ram.Disk ]] && die "These directories/files ${BACKUPDIR[@]} are in a RAM Disk"
+  [[ $DRIVETYPE =~ Ram.Disk ]] && die "These directories/files ${BACKUPDIR[@]} are in a RAM Disk"
 
-exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-DRIVE=${DRIVE%%:*}
+  exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+  DRIVE=${DRIVE%%:*}
 
-#compute Remote Volume ID
-RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-CONF="$SDIR/conf/conf.init"
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-source "$CONF"
+  #compute Remote Volume ID
+  RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+}
+
+[[ $BACKUPURL =~ rsync://.+@.+:[0-9]+/.+ ]] || {
+  CONFIG="$SDIR/conf/conf.init"
+  [[ -f $CONFIG ]] || die Cannot found configuration file at $CONFIG
+  source "$CONFIG"
+}
+
 exists rsync || die Cannot find rsync
 
 trap '' SIGPIPE
@@ -273,7 +305,7 @@ clean(){
 	dorsync -riHDR "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
 }
 snapshot(){
-	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@snap"
+	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/$SNAP"
 }
 prepare(){
 	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@current/data"

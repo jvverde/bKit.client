@@ -22,7 +22,10 @@ do
   esac
 done
 
-TARGET=$(readlink -nm "$(cygpath -u "${1:-.}")")
+TARGET="${1:-.}"
+exists cygpath && TARGET=$(cygpath -u "$TARGET")
+TARGET=$(readlink -nm "$TARGET")
+
 DIR=$(dirname "$TARGET")
 [[ -d $DIR ]] || mkdir -pv "$DIR"
 REL=${TARGET#$SDIR}

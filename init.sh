@@ -54,7 +54,7 @@ exists rsync || die rsync not found
 export RSYNC_PASSWORD="4dm1n"
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
-rsync -rltvhR $FMT --inplace --stats "${CONFDIR}/./" rsync://admin\@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}
+rsync -rltvhR $FMT --inplace --stats "${CONFDIR}/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}"
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1
 

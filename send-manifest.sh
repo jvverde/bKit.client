@@ -97,3 +97,5 @@ upload_manifest(){
 	update_file "$MANIFEST" "$BACKUPURL/$RVID/@manifest/$PREFIX/manifest.lst"
 	update_file "$MANIFEST" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/manifest.lst"
 }
+
+upload_manifest "$1" "$PREFIX"

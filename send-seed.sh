@@ -102,7 +102,7 @@ update_file(){
 
 update_files(){
   local SRC=$1 && shift
-  local FILE="$$.sort"
+  local FILE="$RUNDIR/$$.sort"
   LC_ALL=C sort -o "$FILE" "$SRC"
   echo dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
   rm -f "$FILE"
@@ -112,6 +112,7 @@ upload_seed(){
   local SEED="$1"
   local BASE="$2"
   local PREFIX="${3:-data}"
+  local FILES="$RUNDIR/$$.seedfiles"
 
   cut -d'|' -f4- "$SEED" > "$FILES"
 
@@ -119,7 +120,9 @@ upload_seed(){
   update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
   rm -f "$FILES"
 }
+
 [[ -z $BASE ]] && {
   BASE="${1%/hashes/file}/data"
 }
+
 upload_seed "$1" "$BASE" "$PREFIX"

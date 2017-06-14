@@ -30,6 +30,7 @@ done
 
 SERVER="$1"
 REPO="$2"
+[[ -z $REPO || -z $SERVER ]] && die "Usage:\n\t$(basename -s .sh "$0") ServerAddress Repo"
 #${DOMAIN}/${NAME}/${UUID}
 
 exists rsync || die rsync not found

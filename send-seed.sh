@@ -56,6 +56,8 @@ do
 	esac
 done
 
+BACKUPURL=${BACKUPURL%/}
+RVID=${RVID%/}
 
 exists rsync || die Cannot find rsync
 
@@ -64,7 +66,7 @@ dorsync2(){
 	local RETRIES=1000
 	while true
 	do
-    rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -104,7 +106,7 @@ update_files(){
   local SRC=$1 && shift
   local FILE="$RUNDIR/$$.sort"
   LC_ALL=C sort -o "$FILE" "$SRC"
-  echo dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+  dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
   rm -f "$FILE"
 }
 
@@ -122,7 +124,7 @@ upload_seed(){
 }
 
 [[ -z $BASE ]] && {
-  BASE="${1%/hashes/file}/data"
+  BASE="${1%/hashes/file}/$PREFIX"
 }
 
 upload_seed "$1" "$BASE" "$PREFIX"

@@ -13,7 +13,6 @@ RSYNCOPTIONS=(
   --usermap=4294967295:$(id -g)
   --numeric-ids
 )
-PREFIX=""
 
 while [[ $1 =~ ^- ]]
 do
@@ -36,6 +35,18 @@ do
     ;;
     --prefix=*)
       PREFIX="${KEY#*=}"
+    ;;
+    --server)
+      SERVER="$1" && shift
+    ;;
+    --server=*)
+      SERVER="${KEY#*=}"
+    ;;
+    --port)
+      PORT="$1" && shift
+    ;;
+    --port=*)
+      PORT="${KEY#*=}"
     ;;
 		-- )
 			while [[ $1 =~ ^- ]]
@@ -98,4 +109,21 @@ upload_manifest(){
 	update_file "$MANIFEST" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/manifest.lst"
 }
 
-upload_manifest "$1" "$PREFIX"
+[[ -z $PREFIX ]] && {
+  PREFIX=$(head -n1 "$1"|cut -d '|' -f4|cut -d '/' -f1)
+}
+[[ -z $RVID ]] && {
+  RVID=$(echo $1 | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
+}
+[[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
+  BACKUPURL="rsync://$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+}
+
+HASHFILE="$RUNDIR/$$.hashes"
+
+perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
+
+
+upload_manifest "$HASHFILE" "$PREFIX"
+
+rm -f "$HASHFILE"

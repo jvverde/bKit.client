@@ -97,6 +97,11 @@ dorsync(){
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 
+RUNDIR="$SDIR/run/manifest-$$"
+[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
+trap 'rm -rf "$RUNDIR"' EXIT
+MANIF="$RUNDIR/manifest-$$"
+
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
 update_file(){
@@ -120,10 +125,6 @@ upload_manifest(){
   BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
 }
 
-RUNDIR="$SDIR/run/manifest-$$"
-[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
-trap 'rm -rf "$RUNDIR"' EXIT
-MANIF="$RUNDIR/manifest-$$"
 
 sed /^$/d "$1" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
 

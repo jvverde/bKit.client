@@ -103,8 +103,8 @@ update_file(){
 }
 
 upload_manifest(){
-  local MANIFEST="$1"
-  local PREFIX="${2:-data}"
+  	local MANIFEST="$1"
+  	local PREFIX="${2:-data}"
 	update_file "$MANIFEST" "$BACKUPURL/$RVID/@manifest/$PREFIX/manifest.lst"
 	update_file "$MANIFEST" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/manifest.lst"
 }
@@ -119,11 +119,10 @@ upload_manifest(){
   BACKUPURL="rsync://$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
 }
 
-HASHFILE="$RUNDIR/$$.hashes"
 
-perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
+upload_manifest <(
+	sed /^$/d "$1" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX 
+) "$PREFIX"
 
 
-upload_manifest "$HASHFILE" "$PREFIX"
 
-rm -f "$HASHFILE"

@@ -107,6 +107,7 @@ PERM=(--perms --acls --owner --group --super --numeric-ids)
 RUNDIR="$SDIR/run/seed-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 trap 'rm -rf "$RUNDIR"' EXIT
+HASHFILE="$RUNDIR/$$.hashes"
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
@@ -147,12 +148,10 @@ upload_seed(){
 	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
 }
 
-HASHFILE="$RUNDIR/$$.hashes"
-
-perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
-
 [[ -z $BACKUPURL || -z $RVID || -z $BASE || -z $PREFIX ]] && {
 	die "Usage:\n\t $(basename -s .sh "$0") --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--base=base] [--prefix=prefix] hashfile"
 }
+
+perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
 
 upload_seed "$HASHFILE" "$BASE" "$PREFIX"

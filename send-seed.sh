@@ -13,8 +13,7 @@ RSYNCOPTIONS=(
   --usermap=4294967295:$(id -g)
   --numeric-ids
 )
-PREFIX="data"
-
+PORT=8731
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -42,6 +41,18 @@ do
     ;;
     --prefix=*)
       PREFIX="${KEY#*=}"
+    ;;
+    --server)
+      SERVER="$1" && shift
+    ;;
+    --server=*)
+      SERVER="${KEY#*=}"
+    ;;
+    --port)
+      PORT="$1" && shift
+    ;;
+    --port=*)
+      PORT="${KEY#*=}"
     ;;
 		-- )
 			while [[ $1 =~ ^- ]]
@@ -118,13 +129,31 @@ upload_seed(){
 
   cut -d'|' -f4- "$SEED" > "$FILES"
 
-  update_files "$FILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
-  update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
+  echo update_files "$FILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
+  echo update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
   rm -f "$FILES"
 }
 
+[[ -z $PREFIX ]] && {
+	PREFIX=$(head -n1 "$1"|cut -d '|' -f4|cut -d '/' -f1)
+}
 [[ -z $BASE ]] && {
   BASE="${1%/hashes/file}/$PREFIX"
 }
+[[ -z $RVID ]] && {
+	RVID=$(echo $1 | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
+}
+[[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
+	BACKUPURL="rsync://$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+}
 
-upload_seed "$1" "$BASE" "$PREFIX"
+HASHFILE="$RUNDIR/$$.hashes"
+
+perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
+
+[[ -z $BACKUPURL || -z $RVID || -z $BASE || -z $PREFIX ]] && {
+	die "Usage:\n\t $(basename -s .sh "$0") --backupurl=rsync://server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--base=base] [--prefix=prefix] hashfile"
+}
+
+upload_seed "$HASHFILE" "$BASE" "$PREFIX"
+rm -rf "$HASHFILE"

@@ -13,6 +13,7 @@ RSYNCOPTIONS=(
   --usermap=4294967295:$(id -g)
   --numeric-ids
 )
+PORT=8731
 
 while [[ $1 =~ ^- ]]
 do
@@ -116,13 +117,15 @@ upload_manifest(){
   RVID=$(echo $1 | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
 }
 [[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
-  BACKUPURL="rsync://$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+  BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
 }
 
+RUNDIR="$SDIR/run/manifest-$$"
+[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
+trap 'rm -rf "$RUNDIR"' EXIT
+MANIF="$RUNDIR/manifest-$$"
 
-upload_manifest <(
-	sed /^$/d "$1" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX 
-) "$PREFIX"
+sed /^$/d "$1" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
 
-
+upload_manifest  "$MANIF" "$PREFIX" 
 

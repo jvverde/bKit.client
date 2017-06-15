@@ -104,8 +104,9 @@ dorsync(){
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 
-RUNDIR="$SDIR/run"
+RUNDIR="$SDIR/run/seed-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
+trap 'rm -rf "$RUNDIR"' EXIT
 
 export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
@@ -129,9 +130,8 @@ upload_seed(){
 
   cut -d'|' -f4- "$SEED" > "$FILES"
 
-  echo update_files "$FILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
-  echo update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
-  rm -f "$FILES"
+  update_files "$FILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
+  update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
 }
 
 [[ -z $PREFIX ]] && {
@@ -144,7 +144,7 @@ upload_seed(){
 	RVID=$(echo $1 | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
 }
 [[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
-	BACKUPURL="rsync://$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
 }
 
 HASHFILE="$RUNDIR/$$.hashes"
@@ -152,8 +152,7 @@ HASHFILE="$RUNDIR/$$.hashes"
 perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
 
 [[ -z $BACKUPURL || -z $RVID || -z $BASE || -z $PREFIX ]] && {
-	die "Usage:\n\t $(basename -s .sh "$0") --backupurl=rsync://server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--base=base] [--prefix=prefix] hashfile"
+	die "Usage:\n\t $(basename -s .sh "$0") --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--base=base] [--prefix=prefix] hashfile"
 }
 
 upload_seed "$HASHFILE" "$BASE" "$PREFIX"
-rm -rf "$HASHFILE"

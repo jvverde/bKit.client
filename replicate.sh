@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
-source "$SDIR/functions/all.sh"SH
+source "$SDIR/functions/all.sh"
 
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
@@ -46,14 +46,13 @@ done
 
 HASHFILE="$1"
 [[ $HASHFILE =~ /hashes/file$ ]] || die "Invalid location for a hash file"
-
 PREFIX=$(head -n1 "$HASHFILE"|cut -d '|' -f4|cut -d '/' -f1)
 RVID=$(echo $HASHFILE | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
 SECTION="$(echo $HASHFILE | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
 BACKUPURL="rsync://user@$SERVER:$PORT/$SECTION"
-REPO=${SECTION//\.//}
+REPO=${SECTION//.//}
 BASE="${HASHFILE%/hashes/file}/$PREFIX"
 
-echo "$SDIR/newrepo.sh" $SERVER $REPO &&
-echo "$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefil="PREFIX" "$HASHFILE" &&
-echo	"$SDIR/send-seeed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$HASHFILE"
+"$SDIR/newrepo.sh" "$SERVER" "$REPO" 
+"$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$HASHFILE" 
+"$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$HASHFILE"

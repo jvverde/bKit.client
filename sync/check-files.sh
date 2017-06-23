@@ -76,4 +76,3 @@ check_snap(){
 }
 
 check_snap "$BACKUPURL/$RVID"
-check_snap "$BACKUPURL/$RVID"

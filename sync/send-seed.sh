@@ -107,7 +107,7 @@ PERM=(--perms --acls --owner --group --super --numeric-ids)
 RUNDIR="$SDIR/run/seed-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 trap 'rm -rf "$RUNDIR"' EXIT
-HASHFILE="$RUNDIR/$$.hashes"
+HASHFILE="$RUNDIR/hashes"
 
 export RSYNC_PASSWORD="$(cat "$SDIR/../conf/pass.txt")"
 
@@ -132,7 +132,7 @@ upload_seed(){
   cut -d'|' -f4- "$SEED" > "$FILES"
 
   update_files "$FILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
-  update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
+  update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/hashes"
 }
 
 [[ -z $PREFIX ]] && {

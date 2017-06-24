@@ -100,7 +100,7 @@ PERM=(--perms --acls --owner --group --super --numeric-ids)
 RUNDIR="$SDIR/run/manifest-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 trap 'rm -rf "$RUNDIR"' EXIT
-MANIF="$RUNDIR/manifest-$$"
+MANIF="$RUNDIR/hashes"
 
 export RSYNC_PASSWORD="$(cat "$SDIR/../conf/pass.txt")"
 
@@ -111,8 +111,8 @@ update_file(){
 upload_manifest(){
   	local MANIFEST="$1"
   	local PREFIX="${2:-data}"
-	update_file "$MANIFEST" "$BACKUPURL/$RVID/@manifest/$PREFIX/manifest.lst"
-	update_file "$MANIFEST" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/manifest.lst"
+	update_file "$MANIFEST" "$BACKUPURL/$RVID/@manifest/$PREFIX/hashes"
+	update_file "$MANIFEST" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/hashes"
 }
 
 [[ -z $PREFIX ]] && {

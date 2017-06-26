@@ -47,8 +47,8 @@ done
 HASHFILE="$1"
 [[ $HASHFILE =~ /hashes/file$ ]] || die "Invalid location for a hash file"
 PREFIX=$(head -n1 "$HASHFILE"|cut -d '|' -f4|cut -d '/' -f1)
-RVID=$(echo $HASHFILE | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
-SECTION="$(echo $HASHFILE | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+RVID=$(echo $HASHFILE | perl "$SDIR/perl/get-RVID.pl")
+SECTION="$(echo $HASHFILE | perl "$SDIR/perl/get-SECTION.pl")"
 BACKUPURL="rsync://user@$SERVER:$PORT/$SECTION"
 REPO=${SECTION//.//}
 BASE="${HASHFILE%/hashes/file}/$PREFIX"

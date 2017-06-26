@@ -104,7 +104,7 @@ dorsync(){
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 
-RUNDIR="$SDIR/run/seed-$$"
+RUNDIR="$SDIR/../run/seed-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 trap 'rm -rf "$RUNDIR"' EXIT
 HASHFILE="$RUNDIR/hashes"
@@ -142,10 +142,10 @@ upload_seed(){
   BASE="${1%/hashes/file}/$PREFIX"
 }
 [[ -z $RVID ]] && {
-	RVID=$(echo $1 | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
+	RVID=$(echo $1 | perl "$SDIR/perl/get-RVID.pl")
 }
 [[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
-	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl "$SDIR/perl/get-SECTION.pl")"
 }
 
 [[ -z $BACKUPURL || -z $RVID || -z $BASE || -z $PREFIX ]] && {

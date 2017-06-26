@@ -70,7 +70,7 @@ dorsync2(){
 	local RETRIES=1000
 	while true
 	do
-    rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -97,7 +97,7 @@ dorsync(){
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 
-RUNDIR="$SDIR/run/manifest-$$"
+RUNDIR="$SDIR/../run/manifest-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 trap 'rm -rf "$RUNDIR"' EXIT
 MANIF="$RUNDIR/hashes"
@@ -115,18 +115,20 @@ upload_manifest(){
 	update_file "$MANIFEST" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/hashes"
 }
 
+SRC="$1"
+
 [[ -z $PREFIX ]] && {
-  PREFIX=$(head -n1 "$1"|cut -d '|' -f4|cut -d '/' -f1)
+  PREFIX=$(head -n1 "$SRC"|cut -d '|' -f4|cut -d '/' -f1)
 }
 [[ -z $RVID ]] && {
-  RVID=$(echo $1 | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|.snapshots/@)#);')
+  RVID=$(echo $SRC | perl "$SDIR/perl/get-RVID.pl")
 }
 [[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
-  BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+  BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $SRC | perl "$SDIR/perl/get-SECTION.pl")"
 }
 
 
-sed /^$/d "$1" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
+sed /^$/d "$SRC" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
 
 upload_manifest  "$MANIF" "$PREFIX" 
 

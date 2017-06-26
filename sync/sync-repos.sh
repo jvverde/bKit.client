@@ -65,11 +65,8 @@ do
 				shift
 			done
 		;;
-		*=*)
-			OPTIONS+=( "$KEY" )
-		;;
 		*)
-			OPTIONS+=( "$KEY" "$1" ) && shift
+			OPTIONS+=( "$KEY" )
 		;;
 	esac
 done
@@ -127,6 +124,10 @@ doit(){
 }
 
 [[ -z $REPO || -z $BACKUPURL || -z $RVID  ]] && {
+	echo REPO=$REPO
+	echo BACKUPURL=$BACKUPURL
+	echo RVID=$RVID
+	echo SERVER=$SERVER
 	die "Usage:\n\t $(basename -s .sh "$0") [--reverse|--list-only] --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] snapdir"
 }
 

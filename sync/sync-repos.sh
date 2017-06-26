@@ -114,7 +114,7 @@ doit(){
 }
 
 [[ -z $RVID ]] && {
-	RVID=$(echo $REPO | perl -lane 'print (m#/data/((?:[^/]+\.){4}[^/]+)/(?=@|[.]snapshots/@)#);')
+	RVID=$(echo $REPO | perl "$SDIR/perl/get-RVID.pl")
 }
 [[ -z $SNAP ]] && {
 	SNAP=$(echo $REPO | perl -lane 'print (m#/data/(?:[^/]+\.){4}[^/]+/(@[^/]+|[.]snapshots/@[^/]+)#);')

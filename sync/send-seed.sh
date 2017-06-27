@@ -135,23 +135,25 @@ upload_seed(){
   update_file "$SEED" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/hashes"
 }
 
+SRC="$1"
+
 [[ -z $PREFIX ]] && {
-	PREFIX=$(head -n1 "$1"|cut -d '|' -f4|cut -d '/' -f1)
+	PREFIX=$(head -n1 "$SRC"|cut -d '|' -f4|cut -d '/' -f1)
 }
 [[ -z $BASE ]] && {
-  BASE="${1%/hashes/file}/$PREFIX"
+  BASE="${SRC%/hashes/file}/$PREFIX"
 }
 [[ -z $RVID ]] && {
-	RVID=$(echo $1 | perl "$SDIR/perl/get-RVID.pl")
+	RVID=$(echo $SRC | perl "$SDIR/perl/get-RVID.pl")
 }
 [[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
-	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $1 | perl "$SDIR/perl/get-SECTION.pl")"
+	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $SRC | perl "$SDIR/perl/get-SECTION.pl")"
 }
 
 [[ -z $BACKUPURL || -z $RVID || -z $BASE || -z $PREFIX ]] && {
 	die "Usage:\n\t $(basename -s .sh "$0") --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--base=base] [--prefix=prefix] hashfile"
 }
 
-perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$1" > $HASHFILE
+perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$SRC" > $HASHFILE
 
 upload_seed "$HASHFILE" "$BASE" "$PREFIX"

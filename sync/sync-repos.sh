@@ -117,10 +117,10 @@ doit(){
 	RVID=$(echo $REPO | perl "$SDIR/perl/get-RVID.pl")
 }
 [[ -z $SNAP ]] && {
-	SNAP=$(echo $REPO | perl -lane 'print (m#/data/(?:[^/]+\.){4}[^/]+/(@[^/]+|[.]snapshots/@[^/]+)#);')
+	SNAP=$(echo $REPO | perl "$SDIR/perl/get-SNAP.pl")
 }
 [[ -z $BACKUPURL && -n $SERVER && -n $PORT ]] && {
-	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $REPO | perl -lane '$,=q|.|;print (m#/([^/]+)/([^/]+)/([^/]+)/data/(?:.+\.){4}[^/]+/(?=@|.snapshots/@)#);')"
+	BACKUPURL="rsync://user@$SERVER:$PORT/$(echo $REPO | perl "$SDIR/perl/get-SECTION.pl")"
 }
 
 [[ -z $REPO || -z $BACKUPURL || -z $RVID  ]] && {

@@ -128,15 +128,16 @@ doit(){
 	echo BACKUPURL=$BACKUPURL
 	echo RVID=$RVID
 	echo SERVER=$SERVER
-	die "Usage:\n\t $(basename -s .sh "$0") [--reverse|--list-only] --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] snapdir"
+	die "Usage:\n\t $(basename -s .sh "$0") [--reverse|--list-only] --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--snap=snap] snapdir"
 }
 
-SRC=$(echo $REPO|sed -E 's#(/data/([^/.]+\.){4}[^/]+/(@|.snapshots/@)[^/]+)/?#\1/./#;')
-DST=$(echo "$BACKUPURL/$RVID/$SNAP"|sed -E 's#(/([^/.]+\.){4}[^/]+/(@|.snapshots/@)[^/]+)/?#\1/./#;')
+SUBDIR=$(echo $REPO|sed -E 's#^.*/data/([^/.]+\.){4}[^/]+/(@|.snapshots/@)[^/]+/?##')
+SRC=$(echo $REPO|sed -E 's#(/data/([^/.]+\.){4}[^/]+/(@|.snapshots/@)[^/]+).*#\1#')
+DST="$BACKUPURL/$RVID/$SNAP"
 
 [[ -z ${REVERSE:+isset} ]] && {
 	[[ $SNAP =~ ^@ ]] || die "We cannot use $DST as destination. Use --reverse or --list-only options"
-	doit  "$SRC" "$DST"
+	doit  "$SRC/./$SUBDIR" "$DST" && exit
 }
-(( REVERSE == 1 )) && doit  "$DST" "$SRC"
-(( REVERSE == 2 )) && doit  --list-only "$DST"
+(( REVERSE == 1 )) && doit "$DST/./$SUBDIR" "$SRC" && exit
+(( REVERSE == 2 )) && doit  --list-only "$DST/$SUBDIR" && exit

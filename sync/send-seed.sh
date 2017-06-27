@@ -73,7 +73,7 @@ RVID=${RVID%/}
 exists rsync || die Cannot find rsync
 
 
-dorsync2(){
+dorsync(){
 	local RETRIES=1000
 	while true
 	do
@@ -95,10 +95,6 @@ dorsync2(){
 		esac
 		(( --RETRIES < 0 )) && warn "I'm tired of trying" && break
 	done
-}
-
-dorsync(){
-	dorsync2 "$@" | grep -v 'unpack_smb_acl'
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'

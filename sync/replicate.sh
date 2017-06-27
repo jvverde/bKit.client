@@ -5,9 +5,6 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 source "$SDIR/../functions/all.sh"
 
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
-
-
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)
   --usermap=4294967295:$(id -g)
@@ -44,17 +41,30 @@ do
 	esac
 done
 
-HASHFILE="$1"
-[[ $HASHFILE =~ /hashes/file$ ]] || die "Invalid location for a hash file"
+Usage(){
+	die "Usage :\n\t $(basename -s .sh "$0") local-repo remote-server"
+}
+
+REPO="$1"
+
+[[ -d $REPO ]] || Usage
+
+HASHFILE="$REPO/hashes/file"
+[[ -e $HASHFILE ]] || die "Didn't find a hash file"
+[[ -z $SERVER ]] && SERVER="$2" 
+[[ -z $SERVER ]] && Usage
 PREFIX=$(head -n1 "$HASHFILE"|cut -d '|' -f4|cut -d '/' -f1)
 RVID=$(echo $HASHFILE | perl "$SDIR/perl/get-RVID.pl")
 SECTION="$(echo $HASHFILE | perl "$SDIR/perl/get-SECTION.pl")"
 BACKUPURL="rsync://user@$SERVER:$PORT/$SECTION"
-REPO=${SECTION//.//}
+NEWREPO=${SECTION//.//}
 BASE="${HASHFILE%/hashes/file}/$PREFIX"
 
-"$SDIR/newrepo.sh" "$SERVER" "$REPO" 
-#echo "$SDIR/check-snap.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" 
-#exit
-"$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$HASHFILE" 
-"$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$HASHFILE"
+bash "$SDIR/compare.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 2>/dev/null 2>/dev/null || {
+	bash "$SDIR/newrepo.sh" "$SERVER" "$NEWREPO" &&
+	bash "$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$HASHFILE" &&
+	bash "$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$HASHFILE" &&
+	bash "$SDIR/update-dirs.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" &&
+	bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" &&
+	echo Replication done
+}

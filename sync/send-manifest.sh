@@ -66,14 +66,14 @@ done
 exists rsync || die Cannot find rsync
 
 
-dorsync2(){
+dorsync(){
 	local RETRIES=1000
 	while true
 	do
 		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
-			0) break 									#this is a success
+			0) break								#this is a success
 			;;
 			5|10|12|30|35)
 				DELAY=$((1 + RANDOM % 60))
@@ -90,9 +90,6 @@ dorsync2(){
 	done
 }
 
-dorsync(){
-	dorsync2 "$@" | grep -v 'unpack_smb_acl'
-}
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
@@ -130,5 +127,5 @@ SRC="$1"
 
 sed /^$/d "$SRC" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
 
-upload_manifest  "$MANIF" "$PREFIX" 
-
+upload_manifest  "$MANIF" "$PREFIX" || echo FAIL
+exit

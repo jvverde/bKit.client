@@ -53,18 +53,35 @@ HASHFILE="$REPO/hashes/file"
 [[ -e $HASHFILE ]] || die "Didn't find a hash file"
 [[ -z $SERVER ]] && SERVER="$2" 
 [[ -z $SERVER ]] && Usage
-PREFIX=$(head -n1 "$HASHFILE"|cut -d '|' -f4|cut -d '/' -f1)
+
 RVID=$(echo $HASHFILE | perl "$SDIR/perl/get-RVID.pl")
 SECTION="$(echo $HASHFILE | perl "$SDIR/perl/get-SECTION.pl")"
 BACKUPURL="rsync://user@$SERVER:$PORT/$SECTION"
-NEWREPO=${SECTION//.//}
-BASE="${HASHFILE%/hashes/file}/$PREFIX"
 
-bash "$SDIR/compare.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 2>/dev/null 2>/dev/null || {
-	bash "$SDIR/newrepo.sh" "$SERVER" "$NEWREPO" &&
-	bash "$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$HASHFILE" &&
-	bash "$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$HASHFILE" &&
-	bash "$SDIR/update-dirs.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" &&
-	bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" &&
+LOGDIR="$SDIR/../logs/sync/$SECTION/$RVID"
+[[ -d $LOGDIR ]] || mkdir -p "$LOGDIR"
+NOW="$(date --iso-8601=seconds)"
+BN="$(basename "$REPO")"
+LOGFILE="$LOGDIR/$BN.log.$NOW"
+LOGERR="$LOGDIR/$BN.err.$NOW"
+echo "Logs goes to $LOGFILE and errors to $LOGERR"
+exec 1>"$LOGFILE"
+exec 2>"$LOGERR"
+
+echo "Start compare $REPO on server $SERVER"
+bash "$SDIR/compare.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || {
+	echo "It seems doesn't exist. I am going to sync it"
+	NEWREPO=${SECTION//.//}
+	bash "$SDIR/newrepo.sh" "$SERVER" "$NEWREPO" 
+	while read -r PREFIX
+	do
+		BASE="${HASHFILE%/hashes/file}/$PREFIX"
+		bash "$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$HASHFILE"
+		bash "$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$HASHFILE" 
+	done < <(cut -d'|' -f4 "$HASHFILE"|cut -d'/' -f1 |sed /^$/d |sort -u)
+	bash "$SDIR/clean.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
+	bash "$SDIR/update-dirs.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
+	#bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
 	echo Replication done
 }
+echo "Done compare $REPO on server $SERVER"

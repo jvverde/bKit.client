@@ -125,7 +125,7 @@ SRC="$1"
 }
 
 
-sed /^$/d "$SRC" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
+sed /^$/d "$SRC" | perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/## or next; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX > "$MANIF"
 
-upload_manifest  "$MANIF" "$PREFIX" || echo FAIL
+upload_manifest  "$MANIF" "$PREFIX"
 exit

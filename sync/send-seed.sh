@@ -150,6 +150,7 @@ SRC="$1"
 	die "Usage:\n\t $(basename -s .sh "$0") --backupurl=rsync://user@server:port/domain.host.uuid [--rvid=letter.uuid.label.type.fs] [--base=base] [--prefix=prefix] hashfile"
 }
 
-perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/##; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$SRC" > $HASHFILE
+perl -F'\|' -slane  '{$F[3] =~ s#^$prefix/## or next; print "$F[0]|$F[1]|$F[2]|$F[3]"}' -- -prefix=$PREFIX "$SRC" > $HASHFILE
 
 upload_seed "$HASHFILE" "$BASE" "$PREFIX"
+exit

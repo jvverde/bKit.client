@@ -69,10 +69,12 @@ exec 1>"$LOGFILE"
 exec 2>"$LOGERR"
 
 echo "Start compare $REPO on server $SERVER"
+
+NEWREPO=${SECTION//.//}
+bash "$SDIR/newrepo.sh" "$SERVER" "$NEWREPO" 
+
 bash "$SDIR/compare.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || {
 	echo "It seems doesn't exist. I am going to sync it"
-	NEWREPO=${SECTION//.//}
-	bash "$SDIR/newrepo.sh" "$SERVER" "$NEWREPO" 
 	while read -r PREFIX
 	do
 		BASE="${HASHFILE%/hashes/file}/$PREFIX"
@@ -81,7 +83,7 @@ bash "$SDIR/compare.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || {
 	done < <(cut -d'|' -f4 "$HASHFILE"|cut -d'/' -f1 |sed /^$/d |sort -u)
 	bash "$SDIR/clean.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
 	bash "$SDIR/update-dirs.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
-	#bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
+	bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" 
 	echo Replication done
 }
 echo "Done compare $REPO on server $SERVER"

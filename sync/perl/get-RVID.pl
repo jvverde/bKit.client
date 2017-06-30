@@ -1,2 +1,2 @@
 #!/usr/bin/perl -lan
-print (m#/data/((?:[^/]+\.){4}[^/]+)(?=/@.+|/[.]snapshots/@GMT.+|/$|$)#);
+print (m#/data/((?:[^/]+\.){4}[^/]+)(?=/@.+|/[.]snapshots(?:/(?:@GMT.+)?)?|/$|$)#);

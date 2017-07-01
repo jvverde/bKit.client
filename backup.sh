@@ -305,10 +305,10 @@ clean(){
 	dorsync -riHDR "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
 }
 snapshot(){
-	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/$SNAP"
+	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/$SNAP"
 }
 prepare(){
-	dorsync --dry-run --dirs --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@current/data"
+	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@current/data"
 }
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))

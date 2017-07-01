@@ -28,6 +28,9 @@ do
     --port=*)
       PORT="${KEY#*=}"
     ;;
+	--no-log)
+		NOLOG=1
+	;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
@@ -58,15 +61,17 @@ RVID=$(echo $HASHFILE | perl "$SDIR/perl/get-RVID.pl")
 SECTION="$(echo $HASHFILE | perl "$SDIR/perl/get-SECTION.pl")"
 BACKUPURL="rsync://user@$SERVER:$PORT/$SECTION"
 
-LOGDIR="$SDIR/../logs/sync/$SECTION/$RVID"
-[[ -d $LOGDIR ]] || mkdir -p "$LOGDIR"
-NOW="$(date --iso-8601=seconds)"
-BN="$(basename "$REPO")"
-LOGFILE="$LOGDIR/$BN.log.$NOW"
-LOGERR="$LOGDIR/$BN.err.$NOW"
-echo "Logs goes to $LOGFILE and errors to $LOGERR"
-exec 1>"$LOGFILE"
-exec 2>"$LOGERR"
+[[ -z ${NOLOG:+unset} ]]  && {
+	LOGDIR="$SDIR/../logs/sync/$SECTION/$RVID"
+	[[ -d $LOGDIR ]] || mkdir -p "$LOGDIR"
+	NOW="$(date --iso-8601=seconds)"
+	BN="$(basename "$REPO")"
+	LOGFILE="$LOGDIR/$BN_$NOW.log"
+	LOGERR="$LOGDIR/$BN_$NOW.err"
+	echo "Logs goes to $LOGFILE and errors to $LOGERR"
+	exec 1>"$LOGFILE"
+	exec 2>"$LOGERR"
+}
 
 RUNDIR="$SDIR/../run/replicate-$$"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
@@ -87,12 +92,15 @@ bash "$SDIR/list-remote.sh" "$REPO" "$SERVER" 2>/dev/null || {
 		PARENT="${PARENT%/}/"
 		:> "$MANIF"
 		fgrep -f- "$HASHFILE" < <(
+			echo "######################################################################################"
 			bash "$SDIR/sync-repos.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --snap="@current" "$REPO" |
 			fgrep '"send' |
 			awk -F'|' '$2 ~ /.f/ {print $3}' |
 			sed "s#^$PARENT#|#"
 		) > "$MANIF"
+		echo "Send Manifest for $(wc -l "$MANIF") of $(wc -l "$HASHFILE")"
 		bash "$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$MANIF" || die "Can't send manifest"
+		echo "Send Manifest for $(wc -l "$MANIF") of $(wc -l "$HASHFILE")"
 		bash "$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$MANIF" || die "Can't send seed"
 	done < <(cut -d'|' -f4 "$HASHFILE"|cut -d'/' -f1 |sed /^$/d |sort -u)
 	echo Clean
@@ -100,8 +108,7 @@ bash "$SDIR/list-remote.sh" "$REPO" "$SERVER" 2>/dev/null || {
 	echo Update dirs
 	bash "$SDIR/update-dirs.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || die "Can't update dirs"
 	echo Check before Snap
-	let CNT=$(bash "$SDIR/sync-repos.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --snap="@current" "$REPO"|wc -l)
-	((CNT == 0)) || die "Don't check. There are at least $CNT unsync resources"
+	bash "$SDIR/sync-repos.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --snap="@current" "$REPO"|fgrep -v 'send|cd++++'|fgrep -v '/hashes/file'
 	echo Snap
 	bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || die "Can't snap"
 	echo Replication done

@@ -10,5 +10,6 @@ OPTIONS=(
 	--times
 	--links
 	--itemize-changes
+	--prune-empty-dirs
 )
 bash "$SDIR/sync-repos.sh" --snap="@current" "${OPTIONS[@]}" "$@"

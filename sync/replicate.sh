@@ -66,8 +66,8 @@ BACKUPURL="rsync://user@$SERVER:$PORT/$SECTION"
 	[[ -d $LOGDIR ]] || mkdir -p "$LOGDIR"
 	NOW="$(date --iso-8601=seconds)"
 	BN="$(basename "$REPO")"
-	LOGFILE="$LOGDIR/$BN_$NOW.log"
-	LOGERR="$LOGDIR/$BN_$NOW.err"
+	LOGFILE="$LOGDIR/${BN}_$NOW.log"
+	LOGERR="$LOGDIR/${BN}_$NOW.err"
 	echo "Logs goes to $LOGFILE and errors to $LOGERR"
 	exec 1>"$LOGFILE"
 	exec 2>"$LOGERR"
@@ -100,16 +100,16 @@ bash "$SDIR/list-remote.sh" "$REPO" "$SERVER" 2>/dev/null || {
 		) > "$MANIF"
 		echo "Send Manifest for $(wc -l "$MANIF") of $(wc -l "$HASHFILE")"
 		bash "$SDIR/send-manifest.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" "$MANIF" || die "Can't send manifest"
-		echo "Send Manifest for $(wc -l "$MANIF") of $(wc -l "$HASHFILE")"
+		echo "Send Seed for $(wc -l "$MANIF") of $(wc -l "$HASHFILE")"
 		bash "$SDIR/send-seed.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --prefix="$PREFIX" --base="$BASE" "$MANIF" || die "Can't send seed"
 	done < <(cut -d'|' -f4 "$HASHFILE"|cut -d'/' -f1 |sed /^$/d |sort -u)
-	echo Clean
+	echo -e "\n####################################Clean####################################"
 	bash "$SDIR/clean.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || die "Can't clean"
-	echo Update dirs
+	echo -e "\n####################################Update dirs##############################"
 	bash "$SDIR/update-dirs.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || die "Can't update dirs"
-	echo Check before Snap
-	bash "$SDIR/sync-repos.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --snap="@current" "$REPO"|fgrep -v 'send|cd++++'|fgrep -v '/hashes/file'
-	echo Snap
+	echo -e "\n####################################Check before Snap########################"
+	bash "$SDIR/chk-current.sh" --backupurl="$BACKUPURL" --rvid="$RVID" --snap="@current" "$REPO"|fgrep -v '/hashes/file|'
+	echo -e "\n####################################Snap#####################################"
 	bash "$SDIR/snap-now.sh" --backupurl="$BACKUPURL" --rvid="$RVID" "$REPO" || die "Can't snap"
 	echo Replication done
 }

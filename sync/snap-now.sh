@@ -7,6 +7,8 @@ OPTIONS=(
 	--dry-run 
 	--relative
 	--itemize-changes
+	--ignore-non-existing
+	--ignore-existing
 )
 SNAP=$(echo "${@: -1}"|sed -E 's#.*/[.]snapshots/(@[^/]+).*#\1#')
 bash "$SDIR/sync-repos.sh" --snap="@snap/$SNAP" "${OPTIONS[@]}" "$@"

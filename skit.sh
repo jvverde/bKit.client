@@ -45,7 +45,8 @@ trap '
 
 importrules(){
 	[[ -e $SDIR/rules/global ]] || mkdir -pv "$SDIR/rules/global"
-	bash "$SDIR/update.sh" "rules/global" "$SDIR" >/dev/null
+	#bash "$SDIR/update.sh" "rules/global" "$SDIR" >/dev/null
+	bash "$SDIR/update.sh" "rules/global" "$SDIR"
 	for F in $(ls "$SDIR/rules/global")
 	do
 		FILTERS+=( --filter=". $SDIR/rules/global/$F" )

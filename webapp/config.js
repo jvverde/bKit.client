@@ -18,7 +18,7 @@ let config = {
   // Docs: https://simulatedgreg.gitbooks.io/electron-vue/content/docs/building_your_app.html
   building: {
     arch: 'x64,ia32',
-    asar: true,
+    asar: false,
     dir: path.join(__dirname, 'app'),
     icon: path.join(__dirname, 'app/icons/transparent/256x256_transp'),
     ignore: /\b(node_modules|src|index\.ejs|icons)\b/,

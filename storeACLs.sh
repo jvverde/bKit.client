@@ -34,8 +34,18 @@ SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
 RESULT="$SDIR/run/store-$$/"
-trap "rm -rf '$RESULT'" EXIT
 mkdir -p "$RESULT"
+
+LOGDIR="$SDIR/logs/acls/$(basename "$TARGETDIR")"
+[[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
+
+ERRFILE="$LOGDIR/$(date +%Y-%m-%dT%H-%M-%S).err"
+exec 2>"$ERRFILE"
+
+trap "
+	rm -rf '$RESULT'
+	[[ -s $ERRFILE ]] || rm -f '$ERRFILE'
+" EXIT
 
 getacl(){
 	local SRC=$1
@@ -47,7 +57,7 @@ getacl(){
 		[[ -e $PARENT ]] && rm -rfv "$PARENT"
 		mkdir -p "$PARENT"
 	}
-	[[ -d $SRC ]] || cp --preserve=all --attributes-only "$SRC" "$DST" || rsync -lptgoAi --out-format="Store:%i|%f" "$SRC" "$DST"
+	[[ -d $SRC ]] || cp --preserve=all --attributes-only "$SRC" "$DST"
 	DOSSRC="$(cygpath -w "${SRC%/*}")\\${SRC##*/}" #we need go this way because symbolic links
 	local DT=$(date -R -r "$SRC")
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$DOSSRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"

@@ -50,11 +50,11 @@ getacl(){
 	DOSSRC="$(cygpath -w "${SRC%/*}")\\${SRC##*/}" #we need go this way because symbolic links
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$DOSSRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
 	#copy attributes, but only for files, not directories
-	{
-		echo "+FILE $(cygpath -w "$2")"
-		cat "$DST"
-	} | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
-	"$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")" |tr -d '\0\r'|sed /^$/d
+	# {
+	# 	echo "+FILE $(cygpath -w "$2")"
+	# 	cat "$DST"
+	# } | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
+	# "$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")" |tr -d '\0\r'|sed /^$/d
 	#don't change the order
 	# [[ $2 == $DST ]] && {
 	# 	cp --preserve=all --attributes-only "$(cygpath -u "$SRC")" "$DST" 2>/dev/null ||

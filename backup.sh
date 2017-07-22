@@ -41,7 +41,7 @@ do
 			exists cygpath && MAPDRIVE=$(cygpath "$MAPDRIVE")
 		;;
     --snap)
-      SNAP="@snap/$1" && shift  
+      SNAP="@snap/$1" && shift
     ;;
     --snap=*)
       SNAP="@snap/${KEY#*=}"
@@ -398,7 +398,7 @@ backupACLS(){
       [[ $I =~ skipping ]] && continue
       J=${I#?????}
       [[ $J =~ [^.] ]] && {
-        echo "ACL:$I|$FILE" >&11
+        echo "ACL miss:$I|$FILE" >&11
         echo "$FILE"
       }
     done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
@@ -425,9 +425,9 @@ backupACLS(){
   echo "e) Update metafiles attributes"
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
-    
+
     backup "$METADATADIR" "$@" "$BACKUPURL/$RVID/@current/metadata"
-    
+
     touch "$ENDFLAG"
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"

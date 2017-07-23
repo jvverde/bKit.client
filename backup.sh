@@ -373,9 +373,15 @@ backupACLS(){
     --group
     --perms
     --relative
+    --super
+    --times
+    --numeric-ids
     --itemize-changes
     --exclude="$ACLFILE"
     --exclude=".rsync-filter"
+    --groupmap=4294967295:$(id -u)
+    --usermap=4294967295:$(id -g)
+    --numeric-ids
     $FMT_QUERY
   )
 

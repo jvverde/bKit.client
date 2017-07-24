@@ -365,13 +365,9 @@ backupACLS(){
     [[ -d "$METADATADIR$DIR" ]] && MDIRS+=( "$METADATADIR$DIR" )
   done
 
-  ACLSOPTIONS=(
+  local LOPTIONS=(
     --no-verbose
     --recursive
-    --acls
-    --owner
-    --group
-    --perms
     --relative
     --super
     --times
@@ -379,6 +375,13 @@ backupACLS(){
     --exclude="$ACLFILE"
     --exclude=".rsync-filter"
     $FMT_QUERY
+  )
+
+  local ACLSOPTIONS=(
+    --acls
+    --owner
+    --group
+    --perms
   )
 
   echo "a) Delete older files from local cache"
@@ -403,13 +406,13 @@ backupACLS(){
         echo "ACL miss:$I|$FILE" >&11
         echo "$FILE"
       }
-    done < <(dorsync --dry-run "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
+    done < <(dorsync --dry-run "${LOPTIONS[@]}" "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
       bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
   echo "c) Update attributes and Clean metafiles on local cache"
   {
-    dorsync --ignore-non-existing --ignore-existing --delete --force "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+    dorsync --ignore-non-existing --ignore-existing --delete --force "${LOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
   echo "d) Backup metafiles from local cache to backup server"

@@ -16,3 +16,4 @@ not-used-anymore/
 .backups
 lixo.txt
 *.log
+*.TMP

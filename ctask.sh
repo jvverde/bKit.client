@@ -87,11 +87,11 @@ do
 			HOUR=ONHOURS
 			DAYOFMONTH=ONDAYOFMONTH
 		;;
-    --email)
-      OPTIONS+=( "$KEY=$1" ) && shift
-    ;;
     --email=*)
       OPTIONS+=( "$KEY" )
+    ;;
+    --email)
+      OPTIONS+=( "$KEY=$1" ) && shift
     ;;
 		-n|--name)
 			NAME="$1" && shift

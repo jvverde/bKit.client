@@ -33,7 +33,11 @@
   import Console from './Console'
 
   var moment = require('moment')
-  moment.locale('pt')
+  moment.locale('en')
+  moment.relativeTimeThreshold('m', 119)
+  moment.relativeTimeThreshold('h', 47)
+  moment.relativeTimeThreshold('d', 59)
+  moment.relativeTimeThreshold('M', 23)
 
   export default {
     data () {
@@ -88,6 +92,14 @@
         this.$store.dispatch('setLocation',
           Object.assign({}, this.currentLocation, {snapshot: this.currentSnap})
         )
+      },
+      howlong (snap) {
+/*        let now = moment()
+        let x = snap.date*/
+/*        return now.diff(x, 'minutes') < 120 ? now.diff(x, 'minutes') + ' min'
+          : now.diff(x, 'hours') < 48 ? now.diff(x, 'hours') + ' hours'
+          : now.diff(x, 'days')  < 60 ? now.diff(x, 'days') + ' days'
+          : now.diff(x, 'months')  < 60 ? now.diff(x, 'days') + ' days'*/
       }
     }
   }

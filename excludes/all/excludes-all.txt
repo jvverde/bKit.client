@@ -10,7 +10,7 @@ CVS/
 *.vvfat
 *.vpc
 *.vmdk
-*.vhdx
+#*.vhdx
 *.vdi
 *.rbd
 *.raw

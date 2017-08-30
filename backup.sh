@@ -370,6 +370,7 @@ backupACLS(){
     --recursive
     --relative
     --super
+    --update
     --times
     --itemize-changes
     --exclude="$ACLFILE"
@@ -401,7 +402,8 @@ backupACLS(){
     while IFS='|' read -r I FILE
     do
       [[ $I =~ skipping ]] && continue
-      J=${I#?????}
+      #J=${I#?????}           #remove first 5 characteres ex: >f.st
+      J=${I#????}             #remove first 4 characteres ex: >f.s
       [[ $J =~ [^.] ]] && {
         echo "ACL miss:$I|$FILE" >&11
         echo "$FILE"

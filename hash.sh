@@ -31,6 +31,8 @@ done
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
+(( $# == 0 )) && die "Usage:\n\t$0 dirs" 
+
 IFS="
 "
 FULLPATHS=( $(readlink -e "$@") )

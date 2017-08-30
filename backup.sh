@@ -386,11 +386,6 @@ backupACLS(){
 
   echo "a) Generate missing metafiles in local cache"
   {
-    #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
-    # [[ ${#MDIRS[@]} -gt 0 ]] && {
-    #   find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
-    #     xargs -r0I{} chmod -v 000 "{}"
-    # }
 
     exec 11>&1
     while IFS='|' read -r I FILE
@@ -482,7 +477,7 @@ backupACLS(){
 
     clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
-    (( ($RANDOM%2) == 0 )) && [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+    [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 4 - Backup ACLS\n"
       backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
     )

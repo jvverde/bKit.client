@@ -385,18 +385,20 @@ backupACLS(){
     --perms
   )
 
-  echo "a) Delete older files from local cache"
-  {
-    [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -ctime +30 -printf "Removed %P\n" -delete
-  } | sed -e 's/^/\t/'
+  (( ($RANDOM%60) == 0 )) && {
+    echo "0) Delete older files from local cache:'${MDIRS[@]}'"
+    {
+      [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -ctime +30 -printf "Removed %P\n" -delete
+    } | sed -e 's/^/\t/'
+  }
 
-  echo "b) Generate missing metafiles in local cache"
+  echo "a) Generate missing metafiles in local cache"
   {
     #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
-    [[ ${#MDIRS[@]} -gt 0 ]] && {
-      find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
-        xargs -r0I{} chmod 000 "{}"
-    }
+    # [[ ${#MDIRS[@]} -gt 0 ]] && {
+    #   find "${MDIRS[@]}" -type d '!' -exec test -e "{}/$ACLFILE" ';' -print0 |
+    #     xargs -r0I{} chmod -v 000 "{}"
+    # }
 
     exec 11>&1
     while IFS='|' read -r I FILE
@@ -412,12 +414,12 @@ backupACLS(){
       bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
-  echo "c) Update attributes and Clean metafiles on local cache"
+  echo "b) Update attributes and Clean metafiles on local cache"
   {
     dorsync --ignore-non-existing --ignore-existing --delete --force "${LOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
-  echo "d) Backup metafiles from local cache to backup server"
+  echo "c) Backup metafiles from local cache to backup server"
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
     {
@@ -429,7 +431,7 @@ backupACLS(){
     rm -f "$MANIFEST" "$ENDFLAG"
   } | sed -e 's/^/\t/'
 
-  echo "e) Update metafiles attributes"
+  echo "d) Update metafiles attributes"
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
 
@@ -440,7 +442,7 @@ backupACLS(){
     rm -f "$MANIFEST" "$ENDFLAG"
   } | sed -e 's/^/\t/'
 
-  echo "f) Clean metafiles on server"
+  echo "e) Clean metafiles on server"
   {
     clean "$METADATADIR" "$@" "$BACKUPURL/$RVID/@current/metadata"
   } | sed -e 's/^/\t/'

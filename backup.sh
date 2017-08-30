@@ -357,12 +357,13 @@ backupACLS(){
   local MDIRS=()
 
   local METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
-  [[ -d $METADATADIR ]] || mkdir -p "$METADATADIR"
+  [[ -d $METADATADIR ]] || mkdir -pv "$METADATADIR"
 
   for DIR in "$@"
   do
     SRCS+=( "$BASE/./$DIR" )
-    [[ -d "$METADATADIR$DIR" ]] && MDIRS+=( "$METADATADIR$DIR" )
+    [[ -d "$METADATADIR$DIR" ]] || mkdir -pv "$METADATADIR$DIR"
+    MDIRS+=( "$METADATADIR$DIR" )
   done
 
   local LOPTIONS=(

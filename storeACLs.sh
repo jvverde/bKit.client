@@ -26,7 +26,7 @@ done
 
 DIRACL=${DIRACL:-'.bkit-dir-acl'}
 
-TARGETDIR=$(readlink -nm "$(cygpath "$1")")
+TARGETDIR="$(cygpath "$(readlink -nm "$1")")"
 
 [[ -d $TARGETDIR ]]  || mkdir -p "$TARGETDIR" || die Cannot create dir $ACLSDIR
 
@@ -51,11 +51,14 @@ getacl(){
 	local SRC=$1
 	[[ -L $SRC ]] && return 0
 	local DST=$2
+	local PARENT="${DST%/*}"
+	[[ -d $PARENT ]] || mkdir -pv "$PARENT"
+
 	[[ -d $SRC ]] && {
-		rsync -idpogAt "${SRC%/}" "${$DST%/*}" #update directory only
+		rsync -idpogAt "${SRC%/}" "${DST%/*}" #update directory only
 		DST="$DST/$DIRACL"
 	}
-	[[ -d $SRC ]] || cp --preserve=all --attributes-only "$SRC" "$DST"
+	[[ -d $SRC ]] || cp --preserve=all --attributes-only -v "$SRC" "$DST"
 	DOSSRC="$(cygpath -w "${SRC%/*}")\\${SRC##*/}" #we need go this way because symbolic links
 	local DT=$(date -R -r "$SRC")
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$DOSSRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"

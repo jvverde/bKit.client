@@ -370,7 +370,6 @@ backupACLS(){
     --recursive
     --relative
     --super
-    --update
     --times
     --itemize-changes
     --exclude="$ACLFILE"

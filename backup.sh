@@ -384,13 +384,6 @@ backupACLS(){
     --perms
   )
 
-  (( ($RANDOM%60) == 0 )) && {
-    echo "0) Delete older files from local cache:'${MDIRS[@]}'"
-    {
-      [[ ${#MDIRS[@]} -gt 0 ]] && find "${MDIRS[@]}" -mindepth 1 -type f -ctime +30 -printf "Removed %P\n" -delete
-    } | sed -e 's/^/\t/'
-  }
-
   echo "a) Generate missing metafiles in local cache"
   {
     #but first check for directory missing a metafile ACLFILE and chmod to force a regeneration
@@ -489,7 +482,7 @@ backupACLS(){
 
     clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
 
-    [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+    (( ($RANDOM%2) == 0 )) && [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 4 - Backup ACLS\n"
       backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
     )

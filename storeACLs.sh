@@ -8,6 +8,13 @@ type cygpath >/dev/null 2>&1 || die Cannot found cygpath
 
 SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
 
+RSYNCOPTIONS=(
+  --groupmap=4294967295:$(id -u)
+  --usermap=4294967295:$(id -g)
+  --numeric-ids
+  --super
+)
+
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -55,7 +62,7 @@ getacl(){
 	[[ -d $PARENT ]] || mkdir -pv "$PARENT"
 
 	[[ -d $SRC ]] && {
-		rsync -idpogAt "${SRC%/}" "${DST%/*}" #update directory only
+		rsync -idpogAt "${RSYNCOPTIONS[@]}" "${SRC%/}" "${DST%/*}" #update directory only
 		DST="$DST/$DIRACL"
 	}
 	[[ -d $SRC ]] || cp --preserve=all --attributes-only -v "$SRC" "$DST"

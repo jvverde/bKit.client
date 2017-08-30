@@ -59,9 +59,9 @@ getacl(){
 	}
 	[[ -d $SRC ]] || cp --preserve=all --attributes-only "$SRC" "$DST"
 	DOSSRC="$(cygpath -w "${SRC%/*}")\\${SRC##*/}" #we need go this way because symbolic links
-	local DT=$(date -R -r "$SRC")
+	#local DT=$(date -R -r "$SRC")
 	"$SUBINACL" /noverbose /nostatistic /onlyfile "$DOSSRC" | iconv -f UTF-16LE -t UTF-8| grep -Pio '^/.+' > "$DST"
-	touch -d "$DT" "$DST"
+	#touch -d "$DT" "$DST"
 	#copy attributes, but only for files, not directories
 	# {
 	# 	echo "+FILE $(cygpath -w "$2")"

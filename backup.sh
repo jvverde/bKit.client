@@ -404,7 +404,7 @@ backupACLS(){
 
   echo "b) Update attributes and Clean metafiles on local cache"
   {
-    dorsync --ignore-non-existing --ignore-existing --delete --force "${LOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+    dorsync --ignore-non-existing --ignore-existing --delete --delete-excluded --force "${LOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
   echo "c) Backup metafiles from local cache to backup server"

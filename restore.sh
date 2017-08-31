@@ -111,6 +111,9 @@ do
     --dry-run)
       RSYNCOPTIONS+=('--dry-run')
     ;;
+    --no-owner)
+      OPTIONS+=( "--no-group" "--no-owner" )  
+    ;;
     --delete)
       OPTIONS+=( '--delete-delay' )
     ;;

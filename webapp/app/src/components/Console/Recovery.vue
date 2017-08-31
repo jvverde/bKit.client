@@ -151,6 +151,9 @@ export default {
       if (src && src !== dst) {
         cmd.push(`--link-dest=${src}`)
       }
+      if (!this.isSameComputer) {
+        cmd.push('--no-owner')
+      }
       cmd.push(this.resource.url)
 
       const fd = spawn(BASH, cmd, {cwd: '..'})

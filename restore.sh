@@ -33,6 +33,7 @@ OPTIONS=(
   --groupmap=4294967295:$(id -u)
   --usermap=4294967295:$(id -g)
   --numeric-ids
+  --super
 )
 
 #Don't try to chown or chgrp if not root or Administrator

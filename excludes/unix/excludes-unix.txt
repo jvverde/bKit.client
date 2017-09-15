@@ -8,8 +8,6 @@ tmp/*
 /home/*/.mozilla/firefox/*/Cache 
 /home/*/.cache/chromium 
 /home/*/.thumbnails 
-/media/* 
-/mnt/* 
 /proc/* 
 /sys/*
 /tmp/* 

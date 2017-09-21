@@ -5,6 +5,8 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 source "$SDIR/functions/all.sh"
 
+trap 'die "BACKUP: caught SIGINT"' INT
+
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 SNAP='@snap'
@@ -103,9 +105,9 @@ IFS="
 "
 exists cygpath && BASEDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${BASEDIR[@]}") )
 
-BASEDIR=( $(readlink -e "${BASEDIR[@]}") )
+BASEDIR=( $(readlink -e "${BASEDIR[@]}") ) || die "Error:  readlink -e '${BASEDIR[@]}'"
 
-ROOTS=( $(stat -c%m "${BASEDIR[@]}") )
+ROOTS=( $(stat -c%m "${BASEDIR[@]}") ) || die "Error: stat -c%m '${BASEDIR[@]}'"
 ROOT=${ROOTS[0]}
 
 [[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
@@ -151,10 +153,10 @@ exists rsync || die Cannot find rsync
 trap '' SIGPIPE
 
 dorsync2(){
-	local RETRIES=1000
+	local RETRIES=300
 	while true
 	do
-    rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    	rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -537,7 +539,14 @@ backupACLS(){
       }
     } | sendnotify "$SUBJECT" "$DEST" "$ME"
   )
+  [[ -s $ERRFILE ]] && {  
+	  echo -e "\n------------Errors found------------"
+	  cat "$ERRFILE"
+	  echo "------------End of Errors------------"
+	  die "Backup finished but some errors occurs"
+  }
   deltatime "$(date -R)" "$ITIME"
   echo "Backup done in $DELTATIME"
+  exit 0
 #) 9>"$LOCK"
 

@@ -5,7 +5,7 @@ exists() {
 }
 
 die() {
-    echo -e "$@">&2;
+    echo -e "Line ${BASH_LINENO[0]}: $@">&2;
     exit 1;
 }
 

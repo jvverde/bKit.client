@@ -10,6 +10,8 @@ usage() {
 	exit 1
 }
 
+trap 'die "BKIT: caught SIGINT;"' INT
+
 FILTERS=()
 
 excludes(){
@@ -72,5 +74,15 @@ done
 
 [[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 
-echo Start backup
-bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
+echo "bkit: Start backup"
+let CNT=16
+let SEC=60
+while ((CNT-- > 0))
+do
+	bash -m "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}" && break
+	let DELAY=(1 + RANDOM % $SEC)
+	echo "bkit:Wait $DELAY seconds before try again"
+	sleep $DELAY 
+	let SEC=2*SEC
+done
+echo "bKit: Done"

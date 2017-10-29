@@ -50,6 +50,13 @@ readUUIDby() {
 	done
 }
 
+readIDby() {
+	for U in $(ls /dev/disk/by-id)
+	do
+		[[ "$DEV" == "$(readlink -ne "/dev/disk/by-id/$U")" ]] && VOLUMESERIALNUMBER="${U//[^0-9A-Za-z_-]/_}" && return 
+	done
+}
+
 volume() {
 	exists lsblk && {
 		VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
@@ -62,11 +69,12 @@ volume() {
 	}
 	exists blkid  && {
 		true ${FILESYSTEM:=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')}
-		true ${VOLUMESERIALNUMBER:=$(blkid "$DEV" |sed -E 's#.*UUID="([^"]+)".*#\1#')}
+		true ${VOLUMESERIALNUMBER:=$(blkid "$DEV" |fgrep 'UUID=' | sed -E 's#.*UUID="([^"]+)".*#\1#')}
 	}	
 
 	[[ -n $DRIVETYPE ]] || readTypeBy
 	[[ -n $VOLUMESERIALNUMBER ]] || readUUIDby
+	[[ -n $VOLUMESERIALNUMBER ]] || readIDby
 	[[ -n $VOLUMENAME ]] || readNameBy
 
 	true ${DRIVETYPE:=_}

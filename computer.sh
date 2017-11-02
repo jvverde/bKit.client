@@ -8,10 +8,10 @@ exists wmic && {
 	NAME="$(wmic computersystem get name /format:textvaluelist.xsl |tr -d '\r'|sed -E '/^$/d;s/^\s+|\s+$//;s/\s+/_/g' | awk -F "=" 'tolower($1) ~  /name/ {print $2}')"
 	echo "${DOMAIN:-_}|${NAME:-_}|${UUID:-_}"
 } || {
-	UUID="$(dmidecode -s system-uuid 2>/dev/null)"
-	true ${UUID:=$(cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null)}
-	true ${UUID:=$(cat /var/lib/dbus/machine-id 2>/dev/null)}
-	true ${UUID:=0000-0000}
+	UUID="$(cat /var/lib/dbus/machine-id 2>/dev/null)"
+	true ${UUID:="$(cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null)"}
+	true ${UUID:="$(dmidecode -s system-uuid 2>/dev/null)"}
+	true ${UUID:="0000-0000"}
 	DOMAIN="$(hostname -d)"
 	true ${DOMAIN:=local}
 	NAME="$(hostname -s)"

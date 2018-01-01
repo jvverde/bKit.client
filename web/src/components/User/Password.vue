@@ -13,6 +13,13 @@
         @blur="$v.confirm.$touch"
         @keyup.enter="send"
       />
+      <q-btn v-model="submit" loader
+        rounded color="secondary"
+        :disabled="!ready" 
+        @click="send"
+      >
+        Set New Pass
+      </q-btn>
     </div>
   </div>
 </template>
@@ -21,36 +28,23 @@
 import axios from 'axios'
 import { required, sameAs, minLength } from 'vuelidate/lib/validators'
 import {
-  QField,
+  QBtn,
   QInput,
-  QList,
-  QListHeader,
-  QItem,
-  QItemMain,
-  QItemTile,
-  QItemSide,
-  QSideLink,
   Toast
 } from 'quasar'
 
 export default {
   name: 'form',
   components: {
-    QField,
+    QBtn,
     QInput,
-    QList,
-    QListHeader,
-    QItem,
-    QItemMain,
-    QItemTile,
-    QItemSide,
-    QSideLink,
     Toast
   },
   data () {
     return {
       pass: '',
-      confirm: ''
+      confirm: '',
+      submit: false
     }
   },
   validations: {

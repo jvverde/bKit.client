@@ -65,7 +65,10 @@ export default {
     send () {
       if (!this.ready) return
       this.submit = true
-      axios.post('/auth/xxxx', {newpass: this.pass})
+      axios.post('/auth/set_pass', {
+        password: this.pass,
+        confirm: this.confirm
+      })
         .then(response => {
           this.submit = false
           console.log('done')

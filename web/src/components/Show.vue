@@ -1,31 +1,17 @@
 <template>
-  <q-list highlight>
-    <q-list-header>{{ $route.query.msg }}</q-list-header>
-  </q-list>
+  <div class="absolute-center">
+    {{ $route.query.msg }}
+  </div>
 </template>
 
 <script>
 
 import {
-  QList,
-  QListHeader,
-  QItem,
-  QItemMain,
-  QItemTile,
-  QItemSide,
-  QSideLink
 } from 'quasar'
 
 export default {
   name: 'msg',
   components: {
-    QList,
-    QListHeader,
-    QItem,
-    QItemMain,
-    QItemTile,
-    QItemSide,
-    QSideLink
   },
   data () {
     return {

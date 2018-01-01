@@ -9,7 +9,7 @@ MOUNTED=()
 getdev(){
     DEV=$(bash "$SDIR/getdev.sh" "$1") || die "Device $1 not found"
     DEV=$(readlink -e "$DEV") || die "Device $1 doesn't exists"
-    MOUNT=$(df --output=target "$DEV"|tail -n 1)
+    MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')
     [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
         MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
             mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT

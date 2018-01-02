@@ -38,12 +38,12 @@ export default new VueRouter({
           component: load('Test')
         },
         {
-          path: 'sign_in',
+          path: 'login',
           component: load('User/Login')
         },
         {
-          path: 'sign_up',
-          component: load('User/Register')
+          path: 'signup',
+          component: load('User/Signup')
         },
         {
           path: 'reset_pass',

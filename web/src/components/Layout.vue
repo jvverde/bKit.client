@@ -19,14 +19,14 @@
       <div v-if="!logged">
         <q-btn
           flat
-          @click="$router.replace('/sign_in')"
+          @click="$router.replace('/login')"
         >
           Sign In
         </q-btn>
         <span> | </span>
         <q-btn
           flat
-          @click="$router.replace('/sign_up')"
+          @click="$router.replace('/signup')"
         >
           Sign Up
         </q-btn>
@@ -44,10 +44,10 @@
       <q-side-link item to="/users">
         <q-item-main label="Users" />
       </q-side-link>
-      <q-side-link item to="/sign_in">
-        <q-item-main label="Sign In" />
+      <q-side-link item to="/login">
+        <q-item-main label="Login" />
       </q-side-link>
-      <q-side-link item to="/sign_up">
+      <q-side-link item to="/signup">
         <q-item-main label="Sign Up" />
       </q-side-link>
     </div>

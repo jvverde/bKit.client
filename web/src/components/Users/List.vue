@@ -32,6 +32,7 @@
 <script>
 import axios from 'axios'
 import {
+  Toast,
   QDataTable,
   QBtn,
   QIcon,
@@ -49,6 +50,7 @@ import {
 export default {
   name: 'form',
   components: {
+    Toast,
     QDataTable,
     QBtn,
     QIcon,
@@ -121,7 +123,11 @@ export default {
           this.users = response.data
         })
         .catch(e => {
-          this.errors.push(e)
+          const msg = e.response.data.msg
+          Toast.create.negative({
+            html: msg,
+            timeout: 10000
+          })
         })
     },
     refresh (done) {

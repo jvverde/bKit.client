@@ -34,6 +34,7 @@
 <script>
 import axios from 'axios'
 import { required } from 'vuelidate/lib/validators'
+import { mapActions } from 'vuex'
 
 import {
   QInput,
@@ -77,10 +78,11 @@ export default {
     send () {
       if (!this.ready) return
       this.submit = true
-      axios.post('/auth/sign_in', this.form)
+      axios.post('/auth/login', this.form)
         .then(response => {
           this.submit = false
-          console.log('done')
+          console.log(response.data)
+          this.login(response.data)
           this.$router.replace({
             path: '/show',
             query: {msg: response.data.msg}
@@ -96,7 +98,8 @@ export default {
         .then(() => {
           this.submit = false
         })
-    }
+    },
+    ...mapActions('login', ['login'])
   },
   mounted () {
   }

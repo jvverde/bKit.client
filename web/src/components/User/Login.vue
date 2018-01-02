@@ -24,7 +24,7 @@
     </q-btn>
     <div class="text-center" style="margin:1em">Or</div>
     <q-btn rounded color="secondary"
-      @click="$router.push('/sign_up')"
+      @click="$router.push('/signup')"
     >
       Sign up
     </q-btn>  

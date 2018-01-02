@@ -28,6 +28,11 @@ import 'quasar-extras/material-icons'
 
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
+
+import interceptorsSetup from 'src/helpers/interceptors'
+
+interceptorsSetup()
+
 Quasar.start(() => {
   /* eslint-disable no-new */
   new Vue({

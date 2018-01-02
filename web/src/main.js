@@ -13,6 +13,7 @@ require(`quasar/dist/quasar.${__THEME}.css`)
 import Vue from 'vue'
 import Quasar from 'quasar'
 import router from './router'
+import store from 'src/store/store'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
@@ -27,12 +28,12 @@ import 'quasar-extras/material-icons'
 
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
-
 Quasar.start(() => {
   /* eslint-disable no-new */
   new Vue({
     el: '#q-app',
     router,
+    store,
     render: h => h(require('./App').default)
   })
 })

@@ -43,7 +43,7 @@ export default {
   methods: {
   },
   mounted () {
-    this.ws = new WebSocket('ws://localhost:9800')
+    /* this.ws = new WebSocket('ws://localhost:9800')
     this.ws.onerror = (err) => console.log(err)
     this.ws.onopen = (msg) => console.log('WS Open:', msg)
     this.ws.onmessage = (msg) => {
@@ -51,6 +51,7 @@ export default {
       this.messages.push(msg.data)
     }
     this.ws.onclose = (e) => console.log('WS Closed: ', e)
+    */
   },
   beforeDestroy () {
     this.ws = undefined

@@ -80,7 +80,7 @@ export default {
     send () {
       if (!this.ready) return
       this.submit = true
-      axios.post('/auth/sign_up', this.form)
+      axios.post('/auth/signup', this.form)
         .then(res => {
           console.log((res.data))
           this.$router.push({path: '/show', query: {msg: res.data.msg}})

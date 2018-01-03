@@ -24,7 +24,7 @@
     </q-btn>
     <div class="text-center" style="margin:1em">Or</div>
     <q-btn rounded color="secondary"
-      @click="$router.push('/signup')"
+      @click="$router.push({ name: 'signup' })"
     >
       Sign up
     </q-btn>  
@@ -80,16 +80,18 @@ export default {
       this.submit = true
       axios.post('/auth/login', this.form)
         .then(response => {
-          this.submit = false
-          console.log(response.data)
           this.login(response.data)
-          this.$router.replace({
+          this.$router.replace(this.$route.query.redirect || {
             path: '/show',
             query: {msg: response.data.msg}
           })
         })
         .catch(e => {
-          const msg = e.response.data.msg
+          let msg = e.toString()
+          if (e.response instanceof Object &&
+            e.response.data instanceof Object) {
+            msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
+          }
           Toast.create.negative({
             html: msg,
             timeout: 10000
@@ -99,7 +101,7 @@ export default {
           this.submit = false
         })
     },
-    ...mapActions('login', ['login'])
+    ...mapActions('auth', ['login'])
   },
   mounted () {
   }

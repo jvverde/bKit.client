@@ -13,20 +13,20 @@
       </q-btn>
 
       <q-toolbar-title>
-        bKit App {{token}}
+        bKit App
         <div slot="subtitle">Running on Quasar v{{$q.version}}</div>
       </q-toolbar-title>
       <div v-if="!logged">
         <q-btn
           flat
-          @click="$router.replace('/login')"
+          @click="$router.replace({ name: 'login' })"
         >
           Sign In
         </q-btn>
         <span> | </span>
         <q-btn
           flat
-          @click="$router.replace('/signup')"
+          @click="$router.replace({ name: 'signup' })"
         >
           Sign Up
         </q-btn>
@@ -43,12 +43,6 @@
       </q-side-link>
       <q-side-link item to="/users">
         <q-item-main label="Users" />
-      </q-side-link>
-      <q-side-link item to="/login">
-        <q-item-main label="Login" />
-      </q-side-link>
-      <q-side-link item to="/signup">
-        <q-item-main label="Sign Up" />
       </q-side-link>
     </div>
     <router-view class="relative-position"></router-view>
@@ -95,7 +89,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('login', [
+    ...mapGetters('auth', [
       'token',
       'logged',
       'session',
@@ -119,7 +113,7 @@ export default {
           })
         })
     },
-    ...mapActions('login', {
+    ...mapActions('auth', {
       logoff: 'logout'
     })
   },

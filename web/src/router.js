@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from 'store'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
 
 Vue.use(VueRouter)
 
@@ -8,7 +12,7 @@ function load (component) {
   return () => import(`@/${component}.vue`)
 }
 
-export default new VueRouter({
+let router = new VueRouter({
   /*
    * NOTE! VueRouter "history" mode DOESN'T works for Cordova builds,
    * it is only to be used only for websites.
@@ -31,7 +35,8 @@ export default new VueRouter({
       children: [
         {
           path: 'users',
-          component: load('Users/List')
+          component: load('Users/List'),
+          meta: { requiresAuth: true }
         },
         {
           path: 'test',
@@ -39,10 +44,12 @@ export default new VueRouter({
         },
         {
           path: 'login',
+          name: 'login',
           component: load('User/Login')
         },
         {
           path: 'signup',
+          name: 'signup',
           component: load('User/Signup')
         },
         {
@@ -63,3 +70,23 @@ export default new VueRouter({
     { path: '*', component: load('Error404') } // Not found
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    // if (!auth.loggedIn()) {
+    if (!store.getters['auth/logged']) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // make sure to always call next()!
+  }
+})
+
+export default router

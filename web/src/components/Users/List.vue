@@ -1,6 +1,6 @@
 <template>
   <q-data-table
-    :data="users"
+    :data="data"
     :config="config"
     :columns="columns"
     @refresh="refresh"
@@ -12,6 +12,14 @@
     <!-- Custom renderer for "source" column -->
     <template slot="col-email" slot-scope="cell">
       <span class="light-paragraph">{{cell.data}}</span>
+    </template>
+    <template slot="col-accessCnt" slot-scope="cell">
+      <span class="light-paragraph">{{cell.data}}</span>
+    </template>
+    <template slot="col-lastAccess" slot-scope="cell">
+      <span class="light-paragraph" v-if="cell.data">{{
+        getDate(cell.data) | moment("from")
+      }}</span>
     </template>
     <!-- Custom renderer for "action" column with button for custom action -->
     <template slot='col-confirmed' slot-scope='cell'>
@@ -97,10 +105,25 @@ export default {
         {
           label: 'Email',
           field: 'email',
-          width: '60%',
+          width: '45%',
           filter: true,
           sort: true,
           type: 'string'
+        },
+        {
+          label: 'Access Cnt',
+          field: 'accessCnt',
+          width: '15%',
+          filter: true,
+          sort: true,
+          type: 'number'
+        },
+        {
+          label: 'Last Access',
+          field: 'lastAccess',
+          width: '15%',
+          sort: true,
+          type: 'number'
         },
         {
           label: 'Confirmed',
@@ -113,8 +136,14 @@ export default {
     }
   },
   computed: {
+    data () {
+      return this.users.filter(user => !user.removed)
+    }
   },
   methods: {
+    getDate (value) {
+      return value ? new Date(1000 * value) : ''
+    },
     getusers () {
       axios.get('/auth/users')
         .then(response => {
@@ -135,8 +164,28 @@ export default {
       done()
     },
     deleteUsers (users) {
+      let remove = {}
       users.rows.forEach(r => {
-        console.log('Row:', r.data.username)
+        console.log('Row:', r)
+        console.log('User:', r.data.username)
+        remove[r.data.username] = r
+        //  this.table.splice(row.index, 1)
+        axios.delete(`/auth/user/${encodeURIComponent(r.data.username)}`)
+          .then(response => {
+            console.log(response)
+            this.$set(this.users[remove[response.data.user].index], 'removed', true)
+          })
+          .catch(e => {
+            let msg = e.toString()
+            if (e.response instanceof Object &&
+              e.response.data instanceof Object) {
+              msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
+            }
+            Toast.create.negative({
+              html: msg,
+              timeout: 10000
+            })
+          })
       })
     }
   },

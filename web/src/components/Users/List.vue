@@ -166,14 +166,13 @@ export default {
     deleteUsers (users) {
       let remove = {}
       users.rows.forEach(r => {
-        console.log('Row:', r)
-        console.log('User:', r.data.username)
         remove[r.data.username] = r
         //  this.table.splice(row.index, 1)
         axios.delete(`/auth/user/${encodeURIComponent(r.data.username)}`)
           .then(response => {
-            console.log(response)
-            this.$set(this.users[remove[response.data.user].index], 'removed', true)
+            this.$set(
+              this.users[remove[response.data.user].index], 'removed', true
+            )
           })
           .catch(e => {
             let msg = e.toString()

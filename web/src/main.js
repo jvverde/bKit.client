@@ -33,6 +33,19 @@ import interceptorsSetup from 'src/helpers/interceptors'
 
 interceptorsSetup()
 
+import VueMoment from 'vue-moment'
+import moment from 'moment-timezone'
+
+moment.locale('en')
+moment.relativeTimeThreshold('m', 119)
+moment.relativeTimeThreshold('h', 47)
+moment.relativeTimeThreshold('d', 59)
+moment.relativeTimeThreshold('M', 23)
+
+Vue.use(VueMoment, {
+  moment
+})
+
 Quasar.start(() => {
   /* eslint-disable no-new */
   new Vue({

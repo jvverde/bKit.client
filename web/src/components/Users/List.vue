@@ -27,7 +27,7 @@
     </template>
     <!-- Custom renderer when user selected one or more rows -->
     <template slot="selection" slot-scope="selection">
-      <q-btn color="primary" @click="changeMessage(selection)">
+      <q-btn color="primary" @click="editUser(selection)">
         <q-icon name="edit" />
       </q-btn>
       <q-btn color="primary" @click="deleteUsers(selection)">
@@ -147,8 +147,6 @@ export default {
     getusers () {
       axios.get('/auth/users')
         .then(response => {
-          // JSON responses are automatically parsed.
-          console.log('Users:', response.data)
           this.users = response.data
         })
         .catch(e => {
@@ -163,9 +161,9 @@ export default {
       this.getusers()
       done()
     },
-    deleteUsers (users) {
+    deleteUsers (sel) {
       let remove = {}
-      users.rows.forEach(r => {
+      sel.rows.forEach(r => {
         remove[r.data.username] = r
         //  this.table.splice(row.index, 1)
         axios.delete(`/auth/user/${encodeURIComponent(r.data.username)}`)
@@ -186,13 +184,37 @@ export default {
             })
           })
       })
+    },
+    editUser (sel) {
+      console.log(sel)
+      sel.rows.forEach(r => {
+        this.$router.push({
+          name: 'userview',
+          params: {username: r.data.username}
+        })
+        /* axios.get(`/auth/user/${encodeURIComponent(r.data.username)}`)
+          .then(response => {
+            console.log(response.data)
+          })
+          .catch(e => {
+            let msg = e.toString()
+            if (e.response instanceof Object &&
+              e.response.data instanceof Object) {
+              msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
+            }
+            Toast.create.negative({
+              html: msg,
+              timeout: 10000
+            })
+          })
+        */
+      })
     }
   },
   mounted () {
     this.getusers()
   },
   beforeDestroy () {
-    this.ws = undefined
   }
 }
 </script>

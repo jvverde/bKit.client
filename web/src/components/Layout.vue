@@ -118,7 +118,6 @@ export default {
     })
   },
   mounted () {
-    console.log('Session: ', this.session)
   },
   beforeDestroy () {
   }

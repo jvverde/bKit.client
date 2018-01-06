@@ -45,24 +45,36 @@ let router = new VueRouter({
         {
           path: 'login',
           name: 'login',
-          component: load('User/Login')
+          component: load('Auth/Login')
         },
         {
           path: 'signup',
           name: 'signup',
-          component: load('User/Signup')
+          component: load('Auth/Signup')
         },
         {
           path: 'reset_pass',
-          component: load('User/Reset')
+          component: load('Auth/Reset')
         },
         {
           path: 'new_pass',
-          component: load('User/Password')
+          component: load('Auth/Password')
         },
         {
           path: 'show',
           component: load('Show')
+        },
+        {
+          path: 'user',
+          component: load('User/Layout'),
+          children: [
+            {
+              path: 'view/:username',
+              name: 'userview',
+              props: true,
+              component: load('User/View')
+            }
+          ]
         }
       ]
     },

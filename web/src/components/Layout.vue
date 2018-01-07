@@ -52,9 +52,9 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import axios from 'axios'
+import {myMixin} from 'src/mixins'
 
 import {
-  Toast,
   QLayout,
   QToolbar,
   QToolbarTitle,
@@ -71,7 +71,6 @@ import {
 export default {
   name: 'layout',
   components: {
-    Toast,
     QLayout,
     QToolbar,
     QToolbarTitle,
@@ -96,6 +95,7 @@ export default {
       'user'
     ])
   },
+  mixins: [myMixin],
   methods: {
     logout () {
       axios.get('/auth/logout')
@@ -106,12 +106,7 @@ export default {
             query: {msg: response.data.msg}
           })
         })
-        .catch(e => {
-          Toast.create.negative({
-            html: e.response.data.msg,
-            timeout: 10000
-          })
-        })
+        .catch(this.catch)
     },
     ...mapActions('auth', {
       logoff: 'logout'

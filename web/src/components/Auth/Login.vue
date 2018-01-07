@@ -34,17 +34,16 @@
 <script>
 import axios from 'axios'
 import { required } from 'vuelidate/lib/validators'
-import { mapActions } from 'vuex'
+import {myMixin} from 'src/mixins'
 
 import {
   QInput,
   QField,
-  QBtn,
-  Toast
+  QBtn
 } from 'quasar'
 
 export default {
-  name: 'test',
+  name: 'Login',
   components: {
     QInput,
     QField,
@@ -69,6 +68,7 @@ export default {
       }
     }
   },
+  mixins: [myMixin],
   computed: {
     ready () {
       return !this.$v.form.$error && this.form.username && this.form.password
@@ -80,28 +80,19 @@ export default {
       this.submit = true
       axios.post('/auth/login', this.form)
         .then(response => {
-          this.login(response.data)
-          this.$router.replace(this.$route.query.redirect || {
-            path: '/show',
-            query: {msg: response.data.msg}
-          })
-        })
-        .catch(e => {
-          let msg = e.toString()
-          if (e.response instanceof Object &&
-            e.response.data instanceof Object) {
-            msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
+          if (this.$route.query.back) this.$router.go(-1)
+          else {
+            this.$router.replace(this.$route.query.redirect || {
+              path: '/show',
+              query: {msg: response.data.login.msg}
+            })
           }
-          Toast.create.negative({
-            html: msg,
-            timeout: 10000
-          })
         })
+        .catch(this.catch)
         .then(() => {
           this.submit = false
         })
-    },
-    ...mapActions('auth', ['login'])
+    }
   },
   mounted () {
   }

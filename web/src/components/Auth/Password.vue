@@ -29,16 +29,15 @@ import axios from 'axios'
 import { required, sameAs, minLength } from 'vuelidate/lib/validators'
 import {
   QBtn,
-  QInput,
-  Toast
+  QInput
 } from 'quasar'
+import {myMixin} from 'src/mixins'
 
 export default {
   name: 'form',
   components: {
     QBtn,
-    QInput,
-    Toast
+    QInput
   },
   data () {
     return {
@@ -61,6 +60,7 @@ export default {
       return !this.$v.pass.$error && !this.$v.confirm.$error && this.pass
     }
   },
+  mixins: [myMixin],
   methods: {
     send () {
       if (!this.ready) return
@@ -77,13 +77,7 @@ export default {
             query: {msg: response.data.msg}
           })
         })
-        .catch(e => {
-          const msg = e.response.data.msg
-          Toast.create.negative({
-            html: msg,
-            timeout: 10000
-          })
-        })
+        .catch(this.catch)
         .then(() => {
           this.submit = false
         })

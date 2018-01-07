@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from 'store'
+import store from 'src/store'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
@@ -66,6 +66,7 @@ let router = new VueRouter({
         },
         {
           path: 'user',
+          meta: { requiresAuth: true },
           component: load('User/Layout'),
           children: [
             {

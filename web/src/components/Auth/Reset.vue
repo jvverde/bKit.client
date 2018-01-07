@@ -21,12 +21,12 @@
 <script>
 import axios from 'axios'
 import { required } from 'vuelidate/lib/validators'
+import {myMixin} from 'src/mixins'
 
 import {
   QInput,
   QField,
-  QBtn,
-  Toast
+  QBtn
 } from 'quasar'
 
 export default {
@@ -52,6 +52,7 @@ export default {
       return !this.$v.$error && this.username
     }
   },
+  mixins: [myMixin],
   methods: {
     send () {
       if (!this.ready) return
@@ -65,13 +66,7 @@ export default {
             query: {msg: response.data.msg}
           })
         })
-        .catch(e => {
-          const msg = e.response.data.msg
-          Toast.create.negative({
-            html: msg,
-            timeout: 10000
-          })
-        })
+        .catch(this.catch)
         .then(() => {
           this.submit = false
         })

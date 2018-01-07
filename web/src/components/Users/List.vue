@@ -39,6 +39,8 @@
 
 <script>
 import axios from 'axios'
+import {myMixin} from 'src/mixins'
+
 import {
   Toast,
   QDataTable,
@@ -58,7 +60,6 @@ import {
 export default {
   name: 'form',
   components: {
-    Toast,
     QDataTable,
     QBtn,
     QIcon,
@@ -140,6 +141,7 @@ export default {
       return this.users.filter(user => !user.removed)
     }
   },
+  mixins: [myMixin],
   methods: {
     getDate (value) {
       return value ? new Date(1000 * value) : ''
@@ -149,13 +151,7 @@ export default {
         .then(response => {
           this.users = response.data
         })
-        .catch(e => {
-          const msg = e.response.data.msg
-          Toast.create.negative({
-            html: msg,
-            timeout: 10000
-          })
-        })
+        .catch(this.catch)
     },
     refresh (done) {
       this.getusers()
@@ -192,22 +188,6 @@ export default {
           name: 'userview',
           params: {username: r.data.username}
         })
-        /* axios.get(`/auth/user/${encodeURIComponent(r.data.username)}`)
-          .then(response => {
-            console.log(response.data)
-          })
-          .catch(e => {
-            let msg = e.toString()
-            if (e.response instanceof Object &&
-              e.response.data instanceof Object) {
-              msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
-            }
-            Toast.create.negative({
-              html: msg,
-              timeout: 10000
-            })
-          })
-        */
       })
     }
   },

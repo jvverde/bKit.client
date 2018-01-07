@@ -1,9 +1,4 @@
 <template>
-  <router-view />
+  <router-view class="column absolute-center"/>
 </template>
 
-<script>
-  export default {}
-</script>
-
-<style></style>

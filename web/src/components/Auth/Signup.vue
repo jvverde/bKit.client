@@ -34,9 +34,9 @@ import { required, minLength, email } from 'vuelidate/lib/validators'
 import {
   QInput,
   QField,
-  QBtn,
-  Toast
+  QBtn
 } from 'quasar'
+import {myMixin} from 'src/mixins'
 
 export default {
   name: 'register',
@@ -76,6 +76,7 @@ export default {
       return !this.$v.form.$error && this.form.username && this.form.email && this.form.password
     }
   },
+  mixins: [myMixin],
   methods: {
     send () {
       if (!this.ready) return
@@ -85,13 +86,7 @@ export default {
           console.log((res.data))
           this.$router.push({path: '/show', query: {msg: res.data.msg}})
         })
-        .catch(e => {
-          const msg = e.response.data.msg
-          Toast.create.negative({
-            html: msg,
-            timeout: 10000
-          })
-        })
+        .catch(this.catch)
         .then(() => {
           this.submit = false
         })

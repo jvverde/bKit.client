@@ -57,7 +57,8 @@ let router = new VueRouter({
           component: load('Auth/Reset')
         },
         {
-          path: 'new_pass',
+          path: 'new_pass/:username',
+          props: true,
           component: load('Auth/Password')
         },
         {

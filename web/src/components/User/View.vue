@@ -24,7 +24,7 @@
       </q-list>
     </q-card-main>
     <q-card-actions>
-      <q-btn flat icon="autorenew" color="orange">Reset Password</q-btn>
+      <q-btn flat icon="autorenew" color="orange" @click="reset_pass">Reset Password</q-btn>
       <q-btn flat icon="delete forever" color="red">Remove</q-btn>
     </q-card-actions>
     <q-card-main>
@@ -203,8 +203,10 @@ export default {
         this.user = {}
       })
     },
-    email (evt) {
-      console.log(evt)
+    reset_pass () {
+      return axios.get(
+        `/auth/reset_pass/${encodeURIComponent(this.username)}`
+      ).then(this.done).catch(this.catch)
     }
   },
   mounted () {

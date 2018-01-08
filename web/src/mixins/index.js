@@ -2,6 +2,13 @@ import { Toast } from 'quasar'
 
 export const myMixin = {
   methods: {
+    done (response) {
+      let msg = response.data.msg || 'done'
+      Toast.create.positive({
+        html: msg,
+        timeout: 3000
+      })
+    },
     catch (e) {
       let msg = e.toString()
       if (e.response instanceof Object &&

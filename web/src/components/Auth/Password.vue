@@ -1,7 +1,8 @@
 <template>
   <div class="column absolute-center">
     <div class="layout-padding column">
-      <h5>Choose a new password</h5>
+      <big class="text-center">Choose a new password</big>
+      <small class="text-center">User: {{username}}</small>
       <q-input type="password" max-length="16" v-model="pass" autofocus
         float-label="New Password"
         :error="$v.pass.$error"
@@ -55,6 +56,7 @@ export default {
       sameAsPassword: sameAs('pass')
     }
   },
+  props: ['username'],
   computed: {
     ready () {
       return !this.$v.pass.$error && !this.$v.confirm.$error && this.pass

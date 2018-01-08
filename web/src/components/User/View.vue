@@ -13,75 +13,86 @@
             <q-item-tile color="info" icon="mail outline"/>
           </q-item-side>
           <q-item-main>
-            <q-item-tile label>Email</q-item-tile>
-            <q-item-tile sublabel>{{user.email}}</q-item-tile>
+            <q-input type="text" max-length="16"
+              v-model="user.email"  float-label="Email"
+              :error="$v.user.email.$error"
+              @blur="$v.user.email.$touch"
+              @keyup.enter="send"
+            />
           </q-item-main>
         </q-item>
-        <q-item>
-          <table class="q-table" responsive>
-            <thead>
-              <tr>
-                <th class="text-center">Operation</th>
-                <th class="text-center">Count</th>
-                <th class="text-center">First</th>
-                <th class="text-center">Last</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="text-right" data-th="Operation">Acesss</td>
-                <td class="text-center" data-th="Count">{{accessCnt}}</td>
-                <td class="text-center" data-th="First">
-                  <span v-if="firstTimeAccess">
-                    {{firstTimeAccess| moment("ddd DD-MM-Y, HH:mm:ss")}}
-                  </span>
-                </td>
-                <td class="text-center" data-th="Last">
-                  <span v-if="lastTimeAccess">
-                    {{lastTimeAccess | moment('from')}}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-right" data-th="Operation">Login</td>
-                <td class="text-center" data-th="Count">{{loginCnt}}</td>
-                <td class="text-center" data-th="First">
-                  <span v-if="firstTimeLogin">
-                    {{firstTimeLogin| moment("ddd DD-MM-Y, HH:mm:ss")}}
-                  </span>
-                </td>
-                <td class="text-center" data-th="Last">
-                  <span v-if="lastTimeLogin">
-                    {{lastTimeLogin | moment('from')}}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-right" data-th="Operation">Logout</td>
-                <td class="text-center" data-th="Count">{{logoutCnt}}</td>
-                <td class="text-center" data-th="First">
-                  <span v-if="firstTimeLogout">
-                    {{firstTimeLogout | moment("ddd DD-MM-Y, HH:mm:ss")}}
-                  </span>
-                </td>
-                <td class="text-center" data-th="Last">
-                  <span v-if="lastTimeLogout">
-                    {{lastTimeLogout | moment('from')}}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </q-item>
       </q-list>
+    </q-card-main>
+    <q-card-actions>
+      <q-btn flat icon="autorenew" color="orange">Reset Password</q-btn>
+      <q-btn flat icon="delete forever" color="red">Remove</q-btn>
+    </q-card-actions>
+    <q-card-main>
+      <table class="q-table" responsive>
+        <thead>
+          <tr>
+            <th class="text-center">Operation</th>
+            <th class="text-center">Count</th>
+            <th class="text-center">First</th>
+            <th class="text-center">Last</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="access">
+            <td class="text-right" data-th="Operation">Access</td>
+            <td class="text-center" data-th="Count">{{accessCnt}}</td>
+            <td class="text-center" data-th="First">
+              <span v-if="firstTimeAccess">
+                {{firstTimeAccess| moment("ddd DD-MM-Y, HH:mm:ss")}}
+              </span>
+            </td>
+            <td class="text-center" data-th="Last">
+              <span v-if="lastTimeAccess">
+                {{lastTimeAccess | moment('from')}}
+              </span>
+            </td>
+          </tr>
+          <tr v-if="login">
+            <td class="text-right" data-th="Operation">Login</td>
+            <td class="text-center" data-th="Count">{{loginCnt}}</td>
+            <td class="text-center" data-th="First">
+              <span v-if="firstTimeLogin">
+                {{firstTimeLogin| moment("ddd DD-MM-Y, HH:mm:ss")}}
+              </span>
+            </td>
+            <td class="text-center" data-th="Last">
+              <span v-if="lastTimeLogin">
+                {{lastTimeLogin | moment('from')}}
+              </span>
+            </td>
+          </tr>
+          <tr v-if="logout">
+            <td class="text-right" data-th="Operation">Logout</td>
+            <td class="text-center" data-th="Count">{{logoutCnt}}</td>
+            <td class="text-center" data-th="First">
+              <span v-if="firstTimeLogout">
+                {{firstTimeLogout | moment("ddd DD-MM-Y, HH:mm:ss")}}
+              </span>
+            </td>
+            <td class="text-center" data-th="Last">
+              <span v-if="lastTimeLogout">
+                {{lastTimeLogout | moment('from')}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </q-card-main>
   </q-card>
 </template>
 
 <script>
 import axios from 'axios'
-import { required, minLength, email } from 'vuelidate/lib/validators'
+import { required, email } from 'vuelidate/lib/validators'
 import {
+  QInput,
+  QBtn,
+  QCardActions,
   QIcon,
   QCard,
   QCardTitle,
@@ -98,6 +109,9 @@ import {myMixin} from 'src/mixins'
 export default {
   name: 'register',
   components: {
+    QInput,
+    QCardActions,
+    QBtn,
     QIcon,
     QCard,
     QCardTitle,
@@ -116,18 +130,10 @@ export default {
     }
   },
   validations: {
-    form: {
-      username: {
-        required,
-        minLength: minLength(4)
-      },
+    user: {
       email: {
         required,
         email
-      },
-      password: {
-        required,
-        minLength: minLength(6)
       }
     }
   },
@@ -142,7 +148,7 @@ export default {
       return this.access.cnt
     },
     lastTimeAccess () {
-      if (this.access.firstTime) {
+      if (this.access.lastTime) {
         return new Date(1000 * this.access.lastTime)
       } else return null
     },
@@ -196,6 +202,9 @@ export default {
         this.catch(e)
         this.user = {}
       })
+    },
+    email (evt) {
+      console.log(evt)
     }
   },
   mounted () {

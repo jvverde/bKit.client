@@ -13,19 +13,33 @@
             <q-item-tile color="info" icon="mail outline"/>
           </q-item-side>
           <q-item-main>
-            <q-input type="text" max-length="16"
+            <q-input type="text" max-length="256"
               v-model="user.email"  float-label="Email"
               :error="$v.user.email.$error"
               @blur="$v.user.email.$touch"
-              @keyup.enter="send"
+              @keyup.enter="set_email"
             />
           </q-item-main>
         </q-item>
       </q-list>
     </q-card-main>
     <q-card-actions>
-      <q-btn flat icon="autorenew" color="orange" @click="reset_pass">Reset Password</q-btn>
-      <q-btn flat icon="delete forever" color="red">Remove</q-btn>
+      <q-btn flat icon="autorenew" color="orange" @click="reset_pass">
+        Reset Password
+      </q-btn>
+      <q-btn flat icon="delete forever" color="negative">
+        Remove
+      </q-btn>
+      <q-btn flat icon="block" color="deep-orange" 
+        v-if="!user.state.block"
+        @click="block_user('set')">
+        Block
+      </q-btn>
+      <q-btn flat icon="lock open" color="positive" 
+        v-else
+        @click="block_user('reset')">
+        Unblock
+      </q-btn>
     </q-card-actions>
     <q-card-main>
       <table class="q-table" responsive>
@@ -139,7 +153,7 @@ export default {
   },
   computed: {
     ready () {
-      return !this.$v.form.$error && this.form.username && this.form.email && this.form.password
+      return !this.$v.user.$error && this.user.username && this.user.email
     },
     access () {
       return (this.user || {}).access || {}
@@ -207,6 +221,24 @@ export default {
       return axios.get(
         `/auth/reset_pass/${encodeURIComponent(this.username)}`
       ).then(this.done).catch(this.catch)
+    },
+    set_email () {
+      return axios.post(
+        '/auth/set_email', {
+          email: this.user.email,
+          username: this.username
+        }
+      ).then(response => {
+        console.log(response.data)
+      })
+    },
+    block_user (action) {
+      return axios.post(
+        `/auth/${action}/block`, [this.username]
+      ).then(response => {
+        console.log(response.data)
+        this.getUser(this.username)
+      })  
     }
   },
   mounted () {

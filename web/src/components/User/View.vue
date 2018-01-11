@@ -31,14 +31,14 @@
         Remove
       </q-btn>
       <q-btn flat icon="lock open" color="positive" 
-        v-if="blocked"
-        @click="block_user('reset')">
-        Unblock
+        v-if="disabled"
+        @click="enable('set')">
+        Enable
       </q-btn>
       <q-btn flat icon="block" color="deep-orange" 
         v-else
-        @click="block_user('set')">
-        Block
+        @click="enable('reset')">
+        disable
       </q-btn>
     </q-card-actions>
     <q-card-main>
@@ -203,8 +203,8 @@ export default {
         return new Date(1000 * this.logout.firstTime)
       } else return null
     },
-    blocked () {
-      return this.user.state instanceof Object && this.user.state.block
+    disabled () {
+      return !(this.user.state instanceof Object && this.user.state.enable)
     }
   },
   mixins: [myMixin],
@@ -235,9 +235,9 @@ export default {
         console.log(response.data)
       })
     },
-    block_user (action) {
+    enable (action) {
       return axios.post(
-        `/auth/${action}/block`, [this.username]
+        `/auth/${action}/enable`, [this.username]
       ).then(response => {
         console.log(response.data)
         this.getUser(this.username)

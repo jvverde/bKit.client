@@ -5,11 +5,9 @@
     :columns="columns"
     @refresh="refresh"
   >
-    <!-- Custom renderer for "message" column -->
     <template slot="col-username" slot-scope="cell">
       <span class="light-paragraph">{{cell.data}}</span>
     </template>
-    <!-- Custom renderer for "source" column -->
     <template slot="col-email" slot-scope="cell">
       <span class="light-paragraph">{{cell.data}}</span>
     </template>
@@ -17,15 +15,16 @@
       <span class="light-paragraph">{{cell.data}}</span>
     </template>
     <template slot="col-lastAccess" slot-scope="cell">
-      <span class="light-paragraph" v-if="cell.data">{{
-        getDate(cell.data) | moment("from")
-      }}</span>
+      <span class="light-paragraph" v-if="cell.data !== null">
+        {{ cell.data | moment("from") }}
+      </span>
     </template>
-    <!-- Custom renderer for "action" column with button for custom action -->
-    <template slot='col-confirmed' slot-scope='cell'>
+    <template slot='col-status' slot-scope='cell'>
       <span class="light-paragraph">{{cell.data}}</span>
     </template>
-    <!-- Custom renderer when user selected one or more rows -->
+    <template slot='col-groups' slot-scope='cell'>
+      <span class="light-paragraph">{{cell.data}}</span>
+    </template>
     <template slot="selection" slot-scope="selection">
       <q-btn color="primary" @click="editUser(selection)">
         <q-icon name="edit" />
@@ -35,6 +34,7 @@
       </q-btn>
     </template>
   </q-data-table>
+
 </template>
 
 <script>
@@ -42,6 +42,9 @@ import axios from 'axios'
 import {myMixin} from 'src/mixins'
 
 import {
+  QCard,
+  QCardActions,
+  QCardMain,
   Toast,
   QDataTable,
   QBtn,
@@ -60,6 +63,9 @@ import {
 export default {
   name: 'form',
   components: {
+    QCard,
+    QCardActions,
+    QCardMain,
     QDataTable,
     QBtn,
     QIcon,
@@ -124,21 +130,35 @@ export default {
           field: 'lastAccess',
           width: '15%',
           sort: true,
-          type: 'number'
+          type: 'date'
         },
         {
-          label: 'Confirmed',
-          field: 'confirmed',
+          label: 'Status',
+          field: 'state',
           width: '10%',
-          sort: true,
-          type: 'number'
+          sort: false,
+          format: state => Object.keys(state)
+            .map(e => `<i>${e}</i>`).join(', ')
+        },
+        {
+          label: 'Groups',
+          field: 'groups',
+          width: '10%',
+          sort: false,
+          type: 'string',
+          format: (groups = []) => groups.join(', ')
         }
       ]
     }
   },
   computed: {
     data () {
-      return this.users.filter(user => !user.removed)
+      return this.users.filter(user => !user.removed).map(user => {
+        user.access = user.access || {}
+        user.accessCnt = user.access.cnt
+        user.lastAccess = new Date(1000 * user.access.lastTime)
+        return user
+      })
     }
   },
   mixins: [myMixin],
@@ -150,6 +170,7 @@ export default {
       axios.get('/auth/users')
         .then(response => {
           this.users = response.data
+          console.log(this.users)
         })
         .catch(this.catch)
     },

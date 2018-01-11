@@ -80,13 +80,10 @@ export default {
       this.submit = true
       axios.post('/auth/login', this.form)
         .then(response => {
-          if (this.$route.query.back) this.$router.go(-1)
-          else {
-            this.$router.replace(this.$route.query.redirect || {
-              path: '/show',
-              query: {msg: response.data.login.msg}
-            })
-          }
+          this.$router.replace(this.$route.query.redirect || {
+            path: '/show',
+            query: {msg: response.data.login.msg}
+          })
         })
         .catch(this.catch)
         .then(() => {

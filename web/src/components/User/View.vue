@@ -30,15 +30,15 @@
       <q-btn flat icon="delete forever" color="negative">
         Remove
       </q-btn>
-      <q-btn flat icon="block" color="deep-orange" 
-        v-if="!user.state.block"
-        @click="block_user('set')">
-        Block
-      </q-btn>
       <q-btn flat icon="lock open" color="positive" 
-        v-else
+        v-if="blocked"
         @click="block_user('reset')">
         Unblock
+      </q-btn>
+      <q-btn flat icon="block" color="deep-orange" 
+        v-else
+        @click="block_user('set')">
+        Block
       </q-btn>
     </q-card-actions>
     <q-card-main>
@@ -202,6 +202,9 @@ export default {
       if (this.logout.firstTime) {
         return new Date(1000 * this.logout.firstTime)
       } else return null
+    },
+    blocked () {
+      return this.user.state instanceof Object && this.user.state.block
     }
   },
   mixins: [myMixin],
@@ -238,7 +241,7 @@ export default {
       ).then(response => {
         console.log(response.data)
         this.getUser(this.username)
-      })  
+      })
     }
   },
   mounted () {

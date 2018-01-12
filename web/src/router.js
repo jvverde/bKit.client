@@ -39,6 +39,11 @@ let router = new VueRouter({
           meta: { requiresAuth: true }
         },
         {
+          path: 'groups',
+          component: load('Groups/List'),
+          meta: { requiresAuth: true }
+        },
+        {
           path: 'test',
           component: load('Test')
         },

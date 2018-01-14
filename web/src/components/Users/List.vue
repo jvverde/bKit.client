@@ -23,7 +23,9 @@
       <span class="light-paragraph">{{cell.data}}</span>
     </template>
     <template slot='col-groups' slot-scope='cell'>
-      <span class="light-paragraph">{{cell.data}}</span>
+      <span class="light-paragraph">{{
+        (cell.data || []).join(', ')
+      }}</span>
     </template>
     <template slot="selection" slot-scope="selection">
       <q-btn color="primary" @click="editUser(selection)">
@@ -42,6 +44,7 @@ import axios from 'axios'
 import {myMixin} from 'src/mixins'
 
 import {
+  QChipsInput,
   QCard,
   QCardActions,
   QCardMain,
@@ -63,6 +66,7 @@ import {
 export default {
   name: 'form',
   components: {
+    QChipsInput,
     QCard,
     QCardActions,
     QCardMain,
@@ -104,7 +108,7 @@ export default {
         {
           label: 'Username',
           field: 'username',
-          width: '30%',
+          width: '20%',
           filter: true,
           sort: true,
           type: 'string'
@@ -112,7 +116,7 @@ export default {
         {
           label: 'Email',
           field: 'email',
-          width: '45%',
+          width: '30%',
           filter: true,
           sort: true,
           type: 'string'
@@ -120,7 +124,7 @@ export default {
         {
           label: 'Access Cnt',
           field: 'accessCnt',
-          width: '15%',
+          width: '10%',
           filter: true,
           sort: true,
           type: 'number'
@@ -128,7 +132,7 @@ export default {
         {
           label: 'Last Access',
           field: 'lastAccess',
-          width: '15%',
+          width: '10%',
           sort: true,
           type: 'date'
         },
@@ -143,10 +147,9 @@ export default {
         {
           label: 'Groups',
           field: 'groups',
-          width: '10%',
+          width: '20%',
           sort: false,
-          type: 'string',
-          format: (groups = []) => groups.join(', ')
+          format: (groups = ['a', 'b']) => groups.join(' + ')
         }
       ]
     }

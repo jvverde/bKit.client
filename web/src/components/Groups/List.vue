@@ -1,18 +1,26 @@
 <template>
   <q-list class="absolute-center" dense no-border>
     <q-list-header class="text-center">Groups</q-list-header>
-    <q-item 
+    <q-item
+      link
       v-for="(group, index) in groups"  
       :key="group.name"
     >
       <q-item-main :label="group.name">
         <q-chips-input 
+          style="padding-left:.5em"
           v-model="group.users"
           :placeholder="group.users.length ? '': 'Type a valid username'"
-          color="info"
+          color="blue-grey-5"
           @change="change(index)"
         />
       </q-item-main>
+      <q-item-side 
+        right 
+        icon="delete forever" 
+        color="negative" 
+        @click="remove(index)"
+      />
     </q-item>
     <q-item-separator/>
     <q-item>
@@ -101,38 +109,38 @@ export default {
           'Cancel',
           {
             label: 'Ok',
-            handler: data => this.groups.push({
-              name: data.name,
-              users: []
-            })
+            handler: data => {
+              axios.put(`/auth/group/${data.name}`, [])
+                .then(response => {
+                  if (response.data instanceof Array) {
+                    this.groups.push({
+                      name: data.name,
+                      users: response.data
+                    })
+                  }
+                }).catch(this.catch)
+            }
           }
         ]
       })
     },
-    search (value, done) {
-      console.log('done:', value)
-      done(['aqui', 'ali'])
+    remove (index) {
+      let group = this.groups[ index ]
+      axios.delete(`/auth/group/${group.name}`)
+        .then(response => {
+          if (response.data instanceof Array) {
+            this.groups = response.data
+          }
+        }).catch(this.catch)
     },
     change (index) {
       let group = this.groups[ index ]
-      let username = group.users[ group.users.length - 1 ]
-      console.log(group.name)
-      axios.get(`/auth/check/${username}`)
+      axios.put(`/auth/group/${group.name}`, group.users)
         .then(response => {
-          let user = response.data
-          console.log(user)
-          if (!user.exists) {
-            group.users = group.users.filter(u => user.username !== u)
-          } else {
-            axios.put(`/auth/group/${group.name}`, group.users)
-              .then(response => {
-                if (response.data instanceof Array) {
-                  group.users = response.data
-                }
-              }).catch(this.catch)
+          if (response.data instanceof Array) {
+            group.users = response.data
           }
-        })
-        .catch(this.catch)
+        }).catch(this.catch)
     }
   },
   mounted () {

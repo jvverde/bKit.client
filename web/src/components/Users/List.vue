@@ -1,41 +1,44 @@
 <template>
-  <q-data-table
-    :data="data"
-    :config="config"
-    :columns="columns"
-    @refresh="refresh"
-  >
-    <template slot="col-username" slot-scope="cell">
-      <span class="light-paragraph">{{cell.data}}</span>
-    </template>
-    <template slot="col-email" slot-scope="cell">
-      <span class="light-paragraph">{{cell.data}}</span>
-    </template>
-    <template slot="col-accessCnt" slot-scope="cell">
-      <span class="light-paragraph">{{cell.data}}</span>
-    </template>
-    <template slot="col-lastAccess" slot-scope="cell">
-      <span class="light-paragraph" v-if="cell.data !== null">
-        {{ cell.data | moment("from") }}
-      </span>
-    </template>
-    <template slot='col-status' slot-scope='cell'>
-      <span class="light-paragraph">{{cell.data}}</span>
-    </template>
-    <template slot='col-groups' slot-scope='cell'>
-      <span class="light-paragraph">{{
-        (cell.data || []).join(', ')
-      }}</span>
-    </template>
-    <template slot="selection" slot-scope="selection">
-      <q-btn color="primary" @click="editUser(selection)">
-        <q-icon name="edit" />
-      </q-btn>
-      <q-btn color="primary" @click="deleteUsers(selection)">
-        <q-icon name="delete" />
-      </q-btn>
-    </template>
-  </q-data-table>
+  <q-list class="absolute-center full-width" dense no-border>
+    <q-list-header class="text-center">Users</q-list-header>
+    <q-item class="row"
+      link
+      v-for="(user, index) in users"  
+      :key="user.username"
+    >
+      <q-item-side
+        @click="remove(index)"
+        icon="delete forever"
+        color="negative"
+      />
+      <q-item-side class="col-1">
+        {{user.username}}
+      </q-item-side>
+      <q-item-side  class="col-2">
+        {{user.email}}
+      </q-item-side>
+      <q-item-side  class="col-1">
+        {{getStates(user.state)}}
+      </q-item-side>
+      <q-item-side  class="col-1">
+        {{user.access.cnt}}
+      </q-item-side>
+      <q-item-side  class="col-1">
+        <span v-if="user.lastAccess !== null">
+          {{user.lastAccess | moment("from")}}
+        </span>
+      </q-item-side>
+      <q-item-main class="col">
+        <q-chips-input 
+          style="padding-left:.5em"
+          v-model="user.groups"
+          :placeholder="user.groups.length ? '': 'Type a valid group name'"
+          color="blue-grey-5"
+          @change="change(index)"
+        />
+      </q-item-main>
+    </q-item>
+  </q-list>
 
 </template>
 
@@ -85,94 +88,26 @@ export default {
   },
   data () {
     return {
-      users: [],
-      config: {
-        title: 'Users on system',
-        refresh: true,
-        noHeader: false,
-        // columnPicker: true,
-        // leftStickyColumns: 0,
-        // rightStickyColumns: 2,
-        bodyStyle: {
-          maxHeight: '500px'
-        },
-        rowHeight: '50px',
-        responsive: true,
-        pagination: {
-          rowsPerPage: 15,
-          options: [5, 10, 15, 30, 50, 500]
-        },
-        selection: 'multiple'
-      },
-      columns: [
-        {
-          label: 'Username',
-          field: 'username',
-          width: '20%',
-          filter: true,
-          sort: true,
-          type: 'string'
-        },
-        {
-          label: 'Email',
-          field: 'email',
-          width: '30%',
-          filter: true,
-          sort: true,
-          type: 'string'
-        },
-        {
-          label: 'Access Cnt',
-          field: 'accessCnt',
-          width: '10%',
-          filter: true,
-          sort: true,
-          type: 'number'
-        },
-        {
-          label: 'Last Access',
-          field: 'lastAccess',
-          width: '10%',
-          sort: true,
-          type: 'date'
-        },
-        {
-          label: 'Status',
-          field: 'state',
-          width: '10%',
-          sort: false,
-          format: state => Object.keys(state)
-            .map(e => `<i>${e}</i>`).join(', ')
-        },
-        {
-          label: 'Groups',
-          field: 'groups',
-          width: '20%',
-          sort: false,
-          format: (groups = ['a', 'b']) => groups.join(' + ')
-        }
-      ]
-    }
-  },
-  computed: {
-    data () {
-      return this.users.filter(user => !user.removed).map(user => {
-        user.access = user.access || {}
-        user.accessCnt = user.access.cnt
-        user.lastAccess = new Date(1000 * user.access.lastTime)
-        return user
-      })
+      users: []
     }
   },
   mixins: [myMixin],
   methods: {
     getDate (value) {
-      return value ? new Date(1000 * value) : ''
+      return value ? new Date(1000 * value) : null
+    },
+    getStates (states) {
+      return Object.keys(states || {}).join(' + ')
     },
     getusers () {
       axios.get('/auth/users')
         .then(response => {
-          this.users = response.data
+          this.users = (response.data || []).map(user => {
+            user.access = user.access || {}
+            user.lastAccess = this.getDate(user.access.lastTime)
+            user.groups = user.groups || []
+            return user
+          })
           console.log(this.users)
         })
         .catch(this.catch)

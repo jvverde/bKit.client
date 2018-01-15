@@ -34,7 +34,7 @@
           v-model="user.groups"
           :placeholder="user.groups.length ? '': 'Type a valid group name'"
           color="blue-grey-5"
-          @change="change(index)"
+          @change="change_groups(index)"
         />
       </q-item-main>
     </q-item>
@@ -98,6 +98,10 @@ export default {
     },
     getStates (states) {
       return Object.keys(states || {}).join(' + ')
+    },
+    change_groups (index) {
+      let user = this.users[index]
+      console.log(user)
     },
     getusers () {
       axios.get('/auth/users')

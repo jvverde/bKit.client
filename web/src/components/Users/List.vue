@@ -101,7 +101,14 @@ export default {
     },
     change_groups (index) {
       let user = this.users[index]
-      console.log(user)
+      console.log(user.username, user.groups)
+      axios.put(`auth/user/${encodeURIComponent(user.username)}/groups`,
+        user.groups || []
+      ).then(response => {
+        if (response.data instanceof Array) {
+          this.users[index] = response.data
+        }
+      }).catch(this.catch)
     },
     getusers () {
       axios.get('/auth/users')

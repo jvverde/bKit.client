@@ -31,8 +31,8 @@
           Sign Up
         </q-btn>
       </div>
-      <div v-else>
-        <span>{{user}}</span>
+      <div v-else class="flex column items-end">
+        <div>{{user}}</div>
         <small><a href="#" @click="logout">Logout</a></small>
       </div>
     </q-toolbar>

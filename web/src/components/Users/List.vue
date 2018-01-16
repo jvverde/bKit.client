@@ -34,7 +34,7 @@
           v-model="user.groups"
           :placeholder="user.groups.length ? '': 'Type a valid group name'"
           color="blue-grey-5"
-          @change="change_groups(index)"
+          @change="change_groups(user)"
         />
       </q-item-main>
     </q-item>
@@ -99,14 +99,19 @@ export default {
     getStates (states) {
       return Object.keys(states || {}).join(' + ')
     },
-    change_groups (index) {
-      let user = this.users[index]
+    change_groups (user) {
       console.log(user.username, user.groups)
       axios.put(`auth/user/${encodeURIComponent(user.username)}/groups`,
         user.groups || []
       ).then(response => {
         if (response.data instanceof Array) {
-          this.users[index] = response.data
+          let groups = response.data
+          user.groups.forEach(g => {
+            if (groups.indexOf(g) === -1) {
+              this.catch(new Error(`Group <b>${g}</b> doesn't exists`))
+            }
+          })
+          user.groups = groups
         }
       }).catch(this.catch)
     },
@@ -127,7 +132,7 @@ export default {
       this.getusers()
       done()
     },
-    deleteUsers (sel) {
+    delete (sel) {
       let remove = {}
       sel.rows.forEach(r => {
         remove[r.data.username] = r

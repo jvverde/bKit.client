@@ -7,7 +7,7 @@
       :key="user.username"
     >
       <q-item-side
-        @click="remove(index)"
+        @click="remove(user)"
         icon="delete forever"
         color="negative"
       />
@@ -51,7 +51,6 @@ import {
   QCard,
   QCardActions,
   QCardMain,
-  Toast,
   QDataTable,
   QBtn,
   QIcon,
@@ -99,6 +98,19 @@ export default {
     getStates (states) {
       return Object.keys(states || {}).join(' + ')
     },
+    setusers (users) {
+      this.users = (users || []).map(user => {
+        user.access = user.access || {}
+        user.lastAccess = this.getDate(user.access.lastTime)
+        user.groups = user.groups || []
+        return user
+      })
+    },
+    getusers () {
+      axios.get('/auth/users')
+        .then(response => this.setusers(response.data))
+        .catch(this.catch)
+    },
     change_groups (user) {
       console.log(user.username, user.groups)
       axios.put(`auth/user/${encodeURIComponent(user.username)}/groups`,
@@ -115,46 +127,10 @@ export default {
         }
       }).catch(this.catch)
     },
-    getusers () {
-      axios.get('/auth/users')
-        .then(response => {
-          this.users = (response.data || []).map(user => {
-            user.access = user.access || {}
-            user.lastAccess = this.getDate(user.access.lastTime)
-            user.groups = user.groups || []
-            return user
-          })
-          console.log(this.users)
-        })
+    remove (user) {
+      axios.delete(`/auth/user/${encodeURIComponent(user.username)}`)
+        .then(response => this.setusers(response.data))
         .catch(this.catch)
-    },
-    refresh (done) {
-      this.getusers()
-      done()
-    },
-    delete (sel) {
-      let remove = {}
-      sel.rows.forEach(r => {
-        remove[r.data.username] = r
-        //  this.table.splice(row.index, 1)
-        axios.delete(`/auth/user/${encodeURIComponent(r.data.username)}`)
-          .then(response => {
-            this.$set(
-              this.users[remove[response.data.user].index], 'removed', true
-            )
-          })
-          .catch(e => {
-            let msg = e.toString()
-            if (e.response instanceof Object &&
-              e.response.data instanceof Object) {
-              msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
-            }
-            Toast.create.negative({
-              html: msg,
-              timeout: 10000
-            })
-          })
-      })
     },
     editUser (sel) {
       console.log(sel)

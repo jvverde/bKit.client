@@ -2,15 +2,31 @@
   <q-list class="absolute-center full-width" dense no-border>
     <q-list-header class="text-center">Users</q-list-header>
     <q-item class="row"
-      link
+      
       v-for="(user, index) in users"  
       :key="user.username"
     >
-      <q-item-side
-        @click="remove(user)"
-        icon="delete forever"
-        color="negative"
-      />
+      <q-item-side class="hover flex justify-around no-wrap">
+        <q-icon
+          @click="remove(user)"
+          name="delete forever"
+          color="negative"
+        />
+        <q-icon
+          @click="enable(user)"
+          :name="user.state.enable ? 'lock open' : 'lock'"
+          color="warning"
+        />
+        <q-icon
+          @click="$router.push({ 
+            name: 'userview',
+            params: { name: user.username }
+          })"
+          name="person"
+          color="secondary"
+        />
+      </q-item-side>
+
       <q-item-side class="col-1">
         {{user.username}}
       </q-item-side>
@@ -96,11 +112,14 @@ export default {
       return value ? new Date(1000 * value) : null
     },
     getStates (states) {
-      return Object.keys(states || {}).join(' + ')
+      return Object.keys(states || {})
+        .filter(state => states[state])
+        .join(' + ')
     },
     setusers (users) {
       this.users = (users || []).map(user => {
         user.access = user.access || {}
+        user.state = user.state || {}
         user.lastAccess = this.getDate(user.access.lastTime)
         user.groups = user.groups || []
         return user
@@ -132,6 +151,15 @@ export default {
         .then(response => this.setusers(response.data))
         .catch(this.catch)
     },
+    enable (user) {
+      let action = user.state.enable ? 'reset' : 'set'
+      return axios.post(`/auth/user/${action}/enable`, [user.username])
+        .then(response => {
+          console.log(response.data)
+          user.state.enable = !user.state.enable
+        })
+        .catch(this.catch)
+    },
     editUser (sel) {
       console.log(sel)
       sel.rows.forEach(r => {
@@ -150,5 +178,14 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="scss">
+  .hover {
+    font-size: 150%;
+    &> * {
+      cursor: pointer;
+    }
+    &> :not(:first-child) {
+      margin-left: 6px;
+    }
+  }
 </style>

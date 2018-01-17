@@ -101,8 +101,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { required, email } from 'vuelidate/lib/validators'
 import {
   QInput,
   QBtn,
@@ -119,6 +117,7 @@ import {
   QItemSide
 } from 'quasar'
 import {myMixin} from 'src/mixins'
+import {User} from 'src/mixins/User'
 
 export default {
   name: 'register',
@@ -137,40 +136,11 @@ export default {
     QItemTile,
     QItemSide
   },
-  props: ['username'],
-  data () {
-    return {
-      user: {}
-    }
-  },
-  validations: {
-    user: {
-      email: {
-        required,
-        email
-      }
-    }
-  },
   computed: {
     ready () {
       return !this.$v.user.$error && this.user.username && this.user.email
     },
-    access () {
-      return (this.user || {}).access || {}
-    },
-    accessCnt () {
-      return this.access.cnt
-    },
-    lastTimeAccess () {
-      if (this.access.lastTime) {
-        return new Date(1000 * this.access.lastTime)
-      } else return null
-    },
-    firstTimeAccess () {
-      if (this.access.firstTime) {
-        return new Date(1000 * this.access.firstTime)
-      } else return null
-    },
+
     login () {
       return (this.user || {}).login || {}
     },
@@ -202,57 +172,21 @@ export default {
       if (this.logout.firstTime) {
         return new Date(1000 * this.logout.firstTime)
       } else return null
-    },
-    disabled () {
-      return !(this.user.state instanceof Object && this.user.state.enable)
     }
   },
-  mixins: [myMixin],
+  mixins: [myMixin, User],
   methods: {
-    getUser (user) {
-      return axios.get(
-        `/auth/user/${encodeURIComponent(user || this.username)}`
-      ).then(response => {
-        this.user = response.data.info
-        console.log(this.user)
-      }).catch((e) => {
-        this.catch(e)
-        this.user = {}
-      })
-    },
-    reset_pass () {
-      return axios.get(
-        `/auth/reset_pass/${encodeURIComponent(this.username)}`
-      ).then(this.done).catch(this.catch)
-    },
-    set_email () {
-      return axios.post(
-        '/auth/set_email', {
-          email: this.user.email,
-          username: this.username
-        }
-      ).then(response => {
-        console.log(response.data)
-      })
-    },
-    enable (action) {
-      return axios.post(
-        `/auth/${action}/enable`, [this.username]
-      ).then(response => {
-        console.log(response.data)
-        this.getUser(this.username)
-      })
+    replaceUser (user) {
+      this.getUser(user)
     }
   },
   mounted () {
-    this.getUser()
   },
   beforeRouteUpdate (to, from, next) {
-    this.getUser(to.params.username)
+    this.replaceUser(to.params.name)
     next()
   },
   beforeDestroy () {
-    console.log('View destroyed')
   }
 }
 </script>

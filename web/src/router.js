@@ -76,7 +76,7 @@ let router = new VueRouter({
           component: load('User/Layout'),
           children: [
             {
-              path: 'view/:username',
+              path: 'view/:name',
               name: 'userview',
               props: true,
               component: load('User/View')

@@ -50,6 +50,30 @@ export const User = {
     },
     accessCnt () {
       return this.access.cnt
+    },
+    login () {
+      return this.user.login || {}
+    },
+    loginCnt () {
+      return this.login.cnt
+    },
+    lastTimeLogin () {
+      return getDate(this.login.lastTime)
+    },
+    firstTimeLogin () {
+      return getDate(this.login.firstTime)
+    },
+    logout () {
+      return this.user.logout || {}
+    },
+    logoutCnt () {
+      return this.logout.cnt
+    },
+    lastTimeLogout () {
+      return getDate(this.logout.lastTime)
+    },
+    firstTimeLogout () {
+      return getDate(this.logout.firstTime)
     }
   },
   mounted () {
@@ -88,21 +112,20 @@ export const User = {
     },
     enable (user) {
       let action = this.states.enable ? 'reset' : 'set'
-      return axios.post(`/auth/user/${action}/enable`, [user.username])
+      return axios.post(`/auth/user/${action}/enable`, [this.username])
         .then(response => {
-          console.log('response:', response.data)
-          this.user.state.enable = !user.state.enable
+          this.user = response.data
         })
         .catch(this.catch)
     },
     reset_pass () {
       return axios.get(
-        `/auth/reset_pass/${encodeURIComponent(this.username)}`
+        `/auth/user/reset_pass/${encodeURIComponent(this.username)}`
       ).then(this.done).catch(this.catch)
     },
     set_email () {
       return axios.post(
-        '/auth/set_email', {
+        '/auth/user/set_email', {
           email: this.user.email,
           username: this.username
         }

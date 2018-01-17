@@ -8,9 +8,9 @@ function getDate (v) {
 
 export const User = {
   name: 'user.logic',
-  data () {
+  data: function () {
     return {
-      user: {}
+      user: {a: 67}
     }
   },
   props: {
@@ -21,16 +21,36 @@ export const User = {
   },
   mixins: [myMixin],
   computed: {
-    access: () => this.user.access,
-    states: () => this.user.state,
-    lastTimeAccess: () => getDate(this.access.lastTime),
-    firstTimeAccess: () => getDate(this.access.firstTime),
-    activeStates: () => Object.keys(this.states).filter(s => this.states[s]),
-    stateNames: () => this.activeStates.join(' '),
-    username: () => this.name,
-    groups: () => this.user.groups,
-    disabled: () => !this.user.state.enable,
-    accessCnt: () => this.access.cnt
+    access () {
+      return this.user.access || {}
+    },
+    states () {
+      return this.user.state || {}
+    },
+    lastTimeAccess () {
+      return getDate(this.access.lastTime)
+    },
+    firstTimeAccess () {
+      return getDate(this.access.firstTime)
+    },
+    activeStates () {
+      return Object.keys(this.states).filter(s => this.states[s])
+    },
+    stateNames () {
+      return this.activeStates.join(' ')
+    },
+    username () {
+      return this.name
+    },
+    groups () {
+      return this.user.groups
+    },
+    disabled () {
+      return !this.states.enable
+    },
+    accessCnt () {
+      return this.access.cnt
+    }
   },
   mounted () {
     this.getUser()
@@ -41,12 +61,7 @@ export const User = {
       return axios.get(
         `/auth/user/${encodeURIComponent(this.name)}`
       ).then(response => {
-        let user = Object.assign({
-          access: {},
-          state: {},
-          groups: []
-        }, response.data || {})
-        this.user = user
+        this.user = response.data
         console.log(this.user)
       }).catch(this.catch)
     },
@@ -75,7 +90,7 @@ export const User = {
       let action = this.states.enable ? 'reset' : 'set'
       return axios.post(`/auth/user/${action}/enable`, [user.username])
         .then(response => {
-          console.log(response.data)
+          console.log('response:', response.data)
           this.user.state.enable = !user.state.enable
         })
         .catch(this.catch)

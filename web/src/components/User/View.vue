@@ -137,42 +137,6 @@ export default {
     QItemSide
   },
   computed: {
-    ready () {
-      return !this.$v.user.$error && this.user.username && this.user.email
-    },
-
-    login () {
-      return (this.user || {}).login || {}
-    },
-    loginCnt () {
-      return this.login.cnt
-    },
-    lastTimeLogin () {
-      if (this.login.lastTime) {
-        return new Date(1000 * this.login.lastTime)
-      } else return null
-    },
-    firstTimeLogin () {
-      if (this.login.firstTime) {
-        return new Date(1000 * this.login.firstTime)
-      } else return null
-    },
-    logout () {
-      return (this.user || {}).logout || {}
-    },
-    logoutCnt () {
-      return this.logout.cnt
-    },
-    lastTimeLogout () {
-      if (this.logout.lastTime) {
-        return new Date(1000 * this.logout.lastTime)
-      } else return null
-    },
-    firstTimeLogout () {
-      if (this.logout.firstTime) {
-        return new Date(1000 * this.logout.firstTime)
-      } else return null
-    }
   },
   mixins: [myMixin, User],
   methods: {

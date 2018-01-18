@@ -1,15 +1,15 @@
 <template>
-  <q-item class="row">
-    <q-item-side class="hover flex justify-around no-wrap">
+  <section class="row line items-start">
+    <div class="icons hover flex justify-around no-wrap col-auto" title="Action">
       <q-icon
         @click="remove"
         name="delete forever"
         color="negative"
       />
       <q-icon
-        @click="enable('set')"
-        :name="disabled ? 'open' : 'lock open'"
-        color="warning"
+        @click="enable"
+        :name="disabled ? 'lock' : 'lock open'"
+        :color="disabled ? 'warning' : 'positive'"
       />
       <q-icon
         @click="$router.push({ 
@@ -17,28 +17,28 @@
           params: { name: username }
         })"
         name="person"
-        color="secondary"
+        color="tertiary"
       />
-    </q-item-side>
+    </div>
 
-    <q-item-side class="col-1">
+    <div class="col-1" title="User">
       {{username}}
-    </q-item-side>
-    <q-item-side  class="col-2">
+    </div>
+    <div class="col-2" title="Email">
       {{user.email}}
-    </q-item-side>
-    <q-item-side  class="col-1">
+    </div>
+    <div class="col-1" title="State">
       {{getStates(user.state)}}
-    </q-item-side>
-    <q-item-side  class="col-1">
+    </div>
+    <div class="col-1" title="Access Cnt">
       {{accessCnt}}
-    </q-item-side>
-    <q-item-side  class="col-1">
+    </div>
+    <div class="col-1" title="Last Access">
       <span v-if="lastTimeAccess !== null">
         {{lastTimeAccess | moment("from")}}
       </span>
-    </q-item-side>
-    <q-item-main class="col">
+    </div>
+    <div class="col" title="Groups">
       <q-chips-input 
         style="padding-left:.5em"
         v-model="groups"
@@ -46,17 +46,14 @@
         color="blue-grey-5"
         @change="change_groups"
       />
-    </q-item-main>
-  </q-item>
+    </div>
+  </section>
 </template>
 
 <script>
 import {
-  QChipsInput,
   QIcon,
-  QItem,
-  QItemMain,
-  QItemSide
+  QChipsInput
 } from 'quasar'
 import {myMixin} from 'src/mixins'
 import {User} from 'src/mixins/User'
@@ -64,11 +61,8 @@ import {User} from 'src/mixins/User'
 export default {
   name: 'register',
   components: {
-    QChipsInput,
     QIcon,
-    QItem,
-    QItemMain,
-    QItemSide
+    QChipsInput
   },
   computed: {
   },
@@ -94,5 +88,30 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="scss" scoped>
+  .icons {
+    margin-right: 6px;
+  }
+  .hover {
+    &> * {
+      font-size: 150%;
+      cursor: pointer;
+    }
+    &> :not(:first-child) {
+      margin-left: 6px;
+    }
+  }
+  section[class~="line"]:first-of-type {
+    margin-top: 3em;
+    [title] {
+      position: relative;
+      &::before {
+        position: absolute;
+        bottom: 100%;
+        margin-bottom: 1em;
+        content: attr(title);
+        font-weight: bold;
+      } 
+    }
+  }
 </style>

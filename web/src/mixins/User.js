@@ -10,7 +10,7 @@ export const User = {
   name: 'user.logic',
   data: function () {
     return {
-      user: {a: 67}
+      user: {}
     }
   },
   props: {
@@ -43,7 +43,7 @@ export const User = {
       return this.name
     },
     groups () {
-      return this.user.groups
+      return this.user.groups || []
     },
     disabled () {
       return !this.states.enable
@@ -80,6 +80,12 @@ export const User = {
     this.getUser()
   },
   methods: {
+    missing_group (g) {
+      this.$emit('missing_group', g)
+    },
+    deleted (u) {
+      this.$emit('deleted', u)
+    },
     getUser () {
       this.user = {}
       return axios.get(
@@ -89,7 +95,7 @@ export const User = {
         console.log(this.user)
       }).catch(this.catch)
     },
-    change_groups (user) {
+    change_groups () {
       console.log(this.username, this.groups)
       axios.put(`auth/user/${encodeURIComponent(this.username)}/groups`,
         this.groups || []
@@ -98,7 +104,7 @@ export const User = {
           let groups = response.data
           this.groups.forEach(g => {
             if (groups.indexOf(g) === -1) {
-              this.catch(new Error(`Group <b>${g}</b> doesn't exists`))
+              this.missing_group(g)
             }
           })
           this.user.groups = groups
@@ -107,7 +113,7 @@ export const User = {
     },
     remove () {
       axios.delete(`/auth/user/${encodeURIComponent(this.username)}`)
-        .then(response => this.$emit('deleted'))
+        .then(response => this.deleted(this.username))
         .catch(this.catch)
     },
     enable (user) {
@@ -120,7 +126,7 @@ export const User = {
     },
     reset_pass () {
       return axios.get(
-        `/auth/user/reset_pass/${encodeURIComponent(this.username)}`
+        `/auth/reset_pass/${encodeURIComponent(this.username)}`
       ).then(this.done).catch(this.catch)
     },
     set_email () {
@@ -131,15 +137,6 @@ export const User = {
         }
       ).then(response => {
         console.log(response.data)
-      })
-    },
-    editUser (sel) {
-      console.log(sel)
-      sel.rows.forEach(r => {
-        this.$router.push({
-          name: 'userview',
-          params: {username: r.data.username}
-        })
       })
     }
   },

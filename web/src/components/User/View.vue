@@ -27,7 +27,10 @@
       <q-btn flat icon="autorenew" color="orange" @click="reset_pass">
         Reset Password
       </q-btn>
-      <q-btn flat icon="delete forever" color="negative">
+      <q-btn flat
+        @click="remove" 
+        icon="delete forever" 
+        color="negative">
         Remove
       </q-btn>
       <q-btn flat icon="lock open" color="positive" 
@@ -140,14 +143,20 @@ export default {
   },
   mixins: [myMixin, User],
   methods: {
-    replaceUser (user) {
+    replace_user (user) {
       this.getUser(user)
+    },
+    missing_group (g) {
+      this.catch(new Error(`Group <b>${g}</b> doesn't exists`))
+    },
+    deleted (u) {
+      this.show(`${u} deleted`)
     }
   },
   mounted () {
   },
   beforeRouteUpdate (to, from, next) {
-    this.replaceUser(to.params.name)
+    this.replace_user(to.params.name)
     next()
   },
   beforeDestroy () {

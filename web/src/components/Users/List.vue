@@ -1,12 +1,8 @@
 <template>
   <q-list class="absolute-center full-width" dense no-border>
     <q-list-header class="text-center">Users</q-list-header>
-    <q-item class="row"
-      
-      v-for="(user, index) in users"  
-      :key="user.username"
-    >
-      <q-item-side class="hover flex justify-around no-wrap">
+    <user :name="user" v-for="user in users" :key="user"/>
+<!--       <q-item-side class="hover flex justify-around no-wrap">
         <q-icon
           @click="remove(user)"
           name="delete forever"
@@ -52,8 +48,7 @@
           color="blue-grey-5"
           @change="change_groups(user)"
         />
-      </q-item-main>
-    </q-item>
+      </q-item-main> -->
   </q-list>
 
 </template>
@@ -61,6 +56,7 @@
 <script>
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
+import User from './User'
 
 import {
   QChipsInput,
@@ -84,6 +80,7 @@ import {
 export default {
   name: 'form',
   components: {
+    User,
     QChipsInput,
     QCard,
     QCardActions,
@@ -108,66 +105,12 @@ export default {
   },
   mixins: [myMixin],
   methods: {
-    getDate (value) {
-      return value ? new Date(1000 * value) : null
-    },
-    getStates (states) {
-      return Object.keys(states || {})
-        .filter(state => states[state])
-        .join(' + ')
-    },
-    setusers (users) {
-      this.users = (users || []).map(user => {
-        user.access = user.access || {}
-        user.state = user.state || {}
-        user.lastAccess = this.getDate(user.access.lastTime)
-        user.groups = user.groups || []
-        return user
-      })
-    },
     getusers () {
       axios.get('/auth/users')
-        .then(response => this.setusers(response.data))
-        .catch(this.catch)
-    },
-    change_groups (user) {
-      console.log(user.username, user.groups)
-      axios.put(`auth/user/${encodeURIComponent(user.username)}/groups`,
-        user.groups || []
-      ).then(response => {
-        if (response.data instanceof Array) {
-          let groups = response.data
-          user.groups.forEach(g => {
-            if (groups.indexOf(g) === -1) {
-              this.catch(new Error(`Group <b>${g}</b> doesn't exists`))
-            }
-          })
-          user.groups = groups
-        }
-      }).catch(this.catch)
-    },
-    remove (user) {
-      axios.delete(`/auth/user/${encodeURIComponent(user.username)}`)
-        .then(response => this.setusers(response.data))
-        .catch(this.catch)
-    },
-    enable (user) {
-      let action = user.state.enable ? 'reset' : 'set'
-      return axios.post(`/auth/user/${action}/enable`, [user.username])
         .then(response => {
-          console.log(response.data)
-          user.state.enable = !user.state.enable
+          this.users = response.data
         })
         .catch(this.catch)
-    },
-    editUser (sel) {
-      console.log(sel)
-      sel.rows.forEach(r => {
-        this.$router.push({
-          name: 'userview',
-          params: {username: r.data.username}
-        })
-      })
     }
   },
   mounted () {

@@ -86,17 +86,18 @@ export const User = {
     deleted (u) {
       this.$emit('deleted', u)
     },
+    changed_email (msg) {
+      this.$emit('changed_email', msg)
+    },
     getUser () {
       this.user = {}
       return axios.get(
         `/auth/user/${encodeURIComponent(this.name)}`
       ).then(response => {
         this.user = response.data
-        console.log(this.user)
       }).catch(this.catch)
     },
     change_groups () {
-      console.log(this.username, this.groups)
       axios.put(`auth/user/${encodeURIComponent(this.username)}/groups`,
         this.groups || []
       ).then(response => {
@@ -116,7 +117,7 @@ export const User = {
         .then(response => this.deleted(this.username))
         .catch(this.catch)
     },
-    enable (user) {
+    enable () {
       let action = this.states.enable ? 'reset' : 'set'
       return axios.post(`/auth/user/${action}/enable`, [this.username])
         .then(response => {
@@ -136,7 +137,7 @@ export const User = {
           username: this.username
         }
       ).then(response => {
-        console.log(response.data)
+        this.changed_email(response.data)
       })
     }
   },

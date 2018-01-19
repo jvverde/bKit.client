@@ -137,7 +137,7 @@ export const User = {
           username: this.username
         }
       ).then(response => {
-        this.changed_email(response.data)
+        this.changed_email(response.data.msg || 'Request apparently accepted, but no reply message')
       })
     }
   },

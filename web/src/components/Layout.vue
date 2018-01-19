@@ -14,7 +14,24 @@
 
       <q-toolbar-title>
         bKit App
-        <div slot="subtitle">Running on Quasar v{{$q.version}}</div>
+        <div slot="subtitle">
+          <u>Server</u> {{servername}}
+          <q-popover v-model="showServers" 
+            anchor="bottom left" 
+            self="top left"
+          >
+            <q-list dense>
+              <q-list-header>Servers</q-list-header>
+              <q-item v-for="(server, index) in servers" :key="server">
+                {{server}}
+              </q-item>
+              <q-item link @click="addServer">
+                <q-item-side icon="add"/>
+                <q-item-main label="Add a new server"/>
+              </q-item>
+            </q-list>
+          </q-popover>
+        </div>
       </q-toolbar-title>
       <div v-if="!logged">
         <q-btn
@@ -58,9 +75,11 @@ import axios from 'axios'
 import {myMixin} from 'src/mixins'
 
 import {
+  Dialog,
   QLayout,
   QToolbar,
   QToolbarTitle,
+  QPopover,
   QBtn,
   QIcon,
   QList,
@@ -68,6 +87,7 @@ import {
   QItem,
   QSideLink,
   QItemSide,
+  QItemTile,
   QItemMain
 } from 'quasar'
 
@@ -77,17 +97,20 @@ export default {
     QLayout,
     QToolbar,
     QToolbarTitle,
+    QPopover,
     QBtn,
     QIcon,
     QList,
     QListHeader,
     QItem,
     QItemSide,
+    QItemTile,
     QSideLink,
     QItemMain
   },
   data () {
     return {
+      showServers: false
     }
   },
   computed: {
@@ -95,7 +118,9 @@ export default {
       'token',
       'logged',
       'session',
-      'user'
+      'user',
+      'servername',
+      'servers'
     ])
   },
   mixins: [myMixin],
@@ -112,8 +137,41 @@ export default {
         .catch(this.catch)
     },
     ...mapActions('auth', {
-      logoff: 'logout'
-    })
+      logoff: 'logout',
+      server: 'server'
+    }),
+    addServer () {
+      Dialog.create({
+        title: 'New Server Address',
+        form: {
+          address: {
+            type: 'text',
+            label: 'Name/IP Address',
+            model: ''
+          },
+          port: {
+            type: 'text',
+            label: 'Port Number',
+            model: ''
+          }
+        },
+        buttons: [
+          'Cancel',
+          {
+            label: 'Apply',
+            handler: data => {
+              const server = `http://${data.address}:${data.port}`
+              console.log(server)
+              axios.get(`${server}/info`)
+                .then(response => {
+                  console.log(response.data)
+                  this.server(server)
+                }).catch(this.catch)
+            }
+          }
+        ]
+      })
+    }
   },
   mounted () {
   },

@@ -151,6 +151,9 @@ export default {
     },
     deleted (u) {
       this.show(`${u} deleted`)
+    },
+    changed_email (msg) {
+      this.show(msg)
     }
   },
   mounted () {

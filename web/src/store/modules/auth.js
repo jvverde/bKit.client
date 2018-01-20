@@ -5,14 +5,18 @@ function defaultSession () {
     token: ''
   })
 }
+function defaultServer () {
+  return {
+    session: defaultSession(),
+    name: '',
+    $http: null
+  }
+}
 export default {
   namespaced: true,
   state: {
     servers: {},
-    currentServer: {
-      session: defaultSession(),
-      name: ''
-    }
+    currentServer: defaultServer ()
   },
   getters: {
     session: state => state.currentServer.session,
@@ -53,10 +57,10 @@ export default {
       }
     },
     load_server (state, name) {
-      state.currentServer = state.servers[name] = state.servers[name] || { // use or create if not exists
-        session: defaultSession(),
-        name: name
-      }
+      state.currentServer = state.servers[name] = state.servers[name] || defaultServer ()
+    }
+    create_server (state, { name, axios }) {
+      // teste
     }
   },
   actions: {
@@ -78,7 +82,7 @@ export default {
     login ({ commit }, data) {
       commit('login', data)
     },
-    server ({ state, commit }, name) {
+    server ({ state, commit }, { name, axios }) {
       commit('save_server', name)
       commit('load_server', name)
     }

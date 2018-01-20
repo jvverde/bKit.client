@@ -11,7 +11,7 @@ export default new Vuex.Store({
   actions,
   getters,
   modules,
-  strict: false,
+  strict: process.env.NODE_ENV !== 'production',
   plugins: [createPersistedState({
     key: 'bKit-vuex'
   })]

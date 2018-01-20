@@ -170,8 +170,13 @@ export default {
     if (!this.servername) {
       axios.get('/info')
         .then(response => {
-          // console.log(response.data.baseUrl)
-          this.server(response.data.baseUrl)
+          console.log(response)
+          if (response.data) {
+            this.server(response.data.baseUrl)
+          }
+          if (response.request && response.request.responseURL) {
+            this.server(response.request.responseURL.replace(/\/info$/, ''))
+          }
         })
         .catch(e => e)
     }

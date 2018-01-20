@@ -1,13 +1,11 @@
 import axios from 'axios'
 import store from 'src/store'
 import router from 'src/router'
-import Vue from 'vue'
-import Vuex from 'vuex'
-
-Vue.use(Vuex)
+import addServer from 'src/helpers/addServer'
 
 export default function setup () {
   let promises = []
+
   axios.interceptors.request.use((config) => {
     const token = store.getters['auth/token']
     if (token) {
@@ -15,6 +13,7 @@ export default function setup () {
     }
     return config
   }, (err) => Promise.reject(err))
+
   axios.interceptors.response.use((response) => {
     if (response.headers['x-bkit-rtoken']) {
       store.dispatch('auth/token', response.headers['x-bkit-rtoken'])
@@ -28,11 +27,15 @@ export default function setup () {
     return response
   }, (err) => {
     const originalRequest = err.config
+    const servername = store.getters['auth/servername']
+
     if (err.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       store.dispatch('auth/logout')
       router.replace({ name: 'login', query: {redirect: router.currentRoute.fullPath} })
       return new Promise((resolve) => promises.push(() => resolve(axios(originalRequest))))
+    } else if (err.response.status === 404 && !servername) {
+      addServer()
     }
     return Promise.reject(err)
   })

@@ -14,18 +14,31 @@
 
       <q-toolbar-title>
         bKit App
-        <div slot="subtitle">
+        <div slot="subtitle" v-if="servername">
           <u>Server</u> {{servername}}
-          <q-popover v-model="showServers" 
+          <q-popover 
+            ref="popover"
+            v-model="showServers" 
             anchor="bottom left" 
             self="top left"
           >
-            <q-list dense>
+            <q-list
+              @click="$refs.popover.close()"
+            >
               <q-list-header>Servers</q-list-header>
-              <q-item v-for="(server, index) in servers" :key="server">
-                {{server}}
+              <q-item 
+                v-for="(server, index) in servers" 
+                :key="server"
+                link
+                @click="changeServer(server)"
+              >
+                <q-item-main :label="server"/>
               </q-item>
-              <q-item link @click="addServer">
+              <q-item 
+                link 
+                @click="addServer" 
+                dense
+              >
                 <q-item-side icon="add"/>
                 <q-item-main label="Add a new server"/>
               </q-item>
@@ -73,9 +86,9 @@
 import { mapGetters, mapActions } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
+import addServer from 'src/helpers/addServer'
 
 import {
-  Dialog,
   QLayout,
   QToolbar,
   QToolbarTitle,
@@ -140,40 +153,28 @@ export default {
       logoff: 'logout',
       server: 'server'
     }),
+    changeServer (server) {
+      console.log(server)
+      axios.get(`${server}/info`)
+        .then(response => {
+          console.log(response.data)
+          this.server(server)
+        })
+        .catch(this.catch)
+    },
     addServer () {
-      Dialog.create({
-        title: 'New Server Address',
-        form: {
-          address: {
-            type: 'text',
-            label: 'Name/IP Address',
-            model: ''
-          },
-          port: {
-            type: 'text',
-            label: 'Port Number',
-            model: ''
-          }
-        },
-        buttons: [
-          'Cancel',
-          {
-            label: 'Apply',
-            handler: data => {
-              const server = `http://${data.address}:${data.port}`
-              console.log(server)
-              axios.get(`${server}/info`)
-                .then(response => {
-                  console.log(response.data)
-                  this.server(server)
-                }).catch(this.catch)
-            }
-          }
-        ]
-      })
+      addServer()
     }
   },
   mounted () {
+    if (!this.servername) {
+      axios.get('/info')
+        .then(response => {
+          console.log(response.data.baseUrl)
+          this.server(response.data.baseUrl)
+        })
+        .catch(e => e)
+    }
   },
   beforeDestroy () {
   }

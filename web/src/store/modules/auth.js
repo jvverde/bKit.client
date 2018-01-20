@@ -1,55 +1,62 @@
+function defaultSession () {
+  return Object.assign({}, {
+    logged: false,
+    user: '',
+    token: ''
+  })
+}
 export default {
   namespaced: true,
   state: {
-    session: {
-      logged: false,
-      user: '',
-      token: ''
-    },
     servers: {},
-    servername: ''
+    currentServer: {
+      session: defaultSession(),
+      name: ''
+    }
   },
   getters: {
-    session: state => state.session,
-    logged: state => state.session.logged,
-    user: state => state.session.user,
-    token: state => state.session.token,
-    servername: state => state.servername,
+    session: state => state.currentServer.session,
+    logged: state => state.currentServer.session.logged,
+    user: state => state.currentServer.session.user,
+    token: state => state.currentServer.session.token,
+    servername: state => state.currentServer.name,
     servers: state => Object.keys(state.servers).sort()
   },
   mutations: {
     logged (state, value) {
-      state.session.logged = value
+      state.currentServer.session.logged = value
     },
     token (state, token) {
-      state.session.token = token
+      state.currentServer.session.token = token
     },
     user (state, user) {
-      state.session.user = user
+      state.currentServer.session.user = user
     },
     session (state, session) {
-      state.session.user = session.user
-      state.session.token = session.token
-      state.session.logged = session.logged
+      state.currentServer.session.user = session.user
+      state.currentServer.session.token = session.token
+      state.currentServer.session.logged = session.logged
     },
     logout (state) {
-      state.session.user = ''
-      state.session.token = ''
-      state.session.logged = false
+      state.currentServer.session.user = ''
+      state.currentServer.session.token = ''
+      state.currentServer.session.logged = false
     },
     login (state, {user, token}) {
-      state.session.user = user
-      state.session.token = token
-      state.session.logged = true
+      state.currentServer.session.user = user
+      state.currentServer.session.token = token
+      state.currentServer.session.logged = true
     },
     save_server (state) {
-      state.servers[state.servername] = Object.assign({}, state.session)
+      if (state.currentServer.name) {
+        state.servers[state.currentServer.name] = state.currentServer
+      }
     },
     load_server (state, name) {
-      state.session = Object.assign({}, state.servers[name])
-    },
-    servername (state, name) {
-      state.servername = name
+      state.currentServer = state.servers[name] = state.servers[name] || { // use or create if not exists
+        session: defaultSession(),
+        name: name
+      }
     }
   },
   actions: {
@@ -72,14 +79,8 @@ export default {
       commit('login', data)
     },
     server ({ state, commit }, name) {
-      if (state.servername) commit('save_server')
-      if (state.servers[name]) {
-        commit('load_server', name)
-      } else {
-        commit('logout')
-      }
-      commit('servername', name)
-      commit('save_server')
+      commit('save_server', name)
+      commit('load_server', name)
     }
   }
 }

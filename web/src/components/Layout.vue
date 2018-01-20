@@ -170,7 +170,7 @@ export default {
     if (!this.servername) {
       axios.get('/info')
         .then(response => {
-          // console.log(response.data.baseUrl)
+          console.log(response.data.baseUrl)
           this.server(response.data.baseUrl)
         })
         .catch(e => e)

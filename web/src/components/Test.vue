@@ -20,7 +20,6 @@ import {
   QItemSide,
   QSideLink
 } from 'quasar'
-import axios from 'axios'
 
 export default {
   name: 'test',
@@ -44,14 +43,7 @@ export default {
   methods: {
   },
   mounted () {
-    axios.get('/info')
-      .then(response => {
-        console.log(response.data)
-      })
-      .catch(e => {
-        console.error(e)
-      })
-    /* this.ws = new WebSocket('ws://localhost:9800')
+    this.ws = new WebSocket('ws://localhost:3000/test')
     this.ws.onerror = (err) => console.log(err)
     this.ws.onopen = (msg) => console.log('WS Open:', msg)
     this.ws.onmessage = (msg) => {
@@ -59,10 +51,9 @@ export default {
       this.messages.push(msg.data)
     }
     this.ws.onclose = (e) => console.log('WS Closed: ', e)
-    */
   },
   beforeDestroy () {
-    this.ws = undefined
+    this.ws.close()
   }
 }
 </script>

@@ -15,7 +15,7 @@
       <q-toolbar-title>
         bKit App
         <div slot="subtitle" v-if="servername">
-          <u>Server</u> {{servername}}
+          <u>Server</u> {{servername}} // {{wsURL}}
           <q-popover 
             ref="popover"
             v-model="showServers" 
@@ -123,10 +123,14 @@ export default {
   },
   data () {
     return {
-      showServers: false
+      showServers: false,
+      ws: []
     }
   },
   computed: {
+    wsURL () {
+      return (this.servername || '').replace(/^http:/, 'ws:')
+    },
     ...mapGetters('auth', [
       'token',
       'logged',
@@ -162,9 +166,33 @@ export default {
     },
     addServer () {
       addServer()
+    },
+    websocket () {
+      this.ws = new WebSocket('ws://localhost:3000/test')
+      this.ws.onerror = (err) => console.log(err)
+      this.ws.onopen = (msg) => console.log('WS Open:', msg)
+      this.ws.onmessage = (msg) => {
+        console.log('Msg: ', msg)
+        this.messages.push(msg.data)
+      }
+      this.ws.onclose = (e) => console.log('WS Closed: ', e)
     }
   },
   mounted () {
+    this.ws = []
+    this.servers.forEach(servername => {
+      const wsname = servername.replace(/^https?/, 'ws')
+      const wsURL = `${wsname}/test`
+      const ws = new WebSocket(wsURL)
+      ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
+      ws.onopen = (msg) => console.log(`WS Open to ${wsURL}`, msg)
+      ws.onmessage = (msg) => {
+        console.log(`Msg from ${wsURL}: `, msg)
+      }
+      ws.onclose = (e) => console.log(`WS to ${wsURL} Closed: `, e)
+      this.ws.push(ws)
+      console.log(wsURL)
+    })
     if (!this.servername) {
       axios.get('/info')
         .then(response => {
@@ -180,6 +208,7 @@ export default {
     }
   },
   beforeDestroy () {
+    this.ws.forEach(ws => ws.close())
   }
 }
 </script>

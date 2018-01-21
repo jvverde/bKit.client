@@ -124,7 +124,8 @@ export default {
   data () {
     return {
       showServers: false,
-      ws: []
+      ws: [],
+      messages: []
     }
   },
   computed: {
@@ -173,7 +174,7 @@ export default {
       this.ws.onopen = (msg) => console.log('WS Open:', msg)
       this.ws.onmessage = (msg) => {
         console.log('Msg: ', msg)
-        this.messages.push(msg.data)
+        this.messages.push(msg)
       }
       this.ws.onclose = (e) => console.log('WS Closed: ', e)
     }
@@ -188,10 +189,15 @@ export default {
       ws.onopen = (msg) => console.log(`WS Open to ${wsURL}`, msg)
       ws.onmessage = (msg) => {
         console.log(`Msg from ${wsURL}: `, msg)
+        this.messages.push({
+          name: servername,
+          url: wsURL,
+          ws: ws,
+          msg: msg
+        })
       }
-      ws.onclose = (e) => console.log(`WS to ${wsURL} Closed: `, e)
+      ws.onclose = (e) => console.log(`WS to ${wsURL} closed: `, e)
       this.ws.push(ws)
-      console.log(wsURL)
     })
     if (!this.servername) {
       axios.get('/info')

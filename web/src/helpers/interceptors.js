@@ -8,8 +8,13 @@ export default function setup () {
 
   axios.interceptors.request.use((config) => {
     const token = store.getters['auth/token']
+    const baseURL = store.getters['auth/baseURL']
+    config.headers['X-bKit-API'] = 1
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    if (baseURL) {
+      config.baseURL = baseURL
     }
     return config
   }, (err) => Promise.reject(err))

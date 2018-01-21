@@ -154,10 +154,8 @@ export default {
       server: 'server'
     }),
     changeServer (server) {
-      console.log(server)
       axios.get(`${server}/info`)
         .then(response => {
-          console.log(response.data)
           this.server(server)
         })
         .catch(this.catch)

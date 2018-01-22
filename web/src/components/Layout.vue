@@ -87,6 +87,7 @@ import { mapGetters, mapActions } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
 import addServer from 'src/helpers/addServer'
+import * as test from 'src/helpers/test'
 
 import {
   QLayout,
@@ -180,6 +181,8 @@ export default {
     }
   },
   mounted () {
+    test.add(3)
+    test.mul(2)
     this.ws = []
     this.servers.forEach(servername => {
       const wsname = servername.replace(/^https?/, 'ws')
@@ -192,7 +195,6 @@ export default {
         this.messages.push({
           name: servername,
           url: wsURL,
-          ws: ws,
           msg: msg
         })
       }

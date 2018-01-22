@@ -10,7 +10,7 @@
 </template>
 
 <script>
-
+import * as test from 'src/helpers/test'
 import {
   QList,
   QListHeader,
@@ -43,17 +43,9 @@ export default {
   methods: {
   },
   mounted () {
-    this.ws = new WebSocket('ws://localhost:3000/test')
-    this.ws.onerror = (err) => console.log(err)
-    this.ws.onopen = (msg) => console.log('WS Open:', msg)
-    this.ws.onmessage = (msg) => {
-      console.log('Msg: ', msg)
-      this.messages.push(msg.data)
-    }
-    this.ws.onclose = (e) => console.log('WS Closed: ', e)
+    test.add(1)
   },
   beforeDestroy () {
-    this.ws.close()
   }
 }
 </script>

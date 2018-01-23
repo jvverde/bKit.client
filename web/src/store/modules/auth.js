@@ -5,26 +5,37 @@ function defaultSession () {
     token: ''
   })
 }
-function defaultServer ({session = defaultSession(), name = ''} = {}) {
-  return {
+function defaultServer ({session = defaultSession(), name = '', url = null} = {}) {
+  console.log('defaultServer:', name)
+  return Object.assign({}, {
     session: session,
-    name: name
-  }
+    name: name,
+    url: url
+  })
 }
+function defaultState () {
+  return Object.assign({}, {
+    servers: [],
+    currentServer: defaultServer()
+  })
+}
+function defaultName () {
+  return 'A.' + Math.random().toString(36).substr(2, 9)
+}
+
+import axios from 'axios'
+
 export default {
   namespaced: true,
-  state: {
-    servers: {},
-    currentServer: defaultServer()
-  },
+  state: defaultState(),
   getters: {
     session: state => state.currentServer.session,
     logged: state => state.currentServer.session.logged,
     user: state => state.currentServer.session.user,
     token: state => state.currentServer.session.token,
     servername: state => state.currentServer.name,
-    baseURL: state => state.currentServer.name,
-    servers: state => Object.keys(state.servers).sort()
+    baseURL: state => state.currentServer.url,
+    servers: state => state.servers
   },
   mutations: {
     logged (state, value) {
@@ -52,12 +63,33 @@ export default {
       state.currentServer.session.logged = true
     },
     save_server (state) {
-      if (state.currentServer.name) {
-        state.servers[state.currentServer.name] = state.currentServer
+      let i = state.servers.findIndex(s => s.name === state.currentServer.name)
+      if (i >= 0) {
+        state.servers[i] = state.currentServer
+      } else if (state.currentServer.name) {
+        state.servers.push(state.currentServer)
       }
     },
     load_server (state, name) {
-      state.currentServer = state.servers[name] = state.servers[name] || defaultServer()
+      let i = state.servers.findIndex(s => s.name === name)
+      state.currentServer = i >= 0 ? state.servers[i] : defaultServer()
+    },
+    remove_server (state, name) {
+      //fin server
+      delete state.servers[name]
+    },
+    add_server (state, server) {
+      let i = state.servers.findIndex(s => s.name === server.name)
+      if (i < 0) {
+        let newServer = defaultServer(server)
+        state.currentServer = newServer
+        return state.servers.push(newServer)
+      }
+      return null
+    },
+    reset (state) {
+      state.servers = []
+      state.currentServer = defaultServer()
     }
   },
   actions: {
@@ -79,9 +111,27 @@ export default {
     login ({ commit }, data) {
       commit('login', data)
     },
-    server ({ state, commit }, name) {
+    server ({ commit }, name) {
       commit('save_server')
       commit('load_server', name)
+    },
+    rmServer ({ commit }, name) {
+      console.log('rmServer', name)
+      commit('remove_server', name)
+    },
+    addServer ({ commit }, { url, name = defaultName() }) {
+      console.log('url: ', `${url}/info`)
+      console.log('name:', name)
+      return axios.get(`${url}/info`)
+        .then(response => {
+          commit('add_server', {
+            name: name,
+            url: url
+          })
+        })
+    },
+    reset ({ commit }) {
+      commit('reset')
     }
   }
 }

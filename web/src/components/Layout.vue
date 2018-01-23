@@ -22,21 +22,27 @@
             anchor="bottom left" 
             self="top left"
           >
-            <q-list
+          <q-list
               @click="$refs.popover.close()"
             >
               <q-list-header>Servers</q-list-header>
               <q-item 
                 v-for="(server, index) in servers" 
-                :key="server"
+                :key="server.name"
                 link
-                @click="changeServer(server)"
               >
-                <q-item-main :label="server"/>
+                <q-item-side icon="delete" color="warning" 
+                  @click="rmServer(server.name)"
+                />
+                <q-item-main 
+                  @click="changeServer(server.name)"
+                  :label="server.name"
+                  :sublabel="server.url"
+                />
               </q-item>
               <q-item 
                 link 
-                @click="addServer" 
+                @click="newServer" 
                 dense
               >
                 <q-item-side icon="add"/>
@@ -86,8 +92,8 @@
 import { mapGetters, mapActions } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
-import addServer from 'src/helpers/addServer'
-import * as test from 'src/helpers/test'
+import newServer from 'src/helpers/newServer'
+// import * as websocks from 'src/helpers/websocks'
 
 import {
   QLayout,
@@ -133,6 +139,9 @@ export default {
     wsURL () {
       return (this.servername || '').replace(/^http:/, 'ws:')
     },
+    servernames () {
+      return this.servers.map(s => s.name)
+    },
     ...mapGetters('auth', [
       'token',
       'logged',
@@ -157,7 +166,10 @@ export default {
     },
     ...mapActions('auth', {
       logoff: 'logout',
-      server: 'server'
+      server: 'server',
+      rmServer: 'rmServer',
+      'addServer': 'addServer',
+      'reset': 'reset'
     }),
     changeServer (server) {
       axios.get(`${server}/info`)
@@ -166,50 +178,51 @@ export default {
         })
         .catch(this.catch)
     },
-    addServer () {
-      addServer()
-    },
-    websocket () {
-      this.ws = new WebSocket('ws://localhost:3000/test')
-      this.ws.onerror = (err) => console.log(err)
-      this.ws.onopen = (msg) => console.log('WS Open:', msg)
-      this.ws.onmessage = (msg) => {
-        console.log('Msg: ', msg)
-        this.messages.push(msg)
-      }
-      this.ws.onclose = (e) => console.log('WS Closed: ', e)
+    newServer () {
+      newServer()
     }
   },
   mounted () {
-    test.add(3)
-    test.mul(2)
     this.ws = []
-    this.servers.forEach(servername => {
-      const wsname = servername.replace(/^https?/, 'ws')
-      const wsURL = `${wsname}/test`
-      const ws = new WebSocket(wsURL)
+    /*    this.servers.forEach(server => {
+      console.log('server:', server)
+      const wsname = server.url.replace(/^https?/, 'ws')
+      const wsURL = `${wsname}/ws/events`
+      const ws = websocks.create(wsURL)
       ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
       ws.onopen = (msg) => console.log(`WS Open to ${wsURL}`, msg)
       ws.onmessage = (msg) => {
         console.log(`Msg from ${wsURL}: `, msg)
         this.messages.push({
-          name: servername,
-          url: wsURL,
+          name: server.name,
           msg: msg
         })
       }
-      ws.onclose = (e) => console.log(`WS to ${wsURL} closed: `, e)
+      ws.onclose = (e) => {
+        console.log(`WS to ${wsURL} closed: `, e)
+        websocks.remove()
+      }
       this.ws.push(ws)
     })
+    */
+    this.reset()
     if (!this.servername) {
+      console.log('getinfo')
       axios.get('/info')
         .then(response => {
-          console.log(response)
+          console.log('res:', response)
           if (response.data) {
-            this.server(response.data.baseUrl)
+            console.log('Add local server')
+            this.addServer({
+              url: response.data.baseUrl,
+              name: 'Local Server 0'
+            })
           }
           if (response.request && response.request.responseURL) {
-            this.server(response.request.responseURL.replace(/\/info$/, ''))
+            this.addServer({
+              url: response.request.responseURL.replace(/\/info$/, ''),
+              name: 'Local Server 1'
+            })
           }
         })
         .catch(e => e)

@@ -36,13 +36,15 @@ export default function setup () {
     console.log('error:', err)
     console.log('originalRequest', originalRequest)
     console.log(servername)
-    if (err.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-      store.dispatch('auth/logout')
-      router.replace({ name: 'login', query: {redirect: router.currentRoute.fullPath} })
-      return new Promise((resolve) => promises.push(() => resolve(axios(originalRequest))))
-    } else if (err.response.status === 404 && !servername) {
-      newServer()
+    if (err.response) {
+      if (err.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true
+        store.dispatch('auth/logout')
+        router.replace({ name: 'login', query: {redirect: router.currentRoute.fullPath} })
+        return new Promise((resolve) => promises.push(() => resolve(axios(originalRequest))))
+      } else if (err.response.status === 404 && !servername) {
+        newServer()
+      }
     }
     return Promise.reject(err)
   })

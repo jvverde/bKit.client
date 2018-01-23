@@ -5,52 +5,38 @@
     :left-class="{'bg-grey-2': true}"
   >
     <q-toolbar slot="header" class="glossy">
-      <q-btn
-        flat
-        @click="$refs.layout.toggleLeft()"
-      >
+      <q-btn flat @click="$refs.layout.toggleLeft()">
         <q-icon name="menu" />
       </q-btn>
 
       <q-toolbar-title>
         bKit App
-        <div slot="subtitle" v-if="servername">
-          <u>Server</u> {{servername}} // {{wsURL}}
-          <q-popover 
-            ref="popover"
-            v-model="showServers" 
-            anchor="bottom left" 
-            self="top left"
-          >
-          <q-list
-              @click="$refs.popover.close()"
-            >
+        <dd v-if="servername" slot="subtitle"> <!-- this is an workaround -->
+          <u>Server</u>: {{servername}}
+          <q-popover anchor="bottom left" self="top left"
+            ref="popover" v-model="showServers">
+            <q-list @click="$refs.popover.close()">
               <q-list-header>Servers</q-list-header>
-              <q-item 
-                v-for="(server, index) in servers" 
-                :key="server.name"
-                link
-              >
-                <q-item-side icon="delete" color="warning" 
-                  @click="rmServer(server.name)"
-                />
-                <q-item-main 
-                  @click="changeServer(server.name)"
+              <q-item link v-for="(server, index) in orderedServers" 
+                :key="server.name">
+                <q-item-side icon="delete" color="warning"
+                  @click="rmServer(server.name)"/>
+                <q-item-main
+                  @click="chgServer(server.name)"
                   :label="server.name"
                   :sublabel="server.url"
                 />
               </q-item>
-              <q-item 
-                link 
-                @click="newServer" 
-                dense
-              >
+              <q-item link @click="newServer" dense>
                 <q-item-side icon="add"/>
                 <q-item-main label="Add a new server"/>
               </q-item>
             </q-list>
           </q-popover>
-        </div>
+        </dd>
+        <div v-else slot="subtitle" @click="newServer">
+          <u>Add server</u>
+        </div>      
       </q-toolbar-title>
       <div v-if="!logged">
         <q-btn
@@ -69,7 +55,7 @@
       </div>
       <div v-else class="flex column items-end">
         <div>{{user}}</div>
-        <small><a href="#" @click="logout">Logout</a></small>
+        <small><a href="#" @click="signout">Logout</a></small>
       </div>
     </q-toolbar>
 
@@ -136,12 +122,6 @@ export default {
     }
   },
   computed: {
-    wsURL () {
-      return (this.servername || '').replace(/^http:/, 'ws:')
-    },
-    servernames () {
-      return this.servers.map(s => s.name)
-    },
     ...mapGetters('auth', [
       'token',
       'logged',
@@ -149,14 +129,19 @@ export default {
       'user',
       'servername',
       'servers'
-    ])
+    ]),
+    orderedServers () {
+      return this.servers.slice().sort(
+        (a, b) => (a.name || '').localeCompare(b.name || '')
+      )
+    }
   },
   mixins: [myMixin],
   methods: {
-    logout () {
+    signout () {
       axios.get('/auth/logout')
         .then(response => {
-          this.logoff()
+          this.logout()
           this.$router.replace({
             path: '/show',
             query: {msg: response.data.msg}
@@ -164,20 +149,12 @@ export default {
         })
         .catch(this.catch)
     },
-    ...mapActions('auth', {
-      logoff: 'logout',
-      server: 'server',
-      rmServer: 'rmServer',
-      'addServer': 'addServer',
-      'reset': 'reset'
-    }),
-    changeServer (server) {
-      axios.get(`${server}/info`)
-        .then(response => {
-          this.server(server)
-        })
-        .catch(this.catch)
-    },
+    ...mapActions('auth', [
+      'logout',
+      'chgServer',
+      'rmServer',
+      'addServer'
+    ]),
     newServer () {
       newServer()
     }
@@ -205,27 +182,26 @@ export default {
       this.ws.push(ws)
     })
     */
-    this.reset()
     if (!this.servername) {
-      console.log('getinfo')
       axios.get('/info')
         .then(response => {
-          console.log('res:', response)
-          if (response.data) {
-            console.log('Add local server')
+          let url0 = (response.data || {}).baseUrl
+          if (url0) {
             this.addServer({
-              url: response.data.baseUrl,
+              url: url0,
               name: 'Local Server 0'
             })
           }
-          if (response.request && response.request.responseURL) {
+          let url1 = ((response.request || {}).responseURL || '')
+            .replace(/\/info$/, '')
+          if (url1 && url1 !== url0) {
             this.addServer({
-              url: response.request.responseURL.replace(/\/info$/, ''),
+              url: url1,
               name: 'Local Server 1'
             })
           }
         })
-        .catch(e => e)
+        .catch(this.catch)
     }
   },
   beforeDestroy () {

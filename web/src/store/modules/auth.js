@@ -6,7 +6,6 @@ function defaultSession () {
   })
 }
 function defaultServer ({session = defaultSession(), name = '', url = null} = {}) {
-  console.log('defaultServer:', name)
   return Object.assign({}, {
     session: session,
     name: name,
@@ -19,11 +18,8 @@ function defaultState () {
     currentServer: defaultServer()
   })
 }
-function defaultName () {
-  return 'A.' + Math.random().toString(36).substr(2, 9)
-}
-
 import axios from 'axios'
+import {defaultName} from 'src/helpers/utils'
 
 export default {
   namespaced: true,
@@ -72,11 +68,20 @@ export default {
     },
     load_server (state, name) {
       let i = state.servers.findIndex(s => s.name === name)
-      state.currentServer = i >= 0 ? state.servers[i] : defaultServer()
+      let found = i >= 0
+      if (found) {
+        state.currentServer = state.servers[i]
+      }
+      return found
     },
     remove_server (state, name) {
-      //fin server
-      delete state.servers[name]
+      let i = state.servers.findIndex(s => s.name === name)
+      let found = i >= 0
+      if (found) state.servers.splice(i, 1)
+      if (state.currentServer.name === name) {
+        state.currentServer = state.servers[0] || defaultServer()
+      }
+      return found
     },
     add_server (state, server) {
       let i = state.servers.findIndex(s => s.name === server.name)
@@ -111,19 +116,17 @@ export default {
     login ({ commit }, data) {
       commit('login', data)
     },
-    server ({ commit }, name) {
+    chgServer ({ commit }, name) {
       commit('save_server')
       commit('load_server', name)
     },
     rmServer ({ commit }, name) {
-      console.log('rmServer', name)
       commit('remove_server', name)
     },
     addServer ({ commit }, { url, name = defaultName() }) {
-      console.log('url: ', `${url}/info`)
-      console.log('name:', name)
       return axios.get(`${url}/info`)
         .then(response => {
+          commit('save_server')
           commit('add_server', {
             name: name,
             url: url

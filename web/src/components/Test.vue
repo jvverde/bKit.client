@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import * as test from 'src/helpers/test'
+
 import {
   QList,
   QListHeader,
@@ -43,7 +43,7 @@ export default {
   methods: {
   },
   mounted () {
-    test.add(1)
+
   },
   beforeDestroy () {
   }

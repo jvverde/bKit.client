@@ -1,7 +1,7 @@
 import axios from 'axios'
 import store from 'src/store'
 import router from 'src/router'
-import addServer from 'src/helpers/addServer'
+import newServer from 'src/helpers/newServer'
 
 export default function setup () {
   let promises = []
@@ -33,14 +33,16 @@ export default function setup () {
   }, (err) => {
     const originalRequest = err.config
     const servername = store.getters['auth/servername']
-
+    console.log('error:', err)
+    console.log('originalRequest', originalRequest)
+    console.log(servername)
     if (err.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       store.dispatch('auth/logout')
       router.replace({ name: 'login', query: {redirect: router.currentRoute.fullPath} })
       return new Promise((resolve) => promises.push(() => resolve(axios(originalRequest))))
     } else if (err.response.status === 404 && !servername) {
-      addServer()
+      newServer()
     }
     return Promise.reject(err)
   })

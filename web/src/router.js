@@ -34,6 +34,11 @@ let router = new VueRouter({
       component: load('Layout'),
       children: [
         {
+          path: 'alerts',
+          component: load('Alerts/Alerts'),
+          name: 'alerts'
+        },
+        {
           path: 'users',
           component: load('Users/List'),
           meta: { requiresAuth: true }

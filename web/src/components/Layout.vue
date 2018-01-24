@@ -57,6 +57,11 @@
         <div>{{user}}</div>
         <small><a href="#" @click="signout">Logout</a></small>
       </div>
+      <div v-show="alerts">
+        <q-btn flat round small icon="notifications"
+          @click="$router.push({ name: 'alerts' })">
+        </q-btn>
+      </div>
     </q-toolbar>
 
     <div slot="left">
@@ -75,11 +80,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
 import newServer from 'src/helpers/newServer'
-// import * as websocks from 'src/helpers/websocks'
+import * as websocks from 'src/helpers/websocks'
 
 import {
   QLayout,
@@ -117,8 +122,8 @@ export default {
   data () {
     return {
       showServers: false,
-      ws: [],
-      messages: []
+      alerts: false,
+      ws: []
     }
   },
   computed: {
@@ -155,25 +160,34 @@ export default {
       'rmServer',
       'addServer'
     ]),
+    ...mapMutations('alerts', [
+      'push'
+    ]),
     newServer () {
       newServer()
     }
   },
   mounted () {
     this.ws = []
-    /*    this.servers.forEach(server => {
-      console.log('server:', server)
+    this.servers.forEach(server => {
       const wsname = server.url.replace(/^https?/, 'ws')
       const wsURL = `${wsname}/ws/events`
       const ws = websocks.create(wsURL)
       ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
       ws.onopen = (msg) => console.log(`WS Open to ${wsURL}`, msg)
       ws.onmessage = (msg) => {
-        console.log(`Msg from ${wsURL}: `, msg)
-        this.messages.push({
+        let data = typeof msg.data === 'string'
+          ? JSON.parse(msg.data)
+          : msg.data
+        console.log(data)
+        this.push({
           name: server.name,
-          msg: msg
+          data: data,
+          from: (msg.target || {}).url,
+          url: wsURL,
+          date: new Date()
         })
+        this.alerts = true
       }
       ws.onclose = (e) => {
         console.log(`WS to ${wsURL} closed: `, e)
@@ -181,7 +195,6 @@ export default {
       }
       this.ws.push(ws)
     })
-    */
     if (!this.servername) {
       axios.get('/info')
         .then(response => {

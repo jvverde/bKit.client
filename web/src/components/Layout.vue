@@ -165,11 +165,8 @@ export default {
     ]),
     newServer () {
       newServer()
-    }
-  },
-  mounted () {
-    this.ws = []
-    this.servers.forEach(server => {
+    },
+    websocket (server, delay = 1) {
       const wsname = server.url.replace(/^https?/, 'ws')
       const wsURL = `${wsname}/ws/tail`
       const ws = websocks.create(wsURL)
@@ -191,10 +188,21 @@ export default {
       }
       ws.onclose = (e) => {
         console.log(`WS to ${wsURL} closed: `, e)
-        websocks.remove()
+        console.log('delay=', delay)
+        if (delay < 65536) {
+          setTimeout(
+            () => this.websocket(server, delay * 2),
+            1000 * delay
+          )
+        }
+        websocks.remove(wsURL)
       }
       this.ws.push(ws)
-    })
+    }
+  },
+  mounted () {
+    this.ws = []
+    this.servers.forEach(server => this.websocket(server))
     if (!this.servername) {
       axios.get('/info')
         .then(response => {

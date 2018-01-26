@@ -168,7 +168,7 @@ export default {
     },
     websocket (server, delay = 1) {
       const wsname = server.url.replace(/^https?/, 'ws')
-      const wsURL = `${wsname}/ws/tail`
+      const wsURL = `${wsname}/ws/alerts`
       const ws = websocks.create(wsURL)
       ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
       ws.onopen = (msg) => console.log(`WS Open to ${wsURL}`, msg)

@@ -216,10 +216,10 @@ export default {
       }
       const ask = {}
       const replay = (id) => {
-        ws.send({
+        ws.send(JSON.stringify({
           id: id,
           answer: ask[id].answer
-        })
+        }))
       }
       ws.onmessage = (msg) => {
         console.log(msg)

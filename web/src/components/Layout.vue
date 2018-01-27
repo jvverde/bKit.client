@@ -84,6 +84,7 @@ import { mapGetters, mapActions, mapMutations } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
 import newServer from 'src/helpers/newServer'
+import askUser from 'src/helpers/askUser'
 import * as websocks from 'src/helpers/websocks'
 
 import {
@@ -166,12 +167,16 @@ export default {
     newServer () {
       newServer()
     },
+    /* NOT NOT REMOVE. IN FUTURE IT COULD BE USEFULL
     websocket (server, delay = 1) {
       const wsname = server.url.replace(/^https?/, 'ws')
       const wsURL = `${wsname}/ws/alerts`
       const ws = websocks.create(wsURL)
       ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
-      ws.onopen = (msg) => console.log(`WS Open to ${wsURL}`, msg)
+      ws.onopen = (msg) => {
+        delay = 1
+        console.log(`WS Open to ${wsURL}`, msg)
+      }
       ws.onmessage = (msg) => {
         let data = typeof msg.data === 'string'
           ? JSON.parse(msg.data)
@@ -185,6 +190,63 @@ export default {
           date: new Date()
         })
         this.alerts = true
+      }
+      ws.onclose = (e) => {
+        console.log(`WS to ${wsURL} closed: `, e)
+        console.log('delay=', delay)
+        if (delay < 65536) {
+          setTimeout(
+            () => this.websocket(server, delay * 2),
+            1000 * delay
+          )
+        }
+        websocks.remove(wsURL)
+      }
+      this.ws.push(ws)
+    },
+    */
+    websocket (server, delay = 1) {
+      const wsname = server.url.replace(/^https?/, 'ws')
+      const wsURL = `${wsname}/ws/alerts`
+      const ws = websocks.create(wsURL)
+      ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
+      ws.onopen = (msg) => {
+        delay = 1
+        console.log(`WS Open to ${wsURL}`, msg)
+      }
+      const ask = {}
+      const replay = (id) => {
+        ws.send({
+          id: id,
+          answer: ask[id].answer
+        })
+      }
+      ws.onmessage = (msg) => {
+        console.log(msg)
+        let data = typeof msg.data === 'string'
+          ? JSON.parse(msg.data)
+          : msg.data
+        let [code, question, cnt, drive, volume, id] = data.msg.split('|')
+        console.log(id, cnt, code, question, drive, volume)
+        if (ask[id]) {
+          if (ask[id].answer) {
+            replay(id)
+          } else if (ask[id].progress instanceof Object) {
+            ask[id].progress.model = 0 | cnt
+          }
+        } else {
+          ask[id] = {
+            title: `Server: ${server.name}`,
+            message: question,
+            progress: {
+              model: 0 | cnt
+            }
+          }
+          askUser(ask[id]).then(answer => {
+            ask[id].answer = answer
+            replay(id)
+          })
+        }
       }
       ws.onclose = (e) => {
         console.log(`WS to ${wsURL} closed: `, e)

@@ -227,26 +227,30 @@ export default {
         let data = typeof msg.data === 'string'
           ? JSON.parse(msg.data)
           : msg.data
-        let [code, question, cnt, drive, volume, id] = data.msg.split('|')
-        console.log(id, cnt, code, question, drive, volume)
-        if (ask[id]) {
-          if (ask[id].answer) {
-            replay(id)
-          } else if (ask[id].progress instanceof Object) {
-            ask[id].progress.model = 0 | cnt
-          }
-        } else {
-          ask[id] = {
-            title: `Server: ${wsname}`,
-            message: question,
-            progress: {
-              model: 0 | cnt
+        if (data.type === 'udp') {
+          let [code, question, cnt, drive, volume, id] = data.msg.split('|')
+          console.log(id, cnt, code, question, drive, volume)
+          if (ask[id]) {
+            if (ask[id].answer) {
+              replay(id)
+            } else if (ask[id].progress instanceof Object) {
+              ask[id].progress.model = 0 | cnt
             }
+          } else {
+            ask[id] = {
+              title: `Server: ${wsname}`,
+              message: question,
+              progress: {
+                model: 0 | cnt
+              }
+            }
+            askUser(ask[id]).then(answer => {
+              ask[id].answer = answer
+              replay(id)
+            })
           }
-          askUser(ask[id]).then(answer => {
-            ask[id].answer = answer
-            replay(id)
-          })
+        } else if (data.type === 'reset') {
+          // remove ask[i] and Dialog
         }
       }
       ws.onclose = (e) => {

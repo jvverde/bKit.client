@@ -220,6 +220,7 @@ export default {
           id: id,
           answer: ask[id].answer
         }))
+        setTimeout(() => delete ask[id], 120000)
       }
       ws.onmessage = (msg) => {
         console.log(msg)
@@ -236,7 +237,7 @@ export default {
           }
         } else {
           ask[id] = {
-            title: `Server: ${server.name}`,
+            title: `Server: ${wsname}`,
             message: question,
             progress: {
               model: 0 | cnt
@@ -250,7 +251,6 @@ export default {
       }
       ws.onclose = (e) => {
         console.log(`WS to ${wsURL} closed: `, e)
-        console.log('delay=', delay)
         if (delay < 65536) {
           setTimeout(
             () => this.websocket(server, delay * 2),

@@ -76,6 +76,7 @@ export default {
     },
     deleted (u) {
       this.show(`${u} deleted`)
+      this.$emit('deleted', u)
     },
     getStates () {
       return Object.keys(this.states || {})

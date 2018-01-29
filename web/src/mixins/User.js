@@ -113,7 +113,7 @@ export const User = {
       }).catch(this.catch)
     },
     remove () {
-      axios.delete(`/auth/user/${encodeURIComponent(this.username)}`)
+      return axios.delete(`/auth/user/${encodeURIComponent(this.username)}`)
         .then(response => this.deleted(this.username))
         .catch(this.catch)
     },

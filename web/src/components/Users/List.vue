@@ -3,7 +3,8 @@
     <header class="text-center">Users</header>
     <user 
       :name="user"
-      @changed_email="changed_email" 
+      @changed_email="changed_email"
+      @deleted="removed" 
       v-for="user in users" 
       :key="user"
     />
@@ -36,11 +37,16 @@ export default {
       axios.get('/auth/users')
         .then(response => {
           this.users = response.data
+          console.log(this.users)
         })
         .catch(this.catch)
     },
     changed_email (msg) {
       this.show(msg)
+    },
+    removed (user) {
+      console.log('removed: ', user)
+      this.users = this.users.filter(u => u !== user)
     }
   },
   mounted () {

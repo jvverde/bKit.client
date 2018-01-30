@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 die() { echo -e "$@" >&2; exit 1; }
 exists() { type "$1" >/dev/null 2>&1;}
 OS=$(uname -o|tr '[:upper:]' '[:lower:]')

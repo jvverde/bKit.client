@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -f
 FILE=${1:--}
 getcivar(){	

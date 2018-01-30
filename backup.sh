@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR

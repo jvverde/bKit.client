@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 SDIR=$(dirname "$(readlink -f "$0")")	#Full DIR
 
 die() { echo -e "$@">&2; exit 1; }

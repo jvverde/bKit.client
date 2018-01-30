@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
 [[ -n $1 ]] || echo -e "Usage:\n\t$0 VolumeId"
 UUID=$1

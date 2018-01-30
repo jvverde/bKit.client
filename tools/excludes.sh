@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #Make a filter from excludes files in excludir directory
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')

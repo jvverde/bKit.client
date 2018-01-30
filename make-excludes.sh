@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 SDIR="$(dirname "$(readlink -f "$0")")"
 COPY=(excludes-all.txt)
 WIN=excludes-windows.txt

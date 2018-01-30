@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 die() { echo -e "$@">&2; exit 1; }
 warn() { echo -e "$@">&2; }
 

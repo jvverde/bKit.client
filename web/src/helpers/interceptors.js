@@ -37,6 +37,10 @@ export default function setup () {
     console.log('originalRequest', originalRequest)
     console.log(servername)
     if (err.response) {
+      if (err.response.status === 400 && err.response.data && err.response.data.msg &&
+        err.response.data.msg.match(/invalid.+user/i)) {
+        store.dispatch('auth/logout')
+      }
       if (err.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true
         store.dispatch('auth/logout')

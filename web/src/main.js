@@ -14,6 +14,7 @@ import Vue from 'vue'
 import Quasar from 'quasar'
 import router from 'src/router'
 import store from 'src/store'
+import Bkitlogo from './Bkitlogo'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
@@ -45,6 +46,8 @@ moment.relativeTimeThreshold('M', 23)
 Vue.use(VueMoment, {
   moment
 })
+
+Vue.component('bkitlogo', Bkitlogo)
 
 Quasar.start(() => {
   /* eslint-disable no-new */

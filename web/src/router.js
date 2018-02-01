@@ -31,6 +31,7 @@ let router = new VueRouter({
   routes: [
     {
       path: '/',
+      name: 'home',
       component: load('Layout'),
       children: [
         {
@@ -85,6 +86,30 @@ let router = new VueRouter({
               name: 'userview',
               props: true,
               component: load('User/View')
+            }
+          ]
+        },
+        {
+          path: 'local',
+          name: 'local',
+          component: load('Local/Layout'),
+          children: [
+            {
+              path: 'disks',
+              name: 'local-disks',
+              component: load('Local/Disks')
+            }
+          ]
+        },
+        {
+          path: 'remote',
+          name: 'remote',
+          component: load('Remote/Layout'),
+          children: [
+            {
+              path: 'computers',
+              name: 'remote-computers',
+              component: load('Remote/Computers')
             }
           ]
         }

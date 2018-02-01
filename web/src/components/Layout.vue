@@ -74,6 +74,9 @@
       <q-side-link item to="/groups">
         <q-item-main label="Groups" />
       </q-side-link>
+      <q-side-link item to="/remote/computers">
+        <q-item-main label="Backups" />
+      </q-side-link>
     </div>
     <router-view class="relative-position"></router-view>
   </q-layout>

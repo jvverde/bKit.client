@@ -8,7 +8,6 @@
       <q-btn flat @click="$refs.layout.toggleLeft()">
         <q-icon name="menu" />
       </q-btn>
-
       <q-toolbar-title>
         bKit App
         <dd v-if="servername" slot="subtitle"> <!-- this is an workaround -->

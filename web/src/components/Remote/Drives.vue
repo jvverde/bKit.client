@@ -2,7 +2,7 @@
   <div class="drives">
     <div class="drive" v-for="(drive, index) in drives">
       <router-link :to="{
-        name: 'Backups-page',
+        name: 'Backups',
         params: {
           computer: computer.id,
           disk:drive.id

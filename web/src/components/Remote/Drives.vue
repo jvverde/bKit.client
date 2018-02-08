@@ -1,8 +1,6 @@
 <template>
   <div class="drives">
-    <div class="drive" v-for="(drive, index) in drives"
-      @mouseout="mouseout"
-      @mouseover="mouseover(drive)" >
+    <div class="drive" v-for="(drive, index) in drives">
       <router-link :to="{
         name: 'Backups-page',
         params: {
@@ -12,6 +10,12 @@
       }" class="link">
         {{drive.name}}
       </router-link>
+      <div class="help">
+        <span>Label: {{drive.label}}</span>
+        <span>FS: {{drive.fs}}</span>
+        <span>Type: {{drive.type}}</span>
+        <span>ID: {{drive.uuid}}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -48,12 +52,6 @@
     methods: {
       toggle_drive (index) {
         this.drives[index].open = !this.drives[index].open
-      },
-      mouseover (disk) {
-        this.$emit('overdrive', disk)
-      },
-      mouseout () {
-        this.$emit('outdrive')
       }
     }
   }
@@ -61,6 +59,8 @@
 
 <style scoped lang="scss">
   @import "~scss/config.scss";
+  $margin: $scale * .05in;
+  $width: $scale * 1.5in;
   .drives{
     display: flex;
     flex-wrap: nowrap;
@@ -68,9 +68,9 @@
     align-items: center;
     .drive{
       height: 100%;
-      margin: 0.5px;
+      margin: $margin;
       padding-top: 3px;
-      width: $scale * 1.5in;
+      width: $width;
       background-color: #333;
       border: 1px solid black;
       color: #CCC;
@@ -92,10 +92,53 @@
         width: 100%;
         height: 100%;
         display:block;
+        text-align: center;
         &:hover{
-          color: #CCC;
-          background-color: rgba(128,128,128,0.5);
+          color: green;
         }
+      }
+      .help {
+        display: none;
+        position:absolute;
+        right: 1px;
+        top:1.5em;
+        z-index: 50000;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+        font-size: 8pt;
+        background-color: #EEE;
+        background-color: rgba(240,240,240,0.7);
+        border-radius: 5px;
+        padding: 5px;
+        span{
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          text-align: left;
+          color: black;
+        }
+      }
+
+      &:hover>.help {
+        display: flex;
+      }
+
+      $limit: 50;
+      $i: 1;
+      @while $i<$limit {
+        $v: 100%-$i*100%;
+        &:nth-last-child(#{$i})>.help {
+          left: auto;
+          right: $v;
+        }
+        // para a primeira metade dos discos, mas só se hover mais de 10 discos
+        &:nth-child(#{$i}):not(:nth-last-child(-n+#{$i})):not(
+          :nth-last-child(-n+5))>.help {
+          right: auto;
+          left: $v;
+        }
+        $i:$i + 1;
       }
     }
   }

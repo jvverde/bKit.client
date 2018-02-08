@@ -23,12 +23,6 @@
           </a>
         </li>
       </ul>
-      <div class="help" v-if="driveover">
-        <span>Label: {{driveover.label}}</span>
-        <span>FS: {{driveover.fs}}</span>
-        <span>Type: {{driveover.type}}</span>
-        <span>ID: {{driveover.uuid}}</span>
-      </div>
     </header>
     <div class="computers" :class="{onlyone:onlyone}">
       <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
@@ -58,7 +52,7 @@
   export default {
     data () {
       return {
-        driveover: null,
+        driveover: {},
         onlyone: false,
         computers: []
       }
@@ -99,7 +93,7 @@
         this.driveover = drive
       },
       outdrive () {
-        this.driveover = null
+        this.driveover = {}
       }
     }
   }
@@ -108,7 +102,6 @@
 <style scoped lang="scss">
   @import "~scss/config.scss";
   @import "~scss/breadcrumb.scss";
-  @import "~scss/config.scss";
   
   .contentor {
     height: 100%;
@@ -123,27 +116,6 @@
     align-self:flex-start;
     .logo{
       float:left;
-    }
-    .help {
-      position:absolute;
-      right: 1px;
-      top:1px;
-      z-index: 50000;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: flex-start;
-      font-size: 8pt;
-      background-color: #EEE;
-      background-color: rgba(240,240,240,0.9);
-      border-radius: 5px;
-      padding: 5px;
-      span{
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        text-align: left;
-      }
     }
   }
   .computers{
@@ -198,7 +170,7 @@
         line-height: $LSIZE;
         box-sizing: border-box;
       }
-      &:after,&:before{
+      &:after, &:before{
         content: "\02297";
         font-size: 60%;
         text-align: center;
@@ -257,9 +229,9 @@
         background-color:#333;
       }
       &:hover{
-        transform: scale(1.01,1.01);
-        box-shadow: 3px 3px 3px 3px #ccc;
-        cursor: pointer;
+        // transform: scale(1.01,1.01);
+        // box-shadow: 3px 3px 3px 3px #ccc;
+        // cursor: pointer;
       }
     }
   }

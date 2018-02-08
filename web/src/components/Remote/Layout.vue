@@ -1,4 +1,7 @@
 <template>
-  <router-view class="column absolute-top"/>
+  <router-view class="absolute-top column"/>
 </template>
+<style scoped lang="scss">
+
+</style>
 

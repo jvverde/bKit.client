@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="contentor no-wrap">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
 <!--       <ul class="breadcrumb">
@@ -108,6 +108,14 @@
 <style scoped lang="scss">
   @import "~scss/config.scss";
   @import "~scss/breadcrumb.scss";
+  @import "~scss/config.scss";
+  
+  .contentor {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    overflow-y:auto; 
+  }
 
   header.top{
     flex-shrink:0;

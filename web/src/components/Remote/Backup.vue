@@ -1,8 +1,6 @@
 <template>
   <div class="backup">
     <header class="top">
-      <bkitlogo class="logo"></bkitlogo>
-      <breadcrumb></breadcrumb>
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps"
           @click.stop="select(index)"
@@ -17,6 +15,7 @@
           </article>
         </section>
       </div>
+      <breadcrumb></breadcrumb>
     </header>
     <snapshot v-if="rootLocation.snapshot !== null"
       :rootLocation="rootLocation" class="snapshot">
@@ -124,9 +123,6 @@
     flex-wrap: nowrap;
     header.top{
       flex-shrink: 0;
-      .logo{
-        float:left;
-      }
     }
     .snapshot{
       flex-grow:1;

@@ -1,7 +1,7 @@
 <template>
   <header>
     <router-link to="/">
-      <img class="logo" src="statics/00-Logotipo/64x64.png">
+      <img src="~assets/bkit-logo.svg" class="logo">
     </router-link>
     <h1>bK<span class="i">i</span>t</h1>
     <i v-if="admin !== true"
@@ -64,10 +64,10 @@
     margin-left: 10px;
     margin-right: 10px;
     position: relative;
+    overflow: hidden;
     h1{
       display: flex;
       margin: 0;
-      margin-top: -10px;
       font-size: 2em;
     }
     .i{
@@ -77,6 +77,13 @@
       position: absolute;
       top:1px;
       left:0;
+    }
+    .logo {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      bottom: 0;
+      right: 0;
     }
   }
 </style>

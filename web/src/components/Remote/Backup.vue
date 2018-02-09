@@ -28,7 +28,8 @@
 </template>
 
 <script>
-  import Snapshot from '.Snapshot'
+  import axios from 'axios'
+  import Snapshot from './Snapshot'
   /*  import Breadcrumb from './Backup/Breadcrumb' */
   /*  import Console from './Console' */
 
@@ -56,8 +57,8 @@
       },
       rootLocation () {
         return {
-          computer: this.$route.params.computer,
-          disk: this.$route.params.disk,
+          computer: this.computer,
+          disk: this.disk,
           snapshot: this.currentSnap,
           path: '/'
         }
@@ -68,13 +69,12 @@
       /* Breadcrumb,
       Console */
     },
-    props: [],
+    props: ['computer','disk'],
     created () {
-      let url = this.$store.getters.url +
-        'backup' +
-        '/' + this.rootLocation.computer +
-        '/' + this.rootLocation.disk
-      this.$http.get(url).then(response => {
+      let url = '/auth/disk' +
+        '/' + this.computer +
+        '/' + this.disk
+      axios.get(url).then(response => {
         this.snaps = (response.data || []).map(snap => {
           return {
             id: snap,
@@ -94,12 +94,13 @@
         )
       },
       howlong (snap) {
-/*        let now = moment()
-        let x = snap.date*/
-/*        return now.diff(x, 'minutes') < 120 ? now.diff(x, 'minutes') + ' min'
+        /* let now = moment()
+        let x = snap.date
+        return now.diff(x, 'minutes') < 120 ? now.diff(x, 'minutes') + ' min'
           : now.diff(x, 'hours') < 48 ? now.diff(x, 'hours') + ' hours'
           : now.diff(x, 'days')  < 60 ? now.diff(x, 'days') + ' days'
-          : now.diff(x, 'months')  < 60 ? now.diff(x, 'days') + ' days'*/
+          : now.diff(x, 'months')  < 60 ? now.diff(x, 'days') + ' days'
+        */
       }
     }
   }

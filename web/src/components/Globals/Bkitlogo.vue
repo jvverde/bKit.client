@@ -15,7 +15,6 @@
   const isElectron = () => typeof process !== 'undefined' &&
     typeof process.versions.node !== 'undefined'
 
-  console.log(process.versions.node, isElectron())
   let exec = null
   if (isElectron()) {
     // exec = require('child_process').exec

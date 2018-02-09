@@ -2,7 +2,7 @@
   <div class="backup">
     <header class="top">
       <bkitlogo class="logo"></bkitlogo>
-      <!-- <breadcrumb></breadcrumb> -->
+      <breadcrumb></breadcrumb>
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps"
           @click.stop="select(index)"
@@ -121,6 +121,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    flex-wrap: nowrap;
     header.top{
       flex-shrink: 0;
       .logo{
@@ -130,7 +131,6 @@
     .snapshot{
       flex-grow:1;
       overflow: hidden;
-      height: 100%;
     }
     footer.bottom{
       flex-shrink: 0;

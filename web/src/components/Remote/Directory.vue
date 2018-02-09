@@ -3,38 +3,42 @@
     <li v-if="loading">
         <i class="fa fa-refresh fa-spin fa-fw"></i> Loading...
     </li>
-    <li v-for="(folder,index) in folders" @click.stop="select(folder)">
-      <header class="line" :class="{selected:currentPath === folder.location.path}">
+    <li v-for="(dir,index) in dirs" @click.stop="select(dir)">
+      <header class="line" :class="{selected:currentPath === dir.location.path}">
         <div class="props">
           <span class="icon is-small">
             <i class="fa fa-minus-square-o close" 
-              v-if="folder.open" 
-              @click.stop="folder.open=false">
+              v-if="dir.open" 
+              @click.stop="dir.open=false">
             </i>
             <i class="fa fa-plus-square-o open" 
               v-else  
-              @click.stop="folder.open=true">
+              @click.stop="dir.open=true">
             </i>
           </span>
           <span class="icon is-small">
-            <i class="fa fa-folder-open-o" v-if="folder.open"></i>
-            <i class="fa fa-folder-o" v-else></i>
+            <i class="fa fa-dir-open-o" v-if="dir.open"></i>
+            <i class="fa fa-dir-o" v-else></i>
           </span>
-          <span class="name">{{folder.name}}</span>
+          <span class="name">{{dir.name}}</span>
         </div>
-        <a :href="getUrl('bkit',folder.name)" title="Recovery" @click.stop="" class="links">
+        <a :href="getUrl('bkit',dir.name)" title="Recovery" @click.stop="" class="links">
           <span class="icon is-small">
             <i class="fa fa-history"></i>
           </span>
         </a>
       </header>
-      <directory v-if="folder.open" :location="folder.location">
+      <directory v-if="dir.open" :location="dir.location">
       </directory>
     </li>
   </ul>
 </template>
 
 <script>
+  import axios from 'axios'
+  import { mapGetters, mapMutations } from 'vuex'
+  import {myMixin} from 'src/mixins'
+
   const requiredLocation = {
     type: Object,
     required: true,
@@ -47,24 +51,22 @@
     return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
   }
 
-  /* import { mapGetters } from 'vuex' */
-
   export default {
     name: 'directory',
     data () {
       return {
-        url: this.$store.getters.url,
-        folders: [],
-        files: [],
+        dirs: [],
         loading: true
       }
     },
     props: {
       location: requiredLocation
     },
+    mixins: [myMixin],
     computed: {
+      ...mapGetters('location', ['getLocation']),
       currentPath () {
-        return this.$store.getters.location.path
+        return this.getLocation.path
       }
     },
     watch: {
@@ -78,45 +80,41 @@
       this.refresh()
     },
     methods: {
+      ...mapMutations('location', ['setLocation']),
       getUrl (base, entry) {
-        return this.url + base +
+        return base +
           '/' + this.location.computer +
           '/' + this.location.disk +
           '/' + this.location.snapshot +
           this.location.path +
           encodeURIComponent(entry || '')
       },
-      select (folder) {
-        this.$store.dispatch('setLocation', folder.location)
-        folder.open = !folder.open
+      select (dir) {
+        this.setLocation(dir.location)
+        dir.open = !dir.open
       },
       refresh () {
-        try {
-          var url = this.getUrl('folder')
-          this.loading = true
-          this.$http.jsonp(url).then((response) => {
-            let files = (response.data.files || []).sort(order)
-            let folders = (response.data.folders || []).map(folder => ({
-              name: folder,
+        const url = this.getUrl('/auth/client/dirs')
+        this.loading = true
+        axios.get(url)
+          .then(response => {
+            let dirs = (response.data || []).map(dir => ({
+              name: dir,
               location: Object.assign({}, this.location, {
-                path: this.location.path + encodeURIComponent(folder) + '/'
+                path: this.location.path + encodeURIComponent(dir) + '/'
               }),
-              open: (this.folders.find(e => e.name === folder) || {})
+              open: (this.dirs.find(e => e.name === dir) || {})
                 .open === true
             })).sort(order)
             this.$nextTick(() => {
               this.loading = false
-              this.files = files
-              this.folders = folders
+              this.dirs = dirs
             })
-          }, (response) => {
-            this.loading = false
-            console.error(response)
           })
-        } catch (e) {
-          this.loading = false
-          console.error(e)
-        }
+          .catch(err => {
+            this.loading = false
+            this.catch(err)
+          })
       }
     }
   }

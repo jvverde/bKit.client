@@ -36,6 +36,8 @@
 </template>
 
 <script>
+  import axios from 'axios'
+
   function order (a, b) {
     return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
   }
@@ -43,7 +45,6 @@
     name: 'files',
     data () {
       return {
-        url: this.$store.getters.url,
         files: [],
         oldlocation: {},
         newestsnap: ''
@@ -71,7 +72,7 @@
     },
     methods: {
       getUrl (base, entry) {
-        return this.url + base +
+        return base +
           '/' + this.location.computer +
           '/' + this.location.disk +
           '/' + this.location.snapshot +
@@ -86,9 +87,9 @@
       },
       refresh () {
         try {
-          const url = this.getUrl('folder')
-          this.$http.jsonp(url).then((response) => {
-            let files = (response.data.files || []).sort(order)
+          const url = this.getUrl('/auth/client/files')
+          axios.get(url).then(response => {
+            let files = (response.data || []).sort(order)
             if (this.isSnap()) {
               if (this.location.snapshot > this.newestsnap) {
                 this.newestsnap = this.location.snapshot

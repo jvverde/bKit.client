@@ -30,6 +30,9 @@
 <script>
   import axios from 'axios'
   import Snapshot from './Snapshot'
+  import { mapMutations } from 'vuex'
+  import {myMixin} from 'src/mixins'
+
   /*  import Breadcrumb from './Backup/Breadcrumb' */
   /*  import Console from './Console' */
 
@@ -70,8 +73,9 @@
       Console */
     },
     props: ['computer', 'disk'],
+    mixins: [myMixin],
     created () {
-      let url = '/auth/client/snaps' +
+      const url = '/auth/client/snaps' +
         '/' + this.computer +
         '/' + this.disk
       axios.get(url).then(response => {
@@ -81,18 +85,16 @@
             date: moment.utc(snap.substring(5), 'YYYY.MM.DD-HH.mm.ss').local()
           }
         })
-        this.select(this.snaps.length - 1)
-      }, response => {
-        console.error(response)
-      })
+        if (this.snaps.length > 0) this.select(this.snaps.length - 1)
+      }).catch(this.catch)
     },
     methods: {
+      ...mapMutations('location', ['setLocation']),
       select (index) {
         this.currentSnap = this.snaps[index].id
-        /* this.$store.dispatch('setLocation',
+        this.setLocation(
           Object.assign({}, this.currentLocation, {snapshot: this.currentSnap})
         )
-        */
       },
       howlong (snap) {
         /* let now = moment()

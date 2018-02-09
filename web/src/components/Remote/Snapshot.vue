@@ -2,18 +2,17 @@
   <section class="snapshot">
     <aside class="tree" v-if="rootLocation.disk">
       <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
-      <directory :location="rootLocation">
-      </directory>
+      <directory :location="rootLocation"/>
     </aside>
     <files class="content" :location="currentLocation" 
-      v-if="currentLocation.path">
-    </files>
+      v-if="currentLocation.path"/>
   </section>
 </template>
 
 <script>
   import Directory from './Directory'
   import Files from './Files'
+  import { mapGetters, mapMutations } from 'vuex'
 
   export default {
     name: 'snapshot',
@@ -24,6 +23,7 @@
     },
     props: ['rootLocation'],
     computed: {
+      ...mapGetters('location', ['getLocation']),
       diskName () {
         const comps = (this.rootLocation.disk || '').split('.')
         return comps[2] === '_' ? comps[0] : comps[2] + (
@@ -31,7 +31,7 @@
         )
       },
       currentLocation () {
-        return this.$store.getters.location
+        return this.getLocation
       }
     },
     components: {
@@ -42,8 +42,9 @@
       this.select(this.rootLocation)
     },
     methods: {
+      ...mapMutations('location', ['setLocation']),
       select (location) {
-        this.$store.dispatch('setLocation', location)
+        this.setLocation(location)
       }
     }
   }

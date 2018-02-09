@@ -14,7 +14,9 @@ import Vue from 'vue'
 import Quasar from 'quasar'
 import router from 'src/router'
 import store from 'src/store'
-import Bkitlogo from './Bkitlogo'
+import Bkitlogo from '@/Globals/Bkitlogo'
+import Formateddate from '@/Globals/Formateddate'
+import Formatedsize from '@/Globals/Formatedsize'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
@@ -48,6 +50,8 @@ Vue.use(VueMoment, {
 })
 
 Vue.component('bkitlogo', Bkitlogo)
+Vue.component('formateddate', Formateddate)
+Vue.component('formatedsize', Formatedsize)
 
 Quasar.start(() => {
   /* eslint-disable no-new */

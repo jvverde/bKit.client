@@ -64,6 +64,7 @@
     </q-toolbar>
 
     <div slot="left">
+      <bkitlogo class="logo"></bkitlogo>
       <q-side-link item to="/test" exact>
         <q-item-main label="About" />
       </q-side-link>
@@ -300,15 +301,7 @@ export default {
 </script>
 
 <style lang="stylus">
-.logo-container
-  width 255px
-  height 242px
-  perspective 800px
-  position absolute
-  top 50%
-  left 50%
-  transform translateX(-50%) translateY(-50%)
 .logo
-  position absolute
-  transform-style preserve-3d
+  width 100px
+  height 100px
 </style>

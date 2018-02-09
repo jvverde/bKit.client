@@ -1,5 +1,5 @@
 <template>
-  <ul class="breadcrumb">
+  <ul class="breadcrumb_bkit">
     <li>
       <span>
        <router-link to="/" class="icon is-small"><i class="fa fa-home"></i></router-link>

@@ -114,6 +114,7 @@ let router = new VueRouter({
             {
               path: 'backup/:computer/:disk',
               name: 'Backups',
+              props: true,
               component: load('Remote/Backup')
             }
           ]

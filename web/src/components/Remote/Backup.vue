@@ -18,9 +18,9 @@
         </section>
       </div>
     </header>
-<!--     <snapshot v-if="rootLocation.snapshot !== null"
+    <snapshot v-if="rootLocation.snapshot !== null"
       :rootLocation="rootLocation" class="snapshot">
-    </snapshot> -->
+    </snapshot>
     <footer class="bottom">
 <!--       <console></console>
  -->    </footer>
@@ -69,9 +69,9 @@
       /* Breadcrumb,
       Console */
     },
-    props: ['computer','disk'],
+    props: ['computer', 'disk'],
     created () {
-      let url = '/auth/disk' +
+      let url = '/auth/client/snaps' +
         '/' + this.computer +
         '/' + this.disk
       axios.get(url).then(response => {
@@ -89,9 +89,10 @@
     methods: {
       select (index) {
         this.currentSnap = this.snaps[index].id
-        this.$store.dispatch('setLocation',
+        /* this.$store.dispatch('setLocation',
           Object.assign({}, this.currentLocation, {snapshot: this.currentSnap})
         )
+        */
       },
       howlong (snap) {
         /* let now = moment()

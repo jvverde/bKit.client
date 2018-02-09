@@ -28,8 +28,7 @@
           </span>
         </a>
       </header>
-      <directory v-if="dir.open" :location="dir.location">
-      </directory>
+      <directory v-if="dir.open" :location="dir.location"/>
     </li>
   </ul>
 </template>
@@ -71,12 +70,14 @@
     },
     watch: {
       location () {
+        console.log('Location change to ', this.location.path)
         this.refresh()
       }
     },
     components: {
     },
-    created () {
+    mounted () {
+      console.log('Mounted for ', this.location.path)
       this.refresh()
     },
     methods: {
@@ -95,6 +96,7 @@
       },
       refresh () {
         const url = this.getUrl('/auth/client/dirs')
+        console.log('url:', url)
         this.loading = true
         axios.get(url)
           .then(response => {

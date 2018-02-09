@@ -17,6 +17,7 @@ import store from 'src/store'
 import Bkitlogo from '@/Globals/Bkitlogo'
 import Formateddate from '@/Globals/Formateddate'
 import Formatedsize from '@/Globals/Formatedsize'
+import Breadcrumb from '@/Globals/Breadcrumb'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
@@ -26,7 +27,7 @@ if (__THEME === 'mat') {
 }
 import 'quasar-extras/material-icons'
 // import 'quasar-extras/ionicons'
-// import 'quasar-extras/fontawesome'
+import 'quasar-extras/fontawesome'
 // import 'quasar-extras/animate'
 
 import Vuelidate from 'vuelidate'
@@ -52,6 +53,7 @@ Vue.use(VueMoment, {
 Vue.component('bkitlogo', Bkitlogo)
 Vue.component('formateddate', Formateddate)
 Vue.component('formatedsize', Formatedsize)
+Vue.component('breadcrumb', Breadcrumb)
 
 Quasar.start(() => {
   /* eslint-disable no-new */

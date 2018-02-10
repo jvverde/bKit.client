@@ -7,7 +7,9 @@
     </li>
     <li v-if="computerName">
       <span>
-        <router-link to="/computers" class="icon is-small"><i class="fa fa-desktop"></i> {{computerName}}</router-link>
+        <router-link :to="{name:'Remote-computers'}" class="icon is-small">
+            <i class="fa fa-desktop"></i> {{computerName}}
+        </router-link>
       </span>
     </li>
     <li v-if="computer && disk">
@@ -31,7 +33,9 @@
     </li>
     <li v-for="step in steps">
       <span>
-        <a @click.stop="selectPath(step.path)">{{step.value}}</a>
+        <a @click.stop="selectPath(step.path)">
+          <i class="fa fa-folder-open"></i> {{step.value}}
+        </a>
       </span>
     </li>
   </ul>
@@ -60,7 +64,7 @@
         return this.currentLocation.disk || ''
       },
       computerName () {
-        return this.computer.split('.').reverse()[1]
+        return this.computer.split('/')[1]
       },
       diskName () {
         const comps = this.disk.split('.')
@@ -92,9 +96,8 @@
     methods: {
       ...mapMutations('location', ['setLocation']),
       selectPath (path) {
-        this.setLocation(
-          Object.assign({}, this.currentLocation, {path: path})
-        )
+        const newLoc = Object.assign({}, this.currentLocation, {path: path})
+        this.setLocation(newLoc)
       }
     }
   }

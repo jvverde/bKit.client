@@ -9,7 +9,6 @@
         <q-icon name="menu" />
       </q-btn>
       <q-toolbar-title>
-        bKit App
         <dd v-if="servername" slot="subtitle"> <!-- this is an workaround -->
           <u>Server</u>: {{servername}}
           <q-popover anchor="bottom left" self="top left"
@@ -300,8 +299,9 @@ export default {
 }
 </script>
 
-<style lang="stylus">
-.logo
-  width 100px
-  height 100px
+<style scoped lang="stylus">
+  .logo
+    font-size 1.5em
+    width 80px
+    height 80px
 </style>

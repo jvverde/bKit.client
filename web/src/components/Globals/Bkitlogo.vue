@@ -68,7 +68,7 @@
     h1{
       display: flex;
       margin: 0;
-      font-size: 2em;
+      font-size: inherit;
     }
     .i{
       color:$bkit-color

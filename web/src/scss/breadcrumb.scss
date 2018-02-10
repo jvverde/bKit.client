@@ -6,7 +6,8 @@ $arrowborderradius: 4px;
 
 ul.breadcrumb_bkit {
   list-style: none;
-  margin-left: $arrowidth;
+  padding-left: $arrowidth;
+  margin: 1px;
   display: flex;
   flex-wrap:wrap;
   font-size: 8pt;

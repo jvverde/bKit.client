@@ -70,14 +70,12 @@
     },
     watch: {
       location () {
-        console.log('Location change to ', this.location.path)
         this.refresh()
       }
     },
     components: {
     },
     mounted () {
-      console.log('Mounted for ', this.location.path)
       this.refresh()
     },
     methods: {
@@ -96,7 +94,6 @@
       },
       refresh () {
         const url = this.getUrl('/auth/client/dirs')
-        console.log('url:', url)
         this.loading = true
         axios.get(url)
           .then(response => {

@@ -29,7 +29,7 @@
 <script>
   import axios from 'axios'
   import Snapshot from './Snapshot'
-  import { mapMutations } from 'vuex'
+  import { mapGetters, mapMutations } from 'vuex'
   import {myMixin} from 'src/mixins'
 
   /*  import Breadcrumb from './Backup/Breadcrumb' */
@@ -54,8 +54,9 @@
     filters: {
     },
     computed: {
+      ...mapGetters('location', ['getLocation']),
       currentLocation () {
-        return this.$store.getters.location
+        return this.getLocation
       },
       rootLocation () {
         return {
@@ -91,9 +92,10 @@
       ...mapMutations('location', ['setLocation']),
       select (index) {
         this.currentSnap = this.snaps[index].id
-        this.setLocation(
-          Object.assign({}, this.currentLocation, {snapshot: this.currentSnap})
-        )
+        const newLoc = Object.assign({}, this.currentLocation, {
+          snapshot: this.currentSnap
+        })
+        this.setLocation(newLoc)
       },
       howlong (snap) {
         /* let now = moment()
@@ -144,7 +146,7 @@
     align-items: center;
     overflow:hidden;
     overflow-x:auto;
-    margin:5px 2px 5px 20px;
+    margin: 4px 8px 1px;
     color:#474747;
     background:#eee;
     padding:1px 3px;

@@ -1,29 +1,5 @@
 <template>
   <div class="contentor no-wrap">
-    <header class="top">
-      <bkitlogo class="logo"></bkitlogo>
-<!--       <ul class="breadcrumb">
-        <li>
-          <span>
-            <router-link to="/" class="icon is-small">
-              <i class="home">Home</i>
-            </router-link>
-          </span>
-        </li>
-      </ul> -->
-      <ul class="breadcrumb">
-        <li>
-          <router-link to="/users">
-            <q-icon name="home" />
-          </router-link>
-        </li>
-        <li>
-          <a>
-            <q-icon name="mail" /> Quasar
-          </a>
-        </li>
-      </ul>
-    </header>
     <div class="computers" :class="{onlyone:onlyone}">
       <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
       <div class="computer" v-for="(computer,index) in computers"
@@ -124,7 +100,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    align-content: flex-start;
+    align-content: space-around;
     width:100%;
     height: 100%;
     overflow: auto;
@@ -231,7 +207,7 @@
       &:hover{
         // transform: scale(1.01,1.01);
         // box-shadow: 3px 3px 3px 3px #ccc;
-        // cursor: pointer;
+        cursor: pointer;
       }
     }
   }

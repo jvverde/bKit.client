@@ -6,7 +6,7 @@
           <i class="fa fa-file-o"></i>
         </span>
         <a :download="file" class="file" @click.stop=""
-          :href="getUrl('download',file.name)">
+          :href="getFullUrl('download',file.name)">
           <span class="name">{{file.name}}</span>
           <formatedsize :value="file.size"></formatedsize>
           <formateddate :value="file.datetime"></formateddate>
@@ -14,18 +14,19 @@
       </div>
       <div class="links">
         <a :download="file" @click.stop=""
-          :href="getUrl('download',file.name)" title="Download">
+          :href="getFullUrl('download',file.name)" title="Download">
           <span class="icon is-small">
             <i class="fa fa-download"></i>
           </span>
         </a>
         <a target="_blank" @click.stop=""
-          :href="getUrl('view',file.name)" title="View">
+          :href="getFullUrl('view',file.name)" title="View">
           <span class="icon is-small">
             <i class="fa fa-eye"></i>
           </span>
         </a>
-        <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop="">
+        <a :href="getFullUrl('bkit',file.name)" title="Recovery" 
+          @click.stop="">
           <span class="icon is-small">
             <i class="fa fa-history"></i>
           </span>
@@ -38,6 +39,7 @@
 <script>
   import axios from 'axios'
   import {myMixin} from 'src/mixins'
+  import { mapGetters } from 'vuex'
 
   function order (a, b) {
     return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
@@ -69,13 +71,18 @@
     mounted () {
       this.refresh()
     },
-    components: {
+    computed: {
+      ...mapGetters('auth', ['baseURL', 'token'])
     },
     mixins: [myMixin],
     methods: {
       getUrl (type, entry) {
         return `/auth/client/${this.location.computer}/disk/${this.location.disk}/snap/${this.location.snapshot}/${type}${this.location.path}` +
           encodeURIComponent(entry || '')
+      },
+      getFullUrl (type, entry) {
+        const r = this.getUrl(type, entry)
+        return `${this.baseURL}${r}?access_token=${this.token}`
       },
       isSnap () {
         return this.location.path === this.oldlocation.path &&

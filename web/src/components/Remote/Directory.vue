@@ -124,13 +124,16 @@
   ul.directories{
     list-style: none;
     position:relative;
+    padding: 0px;
     li {
       display: flex;
       flex-direction: column;
-      padding-left: $li-ident;            /* indentation = .5em */
       line-height:$line-height;
       box-sizing: border-box;
       position: relative;
+      &>*{
+        padding-left: $li-ident;            /* indentation = .5em */
+      }
       &::before, &::after {
         border-width: 0;
         border-style: dotted;

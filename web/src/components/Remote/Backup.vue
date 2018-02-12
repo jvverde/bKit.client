@@ -75,9 +75,7 @@
     props: ['computer', 'disk'],
     mixins: [myMixin],
     created () {
-      const url = '/auth/client/snaps' +
-        '/' + this.computer +
-        '/' + this.disk
+      const url = `/auth/client/${this.computer}/disk/${this.disk}/snaps`
       axios.get(url).then(response => {
         this.snaps = (response.data || []).map(snap => {
           return {

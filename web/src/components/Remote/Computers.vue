@@ -22,7 +22,6 @@
     QIcon
   } from 'quasar'
   import axios from 'axios'
-  import { mapGetters } from 'vuex'
   import {myMixin} from 'src/mixins'
 
   export default {
@@ -34,9 +33,6 @@
       }
     },
     computed: {
-      ...mapGetters('auth', [
-        'servername'
-      ])
     },
     components: {
       QIcon,

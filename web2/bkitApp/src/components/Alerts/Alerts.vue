@@ -1,5 +1,5 @@
 <template>
-  <main class="absolute-top">
+  <main class="absolute-center">
     <section class="text-center">
       <header>
         Messages
@@ -30,7 +30,7 @@
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
-  name: 'form',
+  name: 'alerts',
   components: {
   },
   data () {

@@ -7,10 +7,7 @@
         @click.stop="select(index)">
         <div class="name">{{computer.name}}</div>
         <div class="uuid">uuid:{{computer.uuid}}</div>
-        <drives :computer="computer" class="components"
-          @outdrive="outdrive"
-          @overdrive="overdrive">
-        </drives>
+        <drives :computer="computer" class="components"/>
       </div>
     </div>
   </div>
@@ -27,7 +24,6 @@
   export default {
     data () {
       return {
-        driveover: {},
         onlyone: false,
         computers: []
       }
@@ -38,7 +34,7 @@
       QIcon,
       Drives
     },
-    props: ['name'],
+    props: ['selected'],
     mixins: [myMixin],
     created () {
       const myself = {id: null}
@@ -46,6 +42,7 @@
         console.log(response.data)
         this.computers = response.data.map((e) => {
           const id = `${e.domain}/${e.name}/${e.uuid}`
+          if (id === this.selected) this.onlyone = e.selected = true
           return Object.assign({id: id, myself: id === myself.id}, e)
         }).sort(function (a, b) {
           return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
@@ -55,17 +52,7 @@
     methods: {
       select (index) {
         const computer = this.computers[index]
-        if (computer.selected) {
-          this.onlyone = computer.selected = false
-        } else {
-          this.onlyone = computer.selected = true
-        }
-      },
-      overdrive (drive) {
-        this.driveover = drive
-      },
-      outdrive () {
-        this.driveover = {}
+        this.onlyone = computer.selected = !computer.selected
       }
     }
   }

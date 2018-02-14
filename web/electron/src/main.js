@@ -42,6 +42,7 @@ function createWindow () {
 }
 
 app.on('ready', createWindow)
+console.log('Electron Start')
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

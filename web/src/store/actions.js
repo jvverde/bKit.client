@@ -1,4 +1,3 @@
-
 /* export const setServerAddress = ({ commit }, addr) => {
   if (typeof addr !== 'string') {
     console.warn('Address must be a string, we got a ' + typeof addr)

@@ -1,8 +1,7 @@
 
-// function load (component) {
-// '@' is aliased to src/components
-// return () => import(`componentes/${component}.vue`)
-// }
+function load (component) {
+  return () => import(`components/${component}.vue`)
+}
 
 export default [
   {
@@ -12,14 +11,15 @@ export default [
       { path: '', component: () => import('pages/index') },
       {
         path: 'alerts',
-        component: () => import('components/Alerts/Alerts'),
+        component: load('Alerts/Alerts'),
         name: 'alerts'
-      }
-      /*      {
+      },
+      {
         path: 'users',
+        name: 'users',
         component: load('Users/List'),
         meta: { requiresAuth: true }
-      },
+      } /*,
       {
         path: 'groups',
         component: load('Groups/List'),

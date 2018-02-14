@@ -1,5 +1,5 @@
 import store from 'src/store'
-import {Toast, Dialog} from 'quasar'
+import {QAlert, Dialog} from 'quasar'
 import {defaultName} from 'src/helpers/utils'
 
 export default function newServer (title) {
@@ -40,7 +40,7 @@ export default function newServer (title) {
               close()
               resolve(url)
             }).catch(e => {
-              Toast.create.negative({
+              QAlert.create.negative({
                 html: e.toString(),
                 timeout: 10000
               })

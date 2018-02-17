@@ -28,17 +28,11 @@
 <script>
 import axios from 'axios'
 import { required, sameAs, minLength } from 'vuelidate/lib/validators'
-import {
-  QBtn,
-  QInput
-} from 'quasar'
 import {myMixin} from 'src/mixins'
 
 export default {
   name: 'form',
   components: {
-    QBtn,
-    QInput
   },
   data () {
     return {

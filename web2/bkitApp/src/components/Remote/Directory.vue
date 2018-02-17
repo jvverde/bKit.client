@@ -3,16 +3,18 @@
     <li v-if="loading">
         <i class="fa fa-refresh fa-spin fa-fw"></i> Loading...
     </li>
-    <li v-for="(dir,index) in dirs" @click.stop="select(dir)">
+    <li v-for="(dir,index) in dirs"
+      :key="index"
+      @click.stop="select(dir)">
       <header class="line" :class="{selected:currentPath === dir.location.path}">
         <div class="props">
           <span class="icon is-small">
-            <i class="fa fa-minus-square-o close" 
-              v-if="dir.open" 
+            <i class="fa fa-minus-square-o close"
+              v-if="dir.open"
               @click.stop="dir.open=false">
             </i>
-            <i class="fa fa-plus-square-o open" 
-              v-else  
+            <i class="fa fa-plus-square-o open"
+              v-else
               @click.stop="dir.open=true">
             </i>
           </span>
@@ -22,7 +24,8 @@
           </span>
           <span class="name">{{dir.name}}</span>
         </div>
-        <a :href="getUrl('bkit',dir.name)" title="Recovery" @click.stop="" class="links">
+        <a :href="getUrl('bkit',dir.name)" title="Recovery" @click.stop
+          class="links">
           <span class="icon is-small">
             <i class="fa fa-history"></i>
           </span>

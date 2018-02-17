@@ -3,7 +3,7 @@
     <q-card-title>
       {{username}}
       <q-icon slot="right" name="account box" size="48px" color="info">
-      </q-icon>    
+      </q-icon>
     </q-card-title>
     <q-card-separator />
     <q-card-main>
@@ -28,17 +28,17 @@
         Reset Password
       </q-btn>
       <q-btn flat
-        @click="remove" 
-        icon="delete forever" 
+        @click="remove"
+        icon="delete forever"
         color="negative">
         Remove
       </q-btn>
-      <q-btn flat icon="lock open" color="positive" 
+      <q-btn flat icon="lock open" color="positive"
         v-if="disabled"
         @click="enable('set')">
         Enable
       </q-btn>
-      <q-btn flat icon="block" color="deep-orange" 
+      <q-btn flat icon="block" color="deep-orange"
         v-else
         @click="enable('reset')">
         disable

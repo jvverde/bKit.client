@@ -1,18 +1,18 @@
-import store from 'src/store'
-import {QAlert, Dialog} from 'quasar'
+import { Dialog } from 'quasar'
 import {defaultName} from 'src/helpers/utils'
+// import store from 'src/store'
 
 export default function newServer (title) {
   return new Promise((resolve) => {
-    Dialog.create({
+    return Dialog({
       title: title || 'Server Address',
-      form: {
-        name: {
-          type: 'text',
-          label: 'Name <small>(<i>must be uniq</i>)</small>',
-          model: defaultName()
-        },
-        address: {
+      prompt: {
+        // name: {
+        type: 'text',
+        label: 'Name <small>(<i>must be uniq</i>)</small>',
+        model: defaultName()
+        // },
+        /*        address: {
           type: 'text',
           label: 'IP/Name Address',
           model: ''
@@ -22,8 +22,9 @@ export default function newServer (title) {
           label: 'Port Number',
           model: ''
         }
-      },
-      buttons: [
+        */
+      } // ,
+      /*      buttons: [
         {
           label: 'Cancel',
           handler: () => resolve(null)
@@ -40,14 +41,15 @@ export default function newServer (title) {
               close()
               resolve(url)
             }).catch(e => {
-              QAlert.create.negative({
-                html: e.toString(),
+              Notify.create({
+                message: e.toString(),
                 timeout: 10000
               })
             })
           }
         }
       ]
+      */
     })
   })
 }

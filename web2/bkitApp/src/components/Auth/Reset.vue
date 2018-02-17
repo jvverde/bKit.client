@@ -6,15 +6,15 @@
         :error="$v.username.$error"
         @blur="$v.username.$touch"
         @keyup.enter="send"
-      />  
+      />
       <q-btn v-model="submit" loader
         rounded color="secondary"
-        :disabled="!ready" 
+        :disabled="!ready"
         @click="send"
       >
         Reset
       </q-btn>
-    </div> 
+    </div>
   </div>
 </template>
 

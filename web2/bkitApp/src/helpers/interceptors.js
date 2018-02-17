@@ -1,7 +1,7 @@
 import axios from 'axios'
 import store from 'src/store'
 import router from 'src/router'
-import newServer from 'src/helpers/newServer'
+// import newServer from 'src/pages/newServer'
 
 export default function setup () {
   let promises = []
@@ -47,7 +47,8 @@ export default function setup () {
         router.replace({ name: 'login', query: {redirect: router.currentRoute.fullPath} })
         return new Promise((resolve) => promises.push(() => resolve(axios(originalRequest))))
       } else if (err.response.status === 404 && !servername) {
-        newServer()
+        // console.log(newServer)
+        // newServer.render()
       }
     }
     return Promise.reject(err)

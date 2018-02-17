@@ -1,6 +1,6 @@
 <template>
   <div class="drives">
-    <div class="drive" v-for="(drive, index) in drives">
+    <div class="drive" v-for="(drive, index) in drives" :key="index">
       <router-link :to="{
         name: 'Backups',
         params: {

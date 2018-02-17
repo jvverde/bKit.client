@@ -9,9 +9,32 @@
           bKit App
           <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
         </q-toolbar-title>
+        <div v-if="!logged">
+          <q-btn
+            flat
+            @click="$router.replace({ name: 'login' })"
+          >
+            Sign In
+          </q-btn>
+          <span> | </span>
+          <q-btn
+            flat
+            @click="$router.replace({ name: 'signup' })"
+          >
+            Sign Up
+          </q-btn>
+        </div>
+        <div v-else class="flex column items-end">
+          <div>{{user}}</div>
+          <small><a href="#" @click="signout">Logout</a></small>
+        </div>
+        <div v-show="alerts">
+          <q-btn flat round small icon="notifications"
+            @click="$router.push({ name: 'alerts' })">
+          </q-btn>
+        </div>
       </q-toolbar>
     </q-layout-header>
-
     <q-layout-drawer v-model="leftDrawerOpen" content-class="bg-grey-2">
       <q-list no-border link inset-delimiter>
         <q-list-header>
@@ -61,16 +84,152 @@
 
 <script>
 import { openURL } from 'quasar'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
+import axios from 'axios'
+import {myMixin} from 'src/mixins'
+import askUser from 'src/helpers/askUser'
+import * as websocks from 'src/helpers/websocks'
+import newServer from 'src/helpers/newServer'
 
 export default {
   name: 'LayoutDefault',
   data () {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      showServers: false,
+      alerts: false,
+      ws: []
     }
   },
+  computed: {
+    ...mapGetters('auth', [
+      'token',
+      'logged',
+      'session',
+      'user',
+      'servername',
+      'servers'
+    ]),
+    orderedServers () {
+      return this.servers.slice().sort(
+        (a, b) => (a.name || '').localeCompare(b.name || '')
+      )
+    }
+  },
+  mixins: [myMixin],
   methods: {
-    openURL
+    openURL,
+    signout () {
+      axios.get('/auth/logout')
+        .then(response => {
+          this.logout()
+          this.$router.replace({
+            path: '/show',
+            query: {msg: response.data.msg}
+          })
+        })
+        .catch(this.catch)
+    },
+    ...mapActions('auth', [
+      'logout',
+      'chgServer',
+      'rmServer',
+      'addServer'
+    ]),
+    ...mapMutations('alerts', [
+      'push'
+    ]),
+    newServer () {
+      newServer()
+    },
+    websocket (server, delay = 1) {
+      const wsname = server.url.replace(/^https?/, 'ws')
+      const wsURL = `${wsname}/ws/alerts`
+      const ws = websocks.create(wsURL)
+      ws.onerror = (err) => console.log(`Error from ${wsURL}`, err)
+      ws.onopen = (msg) => {
+        delay = 1
+        console.log(`WS Open to ${wsURL}`, msg)
+      }
+      const ask = {}
+      const replay = (id) => {
+        ws.send(JSON.stringify({
+          id: id,
+          answer: ask[id].answer
+        }))
+        setTimeout(() => delete ask[id], 120000)
+      }
+      ws.onmessage = (msg) => {
+        console.log(msg)
+        let data = typeof msg.data === 'string'
+          ? JSON.parse(msg.data)
+          : msg.data
+        if (data.type === 'udp') {
+          let [code, question, cnt, drive, volume, id] = data.msg.split('|')
+          console.log(id, cnt, code, question, drive, volume)
+          if (ask[id]) {
+            if (ask[id].answer) {
+              replay(id)
+            } else if (ask[id].progress instanceof Object) {
+              ask[id].progress.model = 0 | cnt
+            }
+          } else {
+            ask[id] = {
+              title: `Server: ${wsname}`,
+              message: question,
+              progress: {
+                model: 0 | cnt
+              }
+            }
+            askUser(ask[id]).then(answer => {
+              ask[id].answer = answer
+              replay(id)
+            })
+          }
+        } else if (data.type === 'reset') {
+          // remove ask[i] and Dialog
+        }
+      }
+      ws.onclose = (e) => {
+        console.log(`WS to ${wsURL} closed: `, e)
+        if (delay < 65536) {
+          setTimeout(
+            () => this.websocket(server, delay * 2),
+            1000 * delay
+          )
+        }
+        websocks.remove(wsURL)
+      }
+      this.ws.push(ws)
+    }
+  },
+  mounted () {
+    this.ws = []
+    this.servers.forEach(server => this.websocket(server))
+    if (!this.servername) {
+      axios.get('/info')
+        .then(response => {
+          let url0 = (response.data || {}).baseUrl
+          if (url0) {
+            this.addServer({
+              url: url0,
+              name: 'Local Server 0'
+            })
+          }
+          let url1 = ((response.request || {}).responseURL || '')
+            .replace(/\/info$/, '')
+          if (url1 && url1 !== url0) {
+            this.addServer({
+              url: url1,
+              name: 'Local Server 1'
+            })
+          }
+        })
+        .catch(this.catch)
+    }
+  },
+  beforeDestroy () {
+    this.ws.forEach(ws => ws.close())
   }
 }
 </script>

@@ -12,7 +12,7 @@
         :color="disabled ? 'warning' : 'positive'"
       />
       <q-icon
-        @click="$router.push({ 
+        @click="$router.push({
           name: 'userview',
           params: { name: username }
         })"
@@ -39,7 +39,7 @@
       </span>
     </div>
     <div class="col" title="Groups">
-      <q-chips-input 
+      <q-chips-input
         style="padding-left:.5em"
         v-model="groups"
         :placeholder="groups.length ? '': 'Type a valid group name'"
@@ -112,7 +112,7 @@ export default {
         margin-bottom: 1em;
         content: attr(title);
         font-weight: bold;
-      } 
+      }
     }
   }
 </style>

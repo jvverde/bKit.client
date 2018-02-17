@@ -3,11 +3,11 @@
     <q-list-header class="text-center">Groups</q-list-header>
     <q-item
       link
-      v-for="(group, index) in groups"  
+      v-for="(group, index) in groups"
       :key="group.name"
     >
       <q-item-main :label="group.name">
-        <q-chips-input 
+        <q-chips-input
           style="padding-left:.5em"
           v-model="group.users"
           :placeholder="group.users.length ? '': 'Type a valid username'"
@@ -15,10 +15,10 @@
           @change="change(index)"
         />
       </q-item-main>
-      <q-item-side 
-        right 
-        icon="delete forever" 
-        color="negative" 
+      <q-item-side
+        right
+        icon="delete forever"
+        color="negative"
         @click="remove(index)"
       />
     </q-item>
@@ -32,52 +32,11 @@
 <script>
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
-
-import {
-  Dialog,
-  QToggle,
-  QAutocomplete,
-  QChipsInput,
-  QCard,
-  QCardActions,
-  QCardMain,
-  QDataTable,
-  QItemSeparator,
-  QBtn,
-  QIcon,
-  QField,
-  QInput,
-  QList,
-  QListHeader,
-  QItem,
-  QItemMain,
-  QItemTile,
-  QItemSide,
-  QSideLink
-} from 'quasar'
+import {Dialog} from 'quasar'
 
 export default {
   name: 'form',
   components: {
-    QToggle,
-    QAutocomplete,
-    QChipsInput,
-    QCard,
-    QCardActions,
-    QCardMain,
-    QDataTable,
-    QItemSeparator,
-    QBtn,
-    QIcon,
-    QField,
-    QInput,
-    QList,
-    QListHeader,
-    QItem,
-    QItemMain,
-    QItemTile,
-    QItemSide,
-    QSideLink
   },
   data () {
     return {

@@ -3,6 +3,7 @@
     <header class="top">
       <div class="accordion">
         <section class="cell" v-for="(snap, index) in snaps"
+          :key="index"
           @click.stop="select(index)"
           :class="{selected: snap.id === currentSnap}">
           <header class="spine" :title="snap.date.format('DD-MM-YYYY HH:mm')">

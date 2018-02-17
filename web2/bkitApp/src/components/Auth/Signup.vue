@@ -5,14 +5,14 @@
       :error="$v.form.username.$error"
       @keyup.enter="send"
       @blur="$v.form.username.$touch"
-    />  
+    />
     <q-input type="email" max-length="50"
       v-model="form.email"  float-label="Email"
       :error="$v.form.email.$error"
       @keyup.enter="send"
       @blur="$v.form.email.$touch"
-    />  
-    <q-input type="password" max-length="16" 
+    />
+    <q-input type="password" max-length="16"
       v-model="form.password" float-label="Password"
       :error="$v.form.password.$error"
       @keyup.enter="send"
@@ -20,11 +20,11 @@
     />
     <q-btn v-model="submit" loader
       rounded color="secondary"
-      :disabled="!ready" 
+      :disabled="!ready"
       @click="send"
     >
       Sign up
-    </q-btn>  
+    </q-btn>
   </div>
 </template>
 

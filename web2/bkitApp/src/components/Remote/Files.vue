@@ -1,11 +1,11 @@
 <template>
   <ul class="files">
-    <li v-for="file in files">
+    <li v-for="(file, index) in files" :key="index">
       <div class="props" :class="{deleted:file.deleted, changed:file.changed}">
         <span class="icon is-small">
           <i class="fa fa-file-o"></i>
         </span>
-        <a :download="file" class="file" @click.stop=""
+        <a :download="file" class="file" @click.stop
           :href="getUrl('download',file.name)">
           <span class="name">{{file.name}}</span>
           <formatedsize :value="file.size"></formatedsize>
@@ -13,19 +13,19 @@
         </a>
       </div>
       <div class="links">
-        <a :download="file" @click.stop=""
+        <a :download="file" @click.stop
           :href="getUrl('download',file.name)" title="Download">
           <span class="icon is-small">
             <i class="fa fa-download"></i>
           </span>
         </a>
-        <a target="_blank" @click.stop=""
+        <a target="_blank" @click.stop
           :href="getUrl('view',file.name)" title="View">
           <span class="icon is-small">
             <i class="fa fa-eye"></i>
           </span>
         </a>
-        <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop="">
+        <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop>
           <span class="icon is-small">
             <i class="fa fa-history"></i>
           </span>

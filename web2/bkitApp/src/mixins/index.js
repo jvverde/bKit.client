@@ -1,8 +1,8 @@
-import { Toast } from 'quasar'
+import { Notify } from 'quasar'
 
 function show (msg) {
-  Toast.create.positive({
-    html: msg,
+  Notify.create({
+    message: msg,
     timeout: 3000
   })
 }
@@ -17,8 +17,8 @@ export const myMixin = {
         e.response.data instanceof Object) {
         msg = `<small>${msg}</small><br/><i>${e.response.data.msg}</i>`
       }
-      Toast.create.negative({
-        html: msg,
+      Notify.create({
+        message: msg,
         timeout: 10000
       })
     }

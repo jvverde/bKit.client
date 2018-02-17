@@ -4,7 +4,7 @@
       <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
       <directory :location="rootLocation"/>
     </aside>
-    <files class="content" :location="currentLocation" 
+    <files class="content" :location="currentLocation"
       v-if="currentLocation.path"/>
   </section>
 </template>

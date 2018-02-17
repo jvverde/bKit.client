@@ -1,11 +1,11 @@
 <template>
   <div class="absolute-top full-width" dense no-border>
     <header class="text-center">Users</header>
-    <user 
+    <user
       :name="user"
       @changed_email="changed_email"
-      @deleted="removed" 
-      v-for="user in users" 
+      @deleted="removed"
+      v-for="user in users"
       :key="user"
     />
   </div>

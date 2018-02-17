@@ -36,18 +36,9 @@ import axios from 'axios'
 import { required } from 'vuelidate/lib/validators'
 import {myMixin} from 'src/mixins'
 
-import {
-  QInput,
-  QField,
-  QBtn
-} from 'quasar'
-
 export default {
   name: 'Login',
   components: {
-    QInput,
-    QField,
-    QBtn
   },
   data () {
     return {

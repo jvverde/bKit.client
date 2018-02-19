@@ -53,7 +53,21 @@ module.exports = function (ctx) {
     devServer: {
       // https: true,
       // port: 8080,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
+      proxy: {
+        '/info': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
+        '/auth': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
+        '/ws': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        }         
+      }
     },
     // framework: 'all' --- includes everything; for dev only!
     framework: {
@@ -72,6 +86,8 @@ module.exports = function (ctx) {
         'QItem',
         'QItemMain',
         'QItemSide',
+        'QInput',
+        'QModal',
         'QAlert'
       ],
       directives: [

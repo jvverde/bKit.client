@@ -75,7 +75,7 @@
       </q-side-link> -->
 
     </q-layout-drawer>
-
+    <new-server :open="askServer" />
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -89,7 +89,7 @@ import axios from 'axios'
 import {myMixin} from 'src/mixins'
 import askUser from 'src/helpers/askUser'
 import * as websocks from 'src/helpers/websocks'
-import newServer from 'src/helpers/newServer'
+import newServer from 'src/pages/newServer'
 
 export default {
   name: 'LayoutDefault',
@@ -101,6 +101,9 @@ export default {
       ws: []
     }
   },
+  components: {
+    newServer
+  },
   computed: {
     ...mapGetters('auth', [
       'token',
@@ -108,8 +111,12 @@ export default {
       'session',
       'user',
       'servername',
-      'servers'
+      'servers',
+      'baseURL'
     ]),
+    askServer () {
+      return !this.baseURL
+    },
     orderedServers () {
       return this.servers.slice().sort(
         (a, b) => (a.name || '').localeCompare(b.name || '')
@@ -213,7 +220,7 @@ export default {
           if (url0) {
             this.addServer({
               url: url0,
-              name: 'Local Server 0'
+              name: 'Local Server (0)'
             })
           }
           let url1 = ((response.request || {}).responseURL || '')
@@ -221,7 +228,7 @@ export default {
           if (url1 && url1 !== url0) {
             this.addServer({
               url: url1,
-              name: 'Local Server 1'
+              name: 'Local Server (1)'
             })
           }
         })

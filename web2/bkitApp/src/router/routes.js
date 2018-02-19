@@ -10,6 +10,25 @@ export default [
     children: [
       { path: '', component: () => import('pages/index') },
       {
+        path: 'login',
+        name: 'login',
+        component: load('Auth/Login')
+      },
+      {
+        path: 'signup',
+        name: 'signup',
+        component: load('Auth/Signup')
+      },
+      {
+        path: 'reset_pass',
+        component: load('Auth/Reset')
+      },
+      {
+        path: 'new_pass/:username',
+        props: true,
+        component: load('Auth/Password')
+      },
+      {
         path: 'alerts',
         component: load('Alerts/Alerts'),
         name: 'alerts'

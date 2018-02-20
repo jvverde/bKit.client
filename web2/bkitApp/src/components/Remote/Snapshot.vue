@@ -1,7 +1,12 @@
 <template>
   <section class="snapshot">
     <aside class="tree" v-if="rootLocation.disk">
-      <div @click.stop="select(rootLocation)" class="root">{{diskName}}</div>
+      <div @click.stop="select(rootLocation)"
+        :class="{selected: currentLocation.path === rootLocation.path}"
+        class="root">
+        <i class="fa fa-hdd-o"></i>
+        {{diskName}}
+      </div>
       <directory :location="rootLocation"/>
     </aside>
     <files class="content" :location="currentLocation"
@@ -57,10 +62,6 @@ export default {
     height: 100%;
     display: flex;
     text-align: left;
-    .root:hover{
-      background-color: $li-hover;
-      cursor: pointer;
-    }
     .content {
       flex-grow:1;
       overflow: auto;
@@ -69,6 +70,17 @@ export default {
     .tree{
       overflow: auto;
       border-right:1px solid $bkit-color;
+      .root.selected {
+        background-color: $li-selected;
+      }
+      .root:hover{
+        background-color: $li-hover;
+        cursor: pointer;
+      }
+      &>*{
+        margin: 0;
+        margin-left: .3em;
+      }
     }
     a{
       color: inherit;

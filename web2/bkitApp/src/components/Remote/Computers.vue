@@ -1,41 +1,15 @@
 <template>
   <div class="contentor no-wrap">
-    <header class="top">
-      <bkitlogo class="logo"></bkitlogo>
-<!--       <ul class="breadcrumb">
-        <li>
-          <span>
-            <router-link to="/" class="icon is-small">
-              <i class="home">Home</i>
-            </router-link>
-          </span>
-        </li>
-      </ul> -->
-      <ul class="breadcrumb">
-        <li>
-          <router-link to="/users">
-            <q-icon name="home" />
-          </router-link>
-        </li>
-        <li>
-          <a>
-            <q-icon name="mail" /> Quasar
-          </a>
-        </li>
-      </ul>
-    </header>
     <div class="computers" :class="{onlyone:onlyone}">
       <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
-      <div class="computer" v-for="(computer,index) in computers"
+      <div class="computer"
+        v-for="(computer,index) in computers"
         :key="index"
         :class="{selected:computer.selected, myself:computer.myself}"
         @click.stop="select(index)">
         <div class="name">{{computer.name}}</div>
         <div class="uuid">uuid:{{computer.uuid}}</div>
-        <drives :computer="computer" class="components"
-          @outdrive="outdrive"
-          @overdrive="overdrive">
-        </drives>
+        <drives :computer="computer" class="components"/>
       </div>
     </div>
   </div>
@@ -47,27 +21,22 @@ import {
   QIcon
 } from 'quasar'
 import axios from 'axios'
-import { mapGetters } from 'vuex'
 import {myMixin} from 'src/mixins'
 
 export default {
   data () {
     return {
-      driveover: {},
       onlyone: false,
       computers: []
     }
   },
   computed: {
-    ...mapGetters('auth', [
-      'servername'
-    ])
   },
   components: {
     QIcon,
     Drives
   },
-  props: ['name'],
+  props: ['selected'],
   mixins: [myMixin],
   created () {
     const myself = {id: null}
@@ -75,6 +44,7 @@ export default {
       console.log(response.data)
       this.computers = response.data.map((e) => {
         const id = `${e.domain}/${e.name}/${e.uuid}`
+        if (id === this.selected) this.onlyone = e.selected = true
         return Object.assign({id: id, myself: id === myself.id}, e)
       }).sort(function (a, b) {
         return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
@@ -84,17 +54,7 @@ export default {
   methods: {
     select (index) {
       const computer = this.computers[index]
-      if (computer.selected) {
-        this.onlyone = computer.selected = false
-      } else {
-        this.onlyone = computer.selected = true
-      }
-    },
-    overdrive (drive) {
-      this.driveover = drive
-    },
-    outdrive () {
-      this.driveover = {}
+      this.onlyone = computer.selected = !computer.selected
     }
   }
 }
@@ -125,7 +85,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    align-content: flex-start;
+    align-content: space-around;
     width:100%;
     height: 100%;
     overflow: auto;
@@ -232,7 +192,7 @@ export default {
       &:hover{
         // transform: scale(1.01,1.01);
         // box-shadow: 3px 3px 3px 3px #ccc;
-        // cursor: pointer;
+        cursor: pointer;
       }
     }
   }

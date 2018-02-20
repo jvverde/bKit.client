@@ -6,7 +6,7 @@
           <i class="fa fa-file-o"></i>
         </span>
         <a :download="file" class="file" @click.stop
-          :href="getUrl('download',file.name)">
+          :href="getFullUrl('download',file.name)">
           <span class="name">{{file.name}}</span>
           <formatedsize :value="file.size"></formatedsize>
           <formateddate :value="file.datetime"></formateddate>
@@ -14,18 +14,19 @@
       </div>
       <div class="links">
         <a :download="file" @click.stop
-          :href="getUrl('download',file.name)" title="Download">
+          :href="getFullUrl('download',file.name)" title="Download">
           <span class="icon is-small">
             <i class="fa fa-download"></i>
           </span>
         </a>
         <a target="_blank" @click.stop
-          :href="getUrl('view',file.name)" title="View">
+          :href="getFullUrl('view',file.name)" title="View">
           <span class="icon is-small">
             <i class="fa fa-eye"></i>
           </span>
         </a>
-        <a :href="getUrl('bkit',file.name)" title="Recovery" @click.stop>
+        <a :href="getFullUrl('bkit',file.name)" title="Recovery"
+          @click.stop>
           <span class="icon is-small">
             <i class="fa fa-history"></i>
           </span>
@@ -37,6 +38,8 @@
 
 <script>
 import axios from 'axios'
+import {myMixin} from 'src/mixins'
+import { mapGetters } from 'vuex'
 
 function order (a, b) {
   return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
@@ -68,16 +71,18 @@ export default {
   mounted () {
     this.refresh()
   },
-  components: {
+  computed: {
+    ...mapGetters('auth', ['baseURL', 'token'])
   },
+  mixins: [myMixin],
   methods: {
-    getUrl (base, entry) {
-      return base +
-        '/' + this.location.computer +
-        '/' + this.location.disk +
-        '/' + this.location.snapshot +
-        this.location.path +
+    getUrl (type, entry) {
+      return `/auth/client/${this.location.computer}/disk/${this.location.disk}/snap/${this.location.snapshot}/${type}${this.location.path}` +
         encodeURIComponent(entry || '')
+    },
+    getFullUrl (type, entry) {
+      const r = this.getUrl(type, entry)
+      return `${this.baseURL}${r}?access_token=${this.token}`
     },
     isSnap () {
       return this.location.path === this.oldlocation.path &&
@@ -86,46 +91,40 @@ export default {
         this.location.snapshot !== this.oldlocation.snapshot
     },
     refresh () {
-      try {
-        const url = this.getUrl('/auth/client/files')
-        axios.get(url).then(response => {
-          let files = (response.data || []).sort(order)
-          if (this.isSnap()) {
-            if (this.location.snapshot > this.newestsnap) {
-              this.newestsnap = this.location.snapshot
-              this.newestfiles = files
-              // console.log('New snapshot', this.newestsnap)
-            } else { // old snapshot in same path
-              // console.log('compare files')
-              files.forEach(f => {
-                const old = this.newestfiles.find(e => {
-                  return e.name === f.name
-                })
-                if (!old) {
-                  // console.log('Not found', f.name)
-                  f.deleted = true
-                } else if (old.size !== f.size ||
-                    old.datetime !== f.datetime) {
-                  // console.log('Different size for', f.name)
-                  f.changed = true
-                }
-              })
-            }
-          } else { // new path
-            this.newestfiles = files
+      const url = this.getUrl('files')
+      axios.get(url).then(response => {
+        let files = (response.data || []).sort(order)
+        if (this.isSnap()) {
+          if (this.location.snapshot > this.newestsnap) {
             this.newestsnap = this.location.snapshot
-            // console.log('new path and new snapshot', this.newestsnap)
+            this.newestfiles = files
+            // console.log('New snapshot', this.newestsnap)
+          } else { // old snapshot in same path
+            // console.log('compare files')
+            files.forEach(f => {
+              const old = this.newestfiles.find(e => {
+                return e.name === f.name
+              })
+              if (!old) {
+                // console.log('Not found', f.name)
+                f.deleted = true
+              } else if (old.size !== f.size ||
+                  old.datetime !== f.datetime) {
+                // console.log('Different size for', f.name)
+                f.changed = true
+              }
+            })
           }
-          this.$nextTick(() => { // update on next clock ticket
-            this.files = files
-            this.oldlocation = this.location
-          })
-        }, (error) => {
-          console.error(error)
+        } else { // new path
+          this.newestfiles = files
+          this.newestsnap = this.location.snapshot
+          // console.log('new path and new snapshot', this.newestsnap)
+        }
+        this.$nextTick(() => { // update on next clock ticket
+          this.files = files
+          this.oldlocation = this.location
         })
-      } catch (e) {
-        console.error(e)
-      }
+      }).catch(this.catch)
     }
   }
 }

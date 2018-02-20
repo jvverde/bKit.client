@@ -2,7 +2,8 @@
   <div class="backup">
     <header class="top">
       <div class="accordion">
-        <section class="cell" v-for="(snap, index) in snaps"
+        <section class="cell"
+          v-for="(snap, index) in snaps"
           :key="index"
           @click.stop="select(index)"
           :class="{selected: snap.id === currentSnap}">
@@ -76,9 +77,7 @@ export default {
   props: ['computer', 'disk'],
   mixins: [myMixin],
   created () {
-    const url = '/auth/client/snaps' +
-      '/' + this.computer +
-      '/' + this.disk
+    const url = `/auth/client/${this.computer}/disk/${this.disk}/snaps`
     axios.get(url).then(response => {
       this.snaps = (response.data || []).map(snap => {
         return {

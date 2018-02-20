@@ -15,21 +15,15 @@
       <div class="links">
         <a :download="file" @click.stop
           :href="getFullUrl('download',file.name)" title="Download">
-          <span class="icon is-small">
-            <i class="fa fa-download"></i>
-          </span>
+          <q-icon name="fa-download" class="icon"/>
         </a>
         <a target="_blank" @click.stop
           :href="getFullUrl('view',file.name)" title="View">
-          <span class="icon is-small">
-            <i class="fa fa-eye"></i>
-          </span>
+          <q-icon name="fa-eye" class="icon"/>
         </a>
         <a :href="getFullUrl('bkit',file.name)" title="Recovery"
           @click.stop>
-          <span class="icon is-small">
-            <i class="fa fa-history"></i>
-          </span>
+          <q-icon name="fa-history" class="icon"/>
         </a>
       </div>
     </li>

@@ -7,7 +7,32 @@
         </q-btn>
         <q-toolbar-title>
           bKit App
-          <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
+          <dd v-if="servername" slot="subtitle"> <!-- this is an workaround -->
+            <u>Server</u>: {{servername}}
+            <q-popover anchor="bottom left" self="top left"
+              ref="popover" v-model="showServers">
+              <q-list @click="$refs.popover.close()">
+                <q-list-header>Servers</q-list-header>
+                <q-item link v-for="server in orderedServers"
+                  :key="server.name">
+                  <q-item-side icon="delete" color="warning"
+                    @click="rmServer(server.name)"/>
+                  <q-item-main
+                    @click="chgServer(server.name)"
+                    :label="server.name"
+                    :sublabel="server.url"
+                  />
+                </q-item>
+                <q-item link @click="newServer" dense>
+                  <q-item-side icon="add"/>
+                  <q-item-main label="Add a new server"/>
+                </q-item>
+              </q-list>
+            </q-popover>
+          </dd>
+          <div v-else slot="subtitle" @click="newServer">
+            <u>Add server</u>
+          </div>
         </q-toolbar-title>
         <div v-if="!logged">
           <q-btn

@@ -16,13 +16,14 @@ Vue.component('formateddate', Formateddate)
 Vue.component('formatedsize', Formatedsize)
 Vue.component('breadcrumb', Breadcrumb)
 
-import moment from 'moment'
+/* import moment from 'moment'
 
 moment.locale('en')
 moment.relativeTimeThreshold('m', 119)
 moment.relativeTimeThreshold('h', 47)
 moment.relativeTimeThreshold('d', 59)
 moment.relativeTimeThreshold('M', 23)
+*/
 
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)

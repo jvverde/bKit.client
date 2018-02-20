@@ -51,13 +51,14 @@ export default [
         component: load('Remote/Layout'),
         children: [
           {
-            path: 'computers',
+            path: 'computers/:selected*',
             name: 'remote-computers',
+            props: true,
             component: load('Remote/Computers')
           },
           {
             path: 'backup/:computer/:disk',
-            name: 'remote-diks',
+            name: 'remote-disk',
             props: true,
             component: load('Remote/Backup')
           }

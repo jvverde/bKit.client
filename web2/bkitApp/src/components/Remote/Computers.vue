@@ -1,6 +1,7 @@
 <template>
-  <div class="contentor no-wrap">
-    <div class="computers" :class="{onlyone:onlyone}">
+    <div
+      class="computers flex column wrap justify-center items-center"
+      :class="{onlyone:onlyone}">
       <i v-if="computers.length === 0" class="fa fa-spinner fa-spin fa-5x fa-fw"></i>
       <div class="computer"
         v-for="(computer,index) in computers"
@@ -12,7 +13,6 @@
         <drives :computer="computer" class="components"/>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -40,8 +40,8 @@ export default {
   mixins: [myMixin],
   created () {
     const myself = {id: null}
+    console.log('selected:', this.selected)
     axios.get('/auth/clients').then(response => {
-      console.log(response.data)
       this.computers = response.data.map((e) => {
         const id = `${e.domain}/${e.name}/${e.uuid}`
         if (id === this.selected) this.onlyone = e.selected = true
@@ -64,13 +64,6 @@ export default {
   @import "src/scss/config.scss";
   @import "src/scss/breadcrumb.scss";
 
-  .contentor {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    overflow-y:auto;
-  }
-
   header.top{
     flex-shrink:0;
     width: 100%;
@@ -80,12 +73,6 @@ export default {
     }
   }
   .computers{
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-content: space-around;
     width:100%;
     height: 100%;
     overflow: auto;

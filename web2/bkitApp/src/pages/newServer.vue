@@ -1,5 +1,5 @@
 <template>
-  <q-modal v-model="open">
+  <q-modal v-model="show">
     <q-btn color="primary" @click="$emit('close')" label="Close" />
   </q-modal>
 </template>
@@ -9,6 +9,11 @@ export default {
   name: 'newServer',
   data () {
     return {
+    }
+  },
+  computed: {
+    show () {
+      return this.open
     }
   },
   props: ['open']

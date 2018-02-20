@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute-top full-width" dense no-border>
+  <div class="flex column justify-center items-stretch users" dense no-border>
     <header class="text-center">Users</header>
     <user
       :name="user"
@@ -58,4 +58,8 @@ export default {
 </script>
 
 <style lang="scss">
+  .users {
+    height: 100%;
+    overflow: auto;
+  }
 </style>

@@ -35,7 +35,7 @@
     </div>
     <div class="col-1" title="Last Access">
       <span v-if="lastTimeAccess !== null">
-        {{lastTimeAccess | moment("from")}}
+        {{fromNow}}
       </span>
     </div>
     <div class="col" title="Groups">
@@ -57,6 +57,8 @@ import {
 } from 'quasar'
 import {myMixin} from 'src/mixins'
 import {User} from 'src/mixins/User'
+let moment = require('moment')
+moment.locale('en')
 
 export default {
   name: 'register',
@@ -65,6 +67,9 @@ export default {
     QChipsInput
   },
   computed: {
+    fromNow () {
+      return moment.utc(this.lastTimeAccess, 'YYYY.MM.DD-HH.mm.ss').local().fromNow(true)
+    }
   },
   mixins: [myMixin, User],
   methods: {

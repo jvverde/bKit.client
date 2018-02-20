@@ -7,6 +7,7 @@ module.exports = {
     src: path.resolve(__dirname, '../src'),
     assets: path.resolve(__dirname, '../src/assets'),
     '@': path.resolve(__dirname, '../src/components'),
+    'E': path.resolve(__dirname, '../electron/src'),
     variables: path.resolve(__dirname, '../src/themes/quasar.variables.styl')
   },
 

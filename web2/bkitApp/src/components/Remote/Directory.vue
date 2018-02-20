@@ -24,8 +24,8 @@
           </span>
           <span class="name">{{dir.name}}</span>
         </div>
-        <a :href="getUrl('bkit',dir.name)" title="Recovery" @click.stop
-          class="links">
+        <a :href="getUrl('bkit',dir.name)" title="Recovery"
+          @click.stop class="links">
           <span class="icon is-small">
             <i class="fa fa-history"></i>
           </span>
@@ -96,7 +96,9 @@ export default {
       dir.open = !dir.open
     },
     refresh () {
-      const url = this.getUrl('/auth/client/dirs')
+      // client/disk/#disk/snap/#snap
+      const url = `/auth/client/${this.location.computer}/disk/${this.location.disk}/snap/${this.location.snapshot}/dirs${this.location.path}`
+      // const url = this.getUrl('/auth/client/dirs')
       this.loading = true
       axios.get(url)
         .then(response => {

@@ -1,6 +1,8 @@
 <template>
   <div class="drives">
-    <div class="drive" v-for="(drive, index) in drives" :key="index">
+    <div class="drive"
+      v-for="(drive, index) in drives"
+      :key="index">
       <router-link :to="{
         name: 'Backups',
         params: {
@@ -32,7 +34,7 @@ export default {
   },
   props: ['computer'],
   created () {
-    axios.get('/auth/client/disks/' + this.computer.id)
+    axios.get(`/auth/client/${this.computer.id}/disks/`)
       .then((response) => {
         this.drives = response.data.map((disk) => {
           const comps = disk.split('.') || []

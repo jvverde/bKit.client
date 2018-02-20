@@ -12,13 +12,15 @@
 </template>
 
 <script>
-  const isElectron = () => typeof process !== 'undefined' &&
-    typeof process.versions.node !== 'undefined'
+  // import {isElectron} from 'E/utils'
+  console.log('node:', process.versions.node)
+  const {ipcRenderer} = require('src/../electron/node_modules/electron')
+  ipcRenderer.send('clear', '')
 
   let exec = null
-  if (isElectron()) {
-    // exec = require('child_process').exec
-  }
+  // if (isElectron()) {
+  // exec = require('child_process').exec
+  // }
   let init = true
   export default {
     name: 'bkitlogo',

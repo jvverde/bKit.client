@@ -1,5 +1,5 @@
 <template>
-  <main class="absolute-center">
+  <main class="flex column justify-center items-stretch">
     <section class="text-center">
       <header>
         Messages

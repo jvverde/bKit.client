@@ -2,25 +2,37 @@
   <ul class="breadcrumb_bkit">
     <li>
       <span>
-       <router-link to="/" class="icon is-small"><i class="fa fa-home"></i></router-link>
+        <router-link :to="{
+          name:'remote-computers'
+        }" class="icon is-small">
+          <i class="fas fa-server"></i>
+        </router-link>
       </span>
     </li>
     <li v-if="computerName">
       <span>
-        <router-link :to="{name:'Remote-computers'}" class="icon is-small">
-            <i class="fa fa-desktop"></i> {{computerName}}
+        <router-link :to="{
+          name:'remote-computers',
+          params: {
+            selected: computer
+          }
+        }" class="icon is-small">
+          <i class="fas fa-desktop"></i>
+          {{computerName}}
         </router-link>
       </span>
     </li>
     <li v-if="computer && disk">
       <span>
         <router-link :to="{
-          name: 'Backups',
+          name: 'remote-disk',
           params: {
             computer: computer,
             disk:disk
-          }}"  class="icon is-small">
-          <i class="fa fa-hdd-o"></i> {{diskName}}
+          }
+        }" class="icon is-small">
+          <i class="fa fa-hdd"></i>
+          {{diskName}}
         </router-link>
       </span>
     </li>

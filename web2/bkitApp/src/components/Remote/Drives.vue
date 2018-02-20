@@ -4,7 +4,7 @@
       v-for="(drive, index) in drives"
       :key="index">
       <router-link :to="{
-        name: 'Backups',
+        name: 'remote-disk',
         params: {
           computer: computer.id,
           disk:drive.id

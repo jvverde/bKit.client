@@ -9,18 +9,18 @@
       <header class="line" :class="{selected:currentPath === dir.location.path}">
         <div class="props">
           <span class="icon is-small">
-            <i class="fa fa-minus-square-o close"
+            <i class="far fa-minus-square close"
               v-if="dir.open"
               @click.stop="dir.open=false">
             </i>
-            <i class="fa fa-plus-square-o open"
+            <i class="far fa-plus-square open"
               v-else
               @click.stop="dir.open=true">
             </i>
           </span>
           <span class="icon is-small">
-            <i class="fa fa-dir-open-o" v-if="dir.open"></i>
-            <i class="fa fa-dir-o" v-else></i>
+            <i class="far fa-folder-open" v-if="dir.open"></i>
+            <i class="far fa-folder" v-else></i>
           </span>
           <span class="name">{{dir.name}}</span>
         </div>

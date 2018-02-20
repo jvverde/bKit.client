@@ -107,8 +107,9 @@ let router = new VueRouter({
           component: load('Remote/Layout'),
           children: [
             {
-              path: 'computers',
+              path: 'computers/:selected*',
               name: 'Remote-computers',
+              props: true,
               component: load('Remote/Computers')
             },
             {

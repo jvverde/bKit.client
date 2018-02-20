@@ -32,7 +32,7 @@
     },
     props: ['computer'],
     created () {
-      axios.get('/auth/client/disks/' + this.computer.id)
+      axios.get(`/auth/client/${this.computer.id}/disks/`)
         .then((response) => {
           this.drives = response.data.map((disk) => {
             const comps = disk.split('.') || []

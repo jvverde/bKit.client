@@ -93,7 +93,9 @@
         dir.open = !dir.open
       },
       refresh () {
-        const url = this.getUrl('/auth/client/dirs')
+        // client/disk/#disk/snap/#snap
+        const url = `/auth/client/${this.location.computer}/disk/${this.location.disk}/snap/${this.location.snapshot}/dirs${this.location.path}`
+        // const url = this.getUrl('/auth/client/dirs')
         this.loading = true
         axios.get(url)
           .then(response => {

@@ -88,7 +88,9 @@ module.exports = function (ctx) {
         'QItemSide',
         'QInput',
         'QModal',
-        'QAlert'
+        'QAlert',
+        'QChipsInput',
+        'QItemSeparator'
       ],
       directives: [
         'Ripple'

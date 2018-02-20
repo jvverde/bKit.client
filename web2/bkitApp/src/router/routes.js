@@ -38,29 +38,34 @@ export default [
         name: 'users',
         component: load('Users/List'),
         meta: { requiresAuth: true }
-      } /*,
+      },
       {
         path: 'groups',
+        name: 'groups',
         component: load('Groups/List'),
         meta: { requiresAuth: true }
       },
       {
+        path: 'remote',
+        name: 'backups',
+        component: load('Remote/Layout'),
+        children: [
+          {
+            path: 'computers',
+            name: 'remote-computers',
+            component: load('Remote/Computers')
+          },
+          {
+            path: 'backup/:computer/:disk',
+            name: 'remote-diks',
+            props: true,
+            component: load('Remote/Backup')
+          }
+        ]
+      } /*
+      {
         path: 'test',
         component: load('Test')
-      },
-      {
-        path: 'login',
-        name: 'login',
-        component: load('Auth/Login')
-      },
-      {
-        path: 'signup',
-        name: 'signup',
-        component: load('Auth/Signup')
-      },
-      {
-        path: 'reset_pass',
-        component: load('Auth/Reset')
       },
       {
         path: 'new_pass/:username',
@@ -96,24 +101,6 @@ export default [
           }
         ]
       },
-      {
-        path: 'remote',
-        name: 'remote',
-        component: load('Remote/Layout'),
-        children: [
-          {
-            path: 'computers',
-            name: 'Remote-computers',
-            component: load('Remote/Computers')
-          },
-          {
-            path: 'backup/:computer/:disk',
-            name: 'Backups',
-            props: true,
-            component: load('Remote/Backup')
-          }
-        ]
-      }
       */
     ]
   },

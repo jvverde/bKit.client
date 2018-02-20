@@ -51,20 +51,14 @@
 </template>
 
 <script>
-import {
-  QIcon,
-  QChipsInput
-} from 'quasar'
 import {myMixin} from 'src/mixins'
 import {User} from 'src/mixins/User'
-let moment = require('moment')
+import moment from 'moment'
 moment.locale('en')
 
 export default {
   name: 'register',
   components: {
-    QIcon,
-    QChipsInput
   },
   computed: {
     fromNow () {

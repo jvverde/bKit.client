@@ -21,7 +21,7 @@ import {
 } from 'quasar'
 
 export default {
-  name: 'form',
+  name: 'users',
   components: {
     User,
     QList

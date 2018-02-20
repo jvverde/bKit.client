@@ -40,20 +40,16 @@
         <q-list-header>
           <bkitlogo class="logo"></bkitlogo>
         </q-list-header>
-        <q-item @click.native="openURL('http://quasar-framework.org')">
-          <q-item-side icon="school" />
-          <q-item-main label="Docs" sublabel="quasar-framework.org" />
+        <q-item @click.native="$router.replace({ name: 'remote-computers' })">
+          <q-item-side icon="settings backup restore" />
+          <q-item-main label="Backups" sublabel="@server" />
         </q-item>
-        <q-item @click.native="openURL('https://github.com/quasarframework/')">
-          <q-item-side icon="code" />
-          <q-item-main label="GitHub" sublabel="github.com/quasarframework" />
-        </q-item>
-        <q-item @click.native="openURL('http://forum.quasar-framework.org')">
-          <q-item-side icon="record_voice_over" />
-          <q-item-main label="Forum" sublabel="forum.quasar-framework.org" />
+        <q-item @click.native="$router.replace({ name: 'groups' })">
+          <q-item-side icon="fa fa-users" />
+          <q-item-main label="Groups" sublabel="of users" />
         </q-item>
         <q-item @click.native="$router.replace({ name: 'users' })">
-          <q-item-side icon="fa fa-users" />
+          <q-item-side icon="fa fa-user" />
           <q-item-main label="Users" sublabel="Management" />
         </q-item>
         <q-item @click.native="$router.replace({ name: 'alerts' })">

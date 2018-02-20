@@ -1,5 +1,5 @@
 <template>
-  <q-list class="absolute-top" dense no-border>
+  <q-list class="flex column justify-center items-stretch" dense no-border>
     <q-list-header class="text-center">Groups</q-list-header>
     <q-item
       link

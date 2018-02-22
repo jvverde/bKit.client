@@ -10,20 +10,21 @@
           <dd v-if="servername" slot="subtitle"> <!-- this is an workaround -->
             <u>Server</u>: {{servername}}
             <q-popover anchor="bottom left" self="top left"
-              ref="popover" v-model="showServers">
-              <q-list @click="$refs.popover.close()">
+              ref="mypopover" v-model="showServers">
+              <q-list @click.native="$refs.mypopover.hide()"
+                link separator class="scroll" style="min-width: 100px">
                 <q-list-header>Servers</q-list-header>
                 <q-item link v-for="server in orderedServers"
                   :key="server.name">
                   <q-item-side icon="delete" color="warning"
-                    @click="rmServer(server.name)"/>
+                    @click.native="rmServer(server.name)"/>
                   <q-item-main
                     @click="chgServer(server.name)"
                     :label="server.name"
                     :sublabel="server.url"
                   />
                 </q-item>
-                <q-item link @click="newServer" dense>
+                <q-item link @click.native="newServer" dense>
                   <q-item-side icon="add"/>
                   <q-item-main label="Add a new server"/>
                 </q-item>
@@ -31,7 +32,7 @@
             </q-popover>
           </dd>
           <div v-else slot="subtitle" @click="newServer">
-            <u>Add server</u>
+            <u style="cursor:pointer">Add server</u>
           </div>
         </q-toolbar-title>
         <div v-if="!logged">
@@ -96,7 +97,7 @@
       </q-side-link> -->
 
     </q-layout-drawer>
-    <new-server :open="askServer" />
+    <new-server :open="askServer" @close="askServer = false"/>
     <q-page-container style="height:100vh">
       <router-view />
     </q-page-container>
@@ -119,7 +120,8 @@ export default {
       leftDrawerOpen: false,
       showServers: false,
       alerts: false,
-      ws: []
+      ws: [],
+      askServer: !this.baseURL
     }
   },
   components: {
@@ -135,9 +137,6 @@ export default {
       'servers',
       'baseURL'
     ]),
-    askServer () {
-      return !this.baseURL
-    },
     orderedServers () {
       return this.servers.slice().sort(
         (a, b) => (a.name || '').localeCompare(b.name || '')
@@ -168,7 +167,7 @@ export default {
       'push'
     ]),
     newServer () {
-      newServer()
+      this.askServer = true
     },
     websocket (server, delay = 1) {
       const wsname = server.url.replace(/^https?/, 'ws')

@@ -13,8 +13,11 @@ export default {
   },
   computed: {
     show: {
-      get: () => this.open,
-      set: () => {}
+      get () {
+        return this.open
+      },
+      set () {
+      }
     }
   },
   props: ['open']

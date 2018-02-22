@@ -12,13 +12,13 @@ export default {
     }
   },
   computed: {
-    show () {
-      return this.open
+    show: {
+      get: () => this.open,
+      set: () => {}
     }
   },
   props: ['open']
 }
 </script>
-
 <style>
 </style>

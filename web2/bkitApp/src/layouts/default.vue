@@ -97,7 +97,7 @@
       </q-side-link> -->
 
     </q-layout-drawer>
-    <new-server :open="askServer" @close="askServer = false"/>
+    <new-server :open="askServer" @close="$askServer = false"/>
     <q-page-container style="height:100vh">
       <router-view />
     </q-page-container>
@@ -121,13 +121,25 @@ export default {
       showServers: false,
       alerts: false,
       ws: [],
-      askServer: !this.baseURL
+      ask_server: false
     }
   },
   components: {
     newServer
   },
   computed: {
+    askServer: {
+      get: function () {
+        console.log('i:ask_server:', this.ask_server)
+        console.log('i:baseURL:', this.baseURL)
+        console.log('i:', this.$askServer || !this.baseURL)
+        return (this.$askServer || !this.baseURL)
+      },
+      set: function (v) {
+        console.log('set ask_server:', v)
+        this.ask_server = v
+      }
+    },
     ...mapGetters('auth', [
       'token',
       'logged',
@@ -168,6 +180,12 @@ export default {
     ]),
     newServer () {
       this.askServer = true
+      console.log('1:ask_server', this.ask_server)
+      console.log('1:askServer', this.askServer)
+      this.$nextTick(() => {
+        console.log('2:ask_server', this.ask_server)
+        console.log('2:askServer', this.askServer)
+      })
     },
     websocket (server, delay = 1) {
       const wsname = server.url.replace(/^https?/, 'ws')

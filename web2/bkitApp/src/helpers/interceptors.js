@@ -31,11 +31,10 @@ export default function setup () {
     }
     return response
   }, (err) => {
+    console.error('Error:', err)
     const originalRequest = err.config
     const servername = store.getters['auth/servername']
-    console.log('error:', err)
-    console.log('originalRequest', originalRequest)
-    console.log(servername)
+    console.log('originalRequest:', originalRequest)
     if (err.response) {
       if (err.response.status === 400 && err.response.data && err.response.data.msg &&
         err.response.data.msg.match(/invalid.+user/i)) {

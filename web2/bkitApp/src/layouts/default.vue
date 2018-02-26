@@ -24,14 +24,14 @@
                     :sublabel="server.url"
                   />
                 </q-item>
-                <q-item link @click.native="newServer" dense>
+                <q-item link @click.native="askServer = true" dense>
                   <q-item-side icon="add"/>
                   <q-item-main label="Add a new server"/>
                 </q-item>
               </q-list>
             </q-popover>
           </dd>
-          <div v-else slot="subtitle" @click="newServer">
+          <div v-else slot="subtitle" @click="askServer = true">
             <u style="cursor:pointer">Add server</u>
           </div>
         </q-toolbar-title>
@@ -97,7 +97,7 @@
       </q-side-link> -->
 
     </q-layout-drawer>
-    <new-server :open="askServer" @close="$askServer = false"/>
+    <new-server :open="askServer" @close="askServer = false"/>
     <q-page-container style="height:100vh">
       <router-view />
     </q-page-container>
@@ -130,13 +130,9 @@ export default {
   computed: {
     askServer: {
       get: function () {
-        console.log('i:ask_server:', this.ask_server)
-        console.log('i:baseURL:', this.baseURL)
-        console.log('i:', this.$askServer || !this.baseURL)
-        return (this.$askServer || !this.baseURL)
+        return (this.ask_server || !this.baseURL)
       },
       set: function (v) {
-        console.log('set ask_server:', v)
         this.ask_server = v
       }
     },
@@ -178,15 +174,6 @@ export default {
     ...mapMutations('alerts', [
       'push'
     ]),
-    newServer () {
-      this.askServer = true
-      console.log('1:ask_server', this.ask_server)
-      console.log('1:askServer', this.askServer)
-      this.$nextTick(() => {
-        console.log('2:ask_server', this.ask_server)
-        console.log('2:askServer', this.askServer)
-      })
-    },
     websocket (server, delay = 1) {
       const wsname = server.url.replace(/^https?/, 'ws')
       const wsURL = `${wsname}/ws/alerts`

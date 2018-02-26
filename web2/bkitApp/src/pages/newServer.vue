@@ -19,20 +19,21 @@
         @blur="$v.form.port.$touch"
         @keyup.enter="send"
       />
-      <q-btn color="primary" @click.native="$emit('close')" label="Cancel" />
-      <q-btn color="primary" @click.native="send" label="Apply" />
+      <q-btn color="primary" @click="$emit('close')" label="Cancel" />
+      <q-btn color="primary" @click="send" :loading="submitting" label="Apply" />
     </form>
   </q-modal>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators'
+import { required, numeric, between } from 'vuelidate/lib/validators'
 import { mapActions } from 'vuex'
 import { defaultName, notify } from 'src/helpers/utils'
 export default {
   name: 'newServer',
   data () {
     return {
+      submitting: false,
       form: {
         serverName: defaultName(),
         port: '',
@@ -49,7 +50,9 @@ export default {
         required
       },
       port: {
-        required
+        required,
+        numeric,
+        between: between(1, 65535)
       }
     }
   },
@@ -72,12 +75,14 @@ export default {
     ]),
     send () {
       if (!this.ready) return
-      this.submit = true
+      this.submitting = true
       const url = `http://${this.form.address}:${this.form.port}`
       this.addServer({
         url: url,
-        name: this.form.name
-      }).then(() => this.$emit('close')).catch(notify)
+        name: this.form.serverName
+      }).then(() => this.$emit('close')).catch(notify).then(() => {
+        this.submitting = false
+      })
     }
   }
 }

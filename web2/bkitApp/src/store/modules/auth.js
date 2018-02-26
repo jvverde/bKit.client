@@ -19,7 +19,7 @@ function defaultState () {
   })
 }
 import axios from 'axios'
-import {defaultName} from 'src/helpers/utils'
+import { defaultName } from 'src/helpers/utils'
 
 export default {
   namespaced: true,

@@ -10,9 +10,9 @@ export default [
     children: [
       { path: '', component: () => import('pages/index') },
       {
-        path: 'login',
-        name: 'login',
-        component: load('Auth/Login')
+        path: 'signin',
+        name: 'signin',
+        component: load('Auth/Signin')
       },
       {
         path: 'signup',

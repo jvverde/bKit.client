@@ -19,7 +19,7 @@
                   <q-item-side icon="delete" color="warning"
                     @click.native="rmServer(server.name)"/>
                   <q-item-main
-                    @click="chgServer(server.name)"
+                    @click.native="chgServer(server.name)"
                     :label="server.name"
                     :sublabel="server.url"
                   />
@@ -38,7 +38,7 @@
         <div v-if="!logged">
           <q-btn
             flat
-            @click="$router.replace({ name: 'login' })"
+            @click="$router.replace({ name: 'signin' })"
           >
             Sign In
           </q-btn>

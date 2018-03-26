@@ -81,11 +81,13 @@ module.exports = function (ctx) {
         'QToolbarTitle',
         'QBtn',
         'QIcon',
+        'QField',
         'QList',
         'QListHeader',
         'QItem',
         'QItemMain',
         'QItemSide',
+        'QItemTile',
         'QInput',
         'QModal',
         'QAlert',
@@ -97,7 +99,8 @@ module.exports = function (ctx) {
         'Ripple'
       ],
       plugins: [
-        'Notify'
+        'Notify',
+        'Dialog'
       ]
     },
     // animations: 'all' --- includes all animations

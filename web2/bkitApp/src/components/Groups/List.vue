@@ -1,26 +1,19 @@
 <template>
   <q-list class="flex column justify-center items-stretch" dense no-border>
     <q-list-header class="text-center">Groups</q-list-header>
-    <q-item
-      link
-      v-for="(group, index) in groups"
-      :key="group.name"
-    >
+    <q-item v-for="(group, index) in groups" :key="group.name">
+      <q-item-side color="negative">
+        <q-btn flat round icon="delete forever" @click="remove(index)"/>
+      </q-item-side>
       <q-item-main :label="group.name">
         <q-chips-input
           style="padding-left:.5em"
           v-model="group.users"
           :placeholder="group.users.length ? '': 'Type a valid username'"
           color="blue-grey-5"
-          @change="change(index)"
+          @input="change(index)"
         />
       </q-item-main>
-      <q-item-side
-        right
-        icon="delete forever"
-        color="negative"
-        @click="remove(index)"
-      />
     </q-item>
     <q-item-separator/>
     <q-item>
@@ -32,7 +25,6 @@
 <script>
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
-import {Dialog} from 'quasar'
 
 export default {
   name: 'form',
@@ -47,6 +39,9 @@ export default {
   },
   mixins: [myMixin],
   methods: {
+    log (msg) {
+      console.log(msg)
+    },
     getgroups () {
       axios.get('/auth/groups')
         .then(response => {
@@ -55,33 +50,26 @@ export default {
         .catch(this.catch)
     },
     add () {
-      Dialog.create({
+      this.$q.dialog({
         title: 'New group',
-        form: {
-          name: {
-            type: 'text',
-            label: 'Group Name',
-            model: ''
-          }
+        message: 'Enter new group name',
+        prompt: {
+          type: 'text',
+          model: ''
         },
-        buttons: [
-          'Cancel',
-          {
-            label: 'Ok',
-            handler: data => {
-              axios.put(`/auth/group/${data.name}`, [])
-                .then(response => {
-                  if (response.data instanceof Array) {
-                    this.groups.push({
-                      name: data.name,
-                      users: response.data
-                    })
-                  }
-                }).catch(this.catch)
+        cancel: true,
+        color: 'secondary'
+      }).then(data => {
+        axios.put(`/auth/group/${data}`, [])
+          .then(response => {
+            if (response.data instanceof Array) {
+              this.groups.push({
+                name: data,
+                users: response.data
+              })
             }
-          }
-        ]
-      })
+          }).catch(this.catch)
+      }).catch()
     },
     remove (index) {
       let group = this.groups[ index ]

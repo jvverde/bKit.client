@@ -43,7 +43,7 @@ export default function setup () {
       if (err.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true
         store.dispatch('auth/logout')
-        router.replace({ name: 'login', query: {redirect: router.currentRoute.fullPath} })
+        router.replace({ name: 'signin', query: {redirect: router.currentRoute.fullPath} })
         return new Promise((resolve) => promises.push(() => resolve(axios(originalRequest))))
       } else if (err.response.status === 404 && !servername) {
         // console.log(newServer)

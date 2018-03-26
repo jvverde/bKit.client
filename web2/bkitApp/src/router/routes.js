@@ -63,7 +63,12 @@ export default [
             component: load('Remote/Backup')
           }
         ]
-      } /*
+      },
+      {
+        path: 'show',
+        component: load('Show')
+      }
+      /*
       {
         path: 'test',
         component: load('Test')
@@ -72,10 +77,6 @@ export default [
         path: 'new_pass/:username',
         props: true,
         component: load('Auth/Password')
-      },
-      {
-        path: 'show',
-        component: load('Show')
       },
       {
         path: 'user',

@@ -109,7 +109,6 @@ import { openURL } from 'quasar'
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
-// import askUser from 'src/helpers/askUser'
 import * as websocks from 'src/helpers/websocks'
 import newServer from 'src/pages/newServer'
 

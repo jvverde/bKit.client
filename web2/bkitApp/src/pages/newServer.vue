@@ -28,7 +28,8 @@
 <script>
 import { required, numeric, between } from 'vuelidate/lib/validators'
 import { mapActions } from 'vuex'
-import { defaultName, notify } from 'src/helpers/utils'
+import { defaultName } from 'src/helpers/utils'
+import {myMixin} from 'src/mixins'
 export default {
   name: 'newServer',
   data () {
@@ -69,6 +70,7 @@ export default {
     }
   },
   props: ['open'],
+  mixins: [myMixin],
   methods: {
     ...mapActions('auth', [
       'addServer'
@@ -80,7 +82,7 @@ export default {
       this.addServer({
         url: url,
         name: this.form.serverName
-      }).then(() => this.$emit('close')).catch(notify).then(() => {
+      }).then(() => this.$emit('close')).catch(this.catch).then(() => {
         this.submitting = false
       })
     }

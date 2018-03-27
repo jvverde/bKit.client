@@ -198,8 +198,8 @@ export default {
         if (data.type === 'udp') {
           let [code, question, cnt, drive, volume, id] = data.msg.split('|')
           console.log(id, cnt, code, question, drive, volume)
-          if (ask[id]) {
-            replay(id)
+          if (ask.hasOwnProperty(id)) {
+            if (ask[id] !== null) replay(id)
           } else {
             ask[id] = null
             this.$q.dialog({

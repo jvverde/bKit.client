@@ -109,7 +109,7 @@ import { openURL } from 'quasar'
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import axios from 'axios'
 import {myMixin} from 'src/mixins'
-import askUser from 'src/helpers/askUser'
+// import askUser from 'src/helpers/askUser'
 import * as websocks from 'src/helpers/websocks'
 import newServer from 'src/pages/newServer'
 
@@ -187,7 +187,7 @@ export default {
       const replay = (id) => {
         ws.send(JSON.stringify({
           id: id,
-          answer: ask[id].answer
+          answer: ask[id]
         }))
         setTimeout(() => delete ask[id], 120000)
       }
@@ -200,23 +200,21 @@ export default {
           let [code, question, cnt, drive, volume, id] = data.msg.split('|')
           console.log(id, cnt, code, question, drive, volume)
           if (ask[id]) {
-            if (ask[id].answer) {
-              replay(id)
-            } else if (ask[id].progress instanceof Object) {
-              ask[id].progress.model = 0 | cnt
-            }
+            replay(id)
           } else {
-            ask[id] = {
+            ask[id] = null
+            this.$q.dialog({
               title: `Server: ${wsname}`,
               message: question,
-              progress: {
-                model: 0 | cnt
-              }
-            }
-            askUser(ask[id]).then(answer => {
-              ask[id].answer = answer
-              replay(id)
-            })
+              noBackdropDismiss: true,
+              noEscDismiss: true,
+              ok: 'Yes',
+              cancel: 'No'
+            }).then(() => {
+              ask[id] = 'YES'
+            }).catch(() => {
+              ask[id] = 'NO'
+            }).then(() => replay(id))
           }
         } else if (data.type === 'reset') {
           // remove ask[i] and Dialog

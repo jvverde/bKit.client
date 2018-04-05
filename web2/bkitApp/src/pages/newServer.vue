@@ -2,21 +2,21 @@
   <q-modal v-model="show" class="newserver">
     <form @submit.prevent>
       <q-input type="text" max-length="16"
-        v-model="form.serverName"  float-label="Name"
-        :error="$v.form.serverName.$error"
-        @blur="$v.form.serverName.$touch"
+        v-model="server.name"  float-label="Name"
+        :error="$v.server.name.$error"
+        @blur="$v.server.name.$touch"
         @keyup.enter="send"
       />
       <q-input type="text" max-length="16" autofocus
-        v-model="form.address" float-label="Server address"
-        :error="$v.form.address.$error"
-        @blur="$v.form.address.$touch"
+        v-model="server.address" float-label="Server address"
+        :error="$v.server.address.$error"
+        @blur="$v.server.address.$touch"
         @keyup.enter="send"
       />
       <q-input type="text" max-length="16"
-        v-model="form.port" float-label="Server port"
-        :error="$v.form.port.$error"
-        @blur="$v.form.port.$touch"
+        v-model="server.port" float-label="Server port"
+        :error="$v.server.port.$error"
+        @blur="$v.server.port.$touch"
         @keyup.enter="send"
       />
       <q-btn color="primary" @click="$emit('close')" label="Cancel" />
@@ -35,16 +35,16 @@ export default {
   data () {
     return {
       submitting: false,
-      form: {
-        serverName: defaultName(),
+      server: {
+        name: defaultName(),
         port: '',
         address: ''
       }
     }
   },
   validations: {
-    form: {
-      serverName: {
+    server: {
+      name: {
         required
       },
       address: {
@@ -66,7 +66,7 @@ export default {
       }
     },
     ready () {
-      return !this.$v.form.$error
+      return !this.$v.server.$error
     }
   },
   props: ['open'],
@@ -78,10 +78,10 @@ export default {
     send () {
       if (!this.ready) return
       this.submitting = true
-      const url = `http://${this.form.address}:${this.form.port}`
+      const url = `http://${this.server.address}:${this.server.port}`
       this.addServer({
         url: url,
-        name: this.form.serverName
+        name: this.server.name
       }).then(() => this.$emit('close')).catch(this.catch).then(() => {
         this.submitting = false
       })

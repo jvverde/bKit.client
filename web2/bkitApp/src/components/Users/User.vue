@@ -2,17 +2,17 @@
   <section class="row line items-start">
     <div class="icons hover flex justify-around no-wrap col-auto" title="Action">
       <q-icon
-        @click="remove"
+        @click.native="remove"
         name="delete forever"
         color="negative"
       />
       <q-icon
-        @click="enable"
+        @click.native="enable"
         :name="disabled ? 'lock' : 'lock open'"
         :color="disabled ? 'warning' : 'positive'"
       />
       <q-icon
-        @click="$router.push({
+        @click.native="$router.push({
           name: 'userview',
           params: { name: username }
         })"
@@ -44,7 +44,7 @@
         v-model="groups"
         :placeholder="groups.length ? '': 'Type a valid group name'"
         color="blue-grey-5"
-        @change="change_groups"
+        @input="change_groups"
       />
     </div>
   </section>
@@ -57,7 +57,7 @@ import moment from 'moment'
 moment.locale('en')
 
 export default {
-  name: 'register',
+  name: 'user',
   components: {
   },
   computed: {
@@ -82,8 +82,6 @@ export default {
         .filter(state => this.states[state])
         .join(' + ')
     }
-  },
-  mounted () {
   }
 }
 </script>

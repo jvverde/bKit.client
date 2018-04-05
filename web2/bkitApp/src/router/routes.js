@@ -67,16 +67,6 @@ export default [
       {
         path: 'show',
         component: load('Show')
-      }
-      /*
-      {
-        path: 'test',
-        component: load('Test')
-      },
-      {
-        path: 'new_pass/:username',
-        props: true,
-        component: load('Auth/Password')
       },
       {
         path: 'user',
@@ -90,6 +80,16 @@ export default [
             component: load('User/View')
           }
         ]
+      }
+      /*
+      {
+        path: 'test',
+        component: load('Test')
+      },
+      {
+        path: 'new_pass/:username',
+        props: true,
+        component: load('Auth/Password')
       },
       {
         path: 'local',

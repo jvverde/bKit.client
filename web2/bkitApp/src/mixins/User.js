@@ -7,10 +7,10 @@ function getDate (v) {
 }
 
 export const User = {
-  name: 'user.logic',
   data: function () {
     return {
-      user: {}
+      user: {
+      }
     }
   },
   props: {
@@ -42,8 +42,13 @@ export const User = {
     username () {
       return this.name
     },
-    groups () {
-      return this.user.groups || []
+    groups: {
+      get () {
+        return this.user.groups || []
+      },
+      set (val) {
+        this.user.groups = val
+      }
     },
     disabled () {
       return !this.states.enable

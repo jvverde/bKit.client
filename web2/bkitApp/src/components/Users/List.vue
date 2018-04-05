@@ -16,15 +16,10 @@ import axios from 'axios'
 import {myMixin} from 'src/mixins'
 import User from './User'
 
-import {
-  QList
-} from 'quasar'
-
 export default {
   name: 'users',
   components: {
-    User,
-    QList
+    User
   },
   data () {
     return {

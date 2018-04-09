@@ -17,7 +17,7 @@
           params: { name: username }
         })"
         name="person"
-        color="tertiary"
+        color="info"
       />
     </div>
 
@@ -35,7 +35,7 @@
     </div>
     <div class="col-1" title="Last Access">
       <span v-if="lastTimeAccess !== null">
-        {{fromNow}}
+        {{lastTimeAccess|from}}
       </span>
     </div>
     <div class="col" title="Groups">
@@ -60,9 +60,9 @@ export default {
   name: 'user',
   components: {
   },
-  computed: {
-    fromNow () {
-      return moment.utc(this.lastTimeAccess, 'YYYY.MM.DD-HH.mm.ss').local().fromNow(true)
+  filters: {
+    from (value) {
+      return moment.utc(value).local().fromNow(true)
     }
   },
   mixins: [myMixin, User],

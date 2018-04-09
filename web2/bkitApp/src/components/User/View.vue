@@ -13,13 +13,17 @@
             <q-item-tile color="info" icon="mail outline"/>
           </q-item-side>
           <q-item-main>
-            <q-input type="text" max-length="256"
-              v-model="user.email"  float-label="Email"
+            <q-input type="email" max-length="256"
+              v-model="user.email"
+              float-label="Email"
               :error="$v.user.email.$error"
               @blur="$v.user.email.$touch"
               @keyup.enter="set_email"
             />
           </q-item-main>
+          <q-item-side right>
+            <q-btn icon="send" flat color="info" round @click="set_email"/>
+          </q-item-side>
         </q-item>
       </q-list>
     </q-card-main>

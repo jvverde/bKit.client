@@ -93,7 +93,12 @@ module.exports = function (ctx) {
         'QAlert',
         'QChipsInput',
         'QItemSeparator',
-        'QPopover'
+        'QPopover',
+        'QCard',
+        'QCardTitle',
+        'QCardMain',
+        'QCardSeparator',
+        'QCardActions'
       ],
       directives: [
         'Ripple'

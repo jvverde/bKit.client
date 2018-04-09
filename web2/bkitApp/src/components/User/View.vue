@@ -65,7 +65,7 @@
             </td>
             <td class="text-center" data-th="Last">
               <span v-if="lastTimeAccess">
-                {{lastTimeAccess | moment('from')}}
+                {{lastTimeAccess | from}}
               </span>
             </td>
           </tr>
@@ -79,7 +79,7 @@
             </td>
             <td class="text-center" data-th="Last">
               <span v-if="lastTimeLogin">
-                {{lastTimeLogin | moment('from')}}
+                {{lastTimeLogin | from}}
               </span>
             </td>
           </tr>
@@ -93,7 +93,7 @@
             </td>
             <td class="text-center" data-th="Last">
               <span v-if="lastTimeLogout">
-                {{lastTimeLogout | moment('from')}}
+                {{lastTimeLogout | from}}
               </span>
             </td>
           </tr>
@@ -104,44 +104,27 @@
 </template>
 
 <script>
-import {
-  QInput,
-  QBtn,
-  QCardActions,
-  QIcon,
-  QCard,
-  QCardTitle,
-  QCardMain,
-  QCardSeparator,
-  QList,
-  QItem,
-  QItemMain,
-  QItemTile,
-  QItemSide
-} from 'quasar'
+
 import {myMixin} from 'src/mixins'
 import {User} from 'src/mixins/User'
+import moment from 'moment'
 
 export default {
-  name: 'register',
+  name: 'userview',
   components: {
-    QInput,
-    QCardActions,
-    QBtn,
-    QIcon,
-    QCard,
-    QCardTitle,
-    QCardMain,
-    QCardSeparator,
-    QList,
-    QItem,
-    QItemMain,
-    QItemTile,
-    QItemSide
   },
   computed: {
+
   },
   mixins: [myMixin, User],
+  filters: {
+    moment: function (value, fmt) {
+      return moment.utc(value).local().format(fmt)
+    },
+    from: function (value) {
+      return moment.utc(value).local().fromNow(true)
+    }
+  },
   methods: {
     replace_user (user) {
       this.getUser(user)

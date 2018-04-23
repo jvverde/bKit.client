@@ -65,8 +65,8 @@ volume() {
 		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
 		true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
 		DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
-		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$DEV")"}
 		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
+		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$DEV")"}
 	}
 	exists blkid  && {
 		true ${FILESYSTEM:=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')}

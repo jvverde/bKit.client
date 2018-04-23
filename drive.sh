@@ -58,13 +58,14 @@ readIDby() {
 }
 
 volume() {
+	FILESYSTEM="$(df --output=fstype "$DEV"|tail -n1)"
 	exists lsblk && {
-		VOLUMENAME=$(lsblk -ln -o LABEL $DEV)
+		VOLUMENAME="$(lsblk -ln -o LABEL "$DEV")"
 		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
 		true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
 		DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
-		FILESYSTEM=$(lsblk -ln -o FSTYPE "$DEV")
+		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$DEV")"}
 		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
 	}
 	exists blkid  && {

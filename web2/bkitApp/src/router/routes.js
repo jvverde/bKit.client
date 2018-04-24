@@ -1,105 +1,113 @@
-
-function load (component) {
-  return () => import(`components/${component}.vue`)
+function loadComponent (c) {
+  return () => import(`components/${c}.vue`)
+}
+function loadPage (p) {
+  return () => import(`pages/${p}.vue`)
+}
+function loadLayout (l) {
+  return () => import(`layouts/${l}.vue`)
 }
 
 export default [
   {
     path: '/',
-    component: () => import('layouts/default'),
+    component: loadLayout('default'),
     children: [
-      { path: '', component: () => import('pages/index') },
+      {
+        path: '',
+        component: loadPage('index')
+      },
       {
         path: 'signin',
         name: 'signin',
-        component: load('Auth/Signin')
+        component: loadComponent('Auth/Signin')
       },
       {
         path: 'signup',
         name: 'signup',
-        component: load('Auth/Signup')
+        component: loadComponent('Auth/Signup')
       },
       {
         path: 'reset_pass',
-        component: load('Auth/Reset')
+        component: loadComponent('Auth/Reset')
       },
       {
         path: 'new_pass/:username',
         props: true,
-        component: load('Auth/Password')
+        component: loadComponent('Auth/Password')
       },
       {
         path: 'alerts',
-        component: load('Alerts/Alerts'),
+        component: loadComponent('Alerts/Alerts'),
         name: 'alerts'
       },
       {
         path: 'users',
         name: 'users',
-        component: load('Users/List'),
+        component: loadComponent('Users/List'),
         meta: { requiresAuth: true }
       },
       {
         path: 'groups',
         name: 'groups',
-        component: load('Groups/List'),
+        component: loadComponent('Groups/List'),
         meta: { requiresAuth: true }
       },
       {
         path: 'remote',
         name: 'backups',
-        component: load('Remote/Layout'),
+        component: loadPage('Remote'),
         children: [
           {
             path: 'computers/:selected*',
             name: 'remote-computers',
             props: true,
-            component: load('Remote/Computers')
+            component: loadComponent('Remote/Computers')
           },
           {
             path: 'backup/:computer/:disk',
             name: 'remote-disk',
             props: true,
-            component: load('Remote/Backup')
+            component: loadComponent('Remote/Backup')
           }
         ]
       },
       {
         path: 'show',
-        component: load('Show')
+        component: loadComponent('Show')
       },
       {
         path: 'user',
         meta: { requiresAuth: true },
-        component: load('User/Layout'),
+        component: loadComponent('User/loadLayout'),
         children: [
           {
             path: 'view/:name',
             name: 'userview',
             props: true,
-            component: load('User/View')
+            component: loadComponent('User/View')
           }
         ]
       }
       /*
       {
         path: 'test',
-        component: load('Test')
+        component: loadComponent('Test')
       },
       {
         path: 'new_pass/:username',
         props: true,
-        component: load('Auth/Password')
+        component: loadComponent('Auth/Password')
       },
       {
         path: 'local',
         name: 'local',
-        component: load('Local/Layout'),
+        component: loadComponent('Local/loadLayout'),
         children: [
           {
             path: 'disks',
             name: 'local-disks',
-            component: load('Local/Disks')
+            component: loadComponent('Local/Disks')
           }
         ]
       },
@@ -109,6 +117,6 @@ export default [
 
   { // Always leave this as last one
     path: '*',
-    component: () => import('pages/404')
+    component: loadPage('404')
   }
 ]

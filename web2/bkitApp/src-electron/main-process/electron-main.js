@@ -3,6 +3,8 @@ import {
   BrowserWindow,
   Tray,
   clipboard,
+  ipcMain,
+  shell,
   Menu
 } from 'electron'
 import path from 'path'
@@ -121,6 +123,20 @@ function openRecovery(menuItem, browserWindow, event) {
 function exitApp() {
     app.quit();
 }
+
+ipcMain.on('register', (event, arg) => {
+  downloadListeners.find(x => x.channel === arg) || downloadListeners.push({receiver:event.sender, channel: arg})
+  event.sender.send(arg, 'done register done for channel:' + arg)
+})
+
+ipcMain.on('clear', () => {
+  console.log('clear')
+  downloadListeners = []
+})
+
+ipcMain.on('debug', (event, arg) => {
+  mainWindow.webContents.openDevTools()
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

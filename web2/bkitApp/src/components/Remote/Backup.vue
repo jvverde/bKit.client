@@ -22,9 +22,6 @@
     <snapshot v-if="rootLocation.snapshot !== null"
       :rootLocation="rootLocation" class="snapshot">
     </snapshot>
-    <footer class="bottom">
-<!--       <console></console>
- -->    </footer>
   </div>
 </template>
 
@@ -35,7 +32,6 @@ import { mapGetters, mapMutations } from 'vuex'
 import {myMixin} from 'src/mixins'
 
 /*  import Breadcrumb from './Backup/Breadcrumb' */
-/*  import Console from './Console' */
 
 var moment = require('moment')
 moment.locale('en')

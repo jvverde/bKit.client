@@ -29,6 +29,8 @@ module.exports = function (ctx) {
       // extractCSS: false,
       // useNotifier: false,
       extendWebpack (cfg) {
+        cfg.node = cfg.node || {}
+        cfg.node.fs = cfg.node.fs || 'empty'
 
         cfg.module.rules.push({
           enforce: 'pre',

@@ -1,12 +1,14 @@
 <template>
   <section class="downloads">
-    <resource v-for="(f, i) in downloads" :key="i" :entry="f"></resource>
+    <!--resource v-for="(f, i) in downloads" :key="i" :entry="f"></resource-->
   </section>
 </template>
 
 <script>
-import Resource from './Resource'
+// import fs from 'fs'
 import {ipcRenderer, remote} from 'electron'
+// import Resource from './Resource'
+// const {ipcRenderer, remote} = require('electron')
 const fs = remote.require('fs')
 export default {
   name: 'downloads',
@@ -16,24 +18,16 @@ export default {
     }
   },
   components: {
-    Resource
+    // Resource
   },
   created () {
     console.log('Create download')
+    // const {ipcRenderer, remote} = require('electron')
     ipcRenderer.on('download', (event, arg) => {
       if (arg instanceof Object && arg.type === 'download') {
-        // this.downloads.find(x => x.fullpath === arg.fullpath) || this.downloads.push(arg)
         if (arg.mimetype === 'application/bkit') {
-          // const oldIndex = this.downloads.findIndex(
-          //   x => x.fullpath === arg.fullpath
-          // )
           const download = arg
           this.downloads.push(download)
-          // if (oldIndex !== -1) {
-          //   this.$nextTick(() => {
-          //     this.downloads.splice(oldIndex, 1)
-          //   })
-          // }
           try {
             const file = fs.readFileSync(arg.fullpath)
             download.resource = JSON.parse(file)
@@ -72,10 +66,10 @@ export default {
     })
   },
   mounted () {
-    ipcRenderer.send('register', 'download')
+    // ipcRenderer.send('register', 'download')
   },
   destroy () {
-    ipcRenderer.removeAllListeners('download')
+    // ipcRenderer.removeAllListeners('download')
   }
 }
 </script>

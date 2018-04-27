@@ -14,13 +14,20 @@
     "axios": "^0.17.1",
     "is-electron": "^2.1.0",
     "moment": "^2.20.1",
+    "quasar-cli": "^0.15.14",
     "vue-i18n": "^7.3.3",
     "vuelidate": "^0.6.1",
     "vuex-persistedstate": "^2.4.2"
   },
   "devDependencies": {
+    "autoprefixer": "^8.3.0",
     "babel-eslint": "8.2.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "devtron": "1.4.0",
+    "electron": "1.7.9",
+    "electron-debug": "1.4.0",
+    "electron-devtools-installer": "2.2.1",
+    "electron-packager": "9.1.0",
     "eslint": "4.15.0",
     "eslint-config-standard": "10.2.1",
     "eslint-friendly-formatter": "3.0.0",
@@ -31,7 +38,6 @@
     "eslint-plugin-standard": "3.0.1",
     "eslint-plugin-vue": "4.0.0",
     "node-sass": "^4.7.2",
-    "quasar-cli": "^0.15.0-beta.36",
     "sass-loader": "^6.0.6",
     "vue-loader": "^14.1.1"
   },

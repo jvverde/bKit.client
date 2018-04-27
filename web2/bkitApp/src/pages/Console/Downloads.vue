@@ -1,16 +1,13 @@
 <template>
   <section class="downloads">
-    <!--resource v-for="(f, i) in downloads" :key="i" :entry="f"></resource-->
+    <resource v-for="(f, i) in downloads" :key="i" :entry="f"></resource>
   </section>
 </template>
 
 <script>
-// import fs from 'fs'
-import {ipcRenderer, remote} from 'electron'
-// import Resource from './Resource'
-// const {ipcRenderer, remote} = require('electron')
-const fs = remote.require('fs')
-export default {
+import isElectron from 'is-electron'
+import Resource from './Resource'
+export default isElectron() ? {
   name: 'downloads',
   data () {
     return {
@@ -18,11 +15,12 @@ export default {
     }
   },
   components: {
-    // Resource
+    Resource
   },
   created () {
     console.log('Create download')
-    // const {ipcRenderer, remote} = require('electron')
+    const {ipcRenderer} = require('electron')
+    const fs = require('fs')
     ipcRenderer.on('download', (event, arg) => {
       if (arg instanceof Object && arg.type === 'download') {
         if (arg.mimetype === 'application/bkit') {
@@ -66,10 +64,18 @@ export default {
     })
   },
   mounted () {
-    // ipcRenderer.send('register', 'download')
+    const {ipcRenderer} = require('electron')
+    ipcRenderer.send('register', 'download')
   },
   destroy () {
-    // ipcRenderer.removeAllListeners('download')
+    const {ipcRenderer} = require('electron')
+    ipcRenderer.removeAllListeners('download')
+  }
+} : {
+  data () {
+    return {
+      downloads: []
+    }
   }
 }
 </script>

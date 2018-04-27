@@ -31,7 +31,8 @@ module.exports = function (ctx) {
       extendWebpack (cfg) {
         cfg.node = cfg.node || {}
         cfg.node.fs = cfg.node.fs || 'empty'
-
+        cfg.node.child_process = cfg.node.child_process || 'empty'
+        
         cfg.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,

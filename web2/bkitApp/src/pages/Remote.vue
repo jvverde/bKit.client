@@ -1,7 +1,9 @@
 <template>
-  <q-page class="flex flex-center remote">
-    <router-view/>
-    <footer class="bottom console" v-if="isElectron">
+  <q-page class="flex column remote">
+    <section class="flex main">
+      <router-view/>
+    </section>
+    <footer class="flex console" v-if="isElectron">
       <downloads></downloads>
     </footer>
   </q-page>
@@ -11,7 +13,7 @@
 import isElectron from 'is-electron'
 const Downloads = () => import('./Console/Downloads')
 export default {
-  name: 'PageRemote',
+  name: 'Remote',
   data () {
     return {
       isElectron: isElectron()
@@ -25,18 +27,23 @@ export default {
 
 <style scoped lang="scss">
   @import "src/scss/config.scss";
-  .console{
-    text-align: left;
-    margin: 2px;
-    padding: 2px;
-    background-color: gainsboro;
-    border-top: 1px solid $bkit-color;
-    display:flex;
-    width: 100%;
-  }
   .remote{
     width:100%;
     height: 100%;
     overflow: hidden;
+    >*{
+      width: 100%;
+    }
+    .main {
+      flex-grow:5;
+    }
+    .console{
+      text-align: left;
+      margin: 2px;
+      padding: 2px;
+      background-color: gainsboro;
+      border-top: 1px solid $bkit-color;
+      flex-grow:0;
+    }
   }
 </style>

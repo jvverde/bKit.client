@@ -74,7 +74,6 @@ export default {
   }
   .computers{
     width:100%;
-    height: 100%;
     overflow: auto;
     &.onlyone .computer.selected{
       width: 100%;

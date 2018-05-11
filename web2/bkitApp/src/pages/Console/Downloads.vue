@@ -6,6 +6,7 @@
 
 <script>
 import Resource from './Resource'
+import {myMixin} from 'src/mixins'
 const {ipcRenderer} = require('electron')
 const fs = require('fs')
 console.log('Downloads....')
@@ -19,6 +20,7 @@ export default {
   components: {
     Resource
   },
+  mixins: [myMixin],
   created () {
     console.log('Create download')
     ipcRenderer.on('download', (event, arg) => {
@@ -47,18 +49,12 @@ export default {
 
             download.open = true
           } catch (err) {
-            this.$notify.error({
-              title: `File:${arg.filename}`,
-              message: `Error: ${err}`
-            })
+            this.error(`File:${arg.filename}`, `Error: ${err}`)
           }
         } else {
           this.downloads.find(x => x.fullpath === arg.fullpath) ||
             this.downloads.push(arg)
-          this.$notify.info({
-            title: arg.filename,
-            message: 'Download completed'
-          })
+          this.show(`Download completed ${arg.filename}`)
         }
       }
     })

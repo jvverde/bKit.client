@@ -8,29 +8,32 @@ function show (msg) {
     timeout: 3000
   })
 }
-
+function error (msg, detail = '') {
+  Notify.create({
+    message: msg,
+    detail: detail,
+    type: 'negative',
+    position: 'top-right',
+    timeout: 10000,
+    actions: [{
+      label: 'Dismiss',
+      icon: 'cancel',
+      handler: () => {}
+    }]
+  })
+}
 export const myMixin = {
   methods: {
     show: msg => show(msg),
     done: response => show(response.data.msg || 'done'),
+    error,
     catch: e => {
       let msg = e.toString()
-      let detail = ''
       if (e.response instanceof Object && e.response.data instanceof Object) {
-        detail = e.response.data.msg
+        error(msg, e.response.data.msg)
+      } else {
+        error(msg)
       }
-      Notify.create({
-        message: msg,
-        detail: detail,
-        type: 'negative',
-        position: 'top-right',
-        timeout: 10000,
-        actions: [{
-          label: 'Dismiss',
-          icon: 'cancel',
-          handler: () => {}
-        }]
-      })
     }
   }
 }

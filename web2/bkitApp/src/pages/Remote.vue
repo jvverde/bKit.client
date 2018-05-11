@@ -1,16 +1,22 @@
 <template>
   <q-page class="flex flex-center remote">
     <router-view/>
-    <footer class="bottom console">
+    <footer class="bottom console" v-if="isElectron">
       <downloads></downloads>
     </footer>
   </q-page>
 </template>
 
 <script>
-import Downloads from './Console/Downloads'
+import isElectron from 'is-electron'
+const Downloads = () => import('./Console/Downloads')
 export default {
   name: 'PageRemote',
+  data () {
+    return {
+      isElectron: isElectron()
+    }
+  },
   components: {
     Downloads
   }

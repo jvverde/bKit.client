@@ -31,12 +31,12 @@
 </template>
 
 <script>
-import isElectron from 'is-electron'
 import path from 'path'
-const {spawn} = isElectron() ? require('child_process') : {}
+const {spawn} = require('child_process')
 const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
+console.log('Recovery..............')
 
-export default isElectron() ? {
+export default {
   data () {
     return {
       isVisible: false,
@@ -192,10 +192,6 @@ export default isElectron() ? {
         }
       })
     }
-  }
-} : {
-  data () {
-    return {}
   }
 }
 

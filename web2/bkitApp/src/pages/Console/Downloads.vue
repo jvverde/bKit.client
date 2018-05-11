@@ -5,9 +5,11 @@
 </template>
 
 <script>
-import isElectron from 'is-electron'
 import Resource from './Resource'
-export default isElectron() ? {
+const {ipcRenderer} = require('electron')
+const fs = require('fs')
+console.log('Downloads....')
+export default {
   name: 'downloads',
   data () {
     return {
@@ -19,8 +21,6 @@ export default isElectron() ? {
   },
   created () {
     console.log('Create download')
-    const {ipcRenderer} = require('electron')
-    const fs = require('fs')
     ipcRenderer.on('download', (event, arg) => {
       if (arg instanceof Object && arg.type === 'download') {
         if (arg.mimetype === 'application/bkit') {
@@ -62,20 +62,10 @@ export default isElectron() ? {
         }
       }
     })
-  },
-  mounted () {
-    const {ipcRenderer} = require('electron')
     ipcRenderer.send('register', 'download')
   },
   destroy () {
-    const {ipcRenderer} = require('electron')
     ipcRenderer.removeAllListeners('download')
-  }
-} : {
-  data () {
-    return {
-      downloads: []
-    }
   }
 }
 </script>

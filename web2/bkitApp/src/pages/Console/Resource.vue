@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import isElectron from 'is-electron'
 import Recovery from './Recovery'
-const {shell} = isElectron() ? require('electron') : {}
+console.log('Resource..............')
+const {shell} = require('electron')
 
-export default isElectron() ? {
+export default {
   name: 'downloads',
   data () {
     return {
@@ -54,10 +54,6 @@ export default isElectron() ? {
     run () {
       this.recoveries.push(this.recoveries[0])
     }
-  }
-} : {
-  data () {
-    return {}
   }
 }
 </script>

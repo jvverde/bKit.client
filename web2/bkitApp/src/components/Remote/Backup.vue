@@ -113,7 +113,6 @@ export default {
   $hvcolor: rgba(230, 230, 230, 0.9);
   $aheight: $width*.7;
   .backup{
-    height:100%;
     width: 100%;
     overflow: hidden;
     display: flex;

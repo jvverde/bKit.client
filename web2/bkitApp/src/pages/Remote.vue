@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex column remote">
+  <q-page class="flex column no-wrap remote">
     <section class="flex main">
       <router-view/>
     </section>
@@ -36,6 +36,7 @@ export default {
     }
     .main {
       flex-grow:5;
+      flex-shrink:1;
     }
     .console{
       text-align: left;

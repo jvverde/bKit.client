@@ -101,7 +101,11 @@ module.exports = function (ctx) {
         'QCardTitle',
         'QCardMain',
         'QCardSeparator',
-        'QCardActions'
+        'QCardActions',
+        'QTabs',
+        'QTab',
+        'QTabPane',
+        'QRouteTab'
       ],
       directives: [
         'Ripple'

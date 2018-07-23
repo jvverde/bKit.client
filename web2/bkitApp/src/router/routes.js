@@ -114,7 +114,6 @@ export default [
       */
     ]
   },
-
   { // Always leave this as last one
     path: '*',
     component: loadPage('404')

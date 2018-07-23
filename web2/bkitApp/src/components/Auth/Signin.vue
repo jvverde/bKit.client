@@ -1,33 +1,42 @@
 <template>
   <div class="column absolute-center">
-    <q-input type="text" max-length="16" autofocus
-      v-model="form.username"  float-label="Username"
+    <q-input
+      type="text"
+      max-length="16"
+      autofocus
+      v-model="form.username"
+      float-label="Username"
       :error="$v.form.username.$error"
       @blur="$v.form.username.$touch"
       @keyup.enter="send"
     />
-    <q-input type="password" max-length="16"
-      v-model="form.password" float-label="Password"
+    <q-input
+      type="password"
+      max-length="16"
+      v-model="form.password"
+      float-label="Password"
       :error="$v.form.password.$error"
       @blur="$v.form.password.$touch"
       @keyup.enter="send"
     />
-    <router-link to="/reset_pass" class="thin-paragraph text-right" style="margin:.5em 0">
+    <router-link
+      to="/reset_pass"
+      class="thin-paragraph text-right"
+      style="margin:.5em 0"
+    >
       <small>Forgot Password?</small>
     </router-link>
-    <q-btn v-model="submit" loader
+    <q-btn
+      v-model="submit"
+      loader
       rounded color="secondary"
       :disabled="!ready"
       @click="send"
-    >
-      Sign In
-    </q-btn>
+    >Sign In</q-btn>
     <div class="text-center" style="margin:1em">Or</div>
     <q-btn rounded color="secondary"
       @click="$router.push({ name: 'signup' })"
-    >
-      Sign up
-    </q-btn>
+    >Sign up</q-btn>
   </div>
 </template>
 

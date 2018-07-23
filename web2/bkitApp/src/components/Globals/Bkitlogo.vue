@@ -13,6 +13,7 @@
 
 <script>
 const isElectron = () => typeof process !== 'undefined' &&
+  typeof process.versions !== 'undefined' &&
   typeof process.versions.node !== 'undefined'
 
 let exec = null

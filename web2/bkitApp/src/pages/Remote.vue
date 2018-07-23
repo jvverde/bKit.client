@@ -6,7 +6,7 @@
     <footer class="flex console" v-if="isElectron">
       <downloads></downloads>
     </footer> -->
-    <q-tabs v-if="isElectron" no-pane-border>
+    <q-tabs v-if="isElectron" no-pane-border  inverted>
       <q-tab default name="files" slot="title" icon="mail" label="files" />
       <q-tab name="logs" slot="title" icon="alarm" label="Console"/>
       <q-tab-pane name="files" keep-alive>

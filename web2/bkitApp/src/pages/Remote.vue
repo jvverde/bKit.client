@@ -1,16 +1,13 @@
 <template>
-  <q-page class="flex column no-wrap remote">
-<!--     <section class="flex main">
-      <router-view/>
-    </section>
-    <footer class="flex console" v-if="isElectron">
-      <downloads></downloads>
-    </footer> -->
+  <q-page class="flex column no-wrap remote ">
     <q-tabs v-if="isElectron" no-pane-border  inverted>
       <q-tab default name="files" slot="title" icon="mail" label="files" />
       <q-tab name="logs" slot="title" icon="alarm" label="Console"/>
+      
       <q-tab-pane name="files" keep-alive>
-        <router-view/>
+        <section class="flex column">
+          <router-view/>
+        </section>
       </q-tab-pane>
       <q-tab-pane name="logs" keep-alive>
         <downloads></downloads>

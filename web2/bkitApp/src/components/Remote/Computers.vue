@@ -40,7 +40,7 @@ export default {
   mixins: [myMixin],
   created () {
     const myself = {id: null}
-    console.log('selected:', this.selected)
+    // console.log('selected:', this.selected)
     axios.get('/auth/clients').then(response => {
       this.computers = response.data.map((e) => {
         const id = `${e.domain}/${e.name}/${e.uuid}`

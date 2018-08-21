@@ -15,15 +15,15 @@
       <div class="links">
         <a :download="file" @click.stop
           :href="getFullUrl('download',file.name)" title="Download">
-          <q-icon name="fa-download" class="icon"/>
+          <q-icon name="fa fa-download" class="icon"/>
         </a>
         <a target="_blank" @click.stop
           :href="getFullUrl('view',file.name)" title="View">
-          <q-icon name="fa-eye" class="icon"/>
+          <q-icon name="fa fa-eye" class="icon"/>
         </a>
         <a :href="getFullUrl('bkit',file.name)" title="Recovery"
           @click.stop>
-          <q-icon name="fa-history" class="icon"/>
+          <q-icon name="fa fa-history" class="icon"/>
         </a>
       </div>
     </li>
@@ -129,6 +129,9 @@ export default {
   ul.files {
     list-style: none;
     overflow: auto;
+    a{
+      text-decoration: none;
+    };
     li:hover{
       background:#eeeeee;
       background-color: $li-hover;

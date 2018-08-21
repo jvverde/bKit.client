@@ -79,7 +79,7 @@ export default [
       {
         path: 'user',
         meta: { requiresAuth: true },
-        component: loadComponent('User/loadLayout'),
+        component: loadComponent('User/Layout'),
         children: [
           {
             path: 'view/:name',

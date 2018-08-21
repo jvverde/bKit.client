@@ -86,15 +86,7 @@
 <!--       <q-side-link item to="/test" exact>
         <q-item-main label="About" />
       </q-side-link>
-      <q-side-link item to="/users">
-        <q-item-main label="Users" />
-      </q-side-link>
-      <q-side-link item to="/groups">
-        <q-item-main label="Groups" />
-      </q-side-link>
-      <q-side-link item to="/remote/computers">
-        <q-item-main label="Backups" />
-      </q-side-link> -->
+-->
 
     </q-layout-drawer>
     <new-server :open="askServer" @close="askServer = false"/>

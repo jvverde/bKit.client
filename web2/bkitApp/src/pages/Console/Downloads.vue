@@ -10,6 +10,7 @@ import {myMixin} from 'src/mixins'
 const {ipcRenderer} = require('electron')
 const fs = require('fs')
 console.log('Downloads....')
+
 export default {
   name: 'downloads',
   data () {
@@ -64,6 +65,7 @@ export default {
     ipcRenderer.removeAllListeners('download')
   }
 }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

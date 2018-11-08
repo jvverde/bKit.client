@@ -3,7 +3,6 @@
     <q-tabs v-if="isElectron" no-pane-border  inverted>
       <q-tab default name="files" slot="title" icon="mail" label="files" />
       <q-tab name="logs" slot="title" icon="alarm" label="Console"/>
-      
       <q-tab-pane name="files" keep-alive>
         <section class="flex column">
           <router-view/>
@@ -13,7 +12,7 @@
         <downloads></downloads>
       </q-tab-pane>
     </q-tabs>
-    <section class="flex main" v-else>
+    <section v-else class="flex main">
       <router-view/>
     </section>
   </q-page>

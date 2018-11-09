@@ -11,6 +11,9 @@ import Formateddate from 'src/components/Globals/Formateddate'
 import Formatedsize from 'src/components/Globals/Formatedsize'
 import Breadcrumb from 'src/components/Globals/Breadcrumb'
 
+import Element from 'element-ui'
+Vue.use(Element)
+
 Vue.component('bkitlogo', Bkitlogo)
 Vue.component('formateddate', Formateddate)
 Vue.component('formatedsize', Formatedsize)

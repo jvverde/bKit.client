@@ -24,7 +24,7 @@
           </span>
           <span class="name">{{dir.name}}</span>
         </div>
-        <a :href="getUrl('bkit',dir.name)" title="Recovery"
+        <a :href="getFullUrl('bkit',dir.name)" title="Recovery"
           @click.stop class="links">
           <span class="icon is-small">
             <i class="fa fa-history"></i>
@@ -67,6 +67,7 @@ export default {
   mixins: [myMixin],
   computed: {
     ...mapGetters('location', ['getLocation']),
+    ...mapGetters('auth', ['baseURL', 'token']),
     currentPath () {
       return this.getLocation.path
     }
@@ -83,13 +84,14 @@ export default {
   },
   methods: {
     ...mapMutations('location', ['setLocation']),
-    getUrl (base, entry) {
-      return base +
-        '/' + this.location.computer +
-        '/' + this.location.disk +
-        '/' + this.location.snapshot +
-        this.location.path +
+    getUrl (type, entry) {
+      return `/auth/client/${this.location.computer}/disk/${this.location.disk}/snap/${this.location.snapshot}/${type}${this.location.path}` +
         encodeURIComponent(entry || '')
+    },
+    getFullUrl (type, entry) {
+      const r = this.getUrl(type, entry)
+      console.log('baseul=',this.baseURL)
+      return `${this.baseURL}${r}?access_token=${this.token}`
     },
     select (dir) {
       this.setLocation(dir.location)

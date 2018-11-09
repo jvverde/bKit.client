@@ -38,6 +38,7 @@ import { mapGetters } from 'vuex'
 function order (a, b) {
   return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
 }
+
 export default {
   name: 'files',
   data () {

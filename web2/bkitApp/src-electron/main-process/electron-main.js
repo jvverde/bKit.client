@@ -125,6 +125,7 @@ function exitApp() {
 }
 
 ipcMain.on('register', (event, arg) => {
+  console.log('register:' + arg)
   downloadListeners.find(x => x.channel === arg) || downloadListeners.push({receiver:event.sender, channel: arg})
   event.sender.send(arg, 'done register done for channel:' + arg)
 })

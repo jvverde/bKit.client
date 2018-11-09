@@ -1,6 +1,6 @@
 <template>
   <div class="recovery">
-    <el-dialog title="Recovery" v-model="isVisible" size="small"
+    <el-dialog title="Recovery" v-model="isVisible"
       class="dialog">
       <div>{{origin}} => {{dst}}/{{resource.entry}}</div>
       <div v-if="isOriginalLocation">
@@ -96,24 +96,38 @@ export default {
   }, */
   mounted () {
     let resource = this.resource || {}
+    console.log('Recovery', resource)
     let [, volID] = (resource.drive || '').split(/\./)
-    const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
+    let cwd = process.cwd()
+    console.log('cwd=', cwd)
+    console.log('__dirname=', __dirname)
+    console.log('__filename=', __filename)
+    let remote = require('electron').remote
+    let app = remote.app
+    let basepath = app.getAppPath()
+    console.log('basepath = ', basepath)
+    const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '../..'})
+    console.log('fd:', fd)
     fd.stdout.on('data', (data) => {
+      console.log('data')
       const root = `${data}`.replace(/\r?\n.*$/, '')
       this.src = path.resolve(root, resource.path)
       this.isVisible = true
       this.dst = this.src
     })
-    /* fd.stderr.on('data', (msg) => {
-      this.$notify.error({
+    fd.stderr.on('data', (msg) => {
+      console.error(msg)
+/*      this.$notify.error({
         title: 'Error',
         message: `${msg}`,
         customClass: 'message warn'
       })
-    }) */
+*/
+    }) 
 
     fd.on('close', (code) => {
       code = 0 | code
+      console.log('close')
       if (code === 1) { // In case of volume wasn't found
         this.src = ''
         this.$notify.info({
@@ -133,7 +147,7 @@ export default {
   },
   methods: {
     selectDestination () {
-      const {dialog} = this.$electron.remote
+      const {dialog} = require('electron').remote
       const [folder] = dialog.showOpenDialog({
         properties: ['openDirectory'],
         title: 'Destination dolder',

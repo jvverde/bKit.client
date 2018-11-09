@@ -25,8 +25,11 @@ export default {
   created () {
     console.log('Create download')
     ipcRenderer.on('download', (event, arg) => {
+      console.log('download event')
       if (arg instanceof Object && arg.type === 'download') {
+        console.log('arg.type=download')
         if (arg.mimetype === 'application/bkit') {
+          console.log('arg.mimetype === application/bkit')
           const download = arg
           this.downloads.push(download)
           try {
@@ -46,8 +49,7 @@ export default {
               '.',
               entry
             ].join('/')
-            console.log(download.resource.url)
-
+            console.log('Download from :', download.resource.url)
             download.open = true
           } catch (err) {
             this.error(`File:${arg.filename}`, `Error: ${err}`)

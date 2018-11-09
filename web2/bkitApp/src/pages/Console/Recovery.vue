@@ -31,6 +31,7 @@
 </template>
 
 <script>
+
 import path from 'path'
 const {spawn} = require('child_process')
 const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'

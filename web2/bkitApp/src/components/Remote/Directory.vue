@@ -90,7 +90,6 @@ export default {
     },
     getFullUrl (type, entry) {
       const r = this.getUrl(type, entry)
-      console.log('baseul=',this.baseURL)
       return `${this.baseURL}${r}?access_token=${this.token}`
     },
     select (dir) {

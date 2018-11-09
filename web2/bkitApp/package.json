@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "element-ui": "^2.4.9",
     "is-electron": "^2.1.0",
     "moment": "^2.20.1",
     "vue-i18n": "^7.3.3",

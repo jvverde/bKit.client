@@ -23,7 +23,7 @@
         </el-button-group>
       </span>
     </el-dialog>
-    <section :class="{show:show}">
+    <section :class="{show:visible}">
       <div class="stdout">{{stdout}}</div>
       <div class="stderr">{{stderr}}</div>
     </section>
@@ -36,6 +36,7 @@ import path from 'path'
 const {spawn} = require('child_process')
 const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
 console.log('Recovery..............')
+import {myMixin} from 'src/mixins'
 
 export default {
   data () {
@@ -79,7 +80,7 @@ export default {
       }
     }
   },
-  props: ['resource', 'show'],
+  props: ['resource', 'visible'],
   components: {
   },
   /*  created () {
@@ -107,7 +108,6 @@ export default {
     let basepath = app.getAppPath()
     console.log('basepath = ', basepath)
     const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '../..'})
-    console.log('fd:', fd)
     fd.stdout.on('data', (data) => {
       console.log('data')
       const root = `${data}`.replace(/\r?\n.*$/, '')
@@ -116,13 +116,8 @@ export default {
       this.dst = this.src
     })
     fd.stderr.on('data', (msg) => {
-      console.error(msg)
-/*      this.$notify.error({
-        title: 'Error',
-        message: `${msg}`,
-        customClass: 'message warn'
-      })
-*/
+      console.error('Error:', `${msg}`)
+      this.catch(`${msg}`)
     }) 
 
     fd.on('close', (code) => {
@@ -145,6 +140,7 @@ export default {
       }
     })
   },
+  mixins: [myMixin],
   methods: {
     selectDestination () {
       const {dialog} = require('electron').remote

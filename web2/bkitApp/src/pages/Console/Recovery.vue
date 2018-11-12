@@ -116,29 +116,35 @@ export default {
       this.dst = this.src
     })
     fd.stderr.on('data', (msg) => {
-      console.error('Error:', `${msg}`)
-      this.catch(`${msg}`)
+      this.error('Error:', `${msg}`)
     }) 
 
     fd.on('close', (code) => {
       code = 0 | code
-      console.log('close')
       if (code === 1) { // In case of volume wasn't found
         this.src = ''
-        this.$notify.info({
-          title: 'Volume not found on this computer',
-          message: 'You can still recovery it but you must choose an alternative location',
-          duration: 1000,
-          onClose: () => {
-            const folder = this.selectDestination()
-            if (folder) {
-              this.isVisible = true
-              this.dst = folder
+        this.notify({
+          message: 'Volume not found on this computer. You can still recovery it but you must choose an alternative location',
+          type: 'info',
+          position: 'top-right',
+          timeout: 1000,
+          actions: [{
+            label: 'Dismiss',
+            icon: 'cancel',
+            handler: () => {}
+          },{
+            label: 'Choose alternative location'
+            handler: () => {
+              const folder = this.selectDestination()
+              if (folder) {
+                this.isVisible = true
+                this.dst = folder
+              }              
             }
-          }
+          }]
         })
       }
-    })
+    }
   },
   mixins: [myMixin],
   methods: {

@@ -19,7 +19,7 @@
         </span>
       </aside>
     </section>
-    <recovery :resource="entry.resource" :show="open"
+    <recovery :resource="entry.resource" :visible="open"
       v-if="entry.resource"></recovery>
   </div>
 </template>

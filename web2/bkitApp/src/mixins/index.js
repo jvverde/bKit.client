@@ -22,11 +22,15 @@ function error (msg, detail = '') {
     }]
   })
 }
+function notify (arg = {}) {
+  Notify.create(arg)
+}
 export const myMixin = {
   methods: {
     show: msg => show(msg),
     done: response => show(response.data.msg || 'done'),
     error,
+    notify,
     catch: e => {
       let msg = e.toString()
       if (e.response instanceof Object && e.response.data instanceof Object) {

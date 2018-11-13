@@ -1,6 +1,6 @@
 <template>
   <div class="recovery">
-    <el-dialog title="Recovery" v-model="isVisible"
+    <el-dialog title="Recovery" v-model="isVisible" size="small"
       class="dialog">
       <div>{{origin}} => {{dst}}/{{resource.entry}}</div>
       <div v-if="isOriginalLocation">
@@ -23,8 +23,7 @@
         </el-button-group>
       </span>
     </el-dialog>
-    <div>aqui</div>
-    <section :class="{show:visible}">
+    <section :class="{show:show}">
       <div class="stdout">{{stdout}}</div>
       <div class="stderr">{{stderr}}</div>
     </section>
@@ -32,17 +31,15 @@
 </template>
 
 <script>
-
 import path from 'path'
-const {spawn} = require('child_process')
+const {remote} = require('electron')
+const {spawn} = remote.require('child_process')
 const BASH = process.platform === 'win32' ? 'bash.bat' : 'bash'
-console.log('Recovery..............')
-import {myMixin} from 'src/mixins'
 
 export default {
   data () {
     return {
-      isVisible: true,
+      isVisible: false,
       drive: '',
       stdout: '',
       stderr: '',
@@ -81,7 +78,7 @@ export default {
       }
     }
   },
-  props: ['resource', 'visible'],
+  props: ['resource', 'show'],
   components: {
   },
   /*  created () {
@@ -98,59 +95,44 @@ export default {
   }, */
   mounted () {
     let resource = this.resource || {}
-    console.log('Recovery', resource)
     let [, volID] = (resource.drive || '').split(/\./)
-    let cwd = process.cwd()
-    console.log('cwd=', cwd)
-    console.log('__dirname=', __dirname)
-    console.log('__filename=', __filename)
-    let remote = require('electron').remote
-    let app = remote.app
-    let basepath = app.getAppPath()
-    console.log('basepath = ', basepath)
-    const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '../..'})
+    const fd = spawn(BASH, ['./findDrive.sh', volID], {cwd: '..'})
     fd.stdout.on('data', (data) => {
-      console.log('data')
       const root = `${data}`.replace(/\r?\n.*$/, '')
       this.src = path.resolve(root, resource.path)
       this.isVisible = true
       this.dst = this.src
     })
-    fd.stderr.on('data', (msg) => {
-      this.error('Error:', `${msg}`)
-    }) 
+    /* fd.stderr.on('data', (msg) => {
+      this.$notify.error({
+        title: 'Error',
+        message: `${msg}`,
+        customClass: 'message warn'
+      })
+    }) */
 
     fd.on('close', (code) => {
       code = 0 | code
       if (code === 1) { // In case of volume wasn't found
         this.src = ''
-        this.notify({
-          message: 'Volume not found on this computer. You can still recovery it but you must choose an alternative location',
-          type: 'info',
-          position: 'top-right',
-          timeout: 60000,
-          actions: [{
-            label: 'Dismiss',
-            icon: 'cancel',
-            handler: () => {}
-          },{
-            label: 'Choose alternative location',
-            handler: () => {
-              const folder = this.selectDestination()
-              if (folder) {
-                this.isVisible = true
-                this.dst = folder
-              }              
+        this.$notify.info({
+          title: 'Volume not found on this computer',
+          message: 'You can still recovery it but you must choose an alternative location',
+          duration: 1000,
+          onClose: () => {
+            const folder = this.selectDestination()
+            if (folder) {
+              this.isVisible = true
+              this.dst = folder
             }
-          }]
+          }
         })
       }
     })
   },
-  mixins: [myMixin],
   methods: {
     selectDestination () {
-      const {dialog} = require('electron').remote
+      const {dialog} = this.$electron.remote
       const [folder] = dialog.showOpenDialog({
         properties: ['openDirectory'],
         title: 'Destination dolder',

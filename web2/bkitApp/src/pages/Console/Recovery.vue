@@ -118,7 +118,7 @@ export default {
     })
     fd.stderr.on('data', (msg) => {
       this.error('Error:', `${msg}`)
-    }) 
+    })
 
     fd.on('close', (code) => {
       code = 0 | code
@@ -133,14 +133,14 @@ export default {
             label: 'Dismiss',
             icon: 'cancel',
             handler: () => {}
-          },{
+          }, {
             label: 'Choose alternative location',
             handler: () => {
               const folder = this.selectDestination()
               if (folder) {
                 this.isVisible = true
                 this.dst = folder
-              }              
+              }
             }
           }]
         })

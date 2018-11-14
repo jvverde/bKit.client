@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex column no-wrap remote ">
-    <q-tabs v-if="isElectron" no-pane-border  inverted>
+    <!--<q-tabs v-if="isElectron" no-pane-border  inverted>
       <q-tab default name="files" slot="title" icon="mail" label="files" />
       <q-tab name="logs" slot="title" icon="alarm" label="Console"/>
       <q-tab-pane name="files" keep-alive>
@@ -11,8 +11,9 @@
       <q-tab-pane name="logs" keep-alive>
         <downloads></downloads>
       </q-tab-pane>
-    </q-tabs>
-    <section v-else class="flex main">
+    </q-tabs> -->
+    <!-- <section v-else class="flex main"> -->
+    <section class="flex main">
       <router-view/>
     </section>
   </q-page>

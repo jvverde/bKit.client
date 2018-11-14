@@ -1,30 +1,22 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpr fff">
     <q-layout-header>
       <q-toolbar
         color="primary"
         :glossy="$q.theme === 'mat'"
         :inverted="$q.theme === 'ios'"
       >
-        <q-btn
-          flat
-          dense
-          round
-          @click="leftDrawerOpen = !leftDrawerOpen"
-          aria-label="Menu"
-        >
-          <q-icon name="menu" />
-        </q-btn>
-
         <q-toolbar-title>
-          Quasar App
+          bKit Desktop App
           <div slot="subtitle">Running on Quasar v{{ $q.version }}</div>
         </q-toolbar-title>
+        <q-btn flat round dense icon="menu" @click="rightMenuOpen = !rightMenuOpen" aria-label="Toggle menu on right side" />
       </q-toolbar>
     </q-layout-header>
 
     <q-layout-drawer
-      v-model="leftDrawerOpen"
+      side="right"
+      v-model="rightMenuOpen"
       :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null"
     >
       <q-list
@@ -73,7 +65,7 @@ export default {
   name: 'MyLayout',
   data () {
     return {
-      leftDrawerOpen: this.$q.platform.is.desktop
+      rightMenuOpen: this.$q.platform.is.desktop
     }
   },
   methods: {

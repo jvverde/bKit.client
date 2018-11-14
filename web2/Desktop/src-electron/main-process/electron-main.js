@@ -59,8 +59,9 @@ function interceptDownload (window) {
       if (state === 'completed') {
         console.log(`Download successfully: ${item.getFilename()} in path ${item.getSavePath()}`)
         console.log(`${item.getMimeType()}`)
-        downloadListeners.forEach( (listener) => {
-          listener.receiver.send(listener.channel, {
+        const mimetype = item.getMimeType()
+        downloadListeners.filter(e => e.type === mimetype).forEach( (listener) => {
+          listener.target.send(listener.type, {
             type: 'download',
             fullpath: `${item.getSavePath()}`,
             filename: `${item.getFilename()}`,
@@ -90,9 +91,6 @@ app.on('activate', () => {
 })
 
 function createChildWindow (address) {
-  /**
-   * Initial window options
-   */
   let win = new BrowserWindow({
     width: 1000,
     height: 600,
@@ -101,17 +99,18 @@ function createChildWindow (address) {
 
   win.loadURL(address)
 
-  win.on('closed', () => {
-    win = null
-  })
-  
   interceptDownload(win)
   return win
 }
 
 ipcMain.on('openUrl', (event, arg) => {
   console.log('open: ' + arg)
-  // downloadListeners.find(x => x.channel === arg) || downloadListeners.push({receiver:event.sender, channel: arg})
   createChildWindow(arg)
-  event.sender.send(arg, 'done openurl done for channel:' + arg)
+  event.sender.send(arg, 'done openurl for:' + arg)
+})
+
+ipcMain.on('openResource', (event, arg) => {
+  console.log('openResource:' + arg)
+  downloadListeners.find(x => x.type === arg) || downloadListeners.push({target:event.sender, type: arg})
+  event.sender.send(arg, 'done register done for type:' + arg)
 })

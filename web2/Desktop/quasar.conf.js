@@ -1,5 +1,5 @@
 // Configuration for your app
-
+const path = require('path')
 module.exports = function (ctx) {
   return {
     // app plugins (/src/plugins)
@@ -32,6 +32,10 @@ module.exports = function (ctx) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias, // This adds the existing alias
+          '@': path.resolve(__dirname, './src/components'),
+        }
       }
     },
     devServer: {

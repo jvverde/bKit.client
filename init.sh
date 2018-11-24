@@ -55,7 +55,7 @@ export RSYNC_PASSWORD="4dm1n"
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 #rsync -rltvhR $FMT --inplace --stats "${CONFDIR}/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}"
-rsync -rlthgpR --no-owner $FMT --inplace "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/./" "${CONFDIR}/" 
+rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/./" "${CONFDIR}/" 
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1
 

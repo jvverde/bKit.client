@@ -38,16 +38,10 @@ ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')
 [[ $ARCH == x86_64 ]] && ARCH=x64 || ARCH=ia32
 [[ $OS == cygwin ]] && OS=win32 || OS=linux
 
-echo Writing configuration to $INITPATH
-(
-	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
-	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
-	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
-)> "$INITFILE"
 
-PASSFILE=$CONFDIR/pass.txt
-echo $PASS > "$PASSFILE"
-chmod 600 "$PASSFILE"
+#PASSFILE=$CONFDIR/pass.txt
+#echo $PASS > "$PASSFILE"
+#chmod 600 "$PASSFILE"
 
 exists rsync || die rsync not found
 
@@ -59,9 +53,15 @@ rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOM
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1
 
+echo Writing configuration to $INITPATH
+(
+	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
+	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
+	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
+)> "$INITPATH"
 
 echo This is the content of init file in $INITPATH
 echo '##########################'
 cat "$INITFILE"
 echo '##########################'
-echo "Backup server setup successfully!"
+echo "Backup server $SERVER setup successfully!"

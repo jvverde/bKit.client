@@ -50,6 +50,7 @@ FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 #rsync -rltvhR $FMT --inplace --stats "${CONFDIR}/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}"
 rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/./" "${CONFDIR}/" 
+#rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 RET=$?
 [[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1
 

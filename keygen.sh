@@ -31,12 +31,24 @@ done
 [[ -n $1 ]] || usage "Servername missing"
 
 CONFDIR="$BKIT/scripts/client/conf/$(id -un)/$1"
-mkdir -p "$CONFDIR"
-NAME="$CONFDIR/key"
+PRIV="$CONFDIR/.priv"
+PUB="$CONFDIR/pub"
+mkdir -p "$PRIV"
+mkdir -p "$PUB"
+KEYSSH="$PRIV/ssh.key"
+PUBSSH="$PUB/ssh.pub"
 
-[[ -e $NAME && -n $NEW ]] && rm "$NAME"
+[[ -e $KEYSSH && -n $NEW ]] && rm "$KEYSSH"
 
-[[ -e $NAME ]] || ssh-keygen -b 256 -t ecdsa -f "$NAME" -q -N "" -C "key from $(id -un)@$(hostname -f) to $1"
+[[ -e $KEYSSH ]] || ssh-keygen -b 256 -t ecdsa -f "$KEYSSH" -q -N "" -C "key from $(id -un)@$(hostname -f) to $1"
 
-[[ -e "${NAME}.pub" ]] && echo "${NAME}.pub" && exit 0 
-exit 1
+ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
+
+{
+	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem"
+	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/key.pub"
+} > /dev/null  2>&1
+chmod 700 "$PRIV"
+#shopt -s extglob
+chmod 600 "$PRIV"/*
+echo "$CONFDIR"

@@ -42,7 +42,8 @@ PUBSSH="$PUB/ssh-client.pub"
 
 [[ -e $KEYSSH ]] || ssh-keygen -b 256 -t ecdsa -f "$KEYSSH" -q -N "" -C "key from $(id -un)@$(hostname -f) to $1"
 
-ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
+#ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
+rsync -ai "$KEYSSH.pub" "$PUBSSH" >&2
 
 {
 	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem"

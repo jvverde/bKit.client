@@ -49,6 +49,5 @@ ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
 	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub"
 } > /dev/null  2>&1
 chmod 700 "$PRIV"
-#shopt -s extglob
 chmod 600 "$PRIV"/*
 echo "$CONFDIR"

@@ -13,8 +13,12 @@ usage() {
 CONFDIR="$1"
 PRIV="$CONFDIR/.priv/key.pem"
 PUB="$CONFDIR/pub/server.pub"
+PASS="$CONFDIR/.priv/pass.bin"
+SECRET="$CONFDIR/.priv/secret"
+
 
 [[ -e $PRIV && -e $PUB ]] || die "Keys are missing"
 
-openssl pkeyutl -derive -inkey "$PRIV" -peerkey "$PUB" -out "$CONFDIR/.priv/pass.bin"
-base64 "$CONFDIR/.priv/pass.bin" > "$CONFDIR/.priv/secret"
+openssl pkeyutl -derive -inkey "$PRIV" -peerkey "$PUB" -out "$PASS"
+base64 "$PASS" > "$SECRET"
+chmod 600 "$SECRET" "$PASS"

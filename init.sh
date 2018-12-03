@@ -39,6 +39,8 @@ IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
 SYNCD="$CONFDIR/pub"
 rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/"
 rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/./" "$SYNCD/" 
+
+"$SDIR/genpass.sh" "$CONFDIR"		|| die "Can't generate the pass"
 exit
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 RET=$?

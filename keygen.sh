@@ -36,7 +36,7 @@ PUB="$CONFDIR/pub"
 mkdir -p "$PRIV"
 mkdir -p "$PUB"
 KEYSSH="$PRIV/ssh.key"
-PUBSSH="$PUB/ssh.pub"
+PUBSSH="$PUB/ssh-client.pub"
 
 [[ -e $KEYSSH && -n $NEW ]] && rm "$KEYSSH"
 
@@ -46,7 +46,7 @@ ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
 
 {
 	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem"
-	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/key.pub"
+	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub"
 } > /dev/null  2>&1
 chmod 700 "$PRIV"
 #shopt -s extglob

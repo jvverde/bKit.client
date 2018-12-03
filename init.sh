@@ -24,9 +24,7 @@ usage() {
 echo Contacting the server ... please wait!
 exists nc && { nc -z $SERVER $PORT 2>&1 		|| die Server $SERVER not found;}
 
-KEY="$("$SDIR"/keygen.sh -n "$SERVER")" 		|| die "Can't generate a key"
-CONFDIR="$(dirname -- "$(readlink -ne -- "$KEY")")" 	|| die "Can't find config directory"
-KEYFILE="$(basename -- "$KEY")"
+CONFDIR="$("$SDIR"/keygen.sh -n "$SERVER")" 		|| die "Can't generate a key"
 
 USER="$(basename -- "$(dirname -- "$CONFDIR")")"	|| die "Can't found USER"	#expected /somepath/user/server from CONFDIR
 INITFILE=$CONFDIR/conf.init
@@ -38,8 +36,9 @@ export RSYNC_PASSWORD="4dm1n"
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
-rsync -rltvhR $FMT "$CONFDIR/./$KEYFILE" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/"
-rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/./pass.txt" "${CONFDIR}/" 
+SYNCD="$CONFDIR/pub"
+rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/"
+rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/./" "$SYNCD/" 
 exit
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 RET=$?

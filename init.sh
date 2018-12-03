@@ -41,6 +41,9 @@ rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOM
 rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/./" "$SYNCD/" 
 
 "$SDIR/genpass.sh" "$CONFDIR"		|| die "Can't generate the pass"
+
+VERIF="$(openssl enc -aes256 -base64 -k "$(cat "$CONFDIR/.priv/secret")" -d -in "$CONFDIR/pub/verification")"
+[[ $VERIF == VerificationOK ]] || die "Something was wron with the produced key"
 exit
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 RET=$?

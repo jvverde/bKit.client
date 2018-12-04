@@ -50,15 +50,17 @@ echo Writing configuration to $INITFILE
 (
 	read SECTION <"$CONFDIR/pub/section"
 	read COMMAND <"$CONFDIR/pub/command"
-	echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
+	#echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
 	echo "SSH=ssh -i '$CONFDIR/.priv/ssh.key' rsyncd@$SERVER $COMMAND"
-	echo "MODULE=user@$SERVER::$SECTION"
+	echo "BACKUPURL=user@$SERVER::$SECTION"
+	echo "PASSFILE='$CONFDIR/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')
 	[[ $ARCH == x86_64 ]] && ARCH=x64 || ARCH=ia32
 	[[ $OS == cygwin ]] && OS=win32 || OS=linux
 	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
 )> "$INITFILE"
+ln -svrfT "$CONFDIR" "$(dirname -- "$CONFDIR")/default"
 
 echo This is the content of init file in $INITFILE
 echo '##########################'

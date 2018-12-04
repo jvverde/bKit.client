@@ -2,10 +2,10 @@
 SDIR=$(dirname "$(readlink -f "$0")")	#Full SDIR
 
 SECTION=bkit
-PORT=8730
-BPORT=8731
-RPORT=8732
-UPORT=8733
+PORT=8760
+BPORT=8761
+RPORT=8762
+UPORT=8763
 USER=user
 PASS=us3r
 SERVER="$1"
@@ -51,8 +51,8 @@ echo Writing configuration to $INITFILE
 	read SECTION <"$CONFDIR/pub/section"
 	read COMMAND <"$CONFDIR/pub/command"
 	#echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
-	echo "SSH=ssh -i '$CONFDIR/.priv/ssh.key' rsyncd@$SERVER $COMMAND"
-	echo "BACKUPURL=user@$SERVER::$SECTION"
+	echo "SSH='ssh -i \"$CONFDIR/.priv/ssh.key\" rsyncd@$SERVER $COMMAND'"
+	echo "BACKUPURL='user@$SERVER::$SECTION'"
 	echo "PASSFILE='$CONFDIR/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')

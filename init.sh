@@ -37,22 +37,22 @@ FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
 SYNCD="$CONFDIR/pub"
-rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/"
-rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/${USER}/./" "$SYNCD/" 
+rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/" || die "Exit value of rsync is non null: $?"
+rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/./" "$SYNCD/" || die "Exit value of rsync is non null: $?"
 
 "$SDIR/genpass.sh" "$CONFDIR"		|| die "Can't generate the pass"
 
-VERIF="$(openssl enc -aes256 -base64 -k "$(cat "$CONFDIR/.priv/secret")" -d -in "$CONFDIR/pub/verification")"
-[[ $VERIF == VerificationOK ]] || die "Something was wron with the produced key"
-exit
+VERIF="$(openssl enc -aes256 -base64 -k "$(<"$CONFDIR/.priv/secret")" -d -in "$CONFDIR/pub/verification")"
+[[ $VERIF == VerificationOK ]] || die "Something was wrong with the produced key"
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
-RET=$?
-[[ $RET -ne 0 ]] && echo "Exit value of rsync is non null: $RET" && exit 1
 
 echo Writing configuration to $INITFILE
 (
-	echo "BACKUPURL=rsync://$USER@$SERVER:$BPORT/$DOMAIN.$NAME.$UUID"
-	echo "RECOVERURL=rsync://$USER@$SERVER:$RPORT/$DOMAIN.$NAME.$UUID"
+	read SECTION <"$CONFDIR/pub/section"
+	read COMMAND <"$CONFDIR/pub/command"
+	echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
+	echo "SSH=ssh -i '$CONFDIR/.priv/ssh.key' rsyncd@$SERVER $COMMAND"
+	echo "MODULE=user@$SERVER::$SECTION"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')
 	[[ $ARCH == x86_64 ]] && ARCH=x64 || ARCH=ia32

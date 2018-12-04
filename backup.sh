@@ -10,13 +10,18 @@ trap 'die "BACKUP: caught SIGINT"' INT
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 SNAP='@snap'
-CONFIG="$SDIR/conf/conf.init"
+USER="$(id -nu)"
+CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
+CONFIG="$CONFIGDIR/conf.init"
+[[ -e $CONFIG ]] && source "$CONFIG"
 
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)
   --usermap=4294967295:$(id -g)
   --numeric-ids
 )
+
+[[ -n $SSH ]] && RSYNCOPTIONS+=("-e '$SSH'")
 
 while [[ $1 =~ ^- ]]
 do
@@ -142,11 +147,11 @@ done
   RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 }
 
-[[ $BACKUPURL =~ rsync://.+@.+:[0-9]+/.+ ]] || {
-  CONFIG="$SDIR/conf/conf.init"
-  [[ -f $CONFIG ]] || die Cannot found configuration file at $CONFIG
-  source "$CONFIG"
-}
+#[[ $BACKUPURL =~ rsync://.+@.+:[0-9]+/.+ ]] || {
+#  CONFIG="$SDIR/conf/conf.init"
+#  [[ -f $CONFIG ]] || die Cannot found configuration file at $CONFIG
+#  source "$CONFIG"
+#}
 
 exists rsync || die Cannot find rsync
 
@@ -156,7 +161,7 @@ dorsync2(){
 	local RETRIES=300
 	while true
 	do
-    	rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    		echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -452,15 +457,16 @@ backupACLS(){
 
     bg_upload_manifest "$MAPDRIVE" 'data'
     echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
-
     echo -e "\nPhase 1 - Backup new/modified files\n"
 
-    bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+    #bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+    bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}"
+exit
 
     touch "$ENDFLAG"
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"
-
+exit
     echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
 
     bg_upload_manifest "$MAPDRIVE" 'data'

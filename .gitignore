@@ -2,7 +2,6 @@
 cache/
 logs/
 run/
-conf/
 tmp/
 gui/
 rules/

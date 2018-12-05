@@ -7,7 +7,6 @@ die() { echo -e "$@">&2; exit 1; }
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
-RSYNCOPTIONS=()
 FMT='--out-format=%i|%n|/%f|%l'
 USER="$(id -nu)"
 CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
@@ -15,6 +14,7 @@ CONFIG="$CONFIGDIR/conf.init"
 [[ -e $CONFIG ]] && source "$CONFIG"
 
 export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file no found on location '$PASSFILE'"
+
 [[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
 
 while [[ $1 =~ ^- ]]
@@ -29,6 +29,8 @@ do
 		;;
 	esac
 done
+
+true ${HASHTARGET:='data'}		#by default we hash data, but we can also hash metadata or anything else. Export HASHTARGET before invoke me
 
 dorsync(){
 	rsync "$@"
@@ -45,10 +47,11 @@ IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/d
 
 exists cygpath && DRIVE=$(cygpath -w "$ROOT")
 DRIVE=${DRIVE%%:*}			#remove anything after : (if any)
-REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/data"
+REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/$HASHTARGET"
 
 SRC="$ROOT/./$STARTDIR"
 dorsync "${RSYNCOPTIONS[@]}" \
+	"${RSYNCGLOBALOPTIONS[@]}" \
 	--dry-run \
 	--recursive \
 	--links \

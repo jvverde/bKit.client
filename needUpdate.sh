@@ -9,86 +9,47 @@ OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 RSYNCOPTIONS=()
 FMT='--out-format=%i|%n|/%f|%l'
+USER="$(id -nu)"
+CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
+CONFIG="$CONFIGDIR/conf.init"
+[[ -e $CONFIG ]] && source "$CONFIG"
+
+export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file no found on location '$PASSFILE'"
+[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
 
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
-		-- )
-                        while [[ $1 =~ ^- ]]
-                        do
-                                [[ $1 == --  ]] && shift && break
-                                RSYNCOPTIONS+=("$1") && shift
-                                [[ ! $1 =~ ^- ]] && RSYNCOPTIONS+=("$1") && shift
-                        done
-
-		;;
-		--root=*)
-			ROOT=$(readlink -e "${KEY#*=}")
-		;;
 		--out-format=*)
 			FMT="$KEY"
 		;;
-		--remotedir=*)
-			REMOTEDIR="${KEY#*=}"
-		;;
 		*)
-			die Unknow	option $KEY
+			die Unknow option $KEY
 		;;
 	esac
 done
 
-IFS="
-"
-BACKUPDIR=( $(readlink -e "$@") )
-
-[[ -n $ROOT ]] || {
-	MOUNT=($(stat -c %m "${BACKUPDIR[@]}"))
-	ROOT=${MOUNT[0]}
-	for M in "${MOUNT[@]}"
-	do
-		[[ $M == $ROOT ]] || die 'All directories/file must belongs to same logical disk'
-	done
-}
-
-STARTDIR=("${BACKUPDIR[@]#$ROOT}") #remove mount pointfrom path
-STARTDIR=("${STARTDIR[@]#/}") #remove leading slash if any
-
-[[ ${#STARTDIR[@]} -eq 0 ]] && STARTDIR=("")
-
-[[ -n $REMOTEDIR ]] || {
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
-
-	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-	DRIVE=${DRIVE%%:*}
-	REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/data"
-}
-
-CONF="$SDIR/conf/conf.init"
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-source "$CONF"
-
-exists rsync || die Cannot find rsync
-
 dorsync(){
-	echo rsync "$@"
+	rsync "$@"
 }
 
-#EXC="$SDIR/conf/excludes.txt"
+BACKUPDIR="$(readlink -ne "$1")"
 
-export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
+ROOT="$(stat -c %m "$BACKUPDIR")"
+STARTDIR="${BACKUPDIR#$ROOT}"		#remove mount point from path
+STARTDIR="${STARTDIR#/}" 		#remove leading slash if any
+ROOT=${ROOT%/} 				#remove trailing slash if any
 
-ROOT=${ROOT%%/} #remove trailing slash if any
+IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
-SRCS=()
-for DIR in "${STARTDIR[@]}"
-do
-	SRCS+=("$ROOT/./$DIR")
-done
+exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+DRIVE=${DRIVE%%:*}			#remove anything after : (if any)
+REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/data"
 
+SRC="$ROOT/./$STARTDIR"
 dorsync "${RSYNCOPTIONS[@]}" \
 	--dry-run \
-	--one-file-system \
 	--recursive \
 	--links \
 	--times \
@@ -96,5 +57,5 @@ dorsync "${RSYNCOPTIONS[@]}" \
 	--relative \
 	--itemize-changes \
 	$FMT \
-	"${SRCS[@]}" \
+	"$SRC" \
 	"$BACKUPURL/$REMOTEDIR"

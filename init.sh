@@ -59,7 +59,7 @@ echo Writing configuration to $INITFILE
 	[[ $ARCH == x86_64 ]] && ARCH=x64 || ARCH=ia32
 	[[ $OS == cygwin ]] && OS=win32 || OS=linux
 	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
-	find "$SDIR/conf" -type f -maxdepth 1 -name '*.conf' -exec cat "{}" ';'
+	find "$SDIR/conf" -maxdepth 1 -type f -iname 'rsync*.conf' -exec cat "{}" ';'
 )> "$INITFILE"
 ln -svrfT "$CONFDIR" "$(dirname -- "$CONFDIR")/default"
 

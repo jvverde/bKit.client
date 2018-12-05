@@ -28,7 +28,6 @@ CONFDIR="$("$SDIR"/keygen.sh -n "$SERVER")" 		|| die "Can't generate a key"
 
 USER="$(basename -- "$(dirname -- "$CONFDIR")")"	|| die "Can't found USER"	#expected /somepath/user/server from CONFDIR
 INITFILE=$CONFDIR/conf.init
-exists cygpath && INITFILE="$(cygpath -w "$INITFILE")"
 
 exists rsync || die rsync not found
 
@@ -37,6 +36,7 @@ FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
 SYNCD="$CONFDIR/pub"
+exists cygpath && SYNCD="$(cygpath -u "$SYNCD")"
 rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/" || die "Exit value of rsync is non null: $?"
 rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/./" "$SYNCD/" || die "Exit value of rsync is non null: $?"
 

@@ -21,7 +21,6 @@ RSYNCOPTIONS=(
   --numeric-ids
 )
 
-[[ -n $SSH ]] && RSYNCOPTIONS+=("-e '$SSH'")
 
 while [[ $1 =~ ^- ]]
 do

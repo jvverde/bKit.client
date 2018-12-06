@@ -15,12 +15,8 @@ CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USE
 CONFIG="$CONFIGDIR/conf.init"
 [[ -e $CONFIG ]] && source "$CONFIG"
 
-RSYNCOPTIONS=(
-  --groupmap=4294967295:$(id -u)
-  --usermap=4294967295:$(id -g)
-  --numeric-ids
-)
-
+export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location '$PASSFILE'"
+[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
 
 while [[ $1 =~ ^- ]]
 do
@@ -160,7 +156,7 @@ dorsync2(){
 	local RETRIES=300
 	while true
 	do
-    		echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -226,7 +222,6 @@ FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids)
 CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
 
-export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
 
 update_hardlinks(){
 	FILE="${HLIST}.sort"
@@ -326,7 +321,7 @@ wait4jobs(){
 
 bg_upload_manifest(){
 	local BASE="$1"
-  local PREFIX="$2"
+	local PREFIX="$2"
 	[[ -e $MANIFEST ]] || touch "$MANIFEST"
 	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
 
@@ -459,13 +454,11 @@ backupACLS(){
     echo -e "\nPhase 1 - Backup new/modified files\n"
 
     #bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-    bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}"
-exit
+    bash "$SDIR/hashit.sh"  "${BACKUPDIR[@]}" > "$MANIFEST"
 
     touch "$ENDFLAG"
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"
-exit
     echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
 
     bg_upload_manifest "$MAPDRIVE" 'data'

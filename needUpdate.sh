@@ -30,7 +30,7 @@ do
 	esac
 done
 
-true ${HASHTARGET:='data'}		#by default we hash data, but we can also hash metadata or anything else. Export HASHTARGET before invoke me
+true ${CMPTARGET:='data'}		#by default we check data, but we can also check metadata or anything else. Export CMPTARGET before invoke me
 
 dorsync(){
 	rsync "$@"
@@ -47,7 +47,7 @@ IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/d
 
 exists cygpath && DRIVE=$(cygpath -w "$ROOT")
 DRIVE=${DRIVE%%:*}			#remove anything after : (if any)
-REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/$HASHTARGET"
+REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/$CMPTARGET"
 
 SRC="$ROOT/./$STARTDIR"
 dorsync "${RSYNCOPTIONS[@]}" \

@@ -412,8 +412,10 @@ backupACLS(){
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
     {
-      bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
-    } | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+	#bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
+	export CMPTARGET='metadata'
+	bash "$SDIR/hashit.sh"  "${MDIRS[@]}"
+    } > "$MANIFEST"
 
     touch "$ENDFLAG"
     wait4jobs

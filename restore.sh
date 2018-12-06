@@ -7,7 +7,14 @@ set -o pipefail
 
 source "$SDIR/functions/all.sh"
 
-export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
+RSYNCOPTIONS=()
+USER="$(id -nu)"
+CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
+CONFIG="$CONFIGDIR/conf.init"
+[[ -e $CONFIG ]] && source "$CONFIG"
+
+export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location '$PASSFILE'"
+[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
 
 FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 PERM=(--perms --acls --super --numeric-ids)
@@ -43,7 +50,6 @@ OPTIONS=(
 }
 [[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
 
-RSYNCOPTIONS=()
 
 dorsync() {
   local BACKUP="${@: -1}$BACKUPDIR"
@@ -165,11 +171,7 @@ LINKS=( "${LINKS[@]:0:20}" )              #a rsync limitation
 
 RESOURCES=("$@")
 
-CONF=$SDIR/conf/conf.init
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-. "$CONF"                                                                     #get configuration parameters
-
-RESULT="$SDIR/run/restore-$$/"
+RESULT="$(mktemp -d --suffix=.bKit)"
 mkdir -p "$RESULT"
 
 LOGFILE="$RESULT/logs.tmp"
@@ -179,10 +181,12 @@ ERRFILE="$RESULT/errors.tmp"
 exec 3>&2
 exec 2>"$ERRFILE"
 
-trap '
+finish() {
   cat "$ERRFILE" >&3
   rm -rf "$RESULT"
-' EXIT
+}
+
+trap finish EXIT
 
 
 aclparents(){
@@ -252,11 +256,11 @@ makestats(){
 
 for RESOURCE in "${RESOURCES[@]}"
 do
-  if [[ $RESOURCE =~ ^rsync://[^@]+@ ]]
+  if [[ $RESOURCE =~ ^[^@]+@.+::.+ ]] #ex: user@server::section
   then
-    [[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #get last argument
+    [[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #Try to get last argument
     [[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
-    SRCS+=( "$RESOURCE" )
+    SRCS+=( "$RESOURCE" )		#Add to a list of multiple SRCs and dorsync later/bellow
     #dorsync "$RESOURCE" "$DST"
   else
     exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
@@ -307,7 +311,7 @@ do
   fi
 done
 
-[[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {
+[[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
   set -o pipefail
   INIT=$(date -R)
   dorsync "${LINKS[@]}" "${SRCS[@]}" "$DST" | tee "$LOGFILE" || die "Problems restoring to $DST"

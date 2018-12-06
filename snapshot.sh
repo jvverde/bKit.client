@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
-source "$SDIR/functions/all.sh"
+source "$SDIR/functions/util.sh"
 
 MOUNTED=()
 getdev(){

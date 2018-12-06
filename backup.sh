@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
-source "$SDIR/functions/all.sh"
+source "$SDIR/functions/util.sh"
 
 trap 'die "BACKUP: caught SIGINT"' INT
 
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
-SNAP='@snap'
-USER="$(id -nu)"
-CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
-CONFIG="$CONFIGDIR/conf.init"
-[[ -e $CONFIG ]] && source "$CONFIG"
+source "$SDIR/ccrsync.sh"
 
-export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location '$PASSFILE'"
-[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
+SNAP='@snap'
 
 while [[ $1 =~ ^- ]]
 do

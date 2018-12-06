@@ -1,19 +1,12 @@
 #!/usr/bin/env bash
-SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 set -o pipefail
 
-source "$SDIR/functions/all.sh"
+source "$SDIR/functions/util.sh"
 
-RSYNCOPTIONS=()
-USER="$(id -nu)"
-CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
-CONFIG="$CONFIGDIR/conf.init"
-[[ -e $CONFIG ]] && source "$CONFIG"
-
-export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location '$PASSFILE'"
-[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
+source "$SDIR/ccrsync.sh"
 
 FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 PERM=(--perms --acls --super --numeric-ids)

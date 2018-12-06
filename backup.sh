@@ -127,7 +127,7 @@ do
 	BACKUPDIR+=( "$MAPDRIVE/$DIR" )
 done
 
-#we need ROOT, BACKUPDIR and STARTDIR
+#We need ROOT, BACKUPDIR and STARTDIR
 [[ $RVID =~ .+\..+\..+\..+\..+ ]] || {
   IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
@@ -156,6 +156,7 @@ dorsync2(){
 	local RETRIES=300
 	while true
 	do
+    		#echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
     		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
@@ -180,25 +181,28 @@ dorsync(){
 	dorsync2 "$@" | grep -v 'unpack_smb_acl'
 }
 
-RUNDIR=$SDIR/run
-[[ -d $RUNDIR ]] || mkdir -p $RUNDIR
-FLIST=$RUNDIR/file-list.$$
-HLIST=$RUNDIR/hl-list.$$
-DLIST=$RUNDIR/dir-list.$$
-MANIFEST=$RUNDIR/manifest.$$
-ENDFLAG=$RUNDIR/endflag.$$
-LOCK=$RUNDIR/${VOLUMESERIALNUMBER:-_}
-LOGFILE=$RUNDIR/logs.$$
-ERRFILE=$RUNDIR/errors.$$
-STATSFILE=$RUNDIR/stats.$$
+#RUNDIR=$SDIR/run
+RUNDIR="$(mktemp -d --suffix=.bKit)" || die "Can't create a temporary working directory"
+[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
+FLIST="$RUNDIR/file-list"
+HLIST="$RUNDIR/hl-list"
+DLIST="$RUNDIR/dir-list"
+MANIFEST="$RUNDIR/manifest"
+ENDFLAG="$RUNDIR/endflag"
+LOCK="$RUNDIR/${VOLUMESERIALNUMBER:-_}"
+LOGFILE="$RUNDIR/logs"
+ERRFILE="$RUNDIR/errors"
+STATSFILE="$RUNDIR/stats"
 
 exec 3>&2
 exec 2>"$ERRFILE"
 
-trap '
+finish() {
   cat "$ERRFILE" >&3
-  rm -f $RUNDIR/*.$$ $RUNDIR/*.$$.* $LOCK
-' EXIT
+  rm -rf $RUNDIR
+}
+
+trap finish EXIT
 
 set_postpone_files(){
 	exec 99>"$HLIST"

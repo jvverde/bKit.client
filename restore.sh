@@ -18,8 +18,8 @@ export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location 
 
 FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 PERM=(--perms --acls --super --numeric-ids)
-BACKUP=".bkit-before-restore-on"
-BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S")"
+BACKUP=".before-restore-on"
+BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S").bkit"
 while [[ -e $BACKUPDIR ]]
 do
   BACKUPDIR="${BACKUPDIR}_"
@@ -37,9 +37,6 @@ OPTIONS=(
   --partial
   --partial-dir=".bkit.rsync-partial"
   --delay-updates
-  --groupmap=4294967295:$(id -u)
-  --usermap=4294967295:$(id -g)
-  --numeric-ids
   --super
 )
 
@@ -81,7 +78,7 @@ usage() {
 
 SRCS=()
 declare -A LINKTO
-LOCALACTION="--link-dest" #rsync option
+LOCALACTION="--copy-dest" #rsync option
 while [[ $1 =~ ^- ]]
 do
   KEY="$1" && shift
@@ -125,6 +122,9 @@ do
     ;;
     --local-copy)
       LOCALACTION="--copy-dest"
+    ;;
+    --local-copy)
+      LOCALACTION="--link-dest"
     ;;
     --link-dest=*)
       LINKTO["--link-dest=${KEY#*=}"]=1

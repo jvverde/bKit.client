@@ -11,6 +11,21 @@ DIR=$1
 	DEV=$(df --output=source "$MOUNT"|tail -1)
 }
 
+[[ $OS == cygwin ]] && exists wmic && {
+	DRIVE=${DEV%%:*} #just left drive letter, nothing else
+	LD="$(WMIC logicaldisk WHERE "name like '$DRIVE:'" GET VolumeName,FileSystem,VolumeSerialNumber,drivetype /format:textvaluelist|
+		tr -d '\r'|
+		sed -r '/^$/d;s/^\s+|\s+$//;s/\s+/_/g'
+	)"
+	
+	FS=$(awk -F '=' 'tolower($1) ~  /filesystem/ {print $2}' <<<"$LD")
+	VN=$(awk -F '=' 'tolower($1) ~  /volumename/ {print $2}' <<<"$LD")
+	SN=$(awk -F '=' 'tolower($1) ~  /volumeserialnumber/ {print $2}' <<<"$LD")
+	DT=$(awk -F '=' 'tolower($1) ~  /drivetype/ {print $2}' <<<"$LD")
+	echo "${VN:-_}|${SN:-_}|${FS:-_}|${DT:-_}"
+	exit
+}
+
 [[ $OS == cygwin ]] && exists fsutil && {
 	DRIVE=${DEV%%:*} #just left drive letter, nothing else
 	VOLUMEINFO="$(fsutil fsinfo volumeinfo $DRIVE:\\ | tr -d '\r')"

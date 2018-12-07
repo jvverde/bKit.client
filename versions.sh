@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@" >&2; exit 1;}
 warn() { echo -e "$@" >&2;}
 
-RSYNCOPTIONS=()
+source "$SDIR/ccrsync.sh"
 
 while [[ $1 =~ ^- ]]
 do
@@ -38,14 +37,7 @@ RESTOREDIR=( $(readlink -m "${RESTOREDIR[@]}") )
 
 IFS=$OLDIFS
 
-CONF=$SDIR/conf/conf.init
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-. "$CONF"                                                                     #get configuration parameters
-
-export RSYNC_PASSWORD="$(cat "$SDIR/conf/pass.txt")"
-
 PERM=(--acls --owner --group --super --numeric-ids)
-BACKUP=".bkit-before-restore-on"
 OPTIONS=(
 	--archive
 	--no-recursive
@@ -67,21 +59,20 @@ do
 	DRIVE=${DRIVE%%:*}
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 
-	ROOT=$(stat -c%m "$DIR")
+	ROOT="$(stat -c%m "$DIR")" || die "Can't find mounting point for '$DIR'"
 
-	PARENT=$DIR
+	DIR="${DIR#$ROOT}"										#remove mounting point from path => relative path
 
-	DIR=${DIR#$ROOT}
+	VERSIONS=( $(rsync --list-only "$BACKUPURL/$RVID/.snapshots/"|grep -Po '@GMT-.+$') ) 		#get a list of all snapshots in backup
 
-	VERSIONS=( $(rsync --list-only "$BACKUPURL/$RVID/.snapshots/"|grep -Po '@GMT-.+$') )
 	for V in "${VERSIONS[@]}"
 	do
 		FMT="--out-format=$V|%o|%i|%M|%l|%f"
 		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/$DIR"
-		rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DST/" 2>/dev/null
-	done| awk -F'|' '
+		rsync "${RSYNCOPTIONS[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DST/" 2>/dev/null
+	done| sort | awk -F'|' '
 		{
-			LINES[$2 $3 $4 $5 $6] = $0
+			LINES[$2 $3 $4 $5 $6] = $1 " have a last modifed version at " $4		#supress the first field(=snapshot) id all the other are the same. Just show one
 		}
 		END{
 			for (L in LINES) print LINES[L]

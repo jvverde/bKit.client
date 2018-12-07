@@ -28,9 +28,9 @@ do
 	esac
 done
 
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
-[[ $# -eq 0 ]] && usage
+(( $# == 0 )) && usage
 
 echo "Start Restore"
 

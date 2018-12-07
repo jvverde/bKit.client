@@ -4,21 +4,37 @@ exists() {
 	type "$1" >/dev/null 2>&1;
 }
 
-die() {
-	echo -e "${BASH_SOURCE[1]}: Line ${BASH_LINENO[0]}: $@">&2;
+if exists tput
+then
+	say() {
+		tput setaf 1; echo -e "$@">&2; tput sgr0
+	}
+else
+	say() {
+		echo -e "$@">&2
+	}
+fi
+
+msg () {
+	say "${BASH_SOURCE[1]}: Line ${BASH_LINENO[0]}: $@">&2;
 	for i in "${!BASH_LINENO[@]}"
 	do
 		(( $i == 0 )) && continue
 		(( $i == ${#BASH_SOURCE[@]} - 1 )) && break
-		echo -e "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
+		say "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
 	done
+	exit 1;
+}
+
+die() {
+	msg "$@"
 	exit 1;
 }
 
 ERROR=0
 warn() {
 	ERROR=1
-	echo -e "$@">&2;
+	msg "$@"
 }
 
 DELTATIME=''

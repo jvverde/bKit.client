@@ -8,15 +8,10 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 FMT='--out-format=%i|%n|/%f|%l'
-USER="$(id -nu)"
-CONFIGDIR="$(readlink -ne -- "$SDIR/conf/$USER/default" || find "$SDIR/conf/$USER" -type d -exec test -e "{}/conf.init" ';' -print -quit)"
-CONFIG="$CONFIGDIR/conf.init"
-[[ -e $CONFIG ]] && source "$CONFIG"
 
-export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file no found on location '$PASSFILE'"
+source "$SDIR/ccrsync.sh"
 
-[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
-
+OPTIONS=()
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -24,8 +19,11 @@ do
 		--out-format=*)
 			FMT="$KEY"
 		;;
+		--cmptarget=*)
+			CMPTARGET="${KEY#*=}"
+		;;
 		*)
-			die Unknow option $KEY
+			OPTIONS+=( "$KEY" )
 		;;
 	esac
 done
@@ -51,7 +49,7 @@ REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}
 
 SRC="$ROOT/./$STARTDIR"
 dorsync "${RSYNCOPTIONS[@]}" \
-	"${RSYNCGLOBALOPTIONS[@]}" \
+	"${OPTIONS[@]}" \
 	--dry-run \
 	--recursive \
 	--links \

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
 source "$SDIR/functions/util.sh"
@@ -12,23 +11,24 @@ source "$SDIR/ccrsync.sh"
 
 SNAP='@snap'
 
+OPTIONS=()
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
-    -l|-log|--log)
-        exec 1>"$1"
-        shift
-    ;;
-    -l=*|-log=*|--log=*)
-      exec 1>"${KEY#*=}"
-    ;;
-    --logdir)
-        redirectlogs $1 backup && shift
-    ;;
-    --logdir=*)
-        redirectlogs "${KEY#*=}" backup
-    ;;
+		-l|-log|--log)
+			exec 1>"$1"
+			shift
+		;;
+		-l=*|-log=*|--log=*)
+			exec 1>"${KEY#*=}"
+		;;
+		--logdir)
+			redirectlogs $1 backup && shift
+		;;
+		--logdir=*)
+			redirectlogs "${KEY#*=}" backup
+		;;
 		-f|--force)
 			FSW='-f' #check if we need it
 		;;
@@ -36,51 +36,51 @@ do
 			MAPDRIVE="$1" && shift
 			exists cygpath && MAPDRIVE=$(cygpath "$MAPDRIVE")
 		;;
-    --snap)
-      SNAP="@snap/$1" && shift
-    ;;
-    --snap=*)
-      SNAP="@snap/${KEY#*=}"
-    ;;
-    --backupurl)
-      BACKUPURL="$1" && shift
-    ;;
-    --backupurl=*)
-      BACKUPURL="${KEY#*=}"
-    ;;
-    --rvid)
-      RVID="$1" && shift
-    ;;
-    --rvid=*)
-      RVID="${KEY#*=}"
-    ;;
-    --config)
-      CONFIG="$1" && shift
-    ;;
-    --config=*)
-      CONFIG="${KEY#*=}"
-    ;;
-    --stats)
-      STATS=1
-    ;;
-    --sendlogs)
-      FULLREPORT=1
-      NOTIFY=1
-      STATS=1
-    ;;
-    --notify)
-      NOTIFY=1
-      STATS=1
-    ;;
-    --email=*)
-      EMAIL="${KEY#*=}"
-      NOTIFY=1
-      STATS=1
-    ;;
+		--snap)
+			SNAP="@snap/$1" && shift
+		;;
+		--snap=*)
+			SNAP="@snap/${KEY#*=}"
+		;;
+		--backupurl)
+			BACKUPURL="$1" && shift
+		;;
+		--backupurl=*)
+			BACKUPURL="${KEY#*=}"
+		;;
+		--rvid)
+			RVID="$1" && shift
+		;;
+		--rvid=*)
+			RVID="${KEY#*=}"
+		;;
+		--config)
+			CONFIG="$1" && shift
+		;;
+		--config=*)
+			CONFIG="${KEY#*=}"
+		;;
+		--stats)
+			STATS=1
+		;;
+		--sendlogs)
+			FULLREPORT=1
+			NOTIFY=1
+			STATS=1
+		;;
+		--notify)
+			NOTIFY=1
+			STATS=1
+		;;
+		--email=*)
+			EMAIL="${KEY#*=}"
+			NOTIFY=1
+			STATS=1
+		;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
-				RSYNCOPTIONS+=("$1")
+				OPTIONS+=("$1")
 				shift
 			done
 		;;
@@ -151,7 +151,7 @@ dorsync2(){
 	while true
 	do
     		#echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
-    		rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    		rsync "${RSYNCOPTIONS[@]}" "${OPTIONS[@]}" --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -412,7 +412,7 @@ backupACLS(){
     {
 	#bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
 	export CMPTARGET='metadata'
-	bash "$SDIR/hashit.sh"  "${MDIRS[@]}"
+	bash "$SDIR/hashit.sh"  "${OPTIONS[@]}" "${MDIRS[@]}"
     } > "$MANIFEST"
 
     touch "$ENDFLAG"
@@ -454,7 +454,7 @@ backupACLS(){
     echo -e "\nPhase 1 - Backup new/modified files\n"
 
     #bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-    bash "$SDIR/hashit.sh"  "${BACKUPDIR[@]}" > "$MANIFEST"
+    bash "$SDIR/hashit.sh" "${OPTIONS[@]}"  "${BACKUPDIR[@]}" > "$MANIFEST"
 
     touch "$ENDFLAG"
     wait4jobs

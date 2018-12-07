@@ -67,7 +67,7 @@ do
 	esac
 done
 
-[[ $# -eq 0 ]] && usage
+(( $# == 0 )) && usage
 
 [[ -n $ALL ]] || excludes
 
@@ -76,7 +76,7 @@ done
 echo "bkit: Start backup"
 let CNT=16
 let SEC=60
-while ((CNT-- > 0))
+while (( CNT-- > 0 ))
 do
 	bash -m "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}" && break
 	let DELAY=(1 + RANDOM % $SEC)

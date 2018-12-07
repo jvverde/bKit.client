@@ -6,7 +6,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
 type cygpath >/dev/null 2>&1 || die Cannot found cygpath
 
-SDIR=$(cygpath "$(dirname "$(readlink -f "$0")")")	#Full DIR
+SDIR=$(cygpath "$(dirname -- "$(readlink -en -- "$0")")")	#Full DIR
 
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)

@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
 
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
-
+source "$SDIR/functions/util.sh"
 
 UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"

@@ -16,11 +16,15 @@ else
 fi
 
 msg () {
-	say "${BASH_SOURCE[1]}: Line ${BASH_LINENO[0]}: $@">&2;
-	for i in "${!BASH_LINENO[@]}"
+	for cnt in "${!BASH_SOURCE[@]}"
 	do
-		(( $i == 0 )) && continue
-		(( $i == ${#BASH_SOURCE[@]} - 1 )) && break
+		[[ "${BASH_SOURCE[$cnt]}" == "${BASH_SOURCE[0]}" ]] || break;	#find first bash_source which is not this file
+	done
+
+	say "${BASH_SOURCE[$cnt]}: Line ${BASH_LINENO[$cnt-1]}: $@">&2;		#show error with line number and file name
+
+	for i in $(seq $cnt $(( ${#BASH_SOURCE[@]} - 2 )) )			#show call stach
+	do
 		say "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
 	done
 	exit 1;

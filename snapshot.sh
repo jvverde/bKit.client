@@ -14,7 +14,8 @@ getdev(){
     DEV=$(readlink -e "$DEV") || die "Device $1 doesn't exists"
     MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')
     [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
-        MOUNT=/tmp/bkit-$(date +%s) && mkdir -pv $MOUNT && {
+	MOUNT="$(mktemp -d --suffix=".$(basename -- "$0").bkit")"
+        mkdir -pv $MOUNT && {
             mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
             MOUNTED+=( "$MOUNT" )
         }
@@ -37,7 +38,7 @@ do
             exec 1>"${KEY#*=}"
         ;;
         --logdir)
-            redirectlogs $1 snapshot && shift			#redirectlog is defined on util.sh
+            redirectlogs $1 snapshot && shift			#redirectlogs is defined on util.sh
         ;;
         --logdir=*)
             redirectlogs "${KEY#*=}" snapshot			#redirect to argument given and prefix the log files with 'snapshot' string

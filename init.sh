@@ -46,12 +46,16 @@ VERIF="$(openssl enc -aes256 -base64 -k "$(<"$CONFDIR/.priv/secret")" -d -in "$C
 [[ $VERIF == VerificationOK ]] || die "Something was wrong with the produced key"
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 
+KH="$CONFDIR/.priv/known_hosts"
+touch "$KH"
+ssh-keygen -R "$SERVER" -f "$KH" && ssh-keyscan -H -t ecdsa "$SERVER" >> "$KH"
+
 echo Writing configuration to $INITFILE
 (
 	read SECTION <"$CONFDIR/pub/section"
 	read COMMAND <"$CONFDIR/pub/command"
 	#echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
-	echo "SSH='ssh -i \"$CONFDIR/.priv/ssh.key\" rsyncd@$SERVER $COMMAND'"
+	echo "SSH='ssh -i \"$CONFDIR/.priv/ssh.key\" -o UserKnownHostsFile=\"$KH\" rsyncd@$SERVER $COMMAND'"
 	echo "BACKUPURL='user@$SERVER::$SECTION'"
 	echo "PASSFILE='$CONFDIR/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')

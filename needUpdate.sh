@@ -28,6 +28,8 @@ do
 	esac
 done
 
+[[ -e $1 ]] || die "'$1' doesn't exist"
+ 
 true ${CMPTARGET:='data'}		#by default we check data, but we can also check metadata or anything else. Export CMPTARGET before invoke me
 
 dorsync(){

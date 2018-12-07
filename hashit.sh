@@ -7,6 +7,18 @@ exists() { type "$1" >/dev/null 2>&1 ;}
 
 SDIR="$(dirname -- "$(readlink -f -- "$0")")"				#Full DIR
 
+OPTIONS=()
+while [[ $1 =~ ^- ]]
+do
+        KEY="$1" && shift
+        case "$KEY" in
+                *)
+                        OPTIONS+=( "$KEY" ) 
+                ;;
+        esac
+done
+
+
 (( $# == 0 )) && die "Usage:\n\t$0 dirs" 
 
 for DIR in "$@"
@@ -15,7 +27,7 @@ do
 
 	ROOT="$(stat -c %m "$FULLPATH")"
 
-	bash "$SDIR/needUpdate.sh" --out-format='%i|/%f' "$FULLPATH"|
+	bash "$SDIR/needUpdate.sh" "${OPTIONS[@]}" --out-format='%i|/%f' "$FULLPATH"|
 	awk -F'|' '$1 ~ /^<f/ {print $2}' | tr '\n' '\0' |
 	xargs -r0 sha256sum -b|sed -E 's/\s+\*/|/' |
 	while IFS='|' read -r HASH FILE

@@ -10,7 +10,7 @@ die() {
 	do
 		(( $i == 0 )) && continue
 		(( $i == ${#BASH_SOURCE[@]} - 1 )) && break
-		echo -e "\t> ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
+		echo -e "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
 	done
 	exit 1;
 }

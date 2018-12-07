@@ -75,7 +75,7 @@ declare -A ROOTOF
 
 for DIR in "${DIRS[@]}"
 do
-    [[ -n ${MOUNT+isset} ]] && FULL=$MOUNT/${DIR#/} || FULL="$DIR"
+    [[ ${MOUNT+isset} == isset ]] && FULL=$MOUNT/${DIR#/} || FULL="$DIR"
     FULL=$(readlink -ne "$FULL") || continue
     exists cygpath && FULL=$(cygpath -u "$FULL")
     ROOT=$(stat -c%m "$FULL")

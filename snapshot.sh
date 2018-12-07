@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+#Backup shadow copies if it is a NTFS and a Fixed Disk. And user have admin rights (544 output from id -G) 
+#In case of shodow copies it also rewrite path locatiosn for possible filter rsync options
+#In all other situation just call backup.sh
+
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 source "$SDIR/functions/util.sh"
@@ -34,10 +37,10 @@ do
             exec 1>"${KEY#*=}"
         ;;
         --logdir)
-            redirectlogs $1 snapshot && shift
+            redirectlogs $1 snapshot && shift			#redirectlog is defined on util.sh
         ;;
         --logdir=*)
-            redirectlogs "${KEY#*=}" snapshot
+            redirectlogs "${KEY#*=}" snapshot			#redirect to argument given and prefix the log files with 'snapshot' string
         ;;
         -u|--uuid)
             getdev "$1" && shift
@@ -150,5 +153,3 @@ do
         backup "${BACKUPDIR[@]}"
     }
 done
-
-

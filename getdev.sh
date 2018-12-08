@@ -7,6 +7,10 @@ source "$SDIR/functions/util.sh"
 UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"
 
+exists wmic && {
+	WMIC logicaldisk WHERE "VolumeSerialNumber like '$UUID'" GET Name /format:textvaluelist| sed -nr 's/Name=(.+)/\1/p'
+}
+
 exists fsutil &&{
 	DRIVE=($(FSUTIL FSINFO DRIVES|sed 's/\r//g;/^$/d'|tr '\0' ' '|grep -io '[a-z]:\\'|xargs -d'\n' -rI{} sh -c '
 		FSUTIL FSINFO VOLUMEINFO "$1"|grep -iq "\bVolume Serial Number\s*:\s*0x$2\b" && echo $1 && exit

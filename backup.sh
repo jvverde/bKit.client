@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
-source "$SDIR/functions/util.sh"
+source "$SDIR/functions/all.sh"
 
 trap 'die "BACKUP: caught SIGINT"' INT
 

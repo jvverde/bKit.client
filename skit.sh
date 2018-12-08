@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
-usage() {
-	NAME=$(basename -s .sh "$0")
-	echo Snapshot and backup one or more directories or files
-	echo -e "Usage:\n\t $NAME [-a|--all] [-c|--compile] dir1/file1 [[dir2/file2 [...]]"
-	exit 1
-}
+
+source "$SDIR/functions/all.sh"
 
 
 FILTERS=()
@@ -56,6 +48,14 @@ importrules(){
 ARGS=("$@")
 OPTIONS=()
 RSYNCOPTIONS=()
+
+usage() {
+	NAME=$(basename -s .sh "$0")
+	echo Snapshot and backup one or more directories or files
+	echo -e "Usage:\n\t $NAME [-a|--all] [-c|--compile] dir1/file1 [[dir2/file2 [...]]"
+	exit 1
+}
+
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -83,8 +83,8 @@ do
 			cd "${KEY#*=}"
 		;;
 		--no-ask)
-       NOASK=1
-    ;;
+			NOASK=1
+		;;
 		-h|--help)
 			usage
 		;;

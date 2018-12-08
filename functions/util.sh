@@ -30,8 +30,9 @@ msg () {
 }
 
 die() {
+	CODE=$?
 	msg "$@"
-	exit 1;
+	exit $CODE;
 }
 
 ERROR=0
@@ -39,6 +40,19 @@ warn() {
 	ERROR=1
 	msg "$@"
 }
+
+declare -a _TEMPDIRS=()
+mktempdir() {
+        local TMP="$(mktemp -d --suffix=".bkit.$(basename -- "$0")")"
+        _TEMPDIRS+=( "$TMP" )
+        echo $TMP
+}
+
+rmtempdir(){
+        rm -rvf "${_TEMPDIRS[@]}"
+}
+
+atexit rmtempdir
 
 DELTATIME=''
 deltatime(){

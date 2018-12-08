@@ -6,7 +6,8 @@ source "$SDIR/functions/all.sh"
 
 UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"
-
+xto
+echo aqui
 exists wmic && {
 	echo -n "$(WMIC logicaldisk WHERE "VolumeSerialNumber like '$UUID'" GET Name /format:textvaluelist| sed -nr 's/Name=(.+)/\1/p')" && exit
 }

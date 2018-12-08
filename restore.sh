@@ -4,7 +4,7 @@ OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 set -o pipefail
 
-source "$SDIR/functions/util.sh"
+source "$SDIR/functions/all.sh"
 
 source "$SDIR/ccrsync.sh"
 

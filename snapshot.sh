@@ -6,7 +6,7 @@
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
-source "$SDIR/functions/util.sh"
+source "$SDIR/functions/all.sh"
 
 MOUNTED=()
 getdev(){

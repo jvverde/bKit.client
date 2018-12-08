@@ -2,7 +2,7 @@
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 [[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
 
-source "$SDIR/functions/util.sh"
+source "$SDIR/functions/all.sh"
 
 UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"

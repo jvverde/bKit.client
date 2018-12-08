@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 exists() {
 	type "$1" >/dev/null 2>&1;
 }

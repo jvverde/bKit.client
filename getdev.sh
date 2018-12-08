@@ -8,7 +8,7 @@ UUID=$1
 [[ -n $UUID ]] || die "Usage:\n\t$0 UUID"
 
 exists wmic && {
-	WMIC logicaldisk WHERE "VolumeSerialNumber like '$UUID'" GET Name /format:textvaluelist| sed -nr 's/Name=(.+)/\1/p'
+	echo -n "$(WMIC logicaldisk WHERE "VolumeSerialNumber like '$UUID'" GET Name /format:textvaluelist| sed -nr 's/Name=(.+)/\1/p')" && exit
 }
 
 exists fsutil &&{

@@ -176,7 +176,7 @@ dorsync(){
 }
 
 #RUNDIR=$SDIR/run
-RUNDIR="$(mktemp -d --suffix=.bKit)" || die "Can't create a temporary working directory"
+RUNDIR="$(mktempdir)" || die "Can't create a temporary working directory"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 FLIST="$RUNDIR/file-list"
 HLIST="$RUNDIR/hl-list"

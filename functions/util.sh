@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+declare -f -F die >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+
 exists() {
 	type "$1" >/dev/null 2>&1;
 }
@@ -40,19 +42,6 @@ warn() {
 	ERROR=1
 	msg "$@"
 }
-
-declare -a _TEMPDIRS=()
-mktempdir() {
-        local TMP="$(mktemp -d --suffix=".bkit.$(basename -- "$0")")"
-        _TEMPDIRS+=( "$TMP" )
-        echo $TMP
-}
-
-rmtempdir(){
-        rm -rvf "${_TEMPDIRS[@]}"
-}
-
-atexit rmtempdir
 
 DELTATIME=''
 deltatime(){

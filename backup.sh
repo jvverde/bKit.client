@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
-source "$SDIR/functions/all.sh"
-
-trap 'die "BACKUP: caught SIGINT"' INT
-
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
-
 source "$SDIR/ccrsync.sh"
 
 SNAP='@snap'
@@ -176,7 +170,7 @@ dorsync(){
 }
 
 #RUNDIR=$SDIR/run
-RUNDIR="$(mktempdir)" || die "Can't create a temporary working directory"
+mktempdir RUNDIR || die "Can't create a temporary working directory"
 [[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 FLIST="$RUNDIR/file-list"
 HLIST="$RUNDIR/hl-list"
@@ -184,19 +178,20 @@ DLIST="$RUNDIR/dir-list"
 MANIFEST="$RUNDIR/manifest"
 ENDFLAG="$RUNDIR/endflag"
 LOCK="$RUNDIR/${VOLUMESERIALNUMBER:-_}"
-LOGFILE="$RUNDIR/logs"
-ERRFILE="$RUNDIR/errors"
-STATSFILE="$RUNDIR/stats"
+VARDIR="$SDIR/var/$USER"
+mkdir -pv "$VARDIR"
+LOGFILE="$VARDIR/logs"
+ERRFILE="$VARDIR/errors"
+STATSFILE="$VARDIR/stats"
 
 exec 3>&2
 exec 2>"$ERRFILE"
 
 finish() {
   cat "$ERRFILE" >&3
-  rm -rf $RUNDIR
 }
 
-trap finish EXIT
+atexit finish
 
 set_postpone_files(){
 	exec 99>"$HLIST"

@@ -4,21 +4,18 @@
 #In all other situation just call backup.sh
 
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 source "$SDIR/functions/all.sh"
 
 MOUNTED=()
 getdev(){
-    DEV=$(bash "$SDIR/getdev.sh" "$1") || die "Device $1 not found"
-    DEV=$(readlink -e "$DEV") || die "Device $1 doesn't exists"
+    DEV=$("$SDIR/getdev.sh" "$1") || die "Device $1 not found"
+    DEV=$(readlink -e "$DEV") || die "Device '$DEV' doesn't exists"
     MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')
     [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
-	MOUNT="$(mktemp -d --suffix=".$(basename -- "$0").bkit")"
-        mkdir -pv $MOUNT && {
-            mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
-            MOUNTED+=( "$MOUNT" )
-        }
+	mktempdir MOUNT || die "can't make temporary directory '$MOUNT'"
+        mount -o ro $DEV  $MOUNT || die Cannot mount $DEV on $MOUNT
+        MOUNTED+=( "$MOUNT" )
     }
     [[ -e $MOUNT ]] || die "Disk $DEV is not mounted"
     MOUNT=${MOUNT%/} #remove trailing slash if any

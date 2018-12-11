@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-die() { echo -e "$@" >&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"                          #Full DIR
+
+source "$SDIR/functions/all.sh"
 
 DIR=$1
 
-[[ -b $DIR ]] && DEV=$DIR || {
+[[ -b $DIR ]] && DEV="$DIR" || {
 	exists cygpath && DIR=$(cygpath "$DIR")
 	MOUNT=$(stat -c%m "$DIR")
 	DEV=$(df --output=source "$MOUNT"|tail -1)

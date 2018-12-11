@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
+source "$SDIR/functions/all.sh"
+
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo Backup one or more directories or files
@@ -9,12 +9,10 @@ usage() {
 	exit 1
 }
 
-trap 'die "BKIT: caught SIGINT;"' INT
-
 FILTERS=()
 
 excludes(){
-	EXCDIR=$SDIR/cache/excludes
+	EXCDIR=$SDIR/cache/$USER/excludes
 	[[ -d $EXCDIR ]] || mkdir -p $EXCDIR
 
 	EXCL=$EXCDIR/exclude.lst

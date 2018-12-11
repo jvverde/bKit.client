@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-THIS="$(readlink -ne -- "${BASH_SOURCE[0]}")"
-DIR="$(dirname -- "$THIS")"
+declare -p DKGFJHFKYDGFNHGH > /dev/null 2>&1 && echo modules already inserted && return
+DKGFJHFKYDGFNHGH="$(readlink -ne -- "${BASH_SOURCE[0]}")"
+DIR="$(dirname -- "$DKGFJHFKYDGFNHGH")"
 
-source <(find "$DIR" -maxdepth 1 -type f -name '*.sh' ! -path "$THIS" -exec cat "{}" ';')
+source <(find "$DIR" -maxdepth 1 -type f -name '*.sh' ! -path "$DKGFJHFKYDGFNHGH" -exec cat "{}" ';')

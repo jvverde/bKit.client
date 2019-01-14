@@ -1,0 +1,28 @@
+skipping directory .
+Start to backup directories/files on . on Mon, 14 Jan 2019 17:13:03 +0000
+
+Phase 1 - Backup new/modified files
+
+"send|<f.st......|tmp/tmp.E2fnI0Bvbj.bkit.backup/manifest-segment.19052|22|186|238|2019/01/14 17:13:04"
+"send|<f..t......|bkit/scripts/client/var/jvv/errors|16|36|0|2019/01/14 17:13:05"
+"send|<f.st......|bkit/scripts/client/var/jvv/logs|28|225|237|2019/01/14 17:13:05"
+"send|<f.st......|tmp/tmp.E2fnI0Bvbj.bkit.backup/manifest-segment.19052|22|186|238|2019/01/14 17:13:06"
+sent 2 lines of manifest starting at 1
+
+Phase 2 - Update Symbolic links, Hard links, Directories and file attributes
+
+miss <f.st......|bkit/scripts/client/var/jvv/logs||624
+"send|<f.st......|tmp/tmp.E2fnI0Bvbj.bkit.backup/manifest-segment.19052|22|137|119|2019/01/14 17:13:07"
+"send|<f.st......|bkit/scripts/client/var/jvv/logs|22|371|783|2019/01/14 17:13:08"
+"send|<f.st......|tmp/tmp.E2fnI0Bvbj.bkit.backup/manifest-segment.19052|22|137|119|2019/01/14 17:13:08"
+sent 1 lines of manifest starting at 1
+
+Phase 3 - Clean deleted files from backup
+
+
+Phase 5 - Create a readonly snapshot on server
+
+skipping directory .
+Backup done on Mon, 14 Jan 2019 17:13:10 +0000 for:
+Files/directories '.' backed up on:
+	user@10.1.1.3::local.bKit-Office.033da664eaf277e22c92d04f57fd12b4.user.jvv/_.42d6c432-cf84-4185-a247-2a8933182caa.ATA_TOSHIBA_HDWN180.sata.btrfs/@current/data/bkit/scripts/client

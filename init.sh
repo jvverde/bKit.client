@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-SDIR=$(dirname "$(readlink -f "$0")")	#Full SDIR
+SDIR=$(dirname -- "$(readlink -ne -- "$0")")	#Full SDIR
 
 SECTION=bkit
 PORT=8760

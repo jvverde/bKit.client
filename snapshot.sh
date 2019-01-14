@@ -105,16 +105,19 @@ ntfssnap(){
     "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" "${OPTIONS[@]}" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
 }
 
-RUNDIR="$SDIR/run"
+mktempdir RUNDIR
 RMFILES=()
-trap '
+
+finish(){
     rm -f "${RMFILES[@]}"
     [[ -s $ERRFILE ]] || rm -f "$ERRFILE"
     for M in ${MOUNTED[@]}
     do 
       umount "$M" && rmdir "$M"
     done
-' EXIT
+}
+
+atexit finish
 
 for ROOT in ${!ROOTS[@]}
 do

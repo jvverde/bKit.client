@@ -3,6 +3,7 @@ cache/
 logs/
 run/
 tmp/
+var/
 gui/
 rules/
 schtasks/

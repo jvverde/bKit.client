@@ -35,7 +35,7 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 
-bash "$SDIR/whoShouldUpdate.sh" "${OPTIONS[@]}" --out-format="%i|%M|%l|/%f"  -- --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"|
+bash "$SDIR/needUpdate.sh" "${OPTIONS[@]}" --out-format="%i|%M|%l|/%f"  -- --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"|
 while IFS='|' read I TIME SIZE FILE
 do
 	exists cygpath && FILE=$(cygpath -w "$FILE")

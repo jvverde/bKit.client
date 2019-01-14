@@ -26,15 +26,6 @@ excludes(){
 	FILTERS+=( --filter=". $EXCL" )
 }
 
-RUNDIR="$SDIR/run"
-RULESFILE="$RUNDIR/filter-$$"
-
-[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
-
-trap '
-    [[ -e $RULESFILE ]] && rm -f "$RULESFILE"
-' EXIT
-
 importrules(){
 	[[ -e $SDIR/rules/global ]] || mkdir -pv "$SDIR/rules/global"
 	#bash "$SDIR/update.sh" "rules/global" "$SDIR" >/dev/null

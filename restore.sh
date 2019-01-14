@@ -4,8 +4,6 @@ OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 set -o pipefail
 
-source "$SDIR/functions/all.sh"
-
 source "$SDIR/ccrsync.sh"
 
 FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
@@ -163,8 +161,7 @@ LINKS=( "${LINKS[@]:0:20}" )              #a rsync limitation
 
 RESOURCES=("$@")
 
-RESULT="$(mktemp -d --suffix=.bKit)"
-mkdir -p "$RESULT"
+mktempdir RESULT || die "Can't create a temporary working directory"
 
 LOGFILE="$RESULT/logs.tmp"
 STATSFILE="$RESULT/stats.tmp"
@@ -174,11 +171,10 @@ exec 3>&2
 exec 2>"$ERRFILE"
 
 finish() {
-  cat "$ERRFILE" >&3
-  rm -rf "$RESULT"
+	cat "$ERRFILE" >&3
 }
 
-trap finish EXIT
+atexit finish
 
 
 aclparents(){

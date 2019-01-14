@@ -169,9 +169,7 @@ dorsync(){
 	dorsync2 "$@" | grep -v 'unpack_smb_acl'
 }
 
-#RUNDIR=$SDIR/run
 mktempdir RUNDIR || die "Can't create a temporary working directory"
-[[ -d $RUNDIR ]] || mkdir -p "$RUNDIR"
 FLIST="$RUNDIR/file-list"
 HLIST="$RUNDIR/hl-list"
 DLIST="$RUNDIR/dir-list"

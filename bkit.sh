@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 source "$SDIR/functions/all.sh"
 
 usage() {

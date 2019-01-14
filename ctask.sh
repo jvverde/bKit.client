@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 exists() { type "$1" >/dev/null 2>&1;}
 die() { echo -e "$@">&2; exit 1; }

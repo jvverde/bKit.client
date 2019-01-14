@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@" >&2; exit 1;}
-warn() { echo -e "$@" >&2;}
-
 source "$SDIR/ccrsync.sh"
 
 while [[ $1 =~ ^- ]]
@@ -47,9 +43,7 @@ OPTIONS=(
 	--dry-run
 )
 
-DST="$SDIR/run/fake-root-$$"
-mkdir -p "$DST"
-trap 'rm -rf "$DST"' EXIT
+mktempdir FAKEROOT
 
 for DIR in "${RESTOREDIR[@]}"
 do
@@ -69,7 +63,7 @@ do
 	do
 		FMT="--out-format=$V|%o|%i|%M|%l|%f"
 		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/$DIR"
-		rsync "${RSYNCOPTIONS[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$DST/" 2>/dev/null
+		rsync "${RSYNCOPTIONS[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$FAKEROOT/" 2>/dev/null
 	done| sort | awk -F'|' '
 		{
 			LINES[$2 $3 $4 $5 $6] = $1 " have a last modifed version at " $4		#supress the first field(=snapshot) id all the other are the same. Just show one

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#Generate password using Diffie-Helman algorithm
 die(){ echo -e "$@" >&2 && exit 1;}
 
 usage() {

@@ -1,0 +1,25 @@
+skipping directory .
+Start to backup directories/files on /tmp/tmp.RBAgdlRh2R.bkit.snapshot/A on Tue, 11 Dec 2018 20:24:40 +0000
+
+Phase 1 - Backup new/modified files
+
+"send|<f..t......|tmp/tmp.RcdtMAL7Q6.bkit.backup/manifest-segment.5362|22|107|88|2018/12/11 20:24:42"
+"send|.d..t......|A|0|0|0|2018/12/11 20:24:43"
+"send|<f..t......|A/a|16|36|0|2018/12/11 20:24:43"
+"send|<f..t......|tmp/tmp.RcdtMAL7Q6.bkit.backup/manifest-segment.5362|22|107|88|2018/12/11 20:24:43"
+sent 1 lines of manifest starting at 1
+
+Phase 2 - Update Symbolic links, Hard links, Directories and file attributes
+
+miss .d..t......|A/||0
+"send|.d..t......|A|0|0|0|2018/12/11 20:24:44"
+
+Phase 3 - Clean deleted files from backup
+
+
+Phase 5 - Create a readonly snapshot on server
+
+skipping directory .
+Backup done on Tue, 11 Dec 2018 20:24:47 +0000 for:
+Files/directories '/tmp/tmp.RBAgdlRh2R.bkit.snapshot/A' backed up on:
+	user@10.1.1.3::local.bKit-Office.033da664eaf277e22c92d04f57fd12b4.user.root/_.A23E81853E8152E9.FOTOS.usb.fuseblk/@current/data/A

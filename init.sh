@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 SDIR=$(dirname -- "$(readlink -ne -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
 
 SECTION=bkit
 PORT=8760
 BPORT=8761
 RPORT=8762
 UPORT=8763
-USER=user
-PASS=us3r
+
 SERVER="$1"
 CERT="${2:-default}"
-
-die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
 
 usage() {
     NAME=$(basename -s .sh "$0")
@@ -25,10 +22,11 @@ usage() {
 echo Contacting the server ... please wait!
 exists nc && { nc -z $SERVER $PORT 2>&1 		|| die Server $SERVER not found;}
 
-CONFDIR="$("$SDIR"/keygen.sh -n "$SERVER")" 		|| die "Can't generate a key"
+CONFDIR="$ETCDIR/$SERVER"
 
-USER="$(basename -- "$(dirname -- "$CONFDIR")")"	|| die "Can't found USER"	#expected /somepath/user/server from CONFDIR
-INITFILE=$CONFDIR/conf.init
+bash "$SDIR"/keygen.sh -n "$SERVER" "$CONFDIR"		|| die "Can't generate a key"
+
+INITFILE="$CONFDIR/conf.init"
 
 export RSYNC_PASSWORD="4dm1n"
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'

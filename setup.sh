@@ -7,10 +7,6 @@ source "$SDIR/functions/all.sh"
 #USERID=$(id -u $U)
 #GRPID=$(id -g $U)
 
-VDIR="$(dirname -- "$VARDIR")"
-EDIR="$(dirname -- "$ETCDIR")"
-chmod -v 777 "$VDIR" "$EDIR"
-
 exists CMD && {
 	mktempdir RUNDIR
 	BATCH="$RUNDIR/set$$.bat"

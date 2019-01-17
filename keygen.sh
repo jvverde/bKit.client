@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 #Generate ssh keys and openssl keys
-die(){ echo -e "$@" >&2 && exit 1;}
-exists() { type "$1" >/dev/null 2>&1;}
 SDIR=$(dirname -- "$(readlink -fn -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
 
 pushd "$SDIR" >/dev/null
-BKIT="$(git rev-parse --show-toplevel)"
 
 usage() {
         echo -e "$@"
@@ -31,10 +29,7 @@ done
 
 [[ -n $1 ]] || usage "Servername missing"
 
-USERDIR="$BKIT/scripts/client/conf/$(id -un)"
-exists cygpath && USERDIR="$(cygpath -u "$USERDIR")"
-
-CONFDIR="$USERDIR/$1"
+CONFDIR="${2:-"$ETCDIR/$1"}"
 PRIV="$CONFDIR/.priv"
 PUB="$CONFDIR/pub"
 mkdir -p "$PRIV"
@@ -54,6 +49,5 @@ rsync -ai "$KEYSSH.pub" "$PUBSSH" >&2
 	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem"
 	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub"
 } > /dev/null  2>&1
-chmod 700 "$USERDIR" "$CONFDIR" "$PRIV"
+chmod 700 "$ETCDIR" "$CONFDIR" "$PRIV"
 chmod 600 "$PRIV"/*
-echo "$CONFDIR"

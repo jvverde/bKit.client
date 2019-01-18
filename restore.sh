@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
-OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 set -o pipefail
 
@@ -163,15 +162,17 @@ RESOURCES=("$@")
 
 mktempdir RESULT || die "Can't create a temporary working directory"
 
-LOGFILE="$RESULT/logs.tmp"
-STATSFILE="$RESULT/stats.tmp"
-ERRFILE="$RESULT/errors.tmp"
+NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
+LOGFILE="$VARDIR/restore-logs-$NOW"
+ERRFILE="$VARDIR/restore-errors-$NOW"
+STATSFILE="$VARDIR/restore-stats-NOW"
 
 exec 3>&2
 exec 2>"$ERRFILE"
 
 finish() {
 	cat "$ERRFILE" >&3
+	[[ -s $ERRFILE ]] || rm "$ERRFILE"
 }
 
 atexit finish

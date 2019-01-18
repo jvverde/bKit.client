@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
+SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
+
 
 exists fsutil && {
   for DRV in $(fsutil fsinfo drives| tr -d '\r' | sed /^$/d | cut -d' ' -f2-)

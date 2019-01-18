@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
+SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
+
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo "List backup versions of a given file"

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-
-die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"
+source "$SDIR/functions/all.sh"
 
 SERVER=$1
 PORT=${2:-25}

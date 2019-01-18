@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
-OS=$(uname -o|tr '[:upper:]' '[:lower:]')
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
-warn() { echo -e "$@">&2;}
+source "$SDIR/functions/all.sh"
+
 usage(){
 	[[ $OS == cygwin ]] && {
 		die "Usage:\n\t$0 --name taskname [-m|-h|-d|-w [every]] [-f|--filter=rules] [-s|--start=stardatetime] [--install] [--force] dirs"

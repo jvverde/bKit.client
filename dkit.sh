@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"
+source "$SDIR/functions/all.sh"
+
 usage() {
 	NAME=$(basename -s .sh "$0")
 	echo Show differences to last backup
@@ -35,7 +35,7 @@ SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 
-bash "$SDIR/needUpdate.sh" "${OPTIONS[@]}" --out-format="%i|%M|%l|/%f"  -- --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"|
+bash "$SDIR/needUpdate.sh" "${OPTIONS[@]}" --out-format="%i|%M|%l|/%f"  --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"|
 while IFS='|' read I TIME SIZE FILE
 do
 	exists cygpath && FILE=$(cygpath -w "$FILE")

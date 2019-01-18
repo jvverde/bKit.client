@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-SDIR=$(dirname "$(readlink -f "$0")")	#Full DIR
+SDIR=$(dirname -- "$(readlink -ne -- "$0")")	#Full DIR
+source "$SDIR/functions/all.sh"
 
-die() { echo -e "$@">&2; exit 1; }
-
-INITFILE=$SDIR/conf/conf.init
+INITFILE=$ETCDIR/default/conf.init
 
 [[ -e $INITFILE ]] || die "file $INITFILE not found"
 

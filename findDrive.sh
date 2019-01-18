@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-SDIR="$(dirname "$(readlink -f "$0")")"       #Full DIR
+SDIR="$(dirname -- "$(readlink -en -- "$0")")"       #Full DIR
+source "$SDIR/functions/all.sh"
 [[ -n $1 ]] || echo -e "Usage:\n\t$0 VolumeId"
 UUID=$1
-die() { echo -e "$@">&2; exit 1; }
-exists() { type "$1" >/dev/null 2>&1;}
 exists fsutil && {
   for DRV in $(fsutil fsinfo drives|sed 's/\r//g;s/\\//g' |cut -d' ' -f2-)
   do

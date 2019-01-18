@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
-[[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
+SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
 
-exists() { type "$1" >/dev/null 2>&1;}
-die() { echo -e "$@">&2; exit 1; }
+[[ $1 == '-log' ]] && shift && exec 1>"$1" && shift
 
 [[ -n $1 ]] || die "Usage:\n\t$0 path [mapdrive]"
 [[ -e $1 ]] || die Cannot find $1

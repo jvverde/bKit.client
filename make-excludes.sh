@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-SDIR="$(dirname "$(readlink -f "$0")")"
+SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
+
 COPY=(excludes-all.txt)
 WIN=excludes-windows.txt
 UNIX=excludes-unix.txt
@@ -8,7 +10,6 @@ SRCDIR="$SDIR/excludes"
 DST="$SDIR/conf/excludes.txt"
 [[ -e $DST ]] || mkdir -pv "${DST%/*}"
 
-die() { echo -e "$@">&2; exit 1; }
 
 EXCDIR="${1:-$SRCDIR}"
 DSTFILE="${2:-$DST}"

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #Generate password using Diffie-Helman algorithm
-die(){ echo -e "$@" >&2 && exit 1;}
+SDIR=$(dirname -- "$(readlink -fn -- "$0")")	#Full SDIR
+source "$SDIR/functions/all.sh"
 
 usage() {
         echo -e "$@"
@@ -11,7 +12,7 @@ usage() {
 
 [[ -n $1 ]] || usage "Directory missing"
 
-CONFDIR="$1"
+CONFDIR="${1:-$ETCDIR/default}"
 PRIV="$CONFDIR/.priv/key.pem"
 PUB="$CONFDIR/pub/server.pub"
 PASS="$CONFDIR/.priv/pass.bin"

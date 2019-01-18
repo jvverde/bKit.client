@@ -130,12 +130,6 @@ done
   RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 }
 
-#[[ $BACKUPURL =~ rsync://.+@.+:[0-9]+/.+ ]] || {
-#  CONFIG="$SDIR/conf/conf.init"
-#  [[ -f $CONFIG ]] || die Cannot found configuration file at $CONFIG
-#  source "$CONFIG"
-#}
-
 exists rsync || die Cannot find rsync
 
 trap '' SIGPIPE
@@ -176,11 +170,10 @@ DLIST="$RUNDIR/dir-list"
 MANIFEST="$RUNDIR/manifest"
 ENDFLAG="$RUNDIR/endflag"
 LOCK="$RUNDIR/${VOLUMESERIALNUMBER:-_}"
-VARDIR="/var/log/bkit/backup/$USER"
-mkdir -pv "$VARDIR"
-LOGFILE="$VARDIR/logs"
-ERRFILE="$VARDIR/errors"
-STATSFILE="$VARDIR/stats"
+NOW="$(date|sed 's/ /-/g')"
+LOGFILE="$VARDIR/log-$NOW"
+ERRFILE="$VARDIR/errors-$NOW"
+STATSFILE="$VARDIR/stats-NOW"
 
 exec 3>&2
 exec 2>"$ERRFILE"

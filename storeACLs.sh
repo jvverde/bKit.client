@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-die() { echo -e "$@">&2; exit 1; }
-warn() { echo -e "$@">&2; }
-
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 
 type cygpath >/dev/null 2>&1 || die Cannot found cygpath
-
 SDIR=$(cygpath "$(dirname -- "$(readlink -en -- "$0")")")	#Full DIR
+source "$SDIR/functions/all.sh"
 
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)
@@ -40,19 +36,17 @@ TARGETDIR="$(cygpath "$(readlink -nm "$1")")"
 SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
 [[ -f $SUBINACL ]] || die SUBINACL.exe not found
 
-RESULT="$SDIR/run/store-$$/"
-mkdir -p "$RESULT"
+mktempdir RESULT
 
-LOGDIR="$SDIR/logs/acls/$(basename "$TARGETDIR")"
-[[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR"
-
-ERRFILE="$LOGDIR/$(date +%Y-%m-%dT%H-%M-%S).err"
+ERRFILE="$VARDIR/acls-$(date +%Y-%m-%dT%H-%M-%S).err"
 exec 2>"$ERRFILE"
 
-trap "
+finish() {
 	rm -rf '$RESULT'
 	[[ -s $ERRFILE ]] || rm -f '$ERRFILE'
-" EXIT
+}
+
+atexit finish
 
 getacl(){
 	local SRC=$1

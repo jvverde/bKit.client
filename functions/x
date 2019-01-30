@@ -1,8 +1,0 @@
-#!/bin/bash
-source "./all.sh"
-
-A=$(mktempdir)
-mktempdir
-mktempdir
-mktempdir
-echo a=$A

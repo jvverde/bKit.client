@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-VARDIR="$HOME/.bkit/$(id -nu)/var"
-ETCDIR="$HOME/.bkit/$(id -nu)/etc"
+dirsinit(){
+	local user="$(id -nu)"
+	local homedir="$( getent passwd "$user" | cut -d: -f6 )"
+	VARDIR="$homedir/.bkit/var"
+	ETCDIR="$homedir/.bkit/etc"
+}
+
+dirsinit
+
 mkdir -pv "$VARDIR"
 mkdir -pv "$ETCDIR" 

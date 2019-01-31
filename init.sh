@@ -72,7 +72,10 @@ echo Writing configuration to $INITFILE
 	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
 	find "$SDIR/conf" -maxdepth 1 -type f -iname 'rsync*.conf' -exec cat "{}" ';'
 )> "$INITFILE"
-ln -svrfT "$CONFDIR" "$(dirname -- "$CONFDIR")/default"
+
+default="$(dirname -- "$CONFDIR")/default"
+
+[[ -d $default ]] || ln -svrfT "$CONFDIR" "$default"
 
 echo This is the content of init file in $INITFILE
 echo '##########################'

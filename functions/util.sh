@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-declare -f -F die >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+declare -p jdhflksdghfasdkof >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+jdhflksdghfasdkof=1
 
 exists() {
 	type "$1" >/dev/null 2>&1;
@@ -28,7 +29,6 @@ msg () {
 	do
 		say "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
 	done
-	exit 1;
 }
 
 die() {

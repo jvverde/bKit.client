@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
+
+source "$SDIR/ccrsync.sh"
+
+[[ ${BKIT_RVID+isset} == isset ]] || {
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$DIR" 2>/dev/null)
+	exists cygpath && DRIVE=$(cygpath -w "$DIR")
+	DRIVE=${DRIVE%%:*}
+	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+}
+
+rsync --list-only "$BACKUPURL/$RVID/.snapshots/" |grep -Po '@GMT-.+$' 	#get a list of all snapshots in backup

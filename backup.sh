@@ -43,10 +43,10 @@ do
 			BACKUPURL="${KEY#*=}"
 		;;
 		--rvid)
-			RVID="$1" && shift
+			export BKIT_RVID="$1" && shift
 		;;
 		--rvid=*)
-			RVID="${KEY#*=}"
+			BKIT_RVID="${KEY#*=}"
 		;;
 		--config)
 			CONFIG="$1" && shift
@@ -116,7 +116,7 @@ do
 done
 
 #We need ROOT, BACKUPDIR and STARTDIR
-[[ $RVID =~ .+\..+\..+\..+\..+ ]] || {
+[[ $BKIT_RVID =~ .+\..+\..+\..+\..+ ]] || {
   IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
 
   IFS=$OLDIFS
@@ -127,7 +127,7 @@ done
   DRIVE=${DRIVE%%:*}
 
   #compute Remote Volume ID
-  RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+  export BKIT_RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 }
 
 exists rsync || die Cannot find rsync
@@ -290,10 +290,10 @@ clean(){
 	dorsync -riHDR "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
 }
 snapshot(){
-	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/$SNAP"
+	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$BKIT_RVID/$SNAP"
 }
 prepare(){
-	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$RVID/@current/data"
+	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$BKIT_RVID/@current/data"
 }
 wait4jobs(){
 	while list=($(jobs -rp)) && ((${#list[*]} > 0))
@@ -321,11 +321,11 @@ bg_upload_manifest(){
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 			(( CNT == 0 )) && sleep 1 && continue
 			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@manifest/$PREFIX/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-manifest/$PREFIX/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@manifest/$PREFIX/manifest.lst"
+			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-manifest/$PREFIX/manifest.lst"
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$RVID/@seed/$PREFIX"
-			update_file "$SEGMENT" "$BACKUPURL/$RVID/@apply-seed/$PREFIX/manifest.lst"
+			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$BKIT_RVID/@seed/$PREFIX"
+			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-seed/$PREFIX/manifest.lst"
 			echo sent $CNT lines of manifest starting at $START
 			let START+=CNT
 		done
@@ -396,7 +396,7 @@ backupACLS(){
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
     {
-	#bash "$SDIR/hash.sh" --remotedir="$RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
+	#bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
 	export CMPTARGET='metadata'
 	bash "$SDIR/hashit.sh"  "${OPTIONS[@]}" "${MDIRS[@]}"
     } > "$MANIFEST"
@@ -410,7 +410,7 @@ backupACLS(){
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
 
-    backup "$METADATADIR" "$@" "$BACKUPURL/$RVID/@current/metadata"
+    backup "$METADATADIR" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
 
     touch "$ENDFLAG"
     wait4jobs
@@ -419,7 +419,7 @@ backupACLS(){
 
   echo "e) Clean metafiles on server"
   {
-    clean "$METADATADIR" "$@" "$BACKUPURL/$RVID/@current/metadata"
+    clean "$METADATADIR" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
   } | sed -e 's/^/\t/'
 }
 
@@ -439,7 +439,7 @@ backupACLS(){
     echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
     echo -e "\nPhase 1 - Backup new/modified files\n"
 
-    #bash "$SDIR/hash.sh" --remotedir="$RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+    #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
     bash "$SDIR/hashit.sh" "${OPTIONS[@]}"  "${BACKUPDIR[@]}" > "$MANIFEST"
 
     touch "$ENDFLAG"
@@ -449,7 +449,7 @@ backupACLS(){
 
     bg_upload_manifest "$MAPDRIVE" 'data'
 
-    backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+    backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
     touch "$ENDFLAG"
     wait4jobs
@@ -457,12 +457,12 @@ backupACLS(){
 
     [[ -n $HLINK ]] && {
       echo -e "\n\tPhase 2.1 update delayed hardlinks"
-      backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+      backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
     }
 
     echo -e "\nPhase 3 - Clean deleted files from backup\n"
 
-    clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$RVID/@current/data"
+    clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
       echo -e "\nPhase 4 - Backup ACLS\n"
@@ -477,7 +477,7 @@ backupACLS(){
     for I in ${!ORIGINALDIR[@]}
     do
       echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
-      echo -e "\t$BACKUPURL/$RVID/@current/data/${STARTDIR[$I]}"
+      echo -e "\t$BACKUPURL/$BKIT_RVID/@current/data/${STARTDIR[$I]}"
     done
   } | tee "$LOGFILE"
 

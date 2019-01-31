@@ -37,11 +37,15 @@ STARTDIR="${BACKUPDIR#$ROOT}"		#remove mount point from path
 STARTDIR="${STARTDIR#/}" 		#remove leading slash if any
 ROOT=${ROOT%/} 				#remove trailing slash if any
 
-IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
+[[ ${BKIT_RVID+isset} == isset ]] || {
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
+	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+	DRIVE=${DRIVE%%:*}			#remove anything after : (if any)
+	#compute Remote Volume ID
+  	BKIT_RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+}
 
-exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-DRIVE=${DRIVE%%:*}			#remove anything after : (if any)
-REMOTEDIR="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}/@current/$CMPTARGET"
+REMOTEDIR="$BKIT_RVID/@current/$CMPTARGET"
 
 SRC="$ROOT/./$STARTDIR"
 dorsync "${RSYNCOPTIONS[@]}" \

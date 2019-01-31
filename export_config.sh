@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-sdir="$(dirname -- "$(readlink -ne -- "$0")")"
+sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 source "$sdir/functions/all.sh"
 
 
@@ -16,6 +16,8 @@ server="$1"
 port=8760
 
 exists nc && { nc -z $server $port 2>&1   || die "Server '$server' not found";}
+
+[[ ${ETCDIR+isset} == isset ]] || die "ETCDIR variable not defined"
 
 config="$ETCDIR/$server/conf.init"
 

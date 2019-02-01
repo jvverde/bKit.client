@@ -1,26 +1,28 @@
 #!/usr/bin/env bash
-sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
-source "$sdir/functions/all.sh"
 
-
-_usage() {
-        local name="$(basename -- "$0")"
-        echo "Set BKIT_CONFIG to point to a given server. Init it if needed"
-        echo -e "Usage:\n\t source $name"
-        exit 1
+usage_export_config() {
+	local name="$(basename -- "$0")"
+	echo "Set BKIT_CONFIG to point to a given server. Init it if needed"
+	echo -e "Usage:\n\t source $name"
+	exit 1
 }
 
-[[ -z $1 ]] && _usage
+export_config(){
+	source "$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")/functions/all.sh"
 
-server="$1"
-port=8760
+	[[ -z $1 ]] && usage_export_config
 
-exists nc && { nc -z $server $port 2>&1   || die "Server '$server' not found";}
+	local server="$1"
+	local port=8760
 
-[[ ${ETCDIR+isset} == isset ]] || die "ETCDIR variable not defined"
+	exists nc && { nc -z $server $port 2>&1   || die "Server '$server' not found";}
 
-config="$ETCDIR/$server/conf.init"
+	[[ ${ETCDIR+isset} == isset ]] || die "ETCDIR variable not defined"
 
-[[ -e $config ]] || bash "$sdir/init.sh" "$server"
-[[ -e $config ]] || die "Can't find file $config"
-export BKIT_CONFIG="$config"
+	local config="$ETCDIR/$server/conf.init"
+
+	[[ -e $config ]] || bash "$sdir/init.sh" "$server"
+	[[ -e $config ]] || die "Can't find file $config"
+	export BKIT_CONFIG="$config"
+}
+export_config "$@"

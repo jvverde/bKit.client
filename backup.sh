@@ -36,6 +36,9 @@ do
 		--snap=*)
 			SNAP="@snap/${KEY#*=}"
 		;;
+		--burn)
+			SNAP="@burn"
+		;;
 		--backupurl)
 			BACKUPURL="$1" && shift
 		;;

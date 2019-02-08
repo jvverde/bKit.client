@@ -6,7 +6,7 @@ exists() {
 	type "$1" >/dev/null 2>&1;
 }
 
-if exists tput && [[ -n $TERM ]]
+if exists tput && [[ -n $TERM && $TERM != dumb ]]
 then
 	say() {
 		tput setaf 1; echo -e "$@">&2; tput sgr0

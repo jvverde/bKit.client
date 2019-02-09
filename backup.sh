@@ -240,7 +240,7 @@ backup(){
 	local SRCS=()
 	for DIR in "${@:1:$#-1}"
 	do
-    DIR=${DIR#/}    #remove any leading slash if any}
+		DIR=${DIR#/}    #remove any leading slash if any}
 		SRCS+=( "$BASE/./$DIR" )
 	done
 	local DST="${@: -1}" #last argument
@@ -254,15 +254,14 @@ backup(){
 		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
 
 		#if it is a directory, symlink, device or special
-    #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
-    [[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
+		#[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
+		[[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
 
 		#this is the main (and most costly) case. A file, or part of it, need to be transfer
 		[[ $I =~ ^[.\<]f ]] && (
 			HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
 			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
-			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix $PREFIX !~ ././././././" && exit;}
-			#echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE"
+			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix '$PREFIX' !~ ././././././" && exit 0;}
 			echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >> "$MANIFEST"
 		) && continue
 

@@ -9,7 +9,6 @@ usage_export_config() {
 
 export_config(){
 	source "$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")/functions/all.sh"
-
 	[[ -z $1 ]] && usage_export_config
 
 	local server="$1"

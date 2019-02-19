@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#Checks who needs to be backup
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 FMT='--out-format=%i|%n|/%f|%l'

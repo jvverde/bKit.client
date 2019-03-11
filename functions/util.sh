@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 declare -p jdhflksdghfasdkof >/dev/null 2>&1 && echo module utils apparentely already sourced && return
-jdhflksdghfasdkof=1
+declare -r jdhflksdghfasdkof=1
 
 exists() {
 	type "$1" >/dev/null 2>&1;

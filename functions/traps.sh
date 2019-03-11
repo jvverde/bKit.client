@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #trap 'warn ${LINENO} $?' ERR
-declare -f -F atexit > /dev/null 2>&1 && echo module trap already inserted && return
+declare -p hdsddJHDKSDGHskDCSDhgdag > /dev/null 2>&1 && echo module trap already inserted && return
+declare -r hdsddJHDKSDGHskDCSDhgdag=1
 
 fn_exists() {
     declare -f -F "$1" > /dev/null
@@ -18,6 +19,7 @@ atexit() {
 doexit() {
 	CODE=$?
 	trap '' EXIT
+	set +eu
 	for FN in "${EXITFN[@]}"
 	do
 		"$FN"

@@ -12,6 +12,7 @@ exists wmic && {
 	true ${UUID:="$(cat /sys/devices/virtual/dmi/id/product_uuid 2>/dev/null)"}
 	true ${UUID:="$(cat /sys/class/dmi/id/product_uuid 2>/dev/null)"}
 	true ${UUID:="$(cat /sys/class/dmi/id/board_id 2>/dev/null)"}
+	true ${UUID:="$(cat /etc/machine-id 2>/dev/null)"}
 	true ${UUID:="$(dmidecode -s system-uuid 2>/dev/null)"}
 	true ${UUID:="0000-0000"}
 	DOMAIN="$(hostname -d)"

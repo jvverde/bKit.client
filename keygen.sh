@@ -46,8 +46,8 @@ PUBSSH="$PUB/ssh-client.pub"
 rsync -ai "$KEYSSH.pub" "$PUBSSH" >&2
 
 {
-	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem"
-	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub"
+	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem" || { echo "Fail to generate key" && exit 1; }
+	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub" || { echo "Fail to get public key" && exit 1; }
 #} > /dev/null  2>&1
 }
 chmod 700 "$ETCDIR" "$CONFDIR" "$PRIV"

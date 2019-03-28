@@ -48,6 +48,7 @@ rsync -ai "$KEYSSH.pub" "$PUBSSH" >&2
 {
 	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem"
 	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub"
-} > /dev/null  2>&1
+#} > /dev/null  2>&1
+}
 chmod 700 "$ETCDIR" "$CONFDIR" "$PRIV"
 chmod 600 "$PRIV"/*

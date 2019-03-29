@@ -49,7 +49,7 @@ rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOM
 "$SDIR/genpass.sh" "$CONFDIR"		|| die "Can't generate the pass"
 
 #And check if challenged was well encripted
-VERIF="$(openssl enc -aes256 -base64 -k "$(<"$CONFDIR/.priv/secret")" -d -in "$CONFDIR/pub/verification")"
+VERIF="$(openssl enc -aes256 -md SHA256 -base64 -k "$(<"$CONFDIR/.priv/secret")" -d -in "$CONFDIR/pub/verification")"
 [[ $VERIF == $CHALLENGE ]] || die "Something was wrong with the produced key"
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 

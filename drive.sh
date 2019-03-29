@@ -14,7 +14,7 @@ MOUNT=$(stat -c%m "$DIR")
 
 [[ -b $DEV ]] || {
 	#echo try another way >&2
-	DEV="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$MOUNT" '$2 == m {printf("/dev/%s",$1)}')"
+	exists lsblk && DEV="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$MOUNT" '$2 == m {printf("/dev/%s",$1)}')"
 }
 
 [[ $OS == cygwin ]] && exists wmic && {

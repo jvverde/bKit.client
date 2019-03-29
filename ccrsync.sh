@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #RSYNC Common Code
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"
+SDIR="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 source "$SDIR/functions/all.sh"
 
 RSYNCOPTIONS=()

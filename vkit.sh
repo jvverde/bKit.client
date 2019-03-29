@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
-source "$SDIR/functions/all.sh"
+sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
+source "$sdir/functions/all.sh"
 
 usage() {
 	NAME=$(basename -s .sh "$0")
@@ -31,9 +31,8 @@ do
 	esac
 done
 
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
 [[ $# -eq 0 ]] && usage
 
 echo "Please wait... this may take a while"
-bash "$SDIR/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"
+bash "$sdir/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"

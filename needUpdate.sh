@@ -6,13 +6,18 @@ FMT='--out-format=%i|%n|/%f|%l'
 
 source "$SDIR/ccrsync.sh"
 
-OPTIONS=()
+declare -a OPTIONS=()
+declare snap='@current'
+
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
 		--out-format=*)
 			FMT="$KEY"
+		;;
+		--snap=*)
+			snap="${KEY#*=}"
 		;;
 		--cmptarget=*)
 			CMPTARGET="${KEY#*=}"
@@ -46,7 +51,7 @@ ROOT=${ROOT%/} 				#remove trailing slash if any
   	BKIT_RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
 }
 
-REMOTEDIR="$BKIT_RVID/@current/$CMPTARGET"
+REMOTEDIR="$BKIT_RVID/$snap/$CMPTARGET"
 
 SRC="$ROOT/./$STARTDIR"
 dorsync "${RSYNCOPTIONS[@]}" \

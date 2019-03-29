@@ -17,4 +17,4 @@ while IFS='|' read i datetime size file
 do
 	exists cygpath && file=$(cygpath -w "$file")
 	echo "$i|$datetime|$size|$file"
-done < <(bash "$sdir/needUpdate.sh" --out-format="%i|%M|%l|/%f"  --filter=": .rsync-filter" "$@")
+done < <(bash "$sdir/needUpdate.sh" --snap="@last" --out-format="%i|%M|%l|/%f"  --filter=": .rsync-filter" "$@")

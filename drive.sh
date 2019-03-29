@@ -5,10 +5,16 @@ source "$SDIR/functions/all.sh"
 
 DIR=$1
 
+MOUNT=$(stat -c%m "$DIR")
+
 [[ -b $DIR ]] && DEV="$DIR" || {
 	exists cygpath && DIR=$(cygpath "$DIR")
-	MOUNT=$(stat -c%m "$DIR")
 	DEV=$(df --output=source "$MOUNT"|tail -1)
+}
+
+[[ -b $DEV ]] || {
+	#echo try another way >&2
+	DEV="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$MOUNT" '$2 == m {printf("/dev/%s",$1)}')"
 }
 
 [[ $OS == cygwin ]] && exists wmic && {
@@ -73,15 +79,14 @@ readIDby() {
 }
 
 volume() {
-	FILESYSTEM="$(df --output=fstype "$DEV"|tail -n1)"
 	exists lsblk && {
 		VOLUMENAME="$(lsblk -ln -o LABEL "$DEV")"
 		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
 		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
 		true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
+		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$DEV")"}
 		DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
 		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
-		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$DEV")"}
 	}
 	exists blkid  && {
 		true ${FILESYSTEM:=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')}
@@ -92,6 +97,8 @@ volume() {
 	[[ -n $VOLUMESERIALNUMBER ]] || readUUIDby
 	[[ -n $VOLUMESERIALNUMBER ]] || readIDby
 	[[ -n $VOLUMENAME ]] || readNameBy
+
+	true ${FILESYSTEM:="$(df --output=fstype "$DEV"|tail -n1)"}
 
 	true ${DRIVETYPE:=_}
 	true ${VOLUMESERIALNUMBER:=_}

@@ -214,13 +214,13 @@ CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-e
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
+	dorsync --archive --ignore-existing --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+	dorsync --archive --ignore-existing --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 update_file(){

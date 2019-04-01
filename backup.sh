@@ -206,7 +206,7 @@ postpone_update(){
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
-PERM=(--perms --acls --owner --group --super --numeric-ids)
+PERM=(--perms --acls --owner --group --super --numeric-ids -XX --devices --specials)
 CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
 
 

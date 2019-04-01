@@ -179,14 +179,14 @@ ERRFILE="$VARDIR/backup-errors-$NOW"
 STATSFILE="$VARDIR/backup-stats-NOW"
 
 exec 3>&2
-exec 2>"$ERRFILE"
+exec 2> >(tee "$ERRFILE" >&3)
 
-finish() {
-  cat "$ERRFILE" >&3
-}
-
-atexit finish
-
+#finish() {
+#  cat "$ERRFILE" >&3
+#}
+#
+#atexit finish
+#
 set_postpone_files(){
 	exec 99>"$HLIST"
 	exec 98>"$DLIST"

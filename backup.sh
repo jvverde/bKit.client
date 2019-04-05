@@ -527,12 +527,8 @@ backupACLS(){
       }
     } | sendnotify "$SUBJECT" "$DEST" "$ME"
   )
-  [[ -s $ERRFILE ]] && {  
-	  echo -e "\n------------Errors found------------"
-	  cat "$ERRFILE"
-	  echo "------------End of Errors------------"
-	  die "Backup finished but some errors occurs"
-  }
+  [[ -s $ERRFILE ]] && die "Backup done with some errors. Check $ERRFILE"
+
   deltatime "$(date -R)" "$ITIME"
   echo "Backup done in $DELTATIME"
   exit 0

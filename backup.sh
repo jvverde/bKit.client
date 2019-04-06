@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
+set -uE
+
 source "$SDIR/ccrsync.sh"
 
 SNAP='@snap'
 
-OPTIONS=()
+declare -a options=()
 while [[ $1 =~ ^- ]]
 do
 	KEY="$1" && shift
@@ -58,26 +60,26 @@ do
 			CONFIG="${KEY#*=}"
 		;;
 		--stats)
-			STATS=1
+			stats=1
 		;;
 		--sendlogs)
 			FULLREPORT=1
 			NOTIFY=1
-			STATS=1
+			stats=1
 		;;
 		--notify)
 			NOTIFY=1
-			STATS=1
+			stats=1
 		;;
 		--email=*)
 			EMAIL="${KEY#*=}"
 			NOTIFY=1
-			STATS=1
+			stats=1
 		;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
-				OPTIONS+=("$1")
+				options+=("$1")
 				shift
 			done
 		;;
@@ -103,7 +105,8 @@ ROOT=${ROOTS[0]}
 
 [[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
 
-[[ -n $MAPDRIVE ]] || MAPDRIVE=$ROOT
+#[[ -n $MAPDRIVE ]] || MAPDRIVE=$ROOT
+true ${MAPDRIVE:="$ROOT"}
 
 STARTDIR=()
 BACKUPDIR=()
@@ -119,19 +122,20 @@ do
 done
 
 #We need ROOT, BACKUPDIR and STARTDIR
-[[ $BKIT_RVID =~ .+\..+\..+\..+\..+ ]] || {
-  IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
-
-  IFS=$OLDIFS
-
-  [[ $DRIVETYPE =~ Ram.Disk ]] && die "These directories/files ${BACKUPDIR[@]} are in a RAM Disk"
-
-  exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-  DRIVE=${DRIVE%%:*}
-
-  #compute Remote Volume ID
-  export BKIT_RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-}
+[[ ${BKIT_RVID:-} =~ .+\..+\..+\..+\..+ ]] || source "$SDIR/lib/rvid.sh" || die "Can't dource rvid"
+#[[ $BKIT_RVID =~ .+\..+\..+\..+\..+ ]] || {
+#  IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
+#
+#  IFS=$OLDIFS
+#
+#  [[ $DRIVETYPE =~ Ram.Disk ]] && die "These directories/files ${BACKUPDIR[@]} are in a RAM Disk"
+#
+#  exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+#  DRIVE=${DRIVE%%:*}
+#
+#  #compute Remote Volume ID
+#  export BKIT_RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+#}
 
 exists rsync || die Cannot find rsync
 
@@ -141,8 +145,8 @@ dorsync2(){
 	local RETRIES=300
 	while true
 	do
-    		#echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
-    		rsync "${RSYNCOPTIONS[@]}" "${OPTIONS[@]}" --one-file-system --compress "$@"
+    		#echo rsync "${RSYNCoptions[@]}" --one-file-system --compress "$@"
+    		rsync ${RSYNCoptions+"${RSYNCoptions[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -176,7 +180,7 @@ LOCK="$RUNDIR/${VOLUMESERIALNUMBER:-_}"
 NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
 LOGFILE="$VARDIR/backup-logs-$NOW"
 ERRFILE="$VARDIR/backup-errors-$NOW"
-STATSFILE="$VARDIR/backup-stats-NOW"
+statsfile="$VARDIR/backup-stats-NOW"
 
 exec 3>&2
 exec 2> >(tee "$ERRFILE" >&3)
@@ -245,7 +249,7 @@ backup(){
 		SRCS+=( "$BASE/./$DIR" )
 	done
 	local DST="${@: -1}" #last argument
-	unset HLINK
+	unset hlinks
 	set_postpone_files
 
 	while IFS='|' read -r I FILE LINK FULLPATH LEN
@@ -270,7 +274,7 @@ backup(){
 		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 
 		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
-		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && HLINK=missing && continue
+		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
 		echo "Is something else:$I|$FILE|$LINK|$LEN"
 
@@ -355,7 +359,7 @@ backupACLS(){
     MDIRS+=( "$METADATADIR$DIR" )
   done
 
-  local LOPTIONS=(
+  local Loptions=(
     --no-verbose
     --recursive
     --relative
@@ -367,7 +371,7 @@ backupACLS(){
     $FMT_QUERY
   )
 
-  local ACLSOPTIONS=(
+  local ACLSoptions=(
     --acls
     --owner
     --group
@@ -387,22 +391,22 @@ backupACLS(){
         echo "ACL miss:$I|$FILE" >&11
         echo "$FILE"
       }
-    done < <(dorsync --dry-run "${LOPTIONS[@]}" "${ACLSOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR") |
+    done < <(dorsync --dry-run "${Loptions[@]}" "${ACLSoptions[@]}" "${SRCS[@]}" "$METADATADIR") |
       bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
   echo "b) Update attributes and Clean metafiles on local cache"
   {
-    dorsync --ignore-non-existing --ignore-existing --delete --delete-excluded --force "${LOPTIONS[@]}" "${SRCS[@]}" "$METADATADIR"
+    dorsync --ignore-non-existing --ignore-existing --delete --delete-excluded --force "${Loptions[@]}" "${SRCS[@]}" "$METADATADIR"
   } | sed -e 's/^/\t/'
 
   echo "c) Backup metafiles from local cache to backup server"
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
     {
-	#bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
+	#bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCoptions[@]}" "${MDIRS[@]}"
 	export CMPTARGET='metadata'
-	bash "$SDIR/hashit.sh"  "${OPTIONS[@]}" "${MDIRS[@]}"
+	bash "$SDIR/hashit.sh"  "${options[@]}" "${MDIRS[@]}"
     } > "$MANIFEST"
 
     touch "$ENDFLAG"
@@ -434,6 +438,7 @@ backupACLS(){
 #    die Volume $VOLUMESERIALNUMBER was locked for 1 day
 #  }
 
+	declare -i cnt=0
   ITIME=$(date -R)
 
   {
@@ -441,15 +446,15 @@ backupACLS(){
 
     bg_upload_manifest "$MAPDRIVE" 'data'
     echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
-    echo -e "\nPhase 1 - Backup new/modified files\n"
+    echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
 
-    #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-    bash "$SDIR/hashit.sh" "${OPTIONS[@]}"  "${BACKUPDIR[@]}" > "$MANIFEST"
+    #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCoptions[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+    bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" > "$MANIFEST"
 
     touch "$ENDFLAG"
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"
-    echo -e "\nPhase 2 - Update Symbolic links, Hard links, Directories and file attributes\n"
+    echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
 
     bg_upload_manifest "$MAPDRIVE" 'data'
 
@@ -459,21 +464,21 @@ backupACLS(){
     wait4jobs
     rm -f "$MANIFEST" "$ENDFLAG"
 
-    [[ -n $HLINK ]] && {
-      echo -e "\n\tPhase 2.1 update delayed hardlinks"
+    [[ ${hlinks+isset} == isset ]] && {
+      echo -e "\n\tPhase $cnt.1 update delayed hardlinks"
       backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
     }
 
-    echo -e "\nPhase 3 - Clean deleted files from backup\n"
+    echo -e "\nPhase $((++cnt)) - Clean deleted files from backup\n"
 
     clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
     [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-      echo -e "\nPhase 4 - Backup ACLS\n"
+      echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
       backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
     )
 
-    echo -e "\nPhase 5 - Create a readonly snapshot on server\n"
+    echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"
 
     snapshot
 
@@ -487,17 +492,17 @@ backupACLS(){
 
   #Now some stats
 
-  [[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
+  [[ ${stats+isset} == isset && -e $LOGFILE && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     deltatime "$(date -R)" "$ITIME"
     echo "Total time spent: $DELTATIME"
     exists cygpath && ROOT=$(cygpath -w "$ROOT")
     cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/send-stats.pl"
     echo "------------End of Stats------------"
-  } | tee "$STATSFILE"
+  } | tee "$statsfile"
 
   #Sent email if required
-  [[ -n $NOTIFY && -s $STATSFILE ]] && (
+  [[ ${NOTIFY+isset} == isset  && -s $statsfile ]] && (
     ME=$(uname -n)
     FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
     exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
@@ -512,7 +517,7 @@ backupACLS(){
     SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
     {
       echo "Backup of $DIRS"
-      cat "$STATSFILE"
+      cat "$statsfile"
 
       [[ -s $ERRFILE ]] && {
         echo -e "\n------------Errors found------------"

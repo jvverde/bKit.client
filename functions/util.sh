@@ -37,16 +37,16 @@ die() {
 	exit $CODE;
 }
 
-ERROR=0
+declare ERROR=0
 warn() {
 	ERROR=1
 	msg "$@"
 }
 
-DELTATIME=''
+declare DELTATIME=''
 deltatime(){
 	let DTIME=$(date +%s -d "$1")-$(date +%s -d "$2")
-	SEC=${DTIME}s
+	declare SEC=${DTIME}s
 	(($DTIME>59)) && {
 		let SEC=DTIME%60
 		let DTIME=DTIME/60
@@ -64,7 +64,7 @@ deltatime(){
 			}
 		}
 	}
-	DELTATIME="$DAYS$HOUR$MIN$SEC"
+	DELTATIME="${DAYS:-}${HOUR:-}${MIN:-}${SEC:-}"
 }
 
 sendnotify(){

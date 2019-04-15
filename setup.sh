@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 [[ $UID -ne 0 ]] && exists sudo && exec sudo "$0" "$@"
 
 #[[ $UID -eq 0 ]] && U=$(who am i | awk '{print $1}')

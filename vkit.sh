@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
-source "$sdir/functions/all.sh"
+source "$sdir/lib/functions/all.sh"
 
 usage() {
 	NAME=$(basename -s .sh "$0")

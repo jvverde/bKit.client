@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -en -- "$0")")"       #Full DIR
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 [[ -n $1 ]] || echo -e "Usage:\n\t$0 VolumeId"
 UUID=$1
 exists fsutil && {

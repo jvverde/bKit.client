@@ -2,7 +2,7 @@
 
 type cygpath >/dev/null 2>&1 || die Cannot found cygpath
 SDIR=$(cygpath "$(dirname -- "$(readlink -en -- "$0")")")	#Full DIR
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 
 RSYNCOPTIONS=(
   --groupmap=4294967295:$(id -u)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 
 usage(){
 	[[ $OS == cygwin ]] && {

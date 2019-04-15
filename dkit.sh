@@ -2,7 +2,7 @@
 #List differences between local and backup
 set -u
 sdir="$(dirname -- "$(readlink -ne -- "$0")")"
-source "$sdir/functions/all.sh"
+source "$sdir/lib/functions/all.sh"
 
 usage() {
 	NAME=$(basename -s .sh "$0")

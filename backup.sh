@@ -275,6 +275,8 @@ backup(){
 		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
+		[[ $I =~ ^\*deleting ]] && continue
+
 		echo "Is something else:$I|$FILE|$LINK|$LEN"
 
 	done < <(dorsync --dry-run --delete --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")

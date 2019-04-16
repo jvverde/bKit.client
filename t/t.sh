@@ -59,9 +59,16 @@ echo $RANDOM > a/b/c/d
 ../bkit.sh .
 sleep 1
 
-echo -e "\n-----------------from directory to hardlink-----------------"
+echo -e "\n-----------------from directory to hardlink + file-----------------"
 rm -rf a/b/c
 ln a/file a/b/c
+echo $RANDOM > a/b/file
+../bkit.sh .
+sleep 1
+
+echo -e "\n-----------------from file to symblink-----------------"
+rm -rf a/b/c
+ln -sfr a/file a/b/file
 ../bkit.sh .
 sleep 1
 

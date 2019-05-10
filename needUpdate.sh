@@ -44,7 +44,7 @@ STARTDIR="${STARTDIR#/}" 		#remove leading slash if any
 ROOT=${ROOT%/} 				#remove trailing slash if any
 
 [[ ${BKIT_RVID+isset} == isset ]] || {
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$ROOT")
 	exists cygpath && DRIVE=$(cygpath -w "$ROOT")
 	DRIVE=${DRIVE%%:*}			#remove anything after : (if any)
 	#compute Remote Volume ID

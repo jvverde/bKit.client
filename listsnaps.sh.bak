@@ -4,7 +4,7 @@ SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 source "$SDIR/ccrsync.sh"
 
 [[ ${BKIT_RVID+isset} == isset ]] || {
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$DIR" 2>/dev/null)
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$DIR" 2>/dev/null)
 	exists cygpath && DRIVE=$(cygpath -w "$DIR")
 	DRIVE=${DRIVE%%:*}
 	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"

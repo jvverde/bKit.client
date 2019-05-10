@@ -13,6 +13,6 @@ exists cygpath && BACKUPDIR=$(cygpath "$1")
 
 BACKUPDIR=$(readlink -ne "$BACKUPDIR")
 
-VOLUMESERIALNUMBER=$(bash "$SDIR/drive.sh" "$BACKUPDIR"|cut -d'|' -f2)
+VOLUMESERIALNUMBER=$(bash "$SDIR/lib/drive.sh" "$BACKUPDIR"|cut -d'|' -f2)
 
 echo "$VOLUMESERIALNUMBER"

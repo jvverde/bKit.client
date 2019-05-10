@@ -266,7 +266,7 @@ do
 
     ENTRY=${RESOURCE#$DIR}    #Is empty when resource is a existing directory (DIR==RESOURCE)
 
-    IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT" 2>/dev/null)
+    IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$ROOT" 2>/dev/null)
 
     exists cygpath && DRIVE=$(cygpath -w "$ROOT")
     DRIVE=${DRIVE%%:*}

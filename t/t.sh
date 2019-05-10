@@ -1,74 +1,47 @@
 #!/usr/bin/env bash
 set -e
 trap 'rm -rf a' EXIT
-mkdir -pv a/b
-echo $RANDOM > a/b/c
-echo $RANDOM > a/file
-../bkit.sh .
-sleep 1
 
-echo -e "\n-----------------from file to directory-----------------"
-rm -rf a/b/c
-mkdir -pv a/b/c/
-echo $RANDOM > a/b/c/d
-../bkit.sh .
-sleep 1
+doit(){
+	mkdir -pv $(pwd)/a/b
+	rm -rf $(pwd)/a/b/c
+	eval "$@"
+	../bkit.sh $(pwd)/a
+}
 
-echo -e "\n-----------------from directory to symlink-----------------"
-rm -rf a/b/c
-ln -sr a/file a/b/c
-../bkit.sh .
-sleep 1
+file(){
+	echo abc > $(pwd)/a/b/c
+	echo abc > $(pwd)/a/file
+}
+hardlink(){
+	ln $(pwd)/a/file $(pwd)/a/b/c
+}
+symlink(){
+	ln -srf $(pwd)/a/file $(pwd)/a/b/c
+}
+directory(){
+	mkdir -pv $(pwd)/a/b/c/ && echo abc > $(pwd)/a/b/c/file
+}
+pipe(){
+	mkfifo $(pwd)/a/b/c
+}
+socket(){
+	python -c "import socket as s; sock = s.socket(s.AF_UNIX); sock.bind('a/b/c')"
+}
 
-echo -e "\n-----------------from symlink to directory-----------------"
-rm -rf a/b/c
-mkdir -pv a/b/c/
-echo $RANDOM > a/b/c/d
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from directory to hardlink-----------------"
-rm -rf a/b/c
-ln a/file a/b/c
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from hardlink to symlink-----------------"
-rm -rf a/b/c
-ln -sr a/file a/b/c
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from symlink to a file-----------------"
-rm -rf a/b/c
-mkdir -pv a/b/c/
-echo $RANDOM > a/b/c/d
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from file to hardlink-----------------"
-rm -rf a/b/c
-ln a/file a/b/c
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from hardlink to directory-----------------"
-rm -rf a/b/c
-mkdir -pv a/b/c/
-echo $RANDOM > a/b/c/d
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from directory to hardlink + file-----------------"
-rm -rf a/b/c
-ln a/file a/b/c
-echo $RANDOM > a/b/file
-../bkit.sh .
-sleep 1
-
-echo -e "\n-----------------from file to symblink-----------------"
-rm -rf a/b/c
-ln -sfr a/file a/b/file
-../bkit.sh .
-sleep 1
-
+#doit file
+declare -a list=(file hardlink symlink directory pipe socket)
+for i in "${list[@]}"
+do
+	[[ ${last+isset} == isset ]] && echo -e "\n----------------- from $last to $i -----------------"
+	doit "$i"
+	last=$i
+	for j in "${list[@]}"
+	do
+		[[ $last == $j ]] && continue
+		echo -e "\n----------------- from $last to $j -----------------"
+		doit "$j"
+		echo -e "\n----------------- from $j to $last -----------------"
+		doit "$last"
+	done
+done

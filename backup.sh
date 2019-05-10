@@ -122,9 +122,9 @@ do
 done
 
 #We need ROOT, BACKUPDIR and STARTDIR
-[[ ${BKIT_RVID:-} =~ .+\..+\..+\..+\..+ ]] || source "$SDIR/lib/rvid.sh" || die "Can't dource rvid"
+[[ ${BKIT_RVID:-} =~ .+\..+\..+\..+\..+ ]] || source "$SDIR/lib/rvid.sh" || die "Can't source rvid"
 #[[ $BKIT_RVID =~ .+\..+\..+\..+\..+ ]] || {
-#  IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$ROOT")
+#  IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$ROOT")
 #
 #  IFS=$OLDIFS
 #
@@ -447,7 +447,7 @@ backupACLS(){
     prepare
 
     bg_upload_manifest "$MAPDRIVE" 'data'
-    echo Start to backup directories/files on ${ORIGINALDIR[@]} on $ITIME
+    echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
     echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
 
     #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCoptions[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"

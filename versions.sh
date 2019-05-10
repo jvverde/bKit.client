@@ -47,7 +47,7 @@ mktempdir FAKEROOT
 
 for DIR in "${RESTOREDIR[@]}"
 do
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/drive.sh" "$DIR" 2>/dev/null)
+	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$DIR" 2>/dev/null)
 
 	exists cygpath && DRIVE=$(cygpath -w "$DIR")
 	DRIVE=${DRIVE%%:*}

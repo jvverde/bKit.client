@@ -3,9 +3,11 @@ SDIR="$(dirname -- "$(readlink -ne -- "$0")")"                          #Full DI
 
 source "$SDIR/functions/all.sh"
 
-DIR=$1
+DIR="$(readlink -ne -- "$1")"
 
 MOUNT=$(stat -c%m "$DIR")
+#Find the top most mount point. We need this for example for BTRFS subvolumes which are mounting points
+MOUNT="$(echo "$MOUNT" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
 
 [[ -b $DIR ]] && DEV="$DIR" || {
 	exists cygpath && DIR=$(cygpath "$DIR")
@@ -111,7 +113,7 @@ volume() {
 
 [[ $OS != cygwin ]] && {
 	volume		
-	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
+	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE" | perl -lape 's/[^a-z0-9._|:+=-]/_/ig'
 	exit
 } 2>/dev/null
 

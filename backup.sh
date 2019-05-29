@@ -214,17 +214,16 @@ PERM=(--perms --acls --owner --group --super --numeric-ids --devices --specials)
 exists cygpath || PERM+=(-XX)
 CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
 
-
 update_hardlinks(){
 	FILE="${HLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
+	dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+	dorsync --delete --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 update_file(){
@@ -234,12 +233,12 @@ update_files(){
 	SRC=$1 && shift
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
-	dorsync --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+	dorsync --delete --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
 	rm -f "$FILE"
 }
 
 backup(){
-  local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
+	local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
 	local BASE=$(readlink -e "$1") && shift
 	#local SRC="$1/./$2"
 	local SRCS=()
@@ -276,9 +275,11 @@ backup(){
 		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
 		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
+		[[ $I =~ ^\*deleting ]] && continue
+
 		echo "Is something else:$I|$FILE|$LINK|$LEN"
 
-	done < <(dorsync --dry-run --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
+	done < <(dorsync --dry-run --delete --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
 	update_dirs	"$BASE" "$DST"
 	update_hardlinks "$BASE" "$DST"
 	remove_postpone_files
@@ -296,6 +297,7 @@ clean(){
 
 	dorsync -riHDR "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
 }
+
 snapshot(){
 	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$BKIT_RVID/$SNAP"
 }

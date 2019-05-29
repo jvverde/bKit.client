@@ -2,7 +2,7 @@
 
 type cygpath >/dev/null 2>&1 || die Cannot found cygpath
 SDIR="$(dirname -- "$(readlink -ne -- "$0")")"
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 SDIR="$(cygpath "$SDIR")"
 
 TARGETDIR=$(readlink -nm "$(cygpath "${@: -1}")")

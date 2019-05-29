@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #Generate ssh keys and openssl keys
 SDIR=$(dirname -- "$(readlink -fn -- "$0")")	#Full SDIR
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 
 pushd "$SDIR" >/dev/null
 

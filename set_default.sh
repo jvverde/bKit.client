@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 sdir=$(dirname -- "$(readlink -ne -- "$0")")	#full sdir
-source "$sdir/functions/all.sh"
+source "$sdir/lib/functions/all.sh"
 port=8760
 
 server="$1"

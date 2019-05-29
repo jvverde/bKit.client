@@ -59,6 +59,7 @@ dorsync "${RSYNCOPTIONS[@]}" \
 	--dry-run \
 	--recursive \
 	--links \
+	--delete-before \
 	--times \
 	--hard-links \
 	--relative \

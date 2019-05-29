@@ -3,7 +3,7 @@
 #output on form a/b/c/d/e/f/[0-9a-f]{58}|size|time|relative path on server side
 #:ex: 1/3/2/0/2/5/750401dd51cd5ba7a44dd7adcb9d4fc7f2e59df4bacf39c7da178868a3|180|1543680565|bkit/scripts/client/conf/tmp/sshkey.pub
 SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 
 
 OPTIONS=()

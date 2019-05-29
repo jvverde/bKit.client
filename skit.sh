@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
-source "$SDIR/functions/all.sh"
+source "$SDIR/lib/functions/all.sh"
 
 
 FILTERS=()

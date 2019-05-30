@@ -444,6 +444,7 @@ backupACLS(){
   ITIME=$(date -R)
 
   {
+	echo Backup to $BACKUPURL
     prepare
 
     bg_upload_manifest "$MAPDRIVE" 'data'

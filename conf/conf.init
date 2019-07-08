@@ -1,0 +1,3 @@
+BACKUPURL=rsync://user@10.1.1.4:8731/local.limosa.8cb4c72db40c691e22db0f6354a2ac80
+RECOVERURL=rsync://user@10.1.1.4:8732/local.limosa.8cb4c72db40c691e22db0f6354a2ac80
+UPDATERSRC=rsync://admin@10.1.1.4:8733/bkit-update/bKit-linux-x64/./

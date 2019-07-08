@@ -19,7 +19,7 @@ else
 
 	confdir="$ETCDIR/$server"
 
-	[[ -e $confdir/conf.init ]] || bash "$sdir/init.sh" "$server" || die "Can't set conf.init"
+	[[ -e $confdir/conf.init ]] || bash "$SDIR/init.sh" "$server" || die "Can't set conf.init to server $server"
 
 	default="$(dirname -- "$confdir")/default"
 

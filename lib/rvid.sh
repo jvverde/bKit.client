@@ -9,7 +9,8 @@ source "$sdir/functions/all.sh"
 export_rvid(){
 	IFS='|' read -r volumename volumeserialnumber filesystem drivetype <<<$("$sdir/drive.sh" "$1")
 	exists cygpath && declare drive="$(cygpath -w "$1")" && drive="${drive%%:*}"                      #remove anything after : (if any)
-	export BKIT_RVID="${drive:-_}.${volumeserialnumber:-_}.${volumename:-_}.${drivetype:-_}.${filesystem:-_}"
+  export BKIT_VOLUMESERIALNUMBER="${volumeserialnumber:-_}"
+	export BKIT_RVID="${drive:-_}.$BKIT_VOLUMESERIALNUMBER.${volumename:-_}.${drivetype:-_}.${filesystem:-_}"
 	issourced || echo $BKIT_RVID
 }
 

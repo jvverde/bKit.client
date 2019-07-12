@@ -5,7 +5,7 @@ sdir="$(dirname -- "$(readlink -ne -- "$0")")"
 source "$sdir/lib/functions/all.sh"
 
 usage() {
-	NAME=$(basename -s .sh "$0")
+	local NAME=$(basename -s .sh "$0")
 	echo Show differences to last backup
 	echo -e "Usage:\n\t $NAME dir1/file1 [[dir2/file2 [...]]"
 	exit 1

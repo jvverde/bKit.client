@@ -9,7 +9,10 @@ exists() {
 if exists tput && [[ -n $TERM && $TERM != dumb ]]
 then
 	say() {
-		tput setaf 1; echo -e "$@">&2; tput sgr0
+		tput setaf 1
+		tput setab 3
+		echo -e "$@">&2 
+		tput sgr0
 	}
 else
 	say() {

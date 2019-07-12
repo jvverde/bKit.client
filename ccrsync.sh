@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #RSYNC Common Code
-SDIR="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
-source "$SDIR/lib/functions/all.sh"
+sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+source "$sdir/lib/functions/all.sh"
 
-RSYNCOPTIONS=()
+declare -a RSYNCOPTIONS=()
 
 [[ ${BKIT_CONFIG+isset} == isset && -e $BKIT_CONFIG ]] || {
 	BKIT_CONFIG="$ETCDIR/default/conf.init"

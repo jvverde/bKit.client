@@ -1,85 +1,87 @@
 #!/usr/bin/env bash
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
-source "$SDIR/lib/functions/all.sh"
+set -uE
+sdir="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
+source "$sdir/lib/functions/all.sh"
 
 usage() {
-	NAME=$(basename -s .sh "$0")
+	local name=$(basename -s .sh "$0")
 	echo Backup one or more directories or files
-	echo -e "Usage:\n\t $NAME [-a|--all] [-c|--compile] dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $name [-a|--all] [-c|--compile] [--ignore-filters] [--stats] dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
-FILTERS=()
+declare -a filters=()
 
 excludes(){
-	EXCDIR=$SDIR/cache/$USER/excludes
-	[[ -d $EXCDIR ]] || mkdir -p $EXCDIR
+	excdir=$sdir/cache/$USER/excludes
+	[[ -d $excdir ]] || mkdir -p $excdir
 
-	EXCL=$EXCDIR/exclude.lst
+	exclist=$excdir/exclude.lst
 
-	[[ -e "$EXCL" ]] || {
+	[[ -e "$exclist" ]] || {
 		echo Compile exclude list
-		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+		bash "$sdir/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
-	[[ -z $(find "$EXCL" -mtime +30) && -z $COMPILE ]] || {
+	[[ -n $(find "$exclist" -mtime +30) || ${compile+isset} == isset ]] && {
 		echo Recompile exclude list
-		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+		bash "$sdir/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
 
-	FILTERS+=( --filter=". $EXCL" )
+	filters+=( --filter=". $exclist" )
 }
-OPTIONS=()
-RSYNCOPTIONS=()
+
+declare -a options=() rsyncoptions=()
+
 while [[ $1 =~ ^- ]]
 do
-	KEY="$1" && shift
-	case "$KEY" in
+	key="$1" && shift
+	case "$key" in
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
-				RSYNCOPTIONS+=( "$1" )
+				rsyncoptions+=( "$1" )
 				shift
 			done
 		;;
 		-a|--all)
-			ALL=1
+			all=1
 		;;
 		-c|--compile)
-			COMPILE=1
+			compile=1
 		;;
 		--ignore-filters)
-			NOFILTERS=1
+			nofilters=1
 		;;
 		-h|--help)
 			usage
 		;;
 		--stats|--sendlogs|--notify)
-			OPTIONS+=( "$KEY")
+			options+=( "$key")
 		;;
 		*=*)
-			OPTIONS+=( "$KEY")
+			options+=( "$key")
 		;;
 		*)
-			OPTIONS+=( "$KEY" "$1" ) && shift
+			options+=( "$key" "$1" ) && shift
 		;;
 	esac
 done
 
 (( $# == 0 )) && usage
 
-[[ -n $ALL ]] || excludes
+[[ ${all+isset} == isset ]] || excludes
 
-[[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
+[[ ${nofilters+isset} == isset ]] || filters+=( --filter=": .rsync-filter" )
 
 echo "bkit: Start backup"
-let CNT=16
-let SEC=60
-while (( CNT-- > 0 ))
+let cnt=16
+let sec=60
+while (( cnt-- > 0 ))
 do
-	bash -m "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}" && break
-	let DELAY=(1 + RANDOM % $SEC)
-	echo "bkit:Wait $DELAY seconds before try again"
-	sleep $DELAY 
-	let SEC=2*SEC
+	bash -m "$sdir/backup.sh" ${options+"${options[@]}"} -- ${filters+"${filters[@]}"} ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}" && break
+	let delay=(1 + RANDOM % $sec)
+	echo "bkit:Wait $delay seconds before try again"
+	sleep $delay 
+	let sec=2*sec
 done
 echo "bKit: Done"

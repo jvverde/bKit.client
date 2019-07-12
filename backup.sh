@@ -161,12 +161,9 @@ dorsync(){
 }
 
 mktempdir RUNDIR || die "Can't create a temporary working directory"
-FLIST="$RUNDIR/file-list"
-HLIST="$RUNDIR/hl-list"
-DLIST="$RUNDIR/dir-list"
-MANIFEST="$RUNDIR/manifest"
-ENDFLAG="$RUNDIR/endflag"
-LOCK="$RUNDIR/${VOLUMESERIALNUMBER:-_}"
+FLIST="$RUNDIR/file-list.$$"
+HLIST="$RUNDIR/hl-list.$$"
+DLIST="$RUNDIR/dir-list.$$"
 NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
 logfile="$VARDIR/backup-logs-$NOW"
 errfile="$VARDIR/backup-errors-$NOW"
@@ -255,36 +252,38 @@ wait4jobs(){
 	done
 }
 
-bg_upload_manifest(){
-	local BASE="$1"
-	local PREFIX="$2"
-	[[ -e $MANIFEST ]] || touch "$MANIFEST"
-	[[ -e $ENDFLAG ]] && rm -f "$ENDFLAG"
+exec {OUT}>&1
+upload_manifest(){
+  exec 1>&$OUT
+  local BASE="$1"
+  local PREFIX="$2"
+  
+  #echo upload manifest for $*  
+  declare manifest="$RUNDIR/manifest.$$"
+  declare files="$RUNDIR/files.$$"
+  :> "$manifest"
+  :> "$files"
+  send_manifest(){
+      update_file "$manifest" "$BACKUPURL/$BKIT_RVID/@manifest/$PREFIX/manifest.lst"
+      update_file "$manifest" "$BACKUPURL/$BKIT_RVID/@apply-manifest/$PREFIX/manifest.lst"
+      cut -d'|' -f4- "$manifest" > "$files"
+      update_files "$files" "$BASE" "$BACKUPURL/$BKIT_RVID/@seed/$PREFIX"
+      update_file "$manifest" "$BACKUPURL/$BKIT_RVID/@apply-seed/$PREFIX/manifest.lst"
+      :> "$manifest"    
+  }
 
-	(	#start a subshell to run in background
-		let START=1
-		let LEN=500
-		SEGMENT=$RUNDIR/manifest-segment.$$
-		SEGFILES=$RUNDIR/segment-files.$$
-		while [[ -e $MANIFEST ]]
-		do
-			let END=LEN+START-1
-			let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
-			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
-			(( CNT == 0 )) && sleep 1 && continue
-			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#Avoid send incomplete lines
-			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@manifest/$PREFIX/manifest.lst"
-			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-manifest/$PREFIX/manifest.lst"
-			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-			update_files "$SEGFILES" "$BASE" "$BACKUPURL/$BKIT_RVID/@seed/$PREFIX"
-			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-seed/$PREFIX/manifest.lst"
-			echo sent $CNT lines of manifest starting at $START
-			let START+=CNT
-		done
-		rm -f "$SEGMENT" "$SEGFILES"
-	)&
+  declare -i cnt=0
+  
+  while read -r line
+  do
+    echo $line >> "$manifest"
+    (( ++cnt > 50 )) && {
+      send_manifest
+      (( cnt = 0 ))
+    }
+  done
+  [[ -s $manifest ]] && send_manifest
 }
-
 
 backupACLS(){
   local FMT='--out-format=ACL:"%o|%i|%f|%c|%b|%l|%t"'
@@ -294,7 +293,7 @@ backupACLS(){
   local SRCS=()
   local MDIRS=()
 
-  local METADATADIR=$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}/
+  local METADATADIR=$SDIR/cache/metadata/by-volume/${BKIT_VOLUMESERIALNUMBER:-_}/
   [[ -d $METADATADIR ]] || mkdir -pv "$METADATADIR"
 
   for DIR in "$@"
@@ -347,27 +346,19 @@ backupACLS(){
 
   echo "c) Backup metafiles from local cache to backup server"
   {
-    bg_upload_manifest "$METADATADIR" 'metadata'
+    coproc upload_manifest "$METADATADIR" 'metadata'
     {
       #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
-      export CMPTARGET='metadata'
+      export BKIT_TARGET='metadata'
       bash "$SDIR/hashit.sh"  "${options[@]}" "${MDIRS[@]}"
-    } > "$MANIFEST"
-
-    touch "$ENDFLAG"
-    wait4jobs
-    rm -f "$MANIFEST" "$ENDFLAG"
+    } >&"${COPROC[1]}"
+    exec {COPROC[1]}>&-
+    wait $COPROC_PID
   } | sed -e 's/^/\t/'
 
   echo "d) Update metafiles attributes"
   {
-    bg_upload_manifest "$METADATADIR" 'metadata'
-
     backup "$METADATADIR" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
-
-    touch "$ENDFLAG"
-    wait4jobs
-    rm -f "$MANIFEST" "$ENDFLAG"
   } | sed -e 's/^/\t/'
 
   echo "e) Clean metafiles on server"
@@ -376,37 +367,6 @@ backupACLS(){
   } | sed -e 's/^/\t/'
 }
 
-exec {OUT}>&1
-upload_manifest(){
-  exec 1>&$OUT
-  local BASE="$1"
-  local PREFIX="$2"
-  
-  #echo upload manifest for $*  
-  SEGMENT=$RUNDIR/manifest-segment.$$
-  SEGFILES=$RUNDIR/segment-files.$$
-  :> "$SEGMENT"
-  :> "$SEGFILES"
-  send_segment(){
-      update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@manifest/$PREFIX/manifest.lst"
-      update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-manifest/$PREFIX/manifest.lst"
-      cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
-      update_files "$SEGFILES" "$BASE" "$BACKUPURL/$BKIT_RVID/@seed/$PREFIX"
-      update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-seed/$PREFIX/manifest.lst"
-      :> "$SEGMENT"    
-  }
-  declare -i cnt=0
-  
-  while read -r line
-  do
-    echo $line >> "$SEGMENT"
-    (( ++cnt > 50 )) && {
-      send_segment
-      (( cnt = 0 ))
-    }
-  done
-  [[ -s $SEGMENT ]] && send_segment
-}
 
 backup(){
   local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
@@ -442,10 +402,10 @@ backup(){
       echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}"
     ) && continue
 
-    #if a hard link (to file or to symlink)
-    [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
+    #if it is a hard link (to file or to symlink)
+    [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
 
-    #there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
+    #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
     [[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
     [[ $I =~ ^\*deleting ]] && continue
@@ -461,6 +421,13 @@ backup(){
   update_hardlinks "$BASE" "$DST"
   remove_postpone_files
 }
+
+manifest(){
+  coproc upload_manifest "$MAPDRIVE" 'data'
+  bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
+  exec {COPROC[1]}>&-
+  wait $COPROC_PID
+} 
 ######################### Start Backup Algorithm #########################
 
 declare -i cnt=0
@@ -470,25 +437,17 @@ ITIME=$(date -R)
   echo "Backup to $BACKUPURL"
   prepare
 
-  coproc upload_manifest "$MAPDRIVE" 'data'
   echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
   echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
 
-  #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-  #bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" > {"$MANIFEST"
-  bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
-  exec {COPROC[1]}>&-
+  manifest
   
-  wait $COPROC_PID
-  #touch "$ENDFLAG"
-  #wait4jobs
-  rm -f "$MANIFEST" "$ENDFLAG"
   echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
 
   backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
   [[ ${hlinks+isset} == isset ]] && {
-    echo -e "\n\tPhase $cnt.1 update delayed hardlinks"
+    echo -e "\n\tPhase ${cnt}.1 update delayed hardlinks"
     backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
   }
 

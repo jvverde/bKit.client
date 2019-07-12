@@ -358,7 +358,7 @@ backupACLS(){
 
   echo "d) Update metafiles attributes"
   {
-    backup "$METADATADIR" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
+    update "$METADATADIR" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
   } | sed -e 's/^/\t/'
 
   echo "e) Clean metafiles on server"
@@ -368,7 +368,7 @@ backupACLS(){
 }
 
 
-backup(){
+update(){
   local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
   local BASE=$(readlink -e "$1") && shift
   #local SRC="$1/./$2"
@@ -422,7 +422,7 @@ backup(){
   remove_postpone_files
 }
 
-manifest(){
+backup(){
   coproc upload_manifest "$MAPDRIVE" 'data'
   bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
   exec {COPROC[1]}>&-
@@ -440,15 +440,15 @@ ITIME=$(date -R)
   echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
   echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
 
-  manifest
+  backup
   
   echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
 
-  backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+  update "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
   [[ ${hlinks+isset} == isset ]] && {
     echo -e "\n\tPhase ${cnt}.1 update delayed hardlinks"
-    backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+    update "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
   }
 
   echo -e "\nPhase $((++cnt)) - Clean deleted files from backup\n"

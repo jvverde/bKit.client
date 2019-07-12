@@ -67,6 +67,10 @@ do
 			NOTIFY=1
 			stats=1
 		;;
+    --no-ssh)
+      unset RSYNC_CONNECT_PROG
+      BACKUPURL="$RSYNCURL"
+    ;;
 		--notify)
 			NOTIFY=1
 			stats=1
@@ -91,11 +95,8 @@ done
 
 BASEDIR=("$@")
 
-ORIGINALDIR=( "${BASEDIR[@]}" )
+ORIGINALDIR=( "${BASEDIR[@]}" ) #dir names as seen by the user (linux vs windows path)
 
-OLDIFS=$IFS
-IFS="
-"
 exists cygpath && BASEDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${BASEDIR[@]}") )
 
 BASEDIR=( $(readlink -e "${BASEDIR[@]}") ) || die "Error:  readlink -e '${BASEDIR[@]}'"
@@ -122,20 +123,9 @@ do
 done
 
 #We need ROOT, BACKUPDIR and STARTDIR
-[[ ${BKIT_RVID:-} =~ .+\..+\..+\..+\..+ ]] || source "$SDIR/lib/rvid.sh" || die "Can't source rvid"
-#[[ $BKIT_RVID =~ .+\..+\..+\..+\..+ ]] || {
-#  IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$ROOT")
-#
-#  IFS=$OLDIFS
-#
-#  [[ $DRIVETYPE =~ Ram.Disk ]] && die "These directories/files ${BACKUPDIR[@]} are in a RAM Disk"
-#
-#  exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-#  DRIVE=${DRIVE%%:*}
-#
-#  #compute Remote Volume ID
-#  export BKIT_RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-#}
+#[[ ${BKIT_RVID:-} =~ .+\..+\..+\..+\..+ ]] || source "$SDIR/lib/rvid.sh" || die "Can't source rvid"
+[[ ${BKIT_RVID+isset} == isset ]] || source "$SDIR/lib/rvid.sh" || die "Can't source rvid"
+
 
 exists rsync || die Cannot find rsync
 
@@ -145,8 +135,8 @@ dorsync2(){
 	local RETRIES=300
 	while true
 	do
-    		#echo rsync "${RSYNCoptions[@]}" --one-file-system --compress "$@"
-    		rsync ${RSYNCoptions+"${RSYNCoptions[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
+    		#echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
+    		rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -178,15 +168,15 @@ MANIFEST="$RUNDIR/manifest"
 ENDFLAG="$RUNDIR/endflag"
 LOCK="$RUNDIR/${VOLUMESERIALNUMBER:-_}"
 NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
-LOGFILE="$VARDIR/backup-logs-$NOW"
-ERRFILE="$VARDIR/backup-errors-$NOW"
+logfile="$VARDIR/backup-logs-$NOW"
+errfile="$VARDIR/backup-errors-$NOW"
 statsfile="$VARDIR/backup-stats-NOW"
 
 exec 3>&2
-exec 2> >(tee "$ERRFILE" >&3)
+exec 2> >(tee "$errfile" >&3)
 
 #finish() {
-#  cat "$ERRFILE" >&3
+#  cat "$errfile" >&3
 #}
 #
 #atexit finish
@@ -237,54 +227,6 @@ update_files(){
 	rm -f "$FILE"
 }
 
-backup(){
-	local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
-	local BASE=$(readlink -e "$1") && shift
-	#local SRC="$1/./$2"
-	local SRCS=()
-	for DIR in "${@:1:$#-1}"
-	do
-		DIR=${DIR#/}    #remove any leading slash if any}
-		SRCS+=( "$BASE/./$DIR" )
-	done
-	local DST="${@: -1}" #last argument
-	unset hlinks
-	set_postpone_files
-
-	while IFS='|' read -r I FILE LINK FULLPATH LEN
-	do
-		echo miss "$I|$FILE|$LINK|$LEN"
-
-		FILE=${FILE%/}	#remove trailing backslash in order to avoid sync files in a directory directly
-
-		#if it is a directory, symlink, device or special
-		#[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
-		[[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
-
-		#this is the main (and most costly) case. A file, or part of it, need to be transfer
-		[[ $I =~ ^[.\<]f ]] && (
-			HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
-			PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
-			[[ $PREFIX =~ ././././././ ]] || { echo "Prefix '$PREFIX' !~ ././././././" && exit 0;}
-			echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >> "$MANIFEST"
-		) && continue
-
-		#if a hard link (to file or to symlink)
-		[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
-
-		#there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
-		[[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
-
-		[[ $I =~ ^\*deleting ]] && continue
-
-		echo "Is something else:$I|$FILE|$LINK|$LEN"
-
-	done < <(dorsync --dry-run --delete --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
-	update_dirs	"$BASE" "$DST"
-	update_hardlinks "$BASE" "$DST"
-	remove_postpone_files
-}
-
 clean(){
 	local BASE=$1 && shift
 	#local SRC="$1/./$2"
@@ -330,7 +272,7 @@ bg_upload_manifest(){
 			let CNT=$(sed -n "${START},${END}p;${END}q" "$MANIFEST"|tee "$SEGMENT" |wc -l)
 			(( CNT == 0 )) && [[ -e $ENDFLAG ]] && break
 			(( CNT == 0 )) && sleep 1 && continue
-			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#avoid send incomplete lines
+			(( CNT < LEN )) && sed -ni "1,${CNT}p" "$SEGMENT" 								#Avoid send incomplete lines
 			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@manifest/$PREFIX/manifest.lst"
 			update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-manifest/$PREFIX/manifest.lst"
 			cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
@@ -342,6 +284,7 @@ bg_upload_manifest(){
 		rm -f "$SEGMENT" "$SEGFILES"
 	)&
 }
+
 
 backupACLS(){
   local FMT='--out-format=ACL:"%o|%i|%f|%c|%b|%l|%t"'
@@ -406,9 +349,9 @@ backupACLS(){
   {
     bg_upload_manifest "$METADATADIR" 'metadata'
     {
-	#bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCoptions[@]}" "${MDIRS[@]}"
-	export CMPTARGET='metadata'
-	bash "$SDIR/hashit.sh"  "${options[@]}" "${MDIRS[@]}"
+      #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
+      export CMPTARGET='metadata'
+      bash "$SDIR/hashit.sh"  "${options[@]}" "${MDIRS[@]}"
     } > "$MANIFEST"
 
     touch "$ENDFLAG"
@@ -433,112 +376,189 @@ backupACLS(){
   } | sed -e 's/^/\t/'
 }
 
+exec {OUT}>&1
+upload_manifest(){
+  exec 1>&$OUT
+  local BASE="$1"
+  local PREFIX="$2"
+  
+  #echo upload manifest for $*  
+  SEGMENT=$RUNDIR/manifest-segment.$$
+  SEGFILES=$RUNDIR/segment-files.$$
+  :> "$SEGMENT"
+  :> "$SEGFILES"
+  send_segment(){
+      update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@manifest/$PREFIX/manifest.lst"
+      update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-manifest/$PREFIX/manifest.lst"
+      cut -d'|' -f4- "$SEGMENT" > "$SEGFILES"
+      update_files "$SEGFILES" "$BASE" "$BACKUPURL/$BKIT_RVID/@seed/$PREFIX"
+      update_file "$SEGMENT" "$BACKUPURL/$BKIT_RVID/@apply-seed/$PREFIX/manifest.lst"
+      :> "$SEGMENT"    
+  }
+  declare -i cnt=0
+  
+  while read -r line
+  do
+    echo $line >> "$SEGMENT"
+    (( ++cnt > 50 )) && {
+      send_segment
+      (( cnt = 0 ))
+    }
+  done
+  [[ -s $SEGMENT ]] && send_segment
+}
 
-#(
-#  flock -w $((3600*24)) 9 || {
-#    rm -fv "$LOCK"
-#    die Volume $VOLUMESERIALNUMBER was locked for 1 day
-#  }
+backup(){
+  local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
+  local BASE=$(readlink -e "$1") && shift
+  #local SRC="$1/./$2"
+  local SRCS=()
+  for DIR in "${@:1:$#-1}"
+  do
+    DIR=${DIR#/}    #remove any leading slash if any}
+    SRCS+=( "$BASE/./$DIR" )
+  done
+  local DST="${@: -1}" #last argument
+  unset hlinks
+  set_postpone_files
 
-	declare -i cnt=0
-  ITIME=$(date -R)
+  coproc upload_manifest "$BASE" 'data'
 
-  {
-	echo Backup to $BACKUPURL
-    prepare
+  while IFS='|' read -r I FILE LINK FULLPATH LEN
+  do
+    echo miss "$I|$FILE|$LINK|$LEN"
 
-    bg_upload_manifest "$MAPDRIVE" 'data'
-    echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
-    echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
+    FILE=${FILE%/}  #remove trailing backslash in order to avoid sync files in a directory directly
 
-    #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCoptions[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
-    bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" > "$MANIFEST"
+    #if it is a directory, symlink, device or special
+    #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
+    [[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
 
-    touch "$ENDFLAG"
-    wait4jobs
-    rm -f "$MANIFEST" "$ENDFLAG"
-    echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
+    #this is the main (and most costly) case. A file, or part of it, need to be transfer
+    [[ $I =~ ^[.\<]f ]] && (
+      HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
+      PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
+      [[ $PREFIX =~ ././././././ ]] || { echo "Prefix '$PREFIX' !~ ././././././" && exit 0;}
+      echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}"
+    ) && continue
 
-    bg_upload_manifest "$MAPDRIVE" 'data'
+    #if a hard link (to file or to symlink)
+    [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK=$(echo $LINK|sed -E 's/\s*=>\s*//') &&  postpone_hl "$LINK" "$FILE" && continue
 
+    #there are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
+    [[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
+
+    [[ $I =~ ^\*deleting ]] && continue
+
+    echo "Hum.. Is something else:$I|$FILE|$LINK|$LEN"
+
+  done < <(dorsync --dry-run --delete --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
+
+  exec {COPROC[1]}>&-
+  wait $COPROC_PID
+
+  update_dirs "$BASE" "$DST"
+  update_hardlinks "$BASE" "$DST"
+  remove_postpone_files
+}
+######################### Start Backup Algorithm #########################
+
+declare -i cnt=0
+ITIME=$(date -R)
+
+{
+  echo "Backup to $BACKUPURL"
+  prepare
+
+  coproc upload_manifest "$MAPDRIVE" 'data'
+  echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
+  echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
+
+  #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/data" -- "${RSYNCOPTIONS[@]}" "${BACKUPDIR[@]}" | sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#' > "$MANIFEST"
+  #bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" > {"$MANIFEST"
+  bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
+  exec {COPROC[1]}>&-
+  
+  wait $COPROC_PID
+  #touch "$ENDFLAG"
+  #wait4jobs
+  rm -f "$MANIFEST" "$ENDFLAG"
+  echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
+
+  backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+
+  [[ ${hlinks+isset} == isset ]] && {
+    echo -e "\n\tPhase $cnt.1 update delayed hardlinks"
     backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+  }
 
-    touch "$ENDFLAG"
-    wait4jobs
-    rm -f "$MANIFEST" "$ENDFLAG"
+  echo -e "\nPhase $((++cnt)) - Clean deleted files from backup\n"
 
-    [[ ${hlinks+isset} == isset ]] && {
-      echo -e "\n\tPhase $cnt.1 update delayed hardlinks"
-      backup "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+  clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+
+  [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+    echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
+    backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
+  )
+
+  echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"
+
+  snapshot
+
+  echo "Backup done on $(date -R) for:"
+  for I in ${!ORIGINALDIR[@]}
+  do
+    echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
+    echo -e "\t$BACKUPURL/$BKIT_RVID/@current/data/${STARTDIR[$I]}"
+  done
+} | tee "$logfile"
+
+
+######################### Now some stats if requested #########################
+
+[[ ${stats+isset} == isset && -e $logfile && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
+  echo "------------Stats------------"
+  deltatime "$(date -R)" "$ITIME"
+  echo "Total time spent: $DELTATIME"
+  exists cygpath && ROOT=$(cygpath -w "$ROOT")
+  cat -v "$logfile" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/send-stats.pl"
+  echo "------------End of Stats------------"
+} | tee "$statsfile"
+
+######################### Sent email if required #########################
+[[ ${NOTIFY+isset} == isset  && -s $statsfile ]] && (
+  ME=$(uname -n)
+  FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
+  exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
+  printf -v DIRS "%s, " "${FULLDIRS[@]}"
+  DIRS=${DIRS%, }
+  WHAT=$DIRS
+  let NUMBEROFDIRS=${#FULLDIRS[@]}
+  let LIMIT=3
+  let EXTRADIRS=NUMBEROFDIRS-LIMIT
+  ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
+  [[ -s $errfile ]] && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" ||
+  SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
+  {
+    echo "Backup of $DIRS"
+    cat "$statsfile"
+
+    [[ -s $errfile ]] && {
+      echo -e "\n------------Errors found------------"
+      cat "$errfile"
+      echo "------------End of Errors------------"
     }
 
-    echo -e "\nPhase $((++cnt)) - Clean deleted files from backup\n"
+    [[ -n $FULLREPORT ]] && {
+      echo -e "\n------------Full Logs------------"
+      cat "$logfile"
+      echo "------------End of Logs------------"
+    }
+  } | sendnotify "$SUBJECT" "$DEST" "$ME"
+)
+[[ -s $errfile ]] && die "Backup done with some errors. Check $errfile"
 
-    clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
-
-    [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-      echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
-      backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
-    )
-
-    echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"
-
-    snapshot
-
-    echo "Backup done on $(date -R) for:"
-    for I in ${!ORIGINALDIR[@]}
-    do
-      echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
-      echo -e "\t$BACKUPURL/$BKIT_RVID/@current/data/${STARTDIR[$I]}"
-    done
-  } | tee "$LOGFILE"
-
-  #Now some stats
-
-  [[ ${stats+isset} == isset && -e $LOGFILE && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
-    echo "------------Stats------------"
-    deltatime "$(date -R)" "$ITIME"
-    echo "Total time spent: $DELTATIME"
-    exists cygpath && ROOT=$(cygpath -w "$ROOT")
-    cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/send-stats.pl"
-    echo "------------End of Stats------------"
-  } | tee "$statsfile"
-
-  #Sent email if required
-  [[ ${NOTIFY+isset} == isset  && -s $statsfile ]] && (
-    ME=$(uname -n)
-    FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
-    exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
-    printf -v DIRS "%s, " "${FULLDIRS[@]}"
-    DIRS=${DIRS%, }
-    WHAT=$DIRS
-    let NUMBEROFDIRS=${#FULLDIRS[@]}
-    let LIMIT=3
-    let EXTRADIRS=NUMBEROFDIRS-LIMIT
-    ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
-    [[ -s $ERRFILE ]] && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" ||
-    SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
-    {
-      echo "Backup of $DIRS"
-      cat "$statsfile"
-
-      [[ -s $ERRFILE ]] && {
-        echo -e "\n------------Errors found------------"
-        cat "$ERRFILE"
-        echo "------------End of Errors------------"
-      }
-
-      [[ -n $FULLREPORT ]] && {
-        echo -e "\n------------Full Logs------------"
-        cat "$LOGFILE"
-        echo "------------End of Logs------------"
-      }
-    } | sendnotify "$SUBJECT" "$DEST" "$ME"
-  )
-  [[ -s $ERRFILE ]] && die "Backup done with some errors. Check $ERRFILE"
-
-  deltatime "$(date -R)" "$ITIME"
-  echo "Backup done in $DELTATIME"
-  exit 0
-#) 9>"$LOCK"
+deltatime "$(date -R)" "$ITIME"
+echo "Backup done in $DELTATIME"
+exit 0
 

@@ -1,1 +1,1 @@
-./needUpdate.sh
+./check.sh

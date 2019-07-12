@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
-source "$SDIR/lib/functions/all.sh"
+sdir="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
+source "$sdir/lib/functions/all.sh"
 
 usage(){
 	[[ $OS == cygwin ]] && {
@@ -138,13 +138,13 @@ done
 IFS=$OLDIFS
 
 CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
-FILTERDIR="$SDIR/filters"
+FILTERDIR="$sdir/filters"
 [[ -d $FILTERDIR ]] || mkdir -pv "$FILTERDIR"
 
 TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
 
-TASKDIR="$SDIR/cronjobs"
-[[ $OS == cygwin ]] && TASKDIR="$SDIR/schtasks"
+TASKDIR="$sdir/cronjobs"
+[[ $OS == cygwin ]] && TASKDIR="$sdir/schtasks"
 
 [[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
 JOBFILE="${TASKDIR}/${TASKNAME}.sh"
@@ -153,11 +153,11 @@ JOBFILE="${TASKDIR}/${TASKNAME}.sh"
 [[ -e $JOBFILE && -z $FORCE ]] && die "'$JOBFILE' already exists"
 :> "$JOBFILE"
 
-#RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
-RDIR="$SDIR"
+#RDIR=$(realpath -m --relative-to="$TASKDIR" "$sdir")
+RDIR="$sdir"
 
 [[ $OS == cygwin ]] && {
-	RDIR=$(realpath -m --relative-to="$TASKDIR" "$SDIR")
+	RDIR=$(realpath -m --relative-to="$TASKDIR" "$sdir")
 	WBASH=$(cygpath -w "$BASH")
 	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
 	DOSBASH=${DOSBASH%.exe} #just in case
@@ -212,7 +212,7 @@ do
   done
 	#echo "${ROOTFILTERS[@]}"
 
-	UUID=$(bash "$SDIR/getUUID.sh" "$ROOT")
+	UUID=$(bash "$sdir/getUUID.sh" "$ROOT")
 	[[ $UUID == _ ]] && continue
 
 	DRIVE=${ROOT//\//.}
@@ -254,7 +254,7 @@ do
 			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"
 			echo "#Logs on folder $LOGDIR"
 			echo 'pushd "$(dirname "$(readlink -f "$0")")"'
-			echo "/bin/bash \"$SDIR/skit.sh\"" "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]:-/}"
+			echo "/bin/bash \"$sdir/skit.sh\"" "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]:-/}"
 			echo 'popd'
 		fi
 	} >> "$JOBFILE"

@@ -13,8 +13,13 @@ usage() {
 
 [[ $# -eq 0 ]] && usage
 
+declare -a filters=( --filter=": .rsync-filter" )
+
+exclist=$sdir/cache/$USER/excludes/exclude.lst
+[[ -e $exclist ]] && filters+=( --filter=". $exclist" )
+
 while IFS='|' read i datetime size file
 do
 	exists cygpath && file=$(cygpath -w "$file")
 	echo "$i|$datetime|$size|$file"
-done < <(bash "$sdir/check.sh" --snap="@last" --out-format="%i|%M|%l|/%f"  --filter=": .rsync-filter" "$@")
+done < <(bash "$sdir/check.sh" --snap="@last" --out-format="%i|%M|%l|/%f"  "${filters[@]}" "$@")

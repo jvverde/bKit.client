@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
-SDIR=$(dirname -- "$(readlink -ne -- "$0")")	#Full SDIR
-source "$SDIR/lib/functions/all.sh"
+#Get or set (permanently or not) the server
+#And also export BKIT_CONFIG when sourced
+
+issourced(){
+  [[ "${BASH_SOURCE[0]}" != "${0}" ]]
+}
+sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
+
+source "$sdir/lib/functions/all.sh"
 
 usage() {
     name=$(basename -s .sh "$0")
@@ -10,22 +17,26 @@ usage() {
 }
 
 [[ $1 =~ ^--?h ]] && usage
+[[ $1 =~ ^-s ]] && shift && save=1 #we wnat to save it permanently
 
-if [[ -z $1 ]] 
-then
-	basename -- "$(readlink -e -- "$ETCDIR/default")"
-else
-	server="$1"
+default="$ETCDIR/default"
+current="$default"
+config="$current/conf.init"
+
+[[ ${1+isset} == isset || ! -d $current || ! -e $config ]] && { 
+	server="${1:-localhost}"
 	port="${2:-8760}"
 
-	exists nc && { nc -z $server $port 2>&1 || die server $server not found;}
+	exists nc && { nc -z $server $port 2>&1 || die Bkit server not found at $server:$port;}
 
-	confdir="$ETCDIR/$server"
+	current="$ETCDIR/$server"
+  config="$current/conf.init"
 
-	[[ -e $confdir/conf.init ]] || bash "$SDIR/init.sh" "$server" || die "Can't set conf.init to server $server"
+	[[ -e $config ]] || bash "$sdir/init.sh" "$server" || die "Can't set conf.init to server $server"
 
-	default="$(dirname -- "$confdir")/default"
+  #if permanently set de default
+  [[ ${save+isset} == isset ]] && ln -srfT "$current" "$default"
+}
+export BKIT_CONFIG="$config"
 
-	ln -svrfT "$confdir" "$default"
-fi
-
+issourced || basename -- "$(readlink -e -- "$current")"

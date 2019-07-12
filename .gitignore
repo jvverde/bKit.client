@@ -20,3 +20,5 @@ lixo.txt
 *.log
 *.TMP
 node_modules/*
+webapp/
+web2/

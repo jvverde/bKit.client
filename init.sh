@@ -29,6 +29,7 @@ bash "$SDIR"/keygen.sh -n "$SERVER" "$CONFDIR"		|| die "Can't generate a key"
 INITFILE="$CONFDIR/conf.init"
 
 export RSYNC_PASSWORD="4dm1n"
+
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
@@ -40,6 +41,7 @@ CHALLENGE="$(head -c 1000 </dev/urandom | tr -cd "[:alnum:]" | head -c 32)"
 echo -n $CHALLENGE > "$SYNCD/challenge"
 
 #Send public keys and challenge to the server
+echo RSYNC_PASSWORD=$RSYNC_PASSWORD
 rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/" || die "Exit value of rsync is non null: $?"
 
 #Read (back) public keys from server including meanwhile generated server public keys as well the encripted challenge
@@ -63,7 +65,9 @@ echo Writing configuration to $INITFILE
 	read COMMAND <"$CONFDIR/pub/command"
 	#echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
 	echo "SSH='ssh -i \"$CONFDIR/.priv/ssh.key\" -o UserKnownHostsFile=\"$KH\" rsyncd@$SERVER $COMMAND'"
-	echo "BACKUPURL='user@$SERVER::$SECTION'"
+  echo "RSYNCURL='rsync://user@$SERVER:$BPORT/$SECTION'"
+  echo "SSHURL='user@$SERVER::$SECTION'"
+  echo "BACKUPURL='user@$SERVER::$SECTION'"
 	echo "PASSFILE='$CONFDIR/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')

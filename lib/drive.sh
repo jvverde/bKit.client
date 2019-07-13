@@ -54,14 +54,16 @@ MOUNT="$(echo "$MOUNT" |fgrep -of <(df --sync --output=target |tail -n +2|sort -
 } 2>/dev/null
 
 readNameBy() {
-		RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
+		local device="$(readlink -ne -- "$DEV")"
+		RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
 		RESULT=${RESULT##*/}
 		RESULT=${RESULT%-*}
 		VOLUMENAME=${RESULT#*-}
 }
 
 readTypeBy() {
-		RESULT=$(find /dev/disk/by-id -lname "*/${DEV##*/}" -print|sort|head -n1 )
+		local device="$(readlink -ne -- "$DEV")"
+		RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
 		RESULT=${RESULT##*/}
 		DRIVETYPE=${RESULT%%-*}
 }
@@ -69,14 +71,14 @@ readTypeBy() {
 readUUIDby() {
 	for U in $(ls /dev/disk/by-uuid)
 	do
-		[[ "$DEV" == "$(readlink -ne "/dev/disk/by-uuid/$U")" ]] && VOLUMESERIALNUMBER="$U" && return 
+		[[ "$(readlink -ne -- "$DEV")" == "$(readlink -ne -- "/dev/disk/by-uuid/$U")" ]] && VOLUMESERIALNUMBER="$U" && return 
 	done
 }
 
 readIDby() {
 	for U in $(ls /dev/disk/by-id)
 	do
-		[[ "$DEV" == "$(readlink -ne "/dev/disk/by-id/$U")" ]] && VOLUMESERIALNUMBER="${U//[^0-9A-Za-z_-]/_}" && return 
+		[[ "$(readlink -ne -- "$DEV")" == "$(readlink -ne "/dev/disk/by-id/$U")" ]] && VOLUMESERIALNUMBER="${U//[^0-9A-Za-z_-]/_}" && return 
 	done
 }
 

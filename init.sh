@@ -24,7 +24,7 @@ exists nc && { nc -z $SERVER $PORT 2>&1 		|| die Server $SERVER not found;}
 
 CONFDIR="$ETCDIR/$SERVER"
 
-bash "$SDIR"/keygen.sh -n "$SERVER" "$CONFDIR"		|| die "Can't generate a key"
+bash "$SDIR"/lib/keygen.sh -n "$SERVER" "$CONFDIR"		|| die "Can't generate a key"
 
 INITFILE="$CONFDIR/conf.init"
 
@@ -32,7 +32,7 @@ export RSYNC_PASSWORD="4dm1n"
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
-IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/computer.sh")
+IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/lib/computer.sh")
 
 SYNCD="$CONFDIR/pub"					#public keys location
 exists cygpath && SYNCD="$(cygpath -u "$SYNCD")"

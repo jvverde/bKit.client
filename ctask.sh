@@ -212,7 +212,7 @@ do
   done
 	#echo "${ROOTFILTERS[@]}"
 
-	UUID=$(bash "$sdir/getUUID.sh" "$ROOT")
+	UUID=$(bash "$sdir/lib/getUUID.sh" "$ROOT")
 	[[ $UUID == _ ]] && continue
 
 	DRIVE=${ROOT//\//.}

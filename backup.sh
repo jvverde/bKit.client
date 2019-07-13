@@ -395,12 +395,11 @@ update(){
     [[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
 
     #this is the main (and most costly) case. A file, or part of it, need to be transfer
-    [[ $I =~ ^[.\<]f ]] && (
+    [[ $I =~ ^[.\<]f ]] && {
       HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
       PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
-      [[ $PREFIX =~ ././././././ ]] || { echo "Prefix '$PREFIX' !~ ././././././" && exit 0;}
-      echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}"
-    ) && continue
+      [[ $PREFIX =~ ././././././ ]] && echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}" || echo "Prefix '$PREFIX' !~ ././././././"
+    } && continue
 
     #if it is a hard link (to file or to symlink)
     [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue

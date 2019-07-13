@@ -2,7 +2,7 @@
 #Generate password using Diffie-Helman algorithm
 set -u
 sdir=$(dirname -- "$(readlink -fn -- "$0")")	#Full sdir
-source "$sdir/lib/functions/all.sh"
+source "$sdir/functions/all.sh"
 
 usage() {
         echo -e "$@"

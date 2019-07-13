@@ -9,7 +9,7 @@ source "$SDIR/lib/functions/all.sh"
 
 MOUNTED=()
 getdev(){
-    DEV=$("$SDIR/getdev.sh" "$1") || die "Device $1 not found"
+    DEV=$("$SDIR/lib/getdev.sh" "$1") || die "Device $1 not found"
     DEV=$(readlink -e "$DEV") || die "Device '$DEV' doesn't exists"
     MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')
     [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not

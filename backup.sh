@@ -92,16 +92,28 @@ done
 
 source "$SDIR/ccrsync.sh"
 
-BASEDIR=("$@")
+ARGS=("$@")
+declare -a BASEDIR=()
 
-ORIGINALDIR=( "${BASEDIR[@]}" ) #dir names as seen by the user (linux vs windows path)
+ORIGINALDIR=( "${ARGS[@]}" ) #dir names as seen by the user (linux vs windows path)
 
-exists cygpath && BASEDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${BASEDIR[@]}") )
+exists cygpath && ARGS=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${ARGS[@]}") )
 
-BASEDIR=( $(readlink -e "${BASEDIR[@]}") ) || die "Error:  readlink -e '${BASEDIR[@]}'"
+#BASEDIR=( "$(readlink -e "${BASEDIR[@]}")" ) || die "Error:  readlink -e '${BASEDIR[@]}'"
+while read file
+do
+  BASEDIR+=(  "$file" )
+done < <(readlink -e "${ARGS[@]}")
+
 
 ROOTS=( $(stat -c%m "${BASEDIR[@]}") ) || die "Error: stat -c%m '${BASEDIR[@]}'"
 ROOT=${ROOTS[0]}
+
+# for i in ${!ROOTS[@]}
+# do
+#   echo i=$i, basedir=${ROOTS[$i]}
+# done
+# exit
 
 [[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
 
@@ -242,14 +254,6 @@ snapshot(){
 prepare(){
 	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$BKIT_RVID/@current/data"
 }
-wait4jobs(){
-	while list=($(jobs -rp)) && ((${#list[*]} > 0))
-	do
-		#10.11.echo Wait for ${#list[*]} job to finish
-		#wait -n
-		wait
-	done
-}
 
 exec {OUT}>&1
 upload_manifest(){
@@ -273,9 +277,9 @@ upload_manifest(){
 
   declare -i cnt=0
   
-  while read -r line
+  while IFS= read -r line
   do
-    echo $line >> "$manifest"
+    echo "$line" >> "$manifest"
     (( ++cnt > 50 )) && {
       send_manifest
       (( cnt = 0 ))

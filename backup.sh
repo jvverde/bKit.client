@@ -349,7 +349,7 @@ backupACLS(){
     {
       #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$METADATADIR" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
       export BKIT_TARGET='metadata'
-      bash "$SDIR/hashit.sh"  "${options[@]}" "${MDIRS[@]}"
+      bash "$SDIR/hashit.sh"  ${options+"${options[@]}"} "${MDIRS[@]}"
     } >&"${COPROC[1]}"
     exec {COPROC[1]}>&-
     wait $COPROC_PID

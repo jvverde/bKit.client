@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p plkavshdghdghnajhstweoqhw >/dev/null 2>&1 && echo module utils apparentely already sourced && return
-declare -r plkavshdghdghnajhstweoqhw=1
+declare -p _eb9c465c37f32608ea3f9186c7a74b90 >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+declare -r _eb9c465c37f32608ea3f9186c7a74b90=1
 
 sendnotify(){
 	local SUBJECT=$1

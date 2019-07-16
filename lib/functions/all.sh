@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-declare -p DKGFJHFKYDGFNHGH > /dev/null 2>&1 && echo modules already inserted >&2 && return
-DKGFJHFKYDGFNHGH="$(readlink -ne -- "${BASH_SOURCE[0]}")"
-dir="$(dirname -- "$DKGFJHFKYDGFNHGH")"
+declare -p _4414d6399d04b360b28fcbc253b4c87d > /dev/null 2>&1 && return
+declare -r _4414d6399d04b360b28fcbc253b4c87d=1
 
-source <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$DKGFJHFKYDGFNHGH" -exec cat "{}" ';')
+declare -r mydir="$(readlink -ne -- "${BASH_SOURCE[0]}")"
+
+dir="$(dirname -- "$mydir")"
+
+source <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$mydir" -exec cat "{}" ';')

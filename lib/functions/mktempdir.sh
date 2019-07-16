@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
-declare -p FRGUFRYFAGFADFWYLFGQYFRQVRFQWRF >/dev/null 2>&1 && echo module mktempdir already inserted && return
+declare -p _f7665047f18a8d740ce732d4ce578608 >/dev/null 2>&1 && echo module mktempdir already inserted && return
+declare -a _f7665047f18a8d740ce732d4ce578608=()
 
-declare -a FRGUFRYFAGFADFWYLFGQYFRQVRFQWRF=()
 mktempdir() {
-	local EPIUWETGPQWEGRFQFLAFHKASVLFGQLGFLQ="$1"
-        local TMP="$(mktemp -d --suffix=".bkit.$(basename --suffix=.sh -- "$0")")"
-        FRGUFRYFAGFADFWYLFGQYFRQVRFQWRF+=( "$TMP" )
-	eval $EPIUWETGPQWEGRFQFLAFHKASVLFGQLGFLQ="'$TMP'" 
-	(( ${#FRGUFRYFAGFADFWYLFGQYFRQVRFQWRF[@]} == 1 )) && atexit rmtempdir
+	local tmpdir="$1"
+  local tmpname="$(mktemp -d --suffix=".bkit.$(basename --suffix=.sh -- "$0")")"
+  
+  _f7665047f18a8d740ce732d4ce578608+=( "$tmpname" )
+	
+  eval $tmpdir="'$tmpname'" 
+	
+  (( ${#_f7665047f18a8d740ce732d4ce578608[@]} == 1 )) && atexit rmtempdir
 	return 0
 }
 
 rmtempdir(){
-        rm -rf "${FRGUFRYFAGFADFWYLFGQYFRQVRFQWRF[@]}"
+        rm -rf "${_f7665047f18a8d740ce732d4ce578608[@]}"
 }
 

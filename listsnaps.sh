@@ -5,7 +5,7 @@ sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full dir
 source "$sdir/ccrsync.sh"
 
 declare -a options=()
-while [[ $1 =~ ^- ]]
+while [[ ${1:-} =~ ^- ]]
 do
         key="$1" && shift
         options+=("$key")

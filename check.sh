@@ -8,7 +8,7 @@ source "$sdir/ccrsync.sh"
 declare -a options=()
 declare snap='@current'
 
-declare fmt='--out-format=%i|%n|/%f|%l'
+declare fmt="--out-format=%i|%n|/%f|%l"
 
 true ${1:? "Usage: $0 [options] src"}
 

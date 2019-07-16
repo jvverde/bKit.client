@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #Checks who needs to be backup
-set -uE
+set -u
 sdir="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
 source "$sdir/ccrsync.sh"
@@ -10,7 +10,9 @@ declare snap='@current'
 
 declare fmt='--out-format=%i|%n|/%f|%l'
 
-while [[ $1 =~ ^- ]]
+true ${1:? "Usage: $0 [options] src"}
+
+while [[ ${1:? "Usage: $0 [options] src"} =~ ^- ]]
 do
 	key="$1" && shift
 	case "$key" in
@@ -49,8 +51,9 @@ mnt=${mnt%/} 				#remove trailing slash if any
 remotedir="$BKIT_RVID/$snap/$BKIT_TARGET"
 
 src="$mnt/./$startdir"
+
 dorsync "${RSYNCOPTIONS[@]}" \
-	"${options+"${options[@]}"}" \
+	${options+"${options[@]}"} \
 	--dry-run \
 	--recursive \
 	--links \

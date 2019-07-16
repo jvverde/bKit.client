@@ -9,9 +9,16 @@ declare -a RSYNCOPTIONS=()
 	BKIT_CONFIG="$ETCDIR/default/conf.init"
 }
 
-[[ -e $BKIT_CONFIG ]] || die "Can't source file $BKIT_CONFIG"
+[[ -e $BKIT_CONFIG ]] || die "Can't source file '$BKIT_CONFIG'"
 
 source "$BKIT_CONFIG"
 
 [[ -e $PASSFILE ]] && export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location '$PASSFILE'"
-[[ -n $SSH ]] && export RSYNC_CONNECT_PROG="$SSH"
+
+[[ ${NOSSH+isset} == isset ]] && {
+                        unset RSYNC_CONNECT_PROG
+                        BACKUPURL="$RSYNCURL"
+} || {
+	export RSYNC_CONNECT_PROG="$SSH"
+        BACKUPURL="$SSHURL"
+}

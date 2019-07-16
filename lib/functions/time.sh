@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p iafsdfhcpjwhajsdhdlfahf >/dev/null 2>&1 && echo module utils apparentely already sourced && return
-declare -r iafsdfhcpjwhajsdhdlfahf=1
+declare -p _4db3375cc8965ee1abde6335c1effd93 >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+declare -r _4db3375cc8965ee1abde6335c1effd93=1
 
 declare DELTATIME=''
 deltatime(){

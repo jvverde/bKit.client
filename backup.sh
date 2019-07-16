@@ -3,8 +3,6 @@ SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
 set -uE
 
-source "$SDIR/ccrsync.sh"
-
 SNAP='@snap'
 
 declare -a options=()
@@ -67,10 +65,9 @@ do
 			NOTIFY=1
 			stats=1
 		;;
-    --no-ssh)
-      unset RSYNC_CONNECT_PROG
-      BACKUPURL="$RSYNCURL"
-    ;;
+		--no-ssh)
+			export NOSSH=1
+		;;
 		--notify)
 			NOTIFY=1
 			stats=1
@@ -92,6 +89,8 @@ do
 		;;
 	esac
 done
+
+source "$SDIR/ccrsync.sh"
 
 BASEDIR=("$@")
 

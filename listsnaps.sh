@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -u
 sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full dir
 
 source "$sdir/ccrsync.sh"
@@ -10,12 +11,6 @@ do
         options+=("$key")
 done
 
-[[ ${BKIT_RVID+isset} == isset ]] || {
-	dir="${1:-$(pwd)}"
-	IFS='|' read -r volumename volumeserialnumber filesystem drivetype <<<$("$sdir/lib/drive.sh" "$dir" 2>/dev/null)
-	exists cygpath && drive=$(cygpath -w "$dir")
-	drive=${drive%%:*}
-	BKIT_RVID="${drive:-_}.${volumeserialnumber:-_}.${volumename:-_}.${drivetype:-_}.${filesystem:-_}"
-}
+[[ ${BKIT_RVID+isset} == isset ]] || source "$sdir/lib/rvid.sh" || die "Can't source rvid"
 
-rsync "${options[@]}" --list-only "$BACKUPURL/./$BKIT_RVID/.snapshots/" | awk '/@GMT/ {print $5}'	#get a list of all snapshots in backup
+rsync ${options+"${options[@]}"} --list-only "$BACKUPURL/./$BKIT_RVID/.snapshots/" | awk '/@GMT/ {print $5}'	#get a list of all snapshots in backup

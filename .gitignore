@@ -19,7 +19,7 @@ not-used-anymore/
 lixo.txt
 *.log
 *.TMP
-node_modules/*
+**/node_modules/*
 webapp/
 web2/
 web2.*/

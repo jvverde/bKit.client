@@ -397,7 +397,9 @@ update(){
     [[ $I =~ ^[.\<]f ]] && {
       HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
       PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
-      [[ $PREFIX =~ ././././././ ]] && echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}" || echo "Prefix '$PREFIX' !~ ././././././"
+      [[ $PREFIX =~ ././././././ ]] && 
+        echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}" || 
+          echo "Prefix '$PREFIX' !~ ././././././"
     } && continue
 
     #if it is a hard link (to file or to symlink)

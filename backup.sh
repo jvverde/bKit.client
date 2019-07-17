@@ -411,7 +411,7 @@ update(){
 
     echo "Hum.. Is something else:$I|$FILE|$LINK|$LEN"
 
-  done < <(dorsync --dry-run --delete --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
+  done < <(dorsync --dry-run --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
 
   exec {COPROC[1]}>&-
   wait $COPROC_PID

@@ -384,7 +384,7 @@ update(){
 
   while IFS='|' read -r I FILE LINK FULLPATH LEN
   do
-    echo miss "$I|$FILE|$LINK|$LEN"
+    #echo miss "$I|$FILE|$LINK|$LEN"
 
     FILE=${FILE%/}  #remove trailing backslash in order to avoid sync files in a directory directly
 
@@ -441,7 +441,7 @@ ITIME=$(date -R)
 
   backup
   
-  echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
+  echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories, File attributes and... meanwhile changed files\n"
 
   update "$MOUNTPOINT" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 

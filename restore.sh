@@ -8,15 +8,15 @@ source "$SDIR/ccrsync.sh"
 FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 PERM=(--perms --acls --super --numeric-ids)
 BACKUP=".before-restore-on"
-BACKUPDIR="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S").bkit"
-while [[ -e $BACKUPDIR ]]
+suffix="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S").bkit"
+while [[ -e $suffix ]]
 do
-  BACKUPDIR="${BACKUPDIR}_"
+  suffix="${suffix}_"
 done
 
 OPTIONS=(
   --backup
-  --backup-dir="$BACKUPDIR"
+  --backup-dir="$suffix"
   --archive
   --exclude="${BACKUP}*"
   --hard-links
@@ -38,10 +38,11 @@ OPTIONS=(
 
 
 dorsync() {
-  local BACKUP="${@: -1}$BACKUPDIR"
+  local BACKUP="${@: -1}$suffix"
   mkdir -p "$BACKUP"
   rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
   RET=$?
+  #delete empty before-backup dirs
   find "$BACKUP" -maxdepth 0 -empty -delete 2>/dev/null
   [[ -e "$BACKUP" ]] && {
     exists cygpath && BACKUP=$(cygpath -w "$BACKUP")

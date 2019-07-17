@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-declare -p _4414d6399d04b360b28fcbc253b4c87d > /dev/null 2>&1 && return
-declare -r _4414d6399d04b360b28fcbc253b4c87d=1
+declare -p _d6896e345fdb50c9693f1023c6210815 > /dev/null 2>&1 && return
+declare -r _d6896e345fdb50c9693f1023c6210815=1
+
+true ${USER:="$(id -un)"}
 
 declare -r mydir="$(readlink -ne -- "${BASH_SOURCE[0]}")"
 

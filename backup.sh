@@ -27,8 +27,8 @@ do
 			FSW='-f' #check if we need it
 		;;
 		-m|--map)
-			MAPDRIVE="$1" && shift
-			exists cygpath && MAPDRIVE=$(cygpath "$MAPDRIVE")
+			MOUNTPOINT="$1" && shift
+			exists cygpath && MOUNTPOINT=$(cygpath "$MOUNTPOINT")
 		;;
 		--snap)
 			SNAP="@snap/$1" && shift
@@ -93,6 +93,7 @@ done
 source "$SDIR/ccrsync.sh"
 
 ARGS=("$@")
+
 declare -a BASEDIR=()
 
 ORIGINALDIR=( "${ARGS[@]}" ) #dir names as seen by the user (linux vs windows path)
@@ -102,23 +103,17 @@ exists cygpath && ARGS=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(
 #BASEDIR=( "$(readlink -e "${BASEDIR[@]}")" ) || die "Error:  readlink -e '${BASEDIR[@]}'"
 while read file
 do
-  BASEDIR+=(  "$file" )
+  BASEDIR+=( "$file" )
 done < <(readlink -e "${ARGS[@]}")
 
 
 ROOTS=( $(stat -c%m "${BASEDIR[@]}") ) || die "Error: stat -c%m '${BASEDIR[@]}'"
 ROOT=${ROOTS[0]}
 
-# for i in ${!ROOTS[@]}
-# do
-#   echo i=$i, basedir=${ROOTS[$i]}
-# done
-# exit
-
 [[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"
 
-#[[ -n $MAPDRIVE ]] || MAPDRIVE=$ROOT
-true ${MAPDRIVE:="$ROOT"}
+#[[ -n $MOUNTPOINT ]] || MOUNTPOINT=$ROOT
+true ${MOUNTPOINT:="$ROOT"}
 
 STARTDIR=()
 BACKUPDIR=()
@@ -130,7 +125,7 @@ do
 	DIR=${BASEDIR[$I]#$ROOT}
 	DIR=${DIR#/}
 	STARTDIR+=( "$DIR" )
-	BACKUPDIR+=( "$MAPDRIVE/$DIR" )
+	BACKUPDIR+=( "$MOUNTPOINT/$DIR" )
 done
 
 #We need ROOT, BACKUPDIR and STARTDIR
@@ -249,10 +244,10 @@ clean(){
 }
 
 snapshot(){
-	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$BKIT_RVID/$SNAP"
+	dorsync --dry-run --ignore-non-existing --ignore-existing "$MOUNTPOINT/./" "$BACKUPURL/$BKIT_RVID/$SNAP"
 }
 prepare(){
-	dorsync --dry-run --ignore-non-existing --ignore-existing "$MAPDRIVE/./" "$BACKUPURL/$BKIT_RVID/@current/data"
+	dorsync --dry-run --ignore-non-existing --ignore-existing "$MOUNTPOINT/./" "$BACKUPURL/$BKIT_RVID/@current/data"
 }
 
 exec {OUT}>&1
@@ -427,7 +422,7 @@ update(){
 }
 
 backup(){
-  coproc upload_manifest "$MAPDRIVE" 'data'
+  coproc upload_manifest "$MOUNTPOINT" 'data'
   bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
   exec {COPROC[1]}>&-
   wait $COPROC_PID
@@ -448,20 +443,20 @@ ITIME=$(date -R)
   
   echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories and file attributes\n"
 
-  update "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+  update "$MOUNTPOINT" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
   [[ ${hlinks+isset} == isset ]] && {
     echo -e "\n\tPhase ${cnt}.1 update delayed hardlinks"
-    update "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+    update "$MOUNTPOINT" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
   }
 
   echo -e "\nPhase $((++cnt)) - Clean deleted files from backup\n"
 
-  clean "$MAPDRIVE" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
+  clean "$MOUNTPOINT" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
   [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
     echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
-    backupACLS "$MAPDRIVE" "${STARTDIR[@]}" |sed -e 's/^/\t/'
+    backupACLS "$MOUNTPOINT" "${STARTDIR[@]}" |sed -e 's/^/\t/'
   )
 
   echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"

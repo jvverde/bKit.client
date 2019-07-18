@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
+sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 
 set -o pipefail
 
-source "$SDIR/ccrsync.sh"
+source "$sdir/ccrsync.sh"
 
 FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 PERM=(--perms --acls --super --numeric-ids)
@@ -223,7 +223,7 @@ NTFS_acls(){
       cat "${ACLSOF["$P"]}"
     done
   } | iconv -f UTF-8 -t UTF-16LE > "$RESULT/acls"
-  SUBINACL=$(find "$SDIR/3rd-party" -type f -name "subinacl.exe" -print -quit)
+  SUBINACL=$(find "$sdir/3rd-party" -type f -name "subinacl.exe" -print -quit)
   [[ -f $SUBINACL ]] || die SUBINACL.exe not found
   "$SUBINACL" /noverbose /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
   #"$SUBINACL" /nostatistic /playfile "$(cygpath -w "$RESULT/acls")"
@@ -232,14 +232,14 @@ NTFS_acls(){
 makestats(){
   local DELTATIME=$1
   local ROOT=$2
-  [[ -n $STATS && -e $LOGFILE && -e "$SDIR/tools/recv-stats.pl" ]] && exists perl && {
+  [[ -n $STATS && -e $LOGFILE && -e "$sdir/tools/recv-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     echo "Total time spent: $DELTATIME"
     exists cygpath && {
       ROOT=$(cygpath -w "$ROOT")
       ROOT="${ROOT//\\/\\\\}\\\\"
     }
-    cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/recv-stats.pl"
+    cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$sdir/tools/recv-stats.pl"
     echo "------------End of Stats------------"
   } | tee "$STATSFILE"
 }
@@ -267,7 +267,7 @@ do
 
     ENTRY=${RESOURCE#$DIR}    #Is empty when resource is a existing directory (DIR==RESOURCE)
 
-    IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$ROOT" 2>/dev/null)
+    IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$sdir/lib/drive.sh" "$ROOT" 2>/dev/null)
 
     exists cygpath && DRIVE=$(cygpath -w "$ROOT")
     DRIVE=${DRIVE%%:*}
@@ -292,7 +292,7 @@ do
         dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi
       [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-        NTFS_acls "$METASRC" "$SDIR/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
+        NTFS_acls "$METASRC" "$sdir/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
       )
     } | tee "$LOGFILE"
     STOP=$(date -R)

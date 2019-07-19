@@ -27,7 +27,7 @@ REM http://www.fruitbat.org/Cygwin/timemachine.html
 		"%~dp0\cygwin-old\setup-x86_64-2.874.exe" !PARAMS!
 	)
 ) else (
-	set PARAMS= -B -D -d -N -n -X -q -l "%~dp0\cygwin\repo" -P %MODULES% -s http://mirrors.fe.up.pt/pub/cygwin/
+	set PARAMS= -B -D -d -N -n -X -q -l "%~dp0\cygwin\repo" -P %MODULES% -s http://www.pirbot.com/mirrors/cygwin/
 	if %OSARCH%==32BIT (
 		"%~dp0\cygwin\setup-x86.exe" !PARAMS!
 	) else (

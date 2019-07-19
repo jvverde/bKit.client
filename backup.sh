@@ -454,7 +454,7 @@ ITIME=$(date -R)
 
   clean "$MOUNTPOINT" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
-  [[ $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+  [[ $OS == 'cygwin' && $BKIT_FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
     echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
     backupACLS "$MOUNTPOINT" "${STARTDIR[@]}" |sed -e 's/^/\t/'
   )

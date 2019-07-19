@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -p _4db3375cc8965ee1abde6335c1effd93 >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+declare -p _4db3375cc8965ee1abde6335c1effd93 >/dev/null 2>&1 && echo module time apparentely already sourced && return
 declare -r _4db3375cc8965ee1abde6335c1effd93=1
 
 declare DELTATIME=''

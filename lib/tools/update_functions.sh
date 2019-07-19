@@ -9,5 +9,5 @@ find "$sdir/lib/functions" -type f -print0|
     do
       #compute new hash but without old hash 
       hash="$(sed "s#$match##" "$file" | md5sum | awk '{print $1}')"     
-      sed -i "s#$match#$hash#" "$file"
+      [[ $match == $hash ]] || sed -i "s#$match#$hash#" "$file"
     done

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -p _43c27414dc70d34858aa5bcad2024f19 >/dev/null 2>&1 && echo module utils apparentely already sourced && return
+declare -p _43c27414dc70d34858aa5bcad2024f19 >/dev/null 2>&1 && echo module logs apparentely already sourced && return
 declare -r _43c27414dc70d34858aa5bcad2024f19=1
 
 redirectlogs() {

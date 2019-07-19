@@ -20,6 +20,7 @@ lixo.txt
 *.log
 *.TMP
 **/node_modules/*
+**/cygwin/repo/*
 webapp/
 web2/
 web2.*/

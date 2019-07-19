@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 
+set -uE
 set -o pipefail
 
 source "$sdir/ccrsync.sh"
@@ -69,7 +70,7 @@ usage() {
 SRCS=()
 declare -A LINKTO
 LOCALACTION="--copy-dest" #rsync option
-while [[ $1 =~ ^- ]]
+while [[ ${1:-} =~ ^- ]]
 do
   KEY="$1" && shift
   case "$KEY" in
@@ -156,10 +157,13 @@ do
     ;;
   esac
 done
-LINKS=( "${!LINKTO[@]}" )                 #get different link-dest/copy-dest
-LINKS=( "${LINKS[@]:0:20}" )              #a rsync limitation
 
-RESOURCES=("$@")
+LINKS=( "${!LINKTO[@]}" )                 #get different link-dest/copy-dest
+LINKS=( ${LINKS[@]+"${LINKS[@]:0:20}"} )  #a rsync limitation of 20 directories
+
+[[ ${1+isset} == isset ]] || usage
+
+declare -a RESOURCES=( "$@" )
 
 mktempdir RESULT || die "Can't create a temporary working directory"
 

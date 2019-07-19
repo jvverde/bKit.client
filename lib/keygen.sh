@@ -43,7 +43,7 @@ PUBSSH="$PUB/ssh-client.pub"
 
 #ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
 
-rsync -ai "$KEYSSH.pub" "$PUBSSH" >&2
+rsync -aiv "$KEYSSH.pub" "$PUBSSH" >&2
 
 {
 	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem" || { echo "Fail to generate key" && exit 1; }

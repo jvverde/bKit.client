@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
-declare -p _d6896e345fdb50c9693f1023c6210815 > /dev/null 2>&1 && return
-declare -r _d6896e345fdb50c9693f1023c6210815=1
+declare -p _f6eda119529f67874f7dae8b73cdb799 > /dev/null 2>&1 && return
+declare -r _f6eda119529f67874f7dae8b73cdb799=1
 
-true ${USER:="$(id -un)"}
+_f6eda119529f67874f7dae8b73cdb799(){
+	true ${USER:="$(id -un)"}
 
-declare -r mydir="$(readlink -ne -- "${BASH_SOURCE[0]}")"
+	declare -r myself="$(readlink -ne -- "${BASH_SOURCE[0]}")"
 
-dir="$(dirname -- "$mydir")"
+	declare -r dir="$(dirname -- "$myself")"
 
-source <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$mydir" -exec cat "{}" ';')
+	#source <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" -exec cat "{}" ';')
+	while IFS= read file
+	do
+		source "$file"
+	done < <( find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" )
+}
+
+_f6eda119529f67874f7dae8b73cdb799

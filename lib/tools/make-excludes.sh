@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
-sdir="${sdir%/client/*}/client" 
+sdir="${sdir%/client*}/client" 
 
 source "$sdir/lib/functions/all.sh"
 

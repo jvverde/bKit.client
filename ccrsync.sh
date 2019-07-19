@@ -16,8 +16,8 @@ source "$BKIT_CONFIG"
 [[ -e $PASSFILE ]] && export RSYNC_PASSWORD="$(<${PASSFILE})" || die "Pass file not found on location '$PASSFILE'"
 
 [[ ${NOSSH+isset} == isset ]] && {
-                        unset RSYNC_CONNECT_PROG
-                        BACKUPURL="$RSYNCURL"
+	unset RSYNC_CONNECT_PROG
+	BACKUPURL="$RSYNCURL"
 } || {
 	export RSYNC_CONNECT_PROG="$SSH"
         BACKUPURL="$SSHURL"

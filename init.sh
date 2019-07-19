@@ -8,7 +8,7 @@ BPORT=8761
 RPORT=8762
 UPORT=8763
 
-SERVER="$1"
+SERVER="${1:-"$($SDIR/server.sh)"}"
 CERT="${2:-default}"
 
 usage() {
@@ -65,9 +65,9 @@ echo Writing configuration to $INITFILE
 	read COMMAND <"$CONFDIR/pub/command"
 	#echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
 	echo "SSH='ssh -i \"$CONFDIR/.priv/ssh.key\" -o UserKnownHostsFile=\"$KH\" rsyncd@$SERVER $COMMAND'"
-  echo "RSYNCURL='rsync://user@$SERVER:$BPORT/$SECTION'"
-  echo "SSHURL='user@$SERVER::$SECTION'"
-  echo "BACKUPURL='user@$SERVER::$SECTION'"
+	echo "RSYNCURL='rsync://user@$SERVER:$BPORT/$SECTION'"
+	echo "SSHURL='user@$SERVER::$SECTION'"
+	echo "BACKUPURL='user@$SERVER::$SECTION'"
 	echo "PASSFILE='$CONFDIR/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')

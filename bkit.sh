@@ -67,7 +67,7 @@ do
 	esac
 done
 
-(( $# == 0 )) && usage
+#(( $# == 0 )) && usage
 
 [[ ${all+isset} == isset ]] || excludes
 

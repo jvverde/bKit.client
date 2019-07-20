@@ -32,7 +32,7 @@ excludes(){
 
 declare -a options=() rsyncoptions=()
 
-while [[ $1 =~ ^- ]]
+while [[ ${1:-} =~ ^- ]]
 do
 	key="$1" && shift
 	case "$key" in

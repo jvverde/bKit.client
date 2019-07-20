@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-declare -p _f6eda119529f67874f7dae8b73cdb799 > /dev/null 2>&1 && return
-declare -r _f6eda119529f67874f7dae8b73cdb799=1
+declare -p _bd543783f4067de2309b8f02b63d3417 > /dev/null 2>&1 && return
+declare -r _bd543783f4067de2309b8f02b63d3417=1
 
-_f6eda119529f67874f7dae8b73cdb799(){
+_bd543783f4067de2309b8f02b63d3417(){
 
 	declare -r myself="$(readlink -ne -- "${BASH_SOURCE[0]}")"
 
@@ -17,4 +17,4 @@ _f6eda119529f67874f7dae8b73cdb799(){
   true ${USER:="$(id -un)"}
 }
 
-_f6eda119529f67874f7dae8b73cdb799
+_bd543783f4067de2309b8f02b63d3417

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p _4db3375cc8965ee1abde6335c1effd93 >/dev/null 2>&1 && echo module time apparentely already sourced && return
-declare -r _4db3375cc8965ee1abde6335c1effd93=1
+declare -p _8cce80a574417cbe3dbdf785b1b40a5c >/dev/null 2>&1 && echo module time apparentely already sourced && return
+declare -r _8cce80a574417cbe3dbdf785b1b40a5c=1
 
 declare DELTATIME=''
 deltatime(){

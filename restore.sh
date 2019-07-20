@@ -6,59 +6,59 @@ set -o pipefail
 
 source "$sdir/ccrsync.sh"
 
-FMT='--out-format="%o|%i|%f|%M|%b|%l|%t"'
-PERM=(--perms --acls --super --numeric-ids)
-BACKUP=".before-restore-on"
-suffix="$BACKUP-$(date +"%Y-%m-%dT%H-%M-%S").bkit"
-while [[ -e $suffix ]]
+declare -r fmt='--out-format="%o|%i|%f|%M|%b|%l|%t"'
+declare -ra perm=(--perms --acls --super --numeric-ids)
+declare -r suffix=".before-restore-on"
+declare localbackup="$suffix-$(date +"%Y-%m-%dT%H-%M-%S").bkit"
+while [[ -e $localbackup ]]
 do
-  suffix="${suffix}_"
+  localbackup="${localbackup}_"
 done
 
-OPTIONS=(
+declare -a options=(
   --backup
-  --backup-dir="$suffix"
+  --backup-dir="$localbackup"
   --archive
-  --exclude="${BACKUP}*"
+  --exclude="${suffix}*"
   --hard-links
   --compress
   --human-readable
   --relative
   --partial
   --partial-dir=".bkit.rsync-partial"
-  --delay-updates
+  --delay-updates 
   --super
 )
 
 #Don't try to chown or chgrp if not root or Administrator
 
 [[ $OS == cygwin ]] && {
-    $(id -G|grep -qE '\b544\b') || OPTIONS+=( "--no-group" "--no-owner" )
+    $(id -G|grep -qE '\b544\b') || options+=( "--no-group" "--no-owner" )
 }
-[[ $OS != cygwin && $UID -ne 0 ]] && OPTIONS+=( "--no-group" "--no-owner" )
+[[ $OS != cygwin && $UID -ne 0 ]] && options+=( "--no-group" "--no-owner" )
 
 
 dorsync() {
-  local BACKUP="${@: -1}$suffix"
-  mkdir -p "$BACKUP"
-  rsync "${RSYNCOPTIONS[@]}" "${PERM[@]}" "$FMT" "${OPTIONS[@]}" "$@"
+  local localdir="${@: -1}$localbackup"
+  mkdir -p "$localdir"
+  rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} "$@"
   RET=$?
-  #delete empty before-backup dirs
-  find "$BACKUP" -maxdepth 0 -empty -delete 2>/dev/null
-  [[ -e "$BACKUP" ]] && {
-    exists cygpath && BACKUP=$(cygpath -w "$BACKUP")
-    echo Old files saved on "$BACKUP"
+  #delete empty before-localdir dirs
+  find "$localdir" -maxdepth 0 -empty -delete 2>/dev/null
+  [[ -e "$localdir" ]] && {
+    exists cygpath && localdir=$(cygpath -w "$localdir")
+    echo Old files saved on "$localdir"
   }
   return $RET
 }
 
 destination() {
-  DST="$1"
-  [[ -e $DST ]] || mkdir -pv "$DST"
-  exists cygpath && DST=$(cygpath -u "$DST")
-  DST=$(readlink -ne "$DST")
-  [[ -d $DST ]] || die "'$1' should be a directory"
-  [[ ${DST: -1} == / ]] || DST="$DST/"
+  declare -g dest="$1"
+  [[ -e $dest ]] || mkdir -pv "$dest"
+  exists cygpath && dest=$(cygpath -u "$dest")
+  dest=$(readlink -ne "$dest")
+  [[ -d $dest ]] || die "'$1' should be a directory"
+  [[ ${dest: -1} == / ]] || dest="$dest/"
 }
 
 usage() {
@@ -106,10 +106,10 @@ do
       RSYNCOPTIONS+=('--dry-run')
     ;;
     --no-owner)
-      OPTIONS+=( "--no-group" "--no-owner" )  
+      options+=( "--no-group" "--no-owner" )  
     ;;
     --delete)
-      OPTIONS+=( '--delete-delay' )
+      options+=( '--delete-delay' )
     ;;
     --local-copy)
       LOCALACTION="--copy-dest"
@@ -163,7 +163,7 @@ LINKS=( ${LINKS[@]+"${LINKS[@]:0:20}"} )  #a rsync limitation of 20 directories
 
 [[ ${1+isset} == isset ]] || usage
 
-declare -a RESOURCES=( "$@" )
+declare -a RESOURCES=( "${@:-.}" )
 
 mktempdir RESULT || die "Can't create a temporary working directory"
 
@@ -184,39 +184,39 @@ atexit finish
 
 
 aclparents(){
-  local DST=$(readlink -e "$DST")
-  local FILE=$(readlink -e "$DST/$FILE")
-  until [[ $FILE == $DST ]]
+  local dest=$(readlink -e "$dest")
+  local FILE=$(readlink -e "$dest/$FILE")
+  until [[ $FILE == $dest ]]
   do
     FILE=$(readlink -e "$FILE") || break
     FILE=${FILE%/*} #parent
     PARENT="+FILE $(cygpath -w "$FILE")"
-    ACLSOF["$PARENT"]=$(readlink -e "$CACHEDST/${FILE#$DST}/.bkit-dir-acl")
+    ACLSOF["$PARENT"]=$(readlink -e "$CACHEDST/${FILE#$dest}/.bkit-dir-acl")
   done
 }
 
 NTFS_acls(){
   local SRC=$1
   local CACHEDST=$(readlink -mn "$2")
-  local DST=$(readlink -e "$3")
+  local dest=$(readlink -e "$3")
   echo "Restore ACLs"
   [[ -d $CACHEDST ]] || mkdir -pv "$CACHEDST"
-  rsync "${RSYNCOPTIONS[@]}" -aizR --inplace "${PERM[@]}" "${PERM[@]}" "$FMT" "$SRC" "$CACHEDST" ||
-    warn "Problemas ao recuperar $CACHEDST"
+  rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} -aizR --inplace ${perm+"${perm[@]}"} "$fmt" "$SRC" "$CACHEDST" ||
+    warn "Problems while trying to restore $CACHEDST"
   {
     declare -A ACLSOF
 
     while read -r FILE
     do
       aclparents
-      local TARGET=$(cygpath -w "$(readlink -e "$DST/$FILE")")
+      local TARGET=$(cygpath -w "$(readlink -e "$dest/$FILE")")
       ACLSOF["+FILE $TARGET"]=$(readlink -e "$CACHEDST/$FILE")
     done < <(grep -Pi 'recv\|[ch>.][^d].{9}\|' "$RESULT/index" | cut -d'|' -f3)
 
     while read -r FILE
     do
       aclparents
-      local TARGET=$(cygpath -w "$(readlink -e "$DST/$FILE")")
+      local TARGET=$(cygpath -w "$(readlink -e "$dest/$FILE")")
       ACLSOF["+FILE $TARGET"]=$(readlink -e "$CACHEDST/$FILE/.bkit-dir-acl")
     done < <(grep -Pi 'recv\|.d.{9}\|' "$RESULT/index" | cut -d'|' -f3)
 
@@ -236,7 +236,7 @@ NTFS_acls(){
 makestats(){
   local DELTATIME=$1
   local ROOT=$2
-  [[ -n $STATS && -e $LOGFILE && -e "$sdir/tools/recv-stats.pl" ]] && exists perl && {
+  [[ ${STATS+isset} == isset && -e $LOGFILE && -e "$sdir/tools/recv-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     echo "Total time spent: $DELTATIME"
     exists cygpath && {
@@ -252,10 +252,10 @@ for RESOURCE in "${RESOURCES[@]}"
 do
   if [[ $RESOURCE =~ ^[^@]+@.+::.+ ]] #ex: user@server::section
   then
-    [[ -z $DST ]] && DST=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #Try to get last argument
-    [[ -d $DST ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
+    [[ -z $dest ]] && dest=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #Try to get last argument
+    [[ -d $dest ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
     SRCS+=( "$RESOURCE" )		#Add to a list of multiple SRCs and dorsync later/bellow
-    #dorsync "$RESOURCE" "$DST"
+    #dorsync "$RESOURCE" "$dest"
   else
     exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
     RESOURCE=$(readlink -m "${RESOURCE}")
@@ -273,13 +273,14 @@ do
 
     IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$sdir/lib/drive.sh" "$ROOT" 2>/dev/null)
 
+    declare DRIVE=''
     exists cygpath && DRIVE=$(cygpath -w "$ROOT")
     DRIVE=${DRIVE%%:*}
     RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
     BASE=${BASE%%/}   #remove trailing slash if present
     ENTRY=${ENTRY#/}  #remove leading slash if present
 
-    [[ -n $SNAP ]] && { # if we want an older version
+    [[ ${SNAP+isset} == isset ]] && { # if we want an older version
       SRC="$BACKUPURL/$RVID/.snapshots/$SNAP/data$BASE/./$ENTRY"
       METASRC="$BACKUPURL/$RVID/.snapshots/$SNAP/metadata$BASE/./$ENTRY"
     } || {              #or last version
@@ -289,34 +290,34 @@ do
 
     INIT=$(date -R)
     {
-      if [[ -n $DST ]]
+      if [[ ${dest+isset} == isset ]]
       then
-        dorsync "${LINKS[@]}" "$SRC" "$LOCALACTION=$DIR/" "$DST" | tee "$RESULT/index" || warn "Problems restoring to $DST"
+        dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$LOCALACTION=$DIR/" "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
       else
-        dorsync "${LINKS[@]}" "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+        dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi
-      [[ -n $ACLS && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-        NTFS_acls "$METASRC" "$sdir/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${DST:-$DIR}"
+      [[ ${ACLS+isset} == isset && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+        NTFS_acls "$METASRC" "$sdir/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${dest:-$DIR}"
       )
     } | tee "$LOGFILE"
     STOP=$(date -R)
     deltatime "$STOP" "$INIT"
-    makestats "$DELTATIME" "${DST:-$DIR}"
+    makestats "$DELTATIME" "${dest:-$DIR}"
   fi
 done
 
-[[ -n $DST && ${#SRCS[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
+[[ ${dest+isset} == isset && ${#SRCS[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
   set -o pipefail
   INIT=$(date -R)
-  dorsync "${LINKS[@]}" "${SRCS[@]}" "$DST" | tee "$LOGFILE" || die "Problems restoring to $DST"
-  exists cygpath && DST=$(cygpath -w "$DST")
-  echo "Files restored to $DST"
+  dorsync ${LINKS[@]+"${LINKS[@]}"} "${SRCS[@]}" "$dest" | tee "$LOGFILE" || die "Problems restoring to $dest"
+  exists cygpath && dest=$(cygpath -w "$dest")
+  echo "Files restored to $dest"
   STOP=$(date -R)
   deltatime "$STOP" "$INIT"
-  makestats "$DELTATIME" "$DST"
+  makestats "$DELTATIME" "$dest"
 }
 
-[[ -n $NOTIFY && -s $STATSFILE ]] && (
+[[ ${NOTIFY+isset} == isset && -s $STATSFILE ]] && (
   ME=$(uname -n)
   FULLDIRS=( $(readlink -e "${RESOURCES[@]}") )     #get full paths
   exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
@@ -327,9 +328,9 @@ done
   let LIMIT=3
   let EXTRADIRS=NUMBEROFDIRS-LIMIT
   ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
-  [[ -n $DST ]] && exists cygpath && DST=$(cygpath -w "$DST")
-  [[ -s $ERRFILE ]] && SUBJECT="Some errors occurred while restoring $WHAT on $ME ${DST:+to $DST} at $(date +%Hh%Mm)" ||
-  SUBJECT="Restore of $WHAT ${DST:+to $DST} on $ME successfully finished at $(date +%Hh%Mm)"
+  [[ -n $dest ]] && exists cygpath && dest=$(cygpath -w "$dest")
+  [[ -s $ERRFILE ]] && SUBJECT="Some errors occurred while restoring $WHAT on $ME ${dest:+to $dest} at $(date +%Hh%Mm)" ||
+  SUBJECT="Restore of $WHAT ${dest:+to $dest} on $ME successfully finished at $(date +%Hh%Mm)"
   {
     echo "Restore of $DIRS"
     cat "$STATSFILE"
@@ -349,4 +350,4 @@ done
 )
 
 
-exit $ERROR
+exit ${ERROR:-0}

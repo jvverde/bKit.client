@@ -24,7 +24,7 @@ for dir in "$@"
 do
 	fullpath="$(readlink -e -- "$dir")" || continue
 
-	root="$(stat -c %m "$fullpath")"
+	root="${BKIT_MNTPOINT:-"$(stat -c %m "$fullpath")"}"
 
 	bash "$sdir/check.sh" ${options+"${options[@]}"} --out-format='%i|/%f' "$fullpath"|
 		awk 'BEGIN {FS="|";ORS="\0"} $1 ~ /^<f/ {print $2}' | #filter out only files who needs update (<f). Ignore all the other situations

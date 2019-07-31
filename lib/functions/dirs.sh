@@ -6,6 +6,9 @@ _fa5db1cec69d83e1bb3898143fd1002c(){
 	local homedir="$( getent passwd "$user" | cut -d: -f6 )"
 	VARDIR="$homedir/.bkit/var"
 	ETCDIR="$homedir/.bkit/etc"
+	[[ -e /home/$user ]] || ln -svT "$homedir" "/home/$user"
+	[[ -e $homedir/.ssh ]] || mkdir -pv " $homedir/.ssh"
+	[[ -e /home/$user/.ssh ]] || ln -svT "$homedir/.ssh" "/home/$user/.ssh"
 }
 
 _fa5db1cec69d83e1bb3898143fd1002c

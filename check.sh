@@ -41,7 +41,7 @@ dorsync(){
 
 backupdir="$(readlink -ne "$1")"
 
-mnt="$(stat -c %m "$backupdir")"
+mnt="${BKIT_MNTPOINT:-"$(stat -c %m "$backupdir")"}"
 startdir="${backupdir#$mnt}"		#remove mount point from path
 startdir="${startdir#/}" 		#remove leading slash if any
 mnt=${mnt%/} 				#remove trailing slash if any

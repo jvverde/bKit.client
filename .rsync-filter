@@ -21,3 +21,4 @@
 - lixo.txt
 - /cronjobs
 - *.log
+- .before-restore-on*

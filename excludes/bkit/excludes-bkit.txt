@@ -10,3 +10,5 @@ conf/*
 not-used-anymore/*
 web
 web2.0
+**/lixo*
+lixo*

@@ -39,3 +39,4 @@ Temporary*/
 Temporary/
 Download/
 Downloads/
+/home/*/.bkit/

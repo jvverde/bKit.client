@@ -13,18 +13,16 @@ usage() {
 declare -a filters=()
 
 excludes(){
-	excdir=$sdir/cache/$USER/excludes
-	[[ -d $excdir ]] || mkdir -p $excdir
 
-	exclist=$excdir/exclude.lst
+	declare -r exclist="$VARDIR/excludes/excludes.lst"
 
 	[[ -e "$exclist" ]] || {
 		echo Compile exclude list
-		bash "$sdir/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
+		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
 	[[ -n $(find "$exclist" -mtime +30) || ${compile+isset} == isset ]] && {
 		echo Recompile exclude list
-		bash "$sdir/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
+		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
 
 	filters+=( --filter=". $exclist" )

@@ -15,7 +15,7 @@ srcdir="${1:-"$base/excludes"}"
 
 [[ -d $srcdir ]] || die "Usage:\n\t$0 [exclude-files-dir]" 
 
-destfile="${2:-"$VARDIR/excludes/excludes.txt"}"
+destfile="${2:-"$VARDIR/excludes/excludes.lst"}"
 
 [[ -e $destfile ]] || mkdir -pv "${destfile%/*}"
 

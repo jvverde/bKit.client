@@ -41,7 +41,7 @@ CHALLENGE="$(head -c 1000 </dev/urandom | tr -cd "[:alnum:]" | head -c 32)"
 echo -n $CHALLENGE > "$SYNCD/challenge"
 
 #Send public keys and challenge to the server
-echo RSYNC_PASSWORD=$RSYNC_PASSWORD
+#echo RSYNC_PASSWORD=$RSYNC_PASSWORD
 rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/" || die "Exit value of rsync is non null: $?"
 
 #Read (back) public keys from server including (meanwhile) generated server public keys as well the encripted challenge

@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
-source "$SDIR/lib/functions/all.sh"
+#REVER ESTE CODIGO. ESTA MUITO CONFUSO
+sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
+source "$sdir/lib/functions/all.sh"
 
-OPTIONS=()
+declare -a options=()
 while [[ $1 =~ ^- ]]
 do
   KEY="$1" && shift
   case "$KEY" in
     --dry-run)
-      OPTIONS=('--dry-run')
+      options=('--dry-run')
     ;;
     *)
       echo Unknow option $KEY && usage
@@ -16,37 +17,34 @@ do
   esac
 done
 
-TARGET="${1:-.}"
-exists cygpath && TARGET=$(cygpath -u "$TARGET")
-TARGET=$(readlink -nm "$TARGET")
+target="${1:-.}"
+exists cygpath && target=$(cygpath -u "$target")
+target=$(readlink -nm "$target")
 
-DIR=$(dirname "$TARGET")
-[[ -d $DIR ]] || mkdir -pv "$DIR"
-REL=${TARGET#$SDIR}
-[[ $REL == $SDIR ]] && die "Update dir must be $SDIR or a subdir"
+dir=$(dirname -- "$target")
+[[ -d $dir ]] || mkdir -pv "$dir"
+rel=${target#$sdir}
+[[ $rel == $sdir ]] && die "Update dir must be $sdir or a subdir"
 OIFS=$IFS
-IFS=/ STEPS=( $REL )
-IFS=OIFS
+IFS=/ steps=( $rel )
+IFS=$OIFS
 
 set -f
 unset B
-FILTERS=()
-for S in ${STEPS[@]}
+filters=()
+for S in "${steps[@]}"
 do
   [[ -z $S ]] && continue
   C="$B/$S"
-  FILTERS+=( --filter="+ $C" )
-  FILTERS+=( --filter="- $B/*" )
-  B=$C
+  filters+=( --filter="+ $C" )
+  filters+=( --filter="- $B/*" )
+  B="$C"
 done
 
-CONF="$SDIR/conf/conf.init"
-[[ -f $CONF ]] || die Cannot found configuration file at $CONF
-. "$CONF"                                                                     #get configuration parameters
 
 export RSYNC_PASSWORD="4dm1n"
-DST="${2:-.}"
-[[ -e $DST ]] || mkdir -p "$DST"
-SRC="$UPDATERSRC"
-rsync -rlcRb "${FILTERS[@]}" "${OPTIONS[@]}" --backup-dir="${DST%/}/.backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$SRC" "${DST%/}/" || die "Problemas ao actualizar $DST"
+dst="${2:-.}"
+[[ -e $dst ]] || mkdir -p "$dst"
+src="$UPDATERSRC"
+rsync -rlcRb "${filters[@]}" "${options[@]}" --backup-dir="${dst%/}/.backups/$(date +"%Y-%m-%dT%H-%M-%S")" --out-format="%p|%t|%o|%i|%b|%l|%f" "$src" "${dst%/}/" || die "Problemas ao actualizar $dst"
 [[ $? -eq 0 ]] && echo "Actualizaçao feita com com sucesso"

@@ -4,38 +4,35 @@ sdir="${sdir%/client*}/client"
 
 source "$sdir/lib/functions/all.sh"
 
-COPY=(excludes-all.txt)
+all=all
 WIN=excludes-windows.txt
-UNIX=excludes-unix.txt
+unix=unix
 BKIT=excludes-bkit.txt
-SRCDIR="$sdir/excludes"
-DST="$sdir/conf/excludes.txt"
-[[ -e $DST ]] || mkdir -pv "${DST%/*}"
 
 
-EXCDIR="${1:-$SRCDIR}"
-DSTFILE="${2:-$DST}"
+srcdir="${1:-"$sdir/excludes"}"
+destfile="${2:-"$VARDIR/excludes/excludes.txt"}"
 
-[[ -d $EXCDIR ]] || die "Usage:\n\t$0 [exclude-files-dir]" 
+[[ -e $destfile ]] || mkdir -pv "${destfile%/*}"
 
-OS=$(uname -o|tr '[:upper:]' '[:lower:]')
+
+[[ -d $srcdir ]] || die "Usage:\n\t$0 [exclude-files-dir]" 
+
 {
-	for F in "${COPY[@]}"
-	do 
-		echo -e "\n# From $F\n"
-		cat "$EXCDIR/$F"
-	done
+	echo -e "\n# From ALL\n"
+	find "$srcdir/$all" -type f -exec cat "{}" '+'
 	
-	echo -e "\n# From BKIT\n"
-	bash "$sdir/tools/bkit-exc.sh" "$EXCDIR/$BKIT"
+	echo -e "\n# From $BKIT\n"
+	bash "$sdir/excludes/bkit-exc.sh" "$srcdir/$BKIT"
 	
 	[[ $OS == 'cygwin' ]] && {
 		echo -e "\n\n#\tFrom windows-exc\n"
-		bash "$sdir/tools/windows-exc.sh" "$EXCDIR/$WIN"
+		bash "$sdir/tools/windows-exc.sh" "$srcdir/$WIN"
 		echo -e "\n\n#\tFrom registry\n"
 		bash "$sdir/tools/hklm.sh" | bash "$sdir/tools/windows-exc.sh" || true
 	} || {
 		echo -e "\n\n#\tFrom unix\n"
-		cat "$EXCDIR/$UNIX"
+		find "$srcdir/$unix" -type f -exec cat "{}" '+'
+		cat "$srcdir/$unix"
 	}
-}> "$DSTFILE"
+}> "$destfile"

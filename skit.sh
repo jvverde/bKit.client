@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-SDIR="$(dirname "$(readlink -f "$0")")"				#Full DIR
+SDIR="$(dirname -- "$(readlink -f -- "$0")")"				#Full DIR
 
 source "$SDIR/lib/functions/all.sh"
 
@@ -7,7 +7,7 @@ source "$SDIR/lib/functions/all.sh"
 FILTERS=()
 
 excludes(){
-	EXCDIR=$SDIR/cache/excludes
+	EXCDIR=$VARDIR/cache/excludes
 	[[ -d $EXCDIR ]] || mkdir -p "$EXCDIR"
 
 	EXCL=$EXCDIR/exclude.lst
@@ -38,7 +38,6 @@ importrules(){
 
 ARGS=("$@")
 OPTIONS=()
-RSYNCOPTIONS=()
 
 usage() {
 	NAME=$(basename -s .sh "$0")
@@ -95,8 +94,9 @@ done
 
 #Don't move up in order to allow help/usage msg
 [[ -n $NOASK ]] || {
+	#run as sudo if user is not root and os is not cygwin
 	[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
-	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {
+	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {	#if cygwin and not Administrator
 		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 		echo I am going to runas Administrator
 		WDIR=$(cygpath -w "$SDIR")
@@ -106,7 +106,9 @@ done
 }
 
 [[ -n $ALL ]] || excludes
-[[ -n $NO_IMPORT ]] || importrules
+
+#Until i think a little bit better about this, comment out next line
+#[[ -n $NO_IMPORT ]] || importrules
 
 [[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
 

@@ -1,43 +1,41 @@
 #!/usr/bin/env bash
-SDIR="$(dirname -- "$(readlink -f -- "$0")")"				#Full DIR
+sdir="$(dirname -- "$(readlink -f -- "$0")")"				#Full DIR
 
-source "$SDIR/lib/functions/all.sh"
+source "$sdir/lib/functions/all.sh"
 
 
-FILTERS=()
+declare -a filters=()
+
 
 excludes(){
-	EXCDIR=$VARDIR/cache/excludes
-	[[ -d $EXCDIR ]] || mkdir -p "$EXCDIR"
 
-	EXCL=$EXCDIR/exclude.lst
+	declare -r exclist="$VARDIR/excludes/excludes.lst"
 
-	[[ -e "$EXCL" ]] || { #if not exist yet
-		echo Compile exclude list
-		:> "$EXCL"
-		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+	[[ -e "$exclist" ]] || {
+		echo compile exclude list
+		mkdir -pv "${exclist%/*}"
+		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
-
-	[[ -e "$EXCL" ]] && [[ -n $COMPILE || -n $(find "$EXCL" -mtime +30) ]] && {
+	[[ -n $(find "$exclist" -mtime +30) || ${compile+isset} == isset ]] && {
 		echo Recompile exclude list
-		bash "$SDIR/tools/excludes.sh" "$SDIR/excludes" >  "$EXCL"
+		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
 
-	FILTERS+=( --filter=". $EXCL" )
+	filters+=( --filter=". $exclist" )
 }
 
 importrules(){
-	[[ -e $SDIR/rules/global ]] || mkdir -pv "$SDIR/rules/global"
-	#bash "$SDIR/update.sh" "rules/global" "$SDIR" >/dev/null
-	bash "$SDIR/update.sh" "rules/global" "$SDIR"
-	for F in $(ls "$SDIR/rules/global")
+	[[ -e $sdir/rules/global ]] || mkdir -pv "$sdir/rules/global"
+	#bash "$sdir/update.sh" "rules/global" "$sdir" >/dev/null
+	bash "$sdir/update.sh" "rules/global" "$sdir"
+	for F in $(ls "$sdir/rules/global")
 	do
-		FILTERS+=( --filter=". $SDIR/rules/global/$F" )
+		filters+=( --filter=". $sdir/rules/global/$F" )
 	done
 }
 
 ARGS=("$@")
-OPTIONS=()
+options=()
 
 usage() {
 	NAME=$(basename -s .sh "$0")
@@ -64,10 +62,10 @@ do
 			NO_IMPORT=1
 		;;
 		-c|--compile)
-			COMPILE=1
+			compile=1
 		;;
 		--ignore-filters)
-			NOFILTERS=1
+			nofilters=1
 		;;
 		--start-in=*)
 			cd "${KEY#*=}"
@@ -79,13 +77,13 @@ do
 			usage
 		;;
 		--stats|--sendlogs|--notify)
-			OPTIONS+=( "$KEY")
+			options+=( "$KEY")
 		;;
 		*=*)
-			OPTIONS+=( "$KEY")
+			options+=( "$KEY")
 		;;
 		*)
-			OPTIONS+=( "$KEY" "$1" ) && shift
+			options+=( "$KEY" "$1" ) && shift
 		;;
 	esac
 done
@@ -99,7 +97,7 @@ done
 	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {	#if cygwin and not Administrator
 		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 		echo I am going to runas Administrator
-		WDIR=$(cygpath -w "$SDIR")
+		WDIR=$(cygpath -w "$sdir")
 		cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" "${ARGS[@]}"
 		exit
 	}
@@ -110,8 +108,8 @@ done
 #Until i think a little bit better about this, comment out next line
 #[[ -n $NO_IMPORT ]] || importrules
 
-[[ -n $NOFILTERS ]] || FILTERS+=( --filter=": .rsync-filter" )
+[[ -n $nofilters ]] || filters+=( --filter=": .rsync-filter" )
 
 echo Start snapshot backup
 
-bash "$SDIR/snapshot.sh" "${OPTIONS[@]}" -- "${FILTERS[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
+bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"

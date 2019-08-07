@@ -215,7 +215,8 @@ do
 	UUID=$(bash "$sdir/lib/getUUID.sh" "$ROOT")
 	[[ $UUID == _ ]] && continue
 
-	DRIVE=${ROOT//\//.}
+  DRIVE="${ROOT//\//.}"
+  #DRIVE="${ROOT}"
 	[[ $OS == cygwin ]] && {
 		DRIVE=$(cygpath -w "$ROOT")
 		DRIVE=${DRIVE:0:1}

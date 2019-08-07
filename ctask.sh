@@ -138,13 +138,13 @@ done
 IFS=$OLDIFS
 
 CURRENTTIME=$(date +%Y-%m-%dT%H-%M-%S)
-FILTERDIR="$sdir/filters"
+FILTERDIR="$VARDIR/filters"
 [[ -d $FILTERDIR ]] || mkdir -pv "$FILTERDIR"
 
 TASKNAME="BKIT-${NAME:-$CURRENTTIME}"
 
-TASKDIR="$sdir/cronjobs"
-[[ $OS == cygwin ]] && TASKDIR="$sdir/schtasks"
+TASKDIR="$VARDIR/cronjobs"
+[[ $OS == cygwin ]] && TASKDIR="$VARDIR/schtasks"
 
 [[ -d $TASKDIR ]] || mkdir -pv "$TASKDIR"
 JOBFILE="${TASKDIR}/${TASKNAME}.sh"
@@ -232,7 +232,10 @@ do
 	do
 		echo "$F"
 	done >> "$FILTERFILE"
-	LOGDIR="$RDIR/logs/${TASKNAME,,}/${DRIVE}/"
+	LOGDIR="$VARDIR/log/${TASKNAME,,}/${DRIVE}/"
+
+  exists cygpath &&  LOGDIR="$(cygpath -w "$LOGDIR")"
+  
   ROPTIONS=(
     "${OPTIONS[@]}"
 		'--uuid "'$UUID'"'

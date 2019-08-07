@@ -8,7 +8,7 @@ source "$sdir/functions/all.sh"
 uuid="$1"
 
 exists wmic && {
-	echo -n "$(WMIC logicaldisk WHERE "VolumeSerialNumber like '$uuid'" GET Name /format:textvaluelist| sed -nr 's/Name=(.+)/\1/p')" && exit
+	echo -n "$(WMIC logicaldisk WHERE "VolumeSerialNumber like '$uuid'" GET Name /format:textvaluelist| sed -nr 's/Name=(.+)/\1/p' | perl -lape 's/(?:\r|\n)+$//g')" && exit
 }
 
 exists fsutil && {

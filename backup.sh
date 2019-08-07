@@ -3,6 +3,8 @@ SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
 set -uE
 
+source "$SDIR/lib/functions/all.sh"
+
 SNAP='@snap'
 
 declare -a options=()
@@ -463,7 +465,8 @@ ITIME=$(date -R)
 
   [[ $OS == 'cygwin' && $BKIT_FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
     echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
-    backupACLS "$MOUNTPOINT" "${STARTDIR[@]}" |sed -e 's/^/\t/'
+	#Need a better revision
+    #backupACLS "$MOUNTPOINT" "${STARTDIR[@]}" |sed -e 's/^/\t/'
   )
 
   echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"

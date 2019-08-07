@@ -15,7 +15,8 @@ usage() {
 
 declare -a filters=( --filter=": .rsync-filter" )
 
-exclist=$sdir/cache/$USER/excludes/exclude.lst
+exclist="$VARDIR/excludes/excludes.lst"
+
 [[ -e $exclist ]] && filters+=( --filter=". $exclist" )
 
 while IFS='|' read i datetime size file

@@ -171,9 +171,11 @@ FLIST="$RUNDIR/file-list.$$"
 HLIST="$RUNDIR/hl-list.$$"
 DLIST="$RUNDIR/dir-list.$$"
 NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
-logfile="$VARDIR/backup-logs-$NOW"
-errfile="$VARDIR/backup-errors-$NOW"
-statsfile="$VARDIR/backup-stats-NOW"
+logfile="$VARDIR/log/backup-logs-$NOW"
+errfile="$VARDIR/log/backup-errors-$NOW"
+statsfile="$VARDIR/log/backup-stats-NOW"
+
+mkdir -pv "${logfile%/*}" #Just ensure that the log directory exists
 
 exec 3>&2
 exec 2> >(tee "$errfile" >&3)

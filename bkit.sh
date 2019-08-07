@@ -18,6 +18,7 @@ excludes(){
 
 	[[ -e "$exclist" ]] || {
 		echo Compile exclude list
+		mkdir -pv "${exclist%/*}"
 		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
 	[[ -n $(find "$exclist" -mtime +30) || ${compile+isset} == isset ]] && {

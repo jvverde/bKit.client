@@ -157,11 +157,12 @@ JOBFILE="${TASKDIR}/${TASKNAME}.sh"
 RDIR="$sdir"
 
 [[ $OS == cygwin ]] && {
-	RDIR=$(realpath -m --relative-to="$TASKDIR" "$sdir")
-	WBASH=$(cygpath -w "$BASH")
-	DOSBASH=$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")
-	DOSBASH=${DOSBASH%.exe} #just in case
-	CMD='"'${DOSBASH}.exe'" "'${RDIR}/skit.sh'"'
+	RDIR="$(realpath -m --relative-to="$TASKDIR" "$sdir")"
+	# WBASH="$(cygpath -w "$BASH")"
+	# DOSBASH="$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")"
+	# DOSBASH="${DOSBASH%.exe}" #just in case
+	#CMD='"'${DOSBASH}.exe'" "'${sdir}/skit.sh'"'
+	CMD='"'$(cygpath -w "${sdir}")\\bash.bat'" "'${sdir}/skit.sh'"'
 	echo '@echo OFF'> "$JOBFILE"
 }
 
@@ -235,7 +236,7 @@ do
 	done >> "$FILTERFILE"
 	LOGDIR="$VARDIR/log/${TASKNAME,,}/${DRIVE}/"
 
-  exists cygpath &&  LOGDIR="$(cygpath -w "$LOGDIR")"
+  #exists cygpath &&  LOGDIR="$(cygpath -w "$LOGDIR")"
   
   ROPTIONS=(
     "${OPTIONS[@]}"

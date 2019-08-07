@@ -7,9 +7,11 @@ SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
 source "$SDIR/lib/functions/all.sh"
 
+
 MOUNTED=()
 getdev(){
-    DEV=$("$SDIR/lib/getdev.sh" "$1") || die "Device $1 not found"
+    DEV=$("$SDIR/lib/getdev.sh" "$1"|perl -lape 's/(?:\r|\n)+$//g') || die "Device $1 not found"
+	exists cygpath && DEV="$(cygpath -u "$DEV")"
     DEV=$(readlink -e "$DEV") || die "Device '$DEV' doesn't exists"
     MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')
     [[ -z $MOUNT && $UID -eq 0  && -b $DEV ]] && { #if it is a block device, then check if it is mounted and mount it if not
@@ -21,7 +23,7 @@ getdev(){
     MOUNT=${MOUNT%/} #remove trailing slash if any
 }
 
-RSYNCOPTIONS=()
+echo args="${@}"
 OPTIONS=()
 while [[ $1 =~ ^- ]]
 do
@@ -128,6 +130,7 @@ do
     done
     [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
 
+	echo 
     [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
         DRIVE=$(cygpath -w "$(stat -c%m "$ROOT")")
 

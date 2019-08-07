@@ -12,8 +12,8 @@ find "$excludedir/bkit" -type f -exec cat "{}" '+' | grep -vP ^# | perl -lape "s
 OS=$(uname -o |tr '[:upper:]' '[:lower:]')
 
 [[ $OS == cygwin ]] && {
-	bash "$sdir/hklm.sh"| bash "$sdir/w2f.sh"
-	find "$excludedir/windows" -type f -print0 | xargs -r0I{} cat "{}" | grep -vP ^# | bash "$sdir/w2f.sh"
+	bash "$sdir/excludes/hklm.sh"| bash "$sdir/excludes/w2f.sh"
+	find "$excludedir/windows" -type f -print0 | xargs -r0I{} cat "{}" | grep -vP ^# | bash "$sdir/excludes/w2f.sh"
 }
 
 [[ $OS != cygwin ]] && {

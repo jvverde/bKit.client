@@ -23,7 +23,7 @@ getdev(){
     MOUNT=${MOUNT%/} #remove trailing slash if any
 }
 
-echo args="${@}"
+#echo args="${@}"
 OPTIONS=()
 while [[ $1 =~ ^- ]]
 do

@@ -484,12 +484,12 @@ ITIME=$(date -R)
 
 ######################### Now some stats if requested #########################
 
-[[ ${stats+isset} == isset && -e $logfile && -e "$SDIR/tools/send-stats.pl" ]] && exists perl && {
+[[ ${stats+isset} == isset && -e $logfile && -e "$SDIR/lib/tools/stats/send-stats.pl" ]] && exists perl && {
   echo "------------Stats------------"
   deltatime "$(date -R)" "$ITIME"
   echo "Total time spent: $DELTATIME"
   exists cygpath && ROOT=$(cygpath -w "$ROOT")
-  cat -v "$logfile" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/tools/send-stats.pl"
+  cat -v "$logfile" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$SDIR/lib/tools/stats/send-stats.pl"
   echo "------------End of Stats------------"
 } | tee "$statsfile"
 

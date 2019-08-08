@@ -3,7 +3,6 @@ sdir="$(dirname -- "$(readlink -f "$0")")"				#Full DIR
 
 source "$sdir/lib/functions/all.sh"
 
-echo VARDIR=$VARDIR
 declare -a filters=()
 
 
@@ -111,7 +110,7 @@ done
 [[ -n $nofilters ]] || filters+=( --filter=": .rsync-filter" )
 
 echo Start snapshot backup
-echo options="${options[@]}"
-echo RSYNCOPTIONS="${RSYNCOPTIONS[@]}"
+#echo options="${options[@]}"
+#echo RSYNCOPTIONS="${RSYNCOPTIONS[@]}"
 echo bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
 bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"

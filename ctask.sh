@@ -235,6 +235,7 @@ do
 		echo "$F"
 	done >> "$FILTERFILE"
 	LOGDIR="$VARDIR/log/${TASKNAME,,}/${DRIVE}/"
+	mkdir -pv "$LOGDIR"
 
   #exists cygpath &&  LOGDIR="$(cygpath -w "$LOGDIR")"
   
@@ -249,11 +250,12 @@ do
 		FILTERLOCATION="$FILTERFILE"
 		if [[ $OS == cygwin ]]
 		then
-			FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
+			#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
+			tasklog="$(cygpath -w "$LOGDIR/task.log")"
 			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
 			echo REM Logs on folder $LOGDIR
 			echo 'pushd "%~dp0"'
-			echo $CMD "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]:-/}"
+			echo $CMD "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]:-/} >> "'"'$tasklog'"'
 			echo 'popd'
 		else
 			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"

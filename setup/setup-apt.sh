@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 #https://github.com/transcode-open/apt-cyg
+# or https://github.com/kou1okada/apt-cyg
+#https://stackoverflow.com/questions/9260014/how-do-i-install-cygwin-components-from-the-command-line
 if [[ ${OSTYPE,,} == cygwin ]] 
 then
 	#cygcheck apt-cyg 1>/dev/null 2>&1 && echo yes
@@ -11,5 +13,5 @@ then
 	popd
 	rmdir -v "$tmp"
 else
-	echo Not Cywin OSTYPE
+	echo Not Cygwin OSTYPE
 fi

@@ -11,7 +11,7 @@ excludes(){
 	declare -r exclist="$VARDIR/excludes/excludes.lst"
 
 	[[ -e "$exclist" ]] || {
-		echo compile exclude list
+		echo Compile exclude list for the first time
 		mkdir -pv "${exclist%/*}"
 		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
 	}
@@ -55,13 +55,13 @@ do
 			done
 		;;
 		-a|--all)
-			ALL=1
+			declare -r ALL=1
 		;;
 		--no-import)
 			NO_IMPORT=1
 		;;
 		-c|--compile)
-			compile=1
+			declare -r compile=1
 		;;
 		--ignore-filters)
 			nofilters=1
@@ -102,7 +102,8 @@ done
 	}
 }
 
-[[ -n $ALL ]] || excludes
+#Use excludes unless we want to snapshot everything
+[[ ${ALL+isset} == isset ]] || excludes
 
 #Until i think a little bit better about this, comment out next line
 #[[ -n $NO_IMPORT ]] || importrules

@@ -162,7 +162,7 @@ RDIR="$sdir"
 	# DOSBASH="$(realpath --relative-to="$(cygpath -w "$TASKDIR")" "$WBASH")"
 	# DOSBASH="${DOSBASH%.exe}" #just in case
 	#CMD='"'${DOSBASH}.exe'" "'${sdir}/skit.sh'"'
-	CMD='call "'$(cygpath -w "${sdir}")\\bash.bat'" "'${sdir}/skit.sh'"'
+	CMD='call "'$(cygpath -w "${sdir}")\\skit.bat'"'
 	echo '@echo OFF'> "$JOBFILE"
 }
 
@@ -238,7 +238,7 @@ do
 	LOGDIR="$LOGBASE/${DRIVE}/"
 	mkdir -pv "$LOGDIR"
 
-  #exists cygpath &&  LOGDIR="$(cygpath -w "$LOGDIR")"
+  exists cygpath &&  WLOGDIR="$(cygpath -w "$LOGDIR")"
   
   ROPTIONS=(
     "${OPTIONS[@]}"
@@ -253,11 +253,15 @@ do
 		then
 			#FILTERLOCATION=$(realpath -m --relative-to="$TASKDIR" "$FILTERFILE")
 			tasklog="$(cygpath -w "$LOGBASE/task.log")"
-			echo REM Backup of "${BACKUPDIR[@]}" on DRIVE $(cygpath -w "$ROOT")
-			echo REM Logs on folder $LOGDIR
-			echo 'pushd "%~dp0"'
-			echo $CMD "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]:-/} >> "'"'$tasklog'"'
-			echo 'popd'
+			cat <<EOF
+>> "$tasklog" 2>&1 (
+	echo Snapshot of ${BACKUPDIR[@]} on DRIVE $(cygpath -w "$ROOT")
+	echo See Logs on folder $WLOGDIR
+	pushd "%~dp0"
+	$CMD ${ROPTIONS[@]}  -- --filter='. $FILTERLOCATION' ${BACKUPDIR[@]:-/}
+	popd
+)
+EOF
 		else
 			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"
 			echo "#Logs on folder $LOGDIR"

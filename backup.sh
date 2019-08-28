@@ -494,36 +494,36 @@ ITIME=$(date -R)
 } | tee "$statsfile"
 
 ######################### Sent email if required #########################
-[[ ${NOTIFY+isset} == isset  && -s $statsfile ]] && (
-  ME=$(uname -n)
-  FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
-  exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
-  printf -v DIRS "%s, " "${FULLDIRS[@]}"
-  DIRS=${DIRS%, }
-  WHAT=$DIRS
-  let NUMBEROFDIRS=${#FULLDIRS[@]}
-  let LIMIT=3
-  let EXTRADIRS=NUMBEROFDIRS-LIMIT
-  ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
-  [[ -s $errfile ]] && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" ||
-  SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
-  {
-    echo "Backup of $DIRS"
-    cat "$statsfile"
+# [[ ${NOTIFY+isset} == isset  && -s $statsfile ]] && (
+  # ME=$(uname -n)
+  # FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
+  # exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
+  # printf -v DIRS "%s, " "${FULLDIRS[@]}"
+  # DIRS=${DIRS%, }
+  # WHAT=$DIRS
+  # let NUMBEROFDIRS=${#FULLDIRS[@]}
+  # let LIMIT=3
+  # let EXTRADIRS=NUMBEROFDIRS-LIMIT
+  # ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
+  # [[ -s $errfile ]] && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" ||
+  # SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
+  # {
+    # echo "Backup of $DIRS"
+    # cat "$statsfile"
 
-    [[ -s $errfile ]] && {
-      echo -e "\n------------Errors found------------"
-      cat "$errfile"
-      echo "------------End of Errors------------"
-    }
+    # [[ -s $errfile ]] && {
+      # echo -e "\n------------Errors found------------"
+      # cat "$errfile"
+      # echo "------------End of Errors------------"
+    # }
 
-    [[ -n $FULLREPORT ]] && {
-      echo -e "\n------------Full Logs------------"
-      cat "$logfile"
-      echo "------------End of Logs------------"
-    }
-  } | sendnotify "$SUBJECT" "$DEST" "$ME"
-)
+    # [[ -n $FULLREPORT ]] && {
+      # echo -e "\n------------Full Logs------------"
+      # cat "$logfile"
+      # echo "------------End of Logs------------"
+    # }
+  # } | sendnotify "$SUBJECT" "$DEST" "$ME"
+# )
 [[ -s $errfile ]] && die "Backup done with some errors. Check $errfile"
 
 deltatime "$(date -R)" "$ITIME"

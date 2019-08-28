@@ -109,8 +109,8 @@ done
 
 [[ -n $nofilters ]] || filters+=( --filter=": .rsync-filter" )
 
-echo Start snapshot backup
+echo @"$(date -Imin)" Start snapshot backup for "${@:-.}"
 #echo options="${options[@]}"
 #echo RSYNCOPTIONS="${RSYNCOPTIONS[@]}"
-echo bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
+echo "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
 bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"

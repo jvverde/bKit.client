@@ -9,6 +9,7 @@ then
 	pushd "$third"
 	wget -nv https://download.sysinternals.com/files/SysinternalsSuite.zip
 	unzip SysinternalsSuite.zip
+	chmod ugo+rx *.exe
 	popd
 else
 	echo Not Cygwin OSTYPE

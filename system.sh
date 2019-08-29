@@ -5,6 +5,6 @@ wdir="$(cygpath -w "$sdir")"
 
 [[ ${OSTYPE,,} != cygwin ]] && echo "Not cygwin here" && exit 1
 
-psexec="$(echo "$(find "$sdir" /cygdrive/* -maxdepth 12 -iname psexec.exe -print -quit 2>/dev/null)")"
+psexec="$(find "$sdir" /cygdrive/* -maxdepth 12 -iname psexec.exe -print -quit 2>/dev/null)"
 
 "$psexec" -is -w "$wdir" "$wdir/bash.bat" "$@"

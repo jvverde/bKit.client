@@ -6,7 +6,7 @@ source "$sdir/lib/functions/all.sh"
 declare -a RSYNCOPTIONS=()
 
 [[ ${BKIT_CONFIG+isset} == isset && -e $BKIT_CONFIG ]] || {
-	BKIT_CONFIG="$ETCDIR/default/conf.init"
+	BKIT_CONFIG="$ETCDIR/server/default/conf.init"
 }
 
 [[ -e $BKIT_CONFIG ]] || die "Can't source file '$BKIT_CONFIG'"

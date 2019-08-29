@@ -172,12 +172,12 @@ mktempdir RUNDIR || die "Can't create a temporary working directory"
 FLIST="$RUNDIR/file-list.$$"
 HLIST="$RUNDIR/hl-list.$$"
 DLIST="$RUNDIR/dir-list.$$"
-NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
-logfile="$VARDIR/log/backup-logs-$NOW"
-errfile="$VARDIR/log/backup-errors-$NOW"
-statsfile="$VARDIR/log/backup-stats-NOW"
+NOW="$(date +"%Y-%m-%dT%Hh%Mm%S(%:::z).%a.%W")"
+logfile="$VARDIR/log/backup/$NOW.log"
+errfile="$VARDIR/log/backup/$NOW.err"
+statsfile="$VARDIR/log/backup/$NOW.stat"
 
-mkdir -pv "${logfile%/*}" #Just ensure that the log directory exists
+mkdir -pv "${logfile%/*}" "${errfile%/*}" "${statsfile%/*}" #Just ensure that the log directory exists
 
 exec 3>&2
 exec 2> >(tee "$errfile" >&3)
@@ -356,7 +356,7 @@ backupACLS(){
     {
       #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$metadatadir" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
       export BKIT_TARGET='metadata'
-	  export BKIT_MNTPOINT="$metadatadir"
+      export BKIT_MNTPOINT="$metadatadir"
       bash "$SDIR/hashit.sh"  ${options+"${options[@]}"} "${MDIRS[@]}"
     } >&"${COPROC[1]}"
     exec {COPROC[1]}>&-
@@ -494,37 +494,40 @@ ITIME=$(date -R)
 } | tee "$statsfile"
 
 ######################### Sent email if required #########################
-# [[ ${NOTIFY+isset} == isset  && -s $statsfile ]] && (
-  # ME=$(uname -n)
-  # FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
-  # exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
-  # printf -v DIRS "%s, " "${FULLDIRS[@]}"
-  # DIRS=${DIRS%, }
-  # WHAT=$DIRS
-  # let NUMBEROFDIRS=${#FULLDIRS[@]}
-  # let LIMIT=3
-  # let EXTRADIRS=NUMBEROFDIRS-LIMIT
-  # ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
-  # [[ -s $errfile ]] && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" ||
-  # SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
-  # {
-    # echo "Backup of $DIRS"
-    # cat "$statsfile"
+[[ ${NOTIFY+isset} == isset  && ${DEST+isset} == isset && -s $statsfile ]] && (
+  ME=$(uname -n)
+  FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
+  exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
+  printf -v DIRS "%s, " "${FULLDIRS[@]}"
+  DIRS=${DIRS%, } #rm last comma
+  WHAT=$DIRS
+  let NUMBEROFDIRS=${#FULLDIRS[@]}
+  let LIMIT=3
+  let EXTRADIRS=NUMBEROFDIRS-LIMIT
+  ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
 
-    # [[ -s $errfile ]] && {
-      # echo -e "\n------------Errors found------------"
-      # cat "$errfile"
-      # echo "------------End of Errors------------"
-    # }
+  [[ -s $errfile ]] \
+    && SUBJECT="Some errors occurred while backing up $WHAT on $ME at $(date +%Hh%Mm)" \
+    || SUBJECT="Backup of $WHAT on $ME successfully finished at $(date +%Hh%Mm)"
+  {
+    echo "Backup of $DIRS"
+    cat "$statsfile"
 
-    # [[ -n $FULLREPORT ]] && {
-      # echo -e "\n------------Full Logs------------"
-      # cat "$logfile"
-      # echo "------------End of Logs------------"
-    # }
-  # } | sendnotify "$SUBJECT" "$DEST" "$ME"
-# )
-[[ -s $errfile ]] && die "Backup done with some errors. Check $errfile"
+    [[ -s $errfile ]] && {
+      echo -e "\n------------Errors found------------"
+      cat "$errfile"
+      echo "------------End of Errors------------"
+    }
+
+    [[ ${FULLREPORT+isset} == isset ]] && {
+      echo -e "\n------------Full Logs------------"
+      cat "$logfile"
+      echo "------------End of Logs------------"
+    }
+  } | sendnotify "$SUBJECT" "$DEST" "$ME"
+)
+
+[[ -s $errfile ]] && die "Backup done with some errors. Check $errfile" || rm "$errfile"
 
 deltatime "$(date -R)" "$ITIME"
 echo "Backup done in $DELTATIME"

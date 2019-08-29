@@ -13,6 +13,8 @@ server_doit(){
 
   [[ ${ETCDIR+isset} == isset ]] || die "ETCDIR is not defined"
 
+  declare -r CONFDIR="$ETCDIR/server"
+
   function usage(){
       local name=$(basename -s .sh "$0")
       echo Set default server
@@ -23,7 +25,7 @@ server_doit(){
   [[ $1 =~ ^--?h ]] && usage
   [[ $1 =~ ^-s ]] && shift && save=1 #we want to save it permanently
 
-  declare -r default="$ETCDIR/default"
+  declare -r default="$CONFDIR/default"
   declare current="$default"
   declare config="$current/conf.init"
 
@@ -33,7 +35,7 @@ server_doit(){
 
   	exists nc && { nc -z $server $port 2>&1 || die bKit server not found at $server:$port;}
 
-  	current="$ETCDIR/$server"
+  	current="$CONFDIR/$server"
     config="$current/conf.init"
 
   	[[ -e $config ]] || bash "$sdir/init.sh" "$server" || die "Can't set conf.init to server $server"

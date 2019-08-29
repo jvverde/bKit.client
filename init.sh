@@ -22,7 +22,7 @@ usage() {
 echo Contacting the server ... please wait!
 exists nc && { nc -z $SERVER $PORT 2>&1 		|| die Server $SERVER not found;}
 
-CONFDIR="$ETCDIR/$SERVER"
+CONFDIR="$ETCDIR/server/$SERVER"
 
 bash "$SDIR"/lib/keygen.sh -n "$SERVER" "$CONFDIR"		|| die "Can't generate a key"
 

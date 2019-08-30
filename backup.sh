@@ -494,7 +494,7 @@ ITIME=$(date -R)
 } | tee "$statsfile"
 
 ######################### Sent email if required #########################
-[[ ${NOTIFY+isset} == isset  && ${DEST+isset} == isset && -s $statsfile ]] && (
+[[ ${NOTIFY+isset} == isset && -s $statsfile ]] && (
   ME=$(uname -n)
   FULLDIRS=( $(readlink -e "${ORIGINALDIR[@]}") )     #get full paths
   exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
@@ -524,7 +524,7 @@ ITIME=$(date -R)
       cat "$logfile"
       echo "------------End of Logs------------"
     }
-  } | sendnotify "$SUBJECT" "$ME" "$DEST" 
+  } | sendnotify "$SUBJECT" "$ME" "${EMAIL:-}" 
 )
 
 [[ -s $errfile ]] && die "Backup done with some errors. Check $errfile" || rm "$errfile"

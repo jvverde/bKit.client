@@ -346,7 +346,7 @@ done
       cat "$LOGFILE"
       echo "------------End of Logs------------"
     }
-  } | sendnotify "$SUBJECT" "$DEST" "$ME"
+  } | sendnotify "$SUBJECT" "$ME" "$DEST"
 )
 
 

@@ -524,7 +524,7 @@ ITIME=$(date -R)
       cat "$logfile"
       echo "------------End of Logs------------"
     }
-  } | sendnotify "$SUBJECT" "$DEST" "$ME"
+  } | sendnotify "$SUBJECT" "$ME" "$DEST" 
 )
 
 [[ -s $errfile ]] && die "Backup done with some errors. Check $errfile" || rm "$errfile"

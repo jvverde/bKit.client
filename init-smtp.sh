@@ -8,7 +8,7 @@ mkdir -pv "${confile%/*}"
 test -e "$confile" || :> "$confile"
 source "$confile"
 
-doit(){
+save2conf(){
   [[ ${email+isset} == isset ]] && {
     sed -i /TO=.*/d "$confile"
     echo "TO=$email" >> "$confile"
@@ -26,9 +26,9 @@ do
   email="${mail:-$TO}"
 done
 
-echo "Just checking" | mail -s "Bkit check if a MTA is installed" "$email" \
+exists mail && echo "Just checking" | mail -s "Bkit check if a MTA is installed" "$email" \
   && echo "A mail was sent to $email. Please check it" \
-  && doit
+  && save2conf
 
 declare -ir dport=25
 
@@ -37,12 +37,11 @@ do
     port=${port:-$dport}
     echo "Test connection to $smtp:$port"
     exists nc && {
-      nc -z $smtp -q 2 $port 2>&1 \
+      nc -z $smtp $port 2>&1 \
         && echo "Good! Port $port is open at server $smtp" \
         && break \
         || warn "Server $smtp at port $port not found"
     }
 done
-
-echo "$smtp:$port"
+save2conf
 

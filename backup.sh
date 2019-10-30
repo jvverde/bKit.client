@@ -179,8 +179,8 @@ statsfile="$VARDIR/log/backup/$NOW.stat"
 
 mkdir -pv "${logfile%/*}" "${errfile%/*}" "${statsfile%/*}" #Just ensure that the log directory exists
 
-exec 3>&2
-exec 2> >(tee "$errfile" >&3)
+exec {FD}>&2
+exec 2> >(tee "$errfile" >&$FD)
 
 #finish() {
 #  cat "$errfile" >&3
@@ -189,21 +189,27 @@ exec 2> >(tee "$errfile" >&3)
 #atexit finish
 #
 set_postpone_files(){
-	exec 99>"$HLIST"
-	exec 98>"$DLIST"
-	exec 97>"$FLIST"
+	#exec 99>"$HLIST"
+	#exec 98>"$DLIST"
+	#exec 97>"$FLIST"
+	exec {FDA}>"$HLIST"
+	exec {FDB}>"$DLIST"
+	exec {FDC}>"$FLIST"
 }
 remove_postpone_files(){
 	rm -f "$HLIST" "$DLIST" "$FLIST"
 }
 postpone_file(){
-	(IFS=$'\n' && echo "$*" ) >&97
+	#(IFS=$'\n' && echo "$*" ) >&97
+	(IFS=$'\n' && echo "$*" ) >&$FDC
 }
 postpone_hl(){
-	(IFS=$'\n' && echo "$*" ) >&99
+	#(IFS=$'\n' && echo "$*" ) >&99
+	(IFS=$'\n' && echo "$*" ) >&$FDA
 }
 postpone_update(){
-	(IFS=$'\n' && echo "$*" ) >&98
+	#(IFS=$'\n' && echo "$*" ) >&98
+	(IFS=$'\n' && echo "$*" ) >&$FDB
 }
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'

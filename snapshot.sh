@@ -133,6 +133,7 @@ do
 	echo 
     [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
         DRIVE=$(cygpath -w "$(stat -c%m "$ROOT")")
+		DRIVE="${DRIVE%\\}"
 
         DOSBASH=$(cygpath -w "$BASH")
 

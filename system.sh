@@ -10,3 +10,4 @@ psexec="$(find "$sdir" -iname psexec.exe -print -quit 2>/dev/null)"
 [[ -x $psexec ]] || echo "'$psexec' is not executable"
 
 "$psexec" -is -w "$wdir" "$wdir/bash.bat" "$@"
+

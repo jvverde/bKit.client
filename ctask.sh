@@ -289,7 +289,7 @@ done
 		schtasks /QUERY|fgrep BKIT
 	else
 		echo "Create a job file in $JOBFILE"
-		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /bin/bash \"$JOBFILE\""
+		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /usr/bin/flock -n '$TASKDIR/.lock.$TASKNAME' /bin/bash '$JOBFILE'"
 		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
 			echo "$JOB"

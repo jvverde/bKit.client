@@ -114,6 +114,6 @@ echo Start snapshot backup for "${@:-.}" @"$(date -Imin)"
 #echo options="${options[@]}"
 #echo RSYNCOPTIONS="${RSYNCOPTIONS[@]}"
 #echo "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
-time bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
+time bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}" 2>&1
 echo Done snapshot backup for "${@:-.}" @"$(date -Imin)" 
 

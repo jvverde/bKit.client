@@ -188,7 +188,7 @@ do
 	BACKUPDIR=()
   for DIR in "${!ROOTOF[@]}"
   do
-      [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "\"${RPATHS["$DIR"]}\"" )
+      [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "'${RPATHS["$DIR"]}'" )
   done
   [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
   #echo ROOT:$ROOT
@@ -263,13 +263,18 @@ do
 )
 EOF
 		else
-			echo "#Backup of [${BACKUPDIR[@]}] under $ROOT"
-			echo "#Logs on folder $LOGDIR"
-			echo 'pushd "$(dirname "$(readlink -f "$0")")"'
-			echo "/bin/bash \"$sdir/skit.sh\"" "${ROPTIONS[@]}"  -- --filter='". '$FILTERLOCATION'"' "${BACKUPDIR[@]:-/}"
-			echo 'popd'
+      cat <<EOF
+#!/usr/bin/env bash
+#Backup of ${BACKUPDIR[@]} under current mointing point $ROOT
+#Logs on folder $LOGDIR
+pushd "\$(dirname "\$(readlink -f "\$0")")" >/dev/null
+/bin/bash '$sdir/skit.sh' ${ROPTIONS[@]}  -- --filter='. $FILTERLOCATION' ${BACKUPDIR[@]:-/}
+popd >/dev/null
+EOF
+
 		fi
 	} >> "$JOBFILE"
+  chmod 755 "$JOBFILE"
 done
 
 [[ -n $INSTALL ]] && {
@@ -289,7 +294,7 @@ done
 		schtasks /QUERY|fgrep BKIT
 	else
 		echo "Create a job file in $JOBFILE"
-		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /usr/bin/flock -n '$TASKDIR/.lock.$TASKNAME' /bin/bash '$JOBFILE'"
+		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /usr/bin/flock -n '$TASKDIR/.lock.$TASKNAME' -c '$JOBFILE' || echo '$TASKDIR/.lock.$TASKNAME' is locked"
 		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
 			echo "$JOB"

@@ -150,7 +150,8 @@ do
 
         if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
         then
-            ntfssnap $DRIVE $MAPLETTER "${BACKUPDIR[@]}"
+            #ntfssnap $DRIVE $MAPLETTER "${BACKUPDIR[@]}"
+            backup "${BACKUPDIR[@]}"
         else
             backup "${BACKUPDIR[@]}"
         fi

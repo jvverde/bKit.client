@@ -105,7 +105,7 @@ ntfssnap(){
         }
     done
     "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" "${OPTIONS[@]}" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
-}
+ }
 
 mktempdir RUNDIR
 RMFILES=()
@@ -133,15 +133,15 @@ do
 	echo 
     [[ $OS == cygwin ]] && (id -G|grep -qE '\b544\b') && {
         DRIVE=$(cygpath -w "$(stat -c%m "$ROOT")")
-		DRIVE="${DRIVE%\\}"
+		DRIVE2="${DRIVE%\\}"
+        
+		DOSBASH=$(cygpath -w "$BASH")
 
-        DOSBASH=$(cygpath -w "$BASH")
-
-        NTFS=$(FSUTIL FSINFO VOLUMEINFO $DRIVE | fgrep -i "File System Name" | fgrep -oi "NTFS")
-        FIXED=$(FSUTIL FSINFO DRIVETYPE $DRIVE | fgrep -oi "Fixed Drive")
+        NTFS=$(FSUTIL FSINFO VOLUMEINFO $DRIVE2 | fgrep -i "File System Name" | fgrep -oi "NTFS")
+        FIXED=$(FSUTIL FSINFO DRIVETYPE $DRIVE2 | fgrep -oi "Fixed Drive")
         CDRIVES=$(FSUTIL FSINFO DRIVES|sed 'N;s/\n//g;/^$/d'|tr '\0' ' '|grep -Poi '(?<=Drives:\s).*'|tr '[:lower:]' '[:upper:]')
 
-        for LETTER in {H..Z} B {D..G} A
+        for LETTER in {I..Z} B {D..H} A
         do
         	[[ $CDRIVES =~ $LETTER ]] || {
         		MAPLETTER="${LETTER}:" && break
@@ -150,6 +150,7 @@ do
 
         if [[ -n $MAPLETTER && -n $FIXED && -n $NTFS ]]
         then
+            echo ntfssnap $DRIVE $MAPLETTER "${BACKUPDIR[@]}"
             ntfssnap $DRIVE $MAPLETTER "${BACKUPDIR[@]}"
         else
             backup "${BACKUPDIR[@]}"

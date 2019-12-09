@@ -14,8 +14,13 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
+    "element-ui": "^2.13.0",
+    "is-electron": "^2.2.0",
+    "moment": "^2.24.0",
     "quasar": "^1.0.0",
-    "vue-i18n": "^8.0.0"
+    "vue-i18n": "^8.0.0",
+    "vuelidate": "^0.7.4",
+    "vuex-persistedstate": "^2.7.0"
   },
   "devDependencies": {
     "@quasar/app": "^1.0.0",

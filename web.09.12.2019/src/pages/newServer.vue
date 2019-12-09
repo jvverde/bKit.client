@@ -1,28 +1,36 @@
 <template>
-  <q-modal v-model="show" class="newserver">
-    <form @submit.prevent>
-      <q-input type="text" max-length="16"
-        v-model="server.name"  float-label="Name"
-        :error="$v.server.name.$error"
-        @blur="$v.server.name.$touch"
-        @keyup.enter="send"
-      />
-      <q-input type="text" max-length="16" autofocus
-        v-model="server.address" float-label="Server address"
-        :error="$v.server.address.$error"
-        @blur="$v.server.address.$touch"
-        @keyup.enter="send"
-      />
-      <q-input type="text" max-length="16"
-        v-model="server.port" float-label="Server port"
-        :error="$v.server.port.$error"
-        @blur="$v.server.port.$touch"
-        @keyup.enter="send"
-      />
-      <q-btn color="primary" @click="$emit('close')" label="Cancel" />
-      <q-btn color="primary" @click="send" :loading="submitting" label="Apply" />
-    </form>
-  </q-modal>
+  <div class="q-pa-md q-gutter-sm">
+    <q-dialog v-model="show" class="newserver">
+      <q-layout view="Lhh lpR fff" container class="bg-white">
+        <q-page-container>
+          <q-page padding>
+            <form @submit.prevent>
+              <q-input type="text" max-length="16"
+                v-model="server.name"  float-label="Name"
+                :error="$v.server.name.$error"
+                @blur="$v.server.name.$touch"
+                @keyup.enter="send"
+              />
+              <q-input type="text" max-length="16" autofocus
+                v-model="server.address" float-label="Server address"
+                :error="$v.server.address.$error"
+                @blur="$v.server.address.$touch"
+                @keyup.enter="send"
+              />
+              <q-input type="text" max-length="16"
+                v-model="server.port" float-label="Server port"
+                :error="$v.server.port.$error"
+                @blur="$v.server.port.$touch"
+                @keyup.enter="send"
+              />
+              <q-btn color="primary" @click="$emit('close')" label="Cancel" />
+              <q-btn color="primary" @click="send" :loading="submitting" label="Apply" />
+            </form>
+          </q-page>
+        </q-page-container>
+      </q-layout>
+    </q-dialog>
+  </div>
 </template>
 
 <script>

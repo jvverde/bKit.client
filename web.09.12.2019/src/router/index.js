@@ -5,22 +5,31 @@ import routes from './routes'
 
 Vue.use(VueRouter)
 
+const Router = new VueRouter({
+  /*
+   * NOTE! Change Vue Router mode from quasar.conf.js -> build -> vueRouterMode
+   *
+   * If you decide to go with "history" mode, please also set "build.publicPath"
+   * to something other than an empty string.
+   * Example: '/' instead of ''
+   */
+
+  // Leave as is and change from quasar.conf.js instead!
+  mode: process.env.VUE_ROUTER_MODE,
+  base: process.env.VUE_ROUTER_BASE,
+  scrollBehavior: () => ({ y: 0 }),
+  routes
+})
+
 /*
- * If not building with SSR mode, you can
- * directly export the Router instantiation
- */
+// Inform Google Analytics
+Router.beforeEach((to, from, next) => {
+  if (typeof ga !== 'undefined') {
+    ga('set', 'page', to.path)
+    ga('send', 'pageview')
+  }
+  next()
+})
+*/
 
-export default function (/* { store, ssrContext } */) {
-  const Router = new VueRouter({
-    scrollBehavior: () => ({ x: 0, y: 0 }),
-    routes,
-
-    // Leave these as they are and change in quasar.conf.js instead!
-    // quasar.conf.js -> build -> vueRouterMode
-    // quasar.conf.js -> build -> publicPath
-    mode: process.env.VUE_ROUTER_MODE,
-    base: process.env.VUE_ROUTER_BASE
-  })
-
-  return Router
-}
+export default Router

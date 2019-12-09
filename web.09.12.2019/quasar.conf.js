@@ -28,6 +28,26 @@ module.exports = function (ctx) {
       'roboto-font', // optional, you are not bound to it
       'material-icons' // optional, you are not bound to it
     ],
+    
+    devServer: {
+      // https: true,
+      // port: 8080,
+      open: true, // opens browser window automatically
+      proxy: {
+        '/info': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
+        '/auth': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
+        '/ws': {
+          target: 'http://localhost:3000/',
+          changeOrigin: true
+        }         
+      }
+    },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {

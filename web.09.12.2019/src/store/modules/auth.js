@@ -72,6 +72,8 @@ export default {
       if (found) {
         state.currentServer = state.servers[i]
       }
+      console.log('load server ', name)
+      console.log('found ', i)
       return found
     },
     remove_server (state, name) {
@@ -117,6 +119,7 @@ export default {
       commit('login', data)
     },
     chgServer ({ commit }, name) {
+      console.log('chServer to ', name)
       commit('save_server')
       commit('load_server', name)
     },

@@ -10,18 +10,22 @@
         </q-toolbar-title>
         <div v-if="servername"> <!-- this is an workaround -->
           <u>Server</u>: {{servername}}
-          <q-menu anchor="bottom left" self="top left"
-            ref="mypopover" v-model="showServers">
-            <q-list @click.native="$refs.mypopover.hide()"
-              link separator class="scroll" style="min-width: 100px">
-              <q-item>Servers</q-item>
-              <q-item link v-for="server in orderedServers"
+          <q-menu
+            anchor="bottom left"
+            self="top left"
+            v-model="showServers">
+            <q-list
+              class="scroll"
+              style="min-width: 100px">
+              <q-item v-for="server in orderedServers"
                 :key="server.name" clickable v-close-popup>
-                <q-item-section>
+                <q-item-section avatar>
                   <q-icon name="delete" color="warning"
-                    @click.native="rmServer(server.name)"/>
+                    @click="rmServer(server.name)"/>
+                </q-item-section>
+                <q-item-section>
                   <q-item-label
-                    @click.native="chgServer(server.name)"
+                    @click="chgServer(server.name)"
                   >
                   {{server.name}}
                   </q-item-label>
@@ -93,7 +97,7 @@
 -->
 
     </q-drawer>
-    <new-server :open="askServer" @close="askServer = false"/>
+    <new-server :open="askServer" :required="nullURL" @close="askServer = false"/>
     <q-page-container style="height:100vh">
       <router-view />
     </q-page-container>
@@ -130,6 +134,9 @@ export default {
       set: function (v) {
         this.ask_server = v
       }
+    },
+    nullURL () {
+      return !this.baseURL
     },
     ...mapGetters('auth', [
       'token',
@@ -170,6 +177,7 @@ export default {
       'push'
     ]),
     websocket (server, delay = 1) {
+      console.log('Set websocket for ', server)
       const wsname = server.url.replace(/^https?/, 'ws')
       const wsURL = `${wsname}/ws/alerts`
       const ws = websocks.create(wsURL)

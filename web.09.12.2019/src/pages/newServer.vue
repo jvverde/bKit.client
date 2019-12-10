@@ -1,31 +1,55 @@
 <template>
   <div class="q-pa-md q-gutter-sm">
     <q-dialog v-model="show" class="newserver">
-      <q-layout view="Lhh lpR fff" container class="bg-white">
+      <q-layout view="hhh LpR fff" container class="bg-white">
         <q-page-container>
           <q-page padding>
-            <form @submit.prevent>
+            <q-form
+              @submit="send"
+              autofocus
+              class="q-gutter-md">
               <q-input type="text" max-length="16"
-                v-model="server.name"  float-label="Name"
-                :error="$v.server.name.$error"
-                @blur="$v.server.name.$touch"
+                v-model="server.name"
+                filled
+                required
+                label="Server Name"
+                hint="Give a name to server"
+                :rules="[ val => !!val || '* Required']"
+                lazy-rules
                 @keyup.enter="send"
               />
-              <q-input type="text" max-length="16" autofocus
-                v-model="server.address" float-label="Server address"
-                :error="$v.server.address.$error"
-                @blur="$v.server.address.$touch"
+              <q-input type="text"
+                max-length="16"
+                autofocus
+                required
+                v-model="server.address"
+                label="Server address"
+                filled
+                hint="Server name or IP Address"
+                :rules="[ val => !!val || '* Required']"
+                lazy-rules
                 @keyup.enter="send"
               />
-              <q-input type="text" max-length="16"
-                v-model="server.port" float-label="Server port"
-                :error="$v.server.port.$error"
-                @blur="$v.server.port.$touch"
+              <q-input type="number"
+                max="65335"
+                min="1024"
+                v-model="server.port"
+                label="Server Port"
+                required
+                filled
+                hint="TCP Port Number where the server is listen"
+                :rules="[
+                  val => !!val || '* Required',
+                  val => val < 65536 && val > 1024 || 'Please use valid port number',
+                ]"
+                lazy-rules
                 @keyup.enter="send"
               />
-              <q-btn color="primary" @click="$emit('close')" label="Cancel" />
-              <q-btn color="primary" @click="send" :loading="submitting" label="Apply" />
-            </form>
+              <div>
+                <q-btn label="Apply" type="submit" color="primary" :loading="submitting"/>
+                <q-btn v-if="!required" color="primary" @click="close" v-close-popup label="Cancel" flat class="q-ml-sm"/>
+              </div>
+            </q-form>
           </q-page>
         </q-page-container>
       </q-layout>
@@ -34,7 +58,6 @@
 </template>
 
 <script>
-import { required, numeric, between } from 'vuelidate/lib/validators'
 import { mapActions } from 'vuex'
 import { defaultName } from 'src/helpers/utils'
 import { myMixin } from 'src/mixins'
@@ -50,21 +73,6 @@ export default {
       }
     }
   },
-  validations: {
-    server: {
-      name: {
-        required
-      },
-      address: {
-        required
-      },
-      port: {
-        required,
-        numeric,
-        between: between(1, 65535)
-      }
-    }
-  },
   computed: {
     show: {
       get () {
@@ -72,19 +80,16 @@ export default {
       },
       set () {
       }
-    },
-    ready () {
-      return !this.$v.server.$error
     }
   },
-  props: ['open'],
+  props: ['open', 'required'],
   mixins: [myMixin],
   methods: {
     ...mapActions('auth', [
       'addServer'
     ]),
     send () {
-      if (!this.ready) return
+      console.log('this.server=', this.server)
       this.submitting = true
       const url = `http://${this.server.address}:${this.server.port}`
       this.addServer({
@@ -93,6 +98,9 @@ export default {
       }).then(() => this.$emit('close')).catch(this.catch).then(() => {
         this.submitting = false
       })
+    },
+    close () {
+      this.$emit('close')
     }
   }
 }

@@ -29,7 +29,7 @@
 import { required, numeric, between } from 'vuelidate/lib/validators'
 import { mapActions } from 'vuex'
 import { defaultName } from 'src/helpers/utils'
-import { myMixin } from 'src/mixins'
+import {myMixin} from 'src/mixins'
 export default {
   name: 'newServer',
   data () {

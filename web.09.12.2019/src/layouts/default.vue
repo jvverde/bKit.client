@@ -6,39 +6,39 @@
           <q-icon name="menu" />
         </q-btn>
         <q-toolbar-title>
-          bKit App
-          <dd v-if="servername" slot="subtitle"> <!-- this is an workaround -->
-            <u>Server</u>: {{servername}}
-            <q-popover anchor="bottom left" self="top left"
-              ref="mypopover" v-model="showServers">
-              <q-list @click.native="$refs.mypopover.hide()"
-                link separator class="scroll" style="min-width: 100px">
-                <q-item>Servers</q-item>
-                <q-item link v-for="server in orderedServers"
-                  :key="server.name">
-                  <q-item-section>
-                    <q-icon="delete" color="warning"
-                      @click.native="rmServer(server.name)"/>
-                    <q-item-label
-                      @click.native="chgServer(server.name)"
-                    >
-                    {{server.name}}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item link @click.native="askServer = true" dense>
-                  <q-item-section>
-                    <q-icon="add"/>
-                    <q-item-label>Add a new server</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-popover>
-          </dd>
-          <div v-else slot="subtitle" @click="askServer = true">
-            <u style="cursor:pointer">Add server</u>
-          </div>
+          <span>bKit App</span>
         </q-toolbar-title>
+        <div v-if="servername"> <!-- this is an workaround -->
+          <u>Server</u>: {{servername}}
+          <q-menu anchor="bottom left" self="top left"
+            ref="mypopover" v-model="showServers">
+            <q-list @click.native="$refs.mypopover.hide()"
+              link separator class="scroll" style="min-width: 100px">
+              <q-item>Servers</q-item>
+              <q-item link v-for="server in orderedServers"
+                :key="server.name" clickable v-close-popup>
+                <q-item-section>
+                  <q-icon name="delete" color="warning"
+                    @click.native="rmServer(server.name)"/>
+                  <q-item-label
+                    @click.native="chgServer(server.name)"
+                  >
+                  {{server.name}}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item link @click.native="askServer = true" dense clickable v-close-popup>
+                <q-item-section>
+                  <q-icon name="add"/>
+                  <q-item-label>Add a new server</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </div>
+        <div v-else @click="askServer = true">
+          <u style="cursor:pointer">Add server</u>
+        </div>
         <div v-if="!logged">
           <q-btn
             flat

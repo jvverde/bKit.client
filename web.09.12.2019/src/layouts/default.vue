@@ -1,14 +1,21 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-header>
+    <q-header elevated>
       <q-toolbar color="primary" glossy>
-        <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen">
-          <q-icon name="menu" />
+        <q-btn
+          flat
+          dense
+          round
+          aria-label="Menu"
+          icon="menu"
+          class="not-decided-yes__q-mx-md" 
+          @click="leftDrawerOpen = !leftDrawerOpen">
         </q-btn>
         <q-toolbar-title>
-          <span>bKit App</span>
+          <span class="not-decided-yes__q-ml-sm">bKit App</span>
         </q-toolbar-title>
-        <div v-if="servername"> <!-- this is an workaround -->
+        <q-space />
+        <div v-if="servername">
           <u>Server</u>: {{servername}}
           <q-menu
             anchor="bottom left"
@@ -43,6 +50,7 @@
         <div v-else @click="askServer = true">
           <u style="cursor:pointer">Add server</u>
         </div>
+        <q-space />        
         <div v-if="!logged">
           <q-btn
             flat
@@ -59,10 +67,11 @@
           </q-btn>
         </div>
         <div v-else class="flex column items-end">
-          <div>{{user}}</div>
+          <span>{{user}}</span>
           <small><a href="#" @click="signout">Logout</a></small>
         </div>
         <div v-show="alerts">
+          <q-space />
           <q-btn flat round small icon="notifications"
             @click="$router.push({ name: 'alerts' })">
           </q-btn>

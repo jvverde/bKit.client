@@ -28,26 +28,6 @@ module.exports = function (ctx) {
       'roboto-font', // optional, you are not bound to it
       'material-icons' // optional, you are not bound to it
     ],
-    
-    devServer: {
-      // https: true,
-      // port: 8080,
-      open: true, // opens browser window automatically
-      proxy: {
-        '/info': {
-          target: 'http://localhost:3000',
-          changeOrigin: true
-        },
-        '/auth': {
-          target: 'http://localhost:3000',
-          changeOrigin: true
-        },
-        '/ws': {
-          target: 'http://localhost:3000/',
-          changeOrigin: true
-        }         
-      }
-    },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
@@ -103,6 +83,26 @@ module.exports = function (ctx) {
       // port: 8080,
       open: true // opens browser window automatically
     },
+
+/* devServer: {
+      // https: true,
+      // port: 8080,
+      open: true, // opens browser window automatically
+      proxy: {
+        '/info': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
+        '/auth': {
+          target: 'http://localhost:3000',
+          changeOrigin: true
+        },
+        '/ws': {
+          target: 'http://localhost:3000/',
+          changeOrigin: true
+        }
+      }
+    }, */
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
@@ -160,7 +160,6 @@ module.exports = function (ctx) {
       // id: 'bkit.serprest.app',
       // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
     },
-
 
     // https://quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
     capacitor: {

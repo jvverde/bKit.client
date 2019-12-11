@@ -1,26 +1,30 @@
 <template>
-  <div class="layout-padding column fullscreen">
-    <div class="layout-padding column">
-      <q-input type="text" max-length="16" autofocus
-        v-model="username"  float-label="Username"
-        :error="$v.username.$error"
-        @blur="$v.username.$touch"
+  <q-page class="flex flex-center">
+    <q-form
+      @submit="send"
+      autofocus
+      class="q-gutter-lg">
+      <q-input
+        type="text"
+        autofocus
+        v-model="username"
+        label="Username"
+        hint="The username of forgotten password"
         @keyup.enter="send"
       />
-      <q-btn v-model="submit" loader
-        rounded color="secondary"
+
+      <q-btn
+        label="Reset"
+        type="submit"
+        color="primary"
         :disabled="!ready"
-        @click="send"
-      >
-        Reset
-      </q-btn>
-    </div>
-  </div>
+        :loading="submit"/>
+    </q-form>
+  </q-page>
 </template>
 
 <script>
 import axios from 'axios'
-import { required } from 'vuelidate/lib/validators'
 import { myMixin } from 'src/mixins'
 
 import {
@@ -42,14 +46,9 @@ export default {
       submit: false
     }
   },
-  validations: {
-    username: {
-      required
-    }
-  },
   computed: {
     ready () {
-      return !this.$v.$error && this.username
+      return this.username !== ''
     }
   },
   mixins: [myMixin],

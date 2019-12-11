@@ -8,7 +8,7 @@
           round
           aria-label="Menu"
           icon="menu"
-          class="not-decided-yes__q-mx-md" 
+          class="not-decided-yes__q-mx-md"
           @click="leftDrawerOpen = !leftDrawerOpen">
         </q-btn>
         <q-toolbar-title>
@@ -50,7 +50,7 @@
         <div v-else @click="askServer = true">
           <u style="cursor:pointer">Add server</u>
         </div>
-        <q-space />        
+        <q-space />
         <div v-if="!logged">
           <q-btn
             flat

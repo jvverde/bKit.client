@@ -10,7 +10,7 @@ source "$SDIR/lib/functions/all.sh"
 
 MOUNTED=()
 getdev(){
-    DEV=$("$SDIR/lib/getdev.sh" "$1"|perl -lape 's/(?:\r|\n)+$//g') || die "Device $1 not found"
+    DEV=$("$SDIR/lib/getdev.sh" "$1"|head -n1|perl -lape 's/(?:\r|\n)+$//g') || die "Device $1 not found"
 	exists cygpath && DEV="$(cygpath -u "$DEV")"
     DEV=$(readlink -e "$DEV") || die "Device '$DEV' doesn't exists"
     MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')

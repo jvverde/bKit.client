@@ -41,10 +41,10 @@ my @files = grep {/^send\|.f/} @sends;
 	print "Total size of touched files: $bytes$u";
 }
 
-print 'Number of verified files:', scalar @files;
+print 'Number of assessed files:', scalar @files;
 
 my @dirs = grep {/^send\|.d/} @sends;
-print 'Number of verified dirs:', scalar @dirs;
+print 'Number of assessed dirs:', scalar @dirs;
 
 my $string = q#send|<f+++++++++|#;
 my @newfiles = grep {/^\Q$string\E/} @sends;

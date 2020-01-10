@@ -2,8 +2,6 @@
 - /logs
 - /run/***
 - /tmp
-- /schtasks
-- /filters
 - *~
 - /old
 - /not-used-anymore

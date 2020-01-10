@@ -32,9 +32,10 @@ exists mail && echo "Just checking" | mail -s "Bkit check if a MTA is installed"
 
 declare -ir dport=25
 
-while IFS=: read -p "SMTP server:port" smtp port
+while IFS=: read -p "SMTP server:port ${SERVER+[$SERVER]${PORT+:$PORT}}" smtp port
 do
     port=${port:-$dport}
+	smtp="${smtp:-$SERVER}"
     echo "Test connection to $smtp:$port"
     exists nc && {
       nc -z $smtp $port 2>&1 \

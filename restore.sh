@@ -41,7 +41,7 @@ declare -a options=(
 dorsync() {
   local localdir="${@: -1}$localbackup"
   mkdir -p "$localdir"
-  rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} "$@"
+  rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
   RET=$?
   #delete empty before-localdir dirs
   find "$localdir" -maxdepth 0 -empty -delete 2>/dev/null

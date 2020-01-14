@@ -14,6 +14,12 @@ do
 				shift
 			done
 		;;
+		-a|--all ) 
+			all="all"
+		;;
+		-d|--detail ) 
+			detail="detail"
+		;;
 		*)
 			die Unknown	option $KEY
 		;;
@@ -47,29 +53,30 @@ mktempdir FAKEROOT
 
 for DIR in "${RESTOREDIR[@]}"
 do
-	IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$SDIR/lib/drive.sh" "$DIR" 2>/dev/null)
 
-	exists cygpath && DRIVE=$(cygpath -w "$DIR")
-	DRIVE=${DRIVE%%:*}
-	RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+	source "$SDIR/lib/rvid.sh" "$DIR" || die "Can't source rvid"
 
 	ROOT="$(stat -c%m "$DIR")" || die "Can't find mounting point for '$DIR'"
 
 	DIR="${DIR#$ROOT}"										#remove mounting point from path => relative path
 
-	VERSIONS=( $(rsync --list-only "$BACKUPURL/$RVID/.snapshots/"|grep -Po '@GMT-.+$') ) 		#get a list of all snapshots in backup
+	VERSIONS=( $(rsync --list-only "$BACKUPURL/$BKIT_RVID/.snapshots/@GMT-*"|grep -Po '@GMT-.+$') ) 		#get a list of all snapshots in backup
 
 	for V in "${VERSIONS[@]}"
 	do
 		FMT="--out-format=$V|%o|%i|%M|%l|%f"
-		SRC="$BACKUPURL/$RVID/.snapshots/$V/data/$DIR"
+		SRC="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$DIR"
 		rsync "${RSYNCOPTIONS[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$FAKEROOT/" 2>/dev/null
-	done| sort | awk -F'|' '
-		{
-			LINES[$2 $3 $4 $5 $6] = $1 " have a last modifed version at " $4		#supress the first field(=snapshot) id all the other are the same. Just show one
-		}
-		END{
-			for (L in LINES) print LINES[L]
-		}
-	' | sort
+	done| sort | {
+		[[ ${detail+isset} == isset ]] && cat || 
+		[[ ${all+isset} == isset ]] && cut -d'|' -f1  || 
+		awk -F'|' ' 
+			{
+				LINES[$2 $3 $4 $5 $6] = $1 " have a last modifed version at " $4 " of " $6 #supress the first field(=snapshot) id all the other are the same. Just show one
+			}
+			END{
+				for (L in LINES) print LINES[L]
+			}
+		' | sort
+	}	
 done

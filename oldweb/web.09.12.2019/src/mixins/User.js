@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {myMixin} from 'src/mixins'
+import { myMixin } from 'src/mixins'
 import { required, email } from 'vuelidate/lib/validators'
 
 function getDate (v) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#List differences between local and lasst backup
+#List differences between local and last backup
 set -u
 sdir="$(dirname -- "$(readlink -ne -- "$0")")"
 source "$sdir/lib/functions/all.sh"

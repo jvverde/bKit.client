@@ -86,7 +86,7 @@ export default {
         })
         .catch(this.catch)
         .then(() => {
-          this.submit = false  
+          this.submit = false
         })
     }
   },

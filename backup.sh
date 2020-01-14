@@ -179,8 +179,10 @@ statsfile="$VARDIR/log/backup/$NOW.stat"
 
 mkdir -pv "${logfile%/*}" "${errfile%/*}" "${statsfile%/*}" #Just ensure that the log directory exists
 
-exec {FD}>&2
-exec 2> >(tee "$errfile" >&$FD)
+exec {ERR}>&2
+exec 2> >(tee "$errfile" >&$ERR)
+exec {OUT}>&1
+exec 1> >(tee "$logfile" >&$OUT)
 
 #finish() {
 #  cat "$errfile" >&3
@@ -262,9 +264,10 @@ prepare(){
 	dorsync --dry-run --ignore-non-existing --ignore-existing "$MOUNTPOINT/./" "$BACKUPURL/$BKIT_RVID/@current/data"
 }
 
-exec {OUT}>&1
+exec {UPLOAD}>&1
+
 upload_manifest(){
-  exec 1>&$OUT
+  exec 1>&$UPLOAD
   local BASE="$1"
   local PREFIX="$2"
   
@@ -454,7 +457,7 @@ ITIME=$(date -R)
   echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
   echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
 
-  backup
+  backup 
   
   echo -e "\nPhase $((++cnt)) - Update Symbolic links, Hard links, Directories, File attributes and... meanwhile changed files\n"
 
@@ -485,7 +488,7 @@ ITIME=$(date -R)
     echo "Files/directories '${ORIGINALDIR[$I]}' backed up on:"
     echo -e "\t$BACKUPURL/$BKIT_RVID/@current/data/${STARTDIR[$I]}"
   done
-} | tee "$logfile"
+}
 
 
 ######################### Now some stats if requested #########################

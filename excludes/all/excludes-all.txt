@@ -9,7 +9,7 @@
 CVS/
 *.vvfat
 *.vpc
-*.vmdk
+#*.vmdk
 #*.vhdx
 *.vdi
 *.rbd
@@ -39,4 +39,4 @@ Temporary*/
 Temporary/
 Download/
 Downloads/
-/home/*/.bkit/
+#/home/*/.bkit/

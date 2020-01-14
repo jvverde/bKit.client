@@ -6,11 +6,11 @@ third="$(find "$sdir" -type d -name '3rd-party' -print -quit)/SysInternals"
 if [[ ${OSTYPE,,} == cygwin ]] 
 then
 	mkdir -pv "$third"
-	pushd "$third"
-	wget -nv https://download.sysinternals.com/files/SysinternalsSuite.zip
-	unzip SysinternalsSuite.zip
+	pushd "$third" >/dev/null
+	[[ -e SysinternalsSuite.zip ]] || wget -nv https://download.sysinternals.com/files/SysinternalsSuite.zip 
+	unzip -u SysinternalsSuite.zip
 	chmod ugo+rx *.exe
-	popd
+	popd >/dev/null
 else
 	echo Not Cygwin OSTYPE
 fi

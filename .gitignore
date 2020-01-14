@@ -12,6 +12,7 @@ schtasks/
 cronjobs/
 filters/
 testar/
+test/
 *~
 old
 not-used-anymore/

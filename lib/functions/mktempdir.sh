@@ -4,11 +4,10 @@ declare -a _73a325646d49adc1f6b82af9b96cab7d=()
 
 
 mktempdir() {
-	local tmpdir="$1"
-	local tmpname="$(mktemp -d --suffix=".bkit.$(basename --suffix=.sh -- "$0")")"
-	local sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
-	
-	source "$sdir/traps.sh"
+	declare -r tmpdir="$1"
+	declare -r tmpname="$(mktemp -d --suffix=".bkit.$(basename --suffix=.sh -- "$0")")"
+	declare -r dir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+	source "$dir/traps.sh"
 
 	_73a325646d49adc1f6b82af9b96cab7d+=( "$tmpname" )
 

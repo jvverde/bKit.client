@@ -18,5 +18,4 @@ export_rvid(){
 	export BKIT_RVID="$BKIT_DRIVE.$BKIT_VOLUMESERIALNUMBER.$BKIT_VOLUMENAME.$BKIT_DRIVETYPE.$BKIT_FILESYSTEM"
 	issourced || echo $BKIT_RVID
 }
-
 export_rvid "${1:-.}"

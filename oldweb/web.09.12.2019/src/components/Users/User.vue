@@ -39,13 +39,24 @@
       </span>
     </div>
     <div class="col" title="Groups">
-      <q-chips-input
+      <!-- q-chips-input
         style="padding-left:.5em"
         v-model="groups"
         :placeholder="groups.length ? '': 'Type a valid group name'"
         color="blue-grey-5"
         @input="change_groups"
-      />
+      / -->
+      <q-input bottom-slots v-model="groups" label="Goups" counter
+        :dense="dense"
+        @input="change_groups"
+        >
+        <template v-slot:prepend>
+          <q-icon name="place" />
+        </template>
+        <template v-slot:append>
+          <q-icon name="close" @click="text = ''" class="cursor-pointer" />
+        </template>
+      </q-input>
     </div>
   </section>
 </template>

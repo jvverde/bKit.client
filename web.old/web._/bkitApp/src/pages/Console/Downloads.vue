@@ -1,0 +1,85 @@
+<template>
+  <section class="downloads">
+    <resource v-for="(f, i) in downloads" :key="i" :entry="f"></resource>
+  </section>
+</template>
+
+<script>
+import Resource from './Resource'
+import {myMixin} from 'src/mixins'
+const {ipcRenderer} = require('electron')
+const fs = require('fs')
+console.log('Downloads....')
+
+export default {
+  name: 'downloads',
+  data () {
+    return {
+      downloads: []
+    }
+  },
+  components: {
+    Resource
+  },
+  mixins: [myMixin],
+  created () {
+    console.log('Create download')
+    ipcRenderer.on('download', (event, arg) => {
+      console.log('download event')
+      if (arg instanceof Object && arg.type === 'download') {
+        console.log('arg.type=download')
+        if (arg.mimetype === 'application/bkit') {
+          console.log('arg.mimetype === application/bkit')
+          const download = arg
+          this.downloads.push(download)
+          try {
+            const file = fs.readFileSync(arg.fullpath)
+            download.resource = JSON.parse(file)
+            const {computer, backup, entry, path, drive} = download.resource
+            download.resource.downloadLocation = arg.fullpath
+            const server = this.$store.getters.address
+            download.resource.url = [
+              `rsync://user@${server}:8731`,
+              computer,
+              drive,
+              '.snapshots',
+              backup,
+              'data',
+              path,
+              '.',
+              entry
+            ].join('/')
+            console.log('Download from :', download.resource.url)
+            download.open = true
+          } catch (err) {
+            this.error(`File:${arg.filename}`, `Error: ${err}`)
+          }
+        } else {
+          this.downloads.find(x => x.fullpath === arg.fullpath) ||
+            this.downloads.push(arg)
+          this.show(`Download completed ${arg.filename}`)
+        }
+      }
+    })
+    ipcRenderer.send('register', 'download')
+  },
+  destroy () {
+    ipcRenderer.removeAllListeners('download')
+  }
+}
+
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+  .downloads{
+    display: flex;
+    flex-direction: column;
+    overflow-y:auto;
+    overflow-x:hidden;
+    width: 100%;
+    * {
+      flex-shrink:0;
+    }
+  }
+</style>

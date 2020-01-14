@@ -67,7 +67,7 @@ do
 		FMT="--out-format=$V|%o|%i|%M|%l|%f"
 		SRC="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$DIR"
 		rsync "${RSYNCOPTIONS[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$FAKEROOT/" 2>/dev/null
-	done| sort | {
+	done | sort | {
 		[[ ${detail+isset} == isset ]] && cat || 
 		[[ ${all+isset} == isset ]] && cut -d'|' -f1  || 
 		awk -F'|' ' 

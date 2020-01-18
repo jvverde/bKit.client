@@ -111,7 +111,6 @@ declare -a BASEDIR=()
 
 for arg in "${ARGS[@]}"
 do
-  echo arg = $arg
   basepath="$(readlink -en "$arg")" || {
     warn "'$arg' doesn't seem to exist. It won't be selected to backup"
     continue
@@ -195,16 +194,7 @@ exec 2> >(tee "$errfile" >&$ERR)
 exec {OUT}>&1
 exec 1> >(tee "$logfile" >&$OUT)
 
-#finish() {
-#  cat "$errfile" >&3
-#}
-#
-#atexit finish
-#
 set_postpone_files(){
-	#exec 99>"$HLIST"
-	#exec 98>"$DLIST"
-	#exec 97>"$FLIST"
 	exec {FDA}>"$HLIST"
 	exec {FDB}>"$DLIST"
 	exec {FDC}>"$FLIST"
@@ -364,7 +354,6 @@ backupACLS(){
       bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$metadatadir"
   } | sed -e 's/^/\t/'
 
-    
   echo "b) Update attributes and Clean metafiles on local cache"
   {
     dorsync --ignore-non-existing --ignore-existing --delete --delete-excluded --force "${Loptions[@]}" "${SRCS[@]}" "$metadatadir"

@@ -94,22 +94,33 @@ done
 
 source "$SDIR/ccrsync.sh"
 
-ARGS=("$@")
+declare -a ORIGINALDIR=( "$@" ) #dir names as seen by the user (linux vs windows path)
+declare -a ARGS=("$@")
+
+exists cygpath && {
+  ARGS=()
+  ORIGINALDIR=()  
+  for arg in "$@"
+  do
+    ARGS+=( "$(cygpath -u "$arg")" )
+    ORIGINALDIR+=( "$(cygpath -w "$arg")" )
+  done
+}
 
 declare -a BASEDIR=()
 
-ORIGINALDIR=( "${ARGS[@]}" ) #dir names as seen by the user (linux vs windows path)
-
-exists cygpath && ARGS=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${ARGS[@]}") )
-
-#BASEDIR=( "$(readlink -e "${BASEDIR[@]}")" ) || die "Error:  readlink -e '${BASEDIR[@]}'"
-while read file
+for arg in "${ARGS[@]}"
 do
-  BASEDIR+=( "$file" )
-done < <(readlink -e "${ARGS[@]}")
-
+  echo arg = $arg
+  basepath="$(readlink -en "$arg")" || {
+    warn "'$arg' doesn't seem to exist. It won't be selected to backup"
+    continue
+  }
+  BASEDIR+=( "$basepath" )
+done
 
 ROOTS=( $(stat -c%m "${BASEDIR[@]}") ) || die "Error: stat -c%m '${BASEDIR[@]}'"
+
 ROOT=${ROOTS[0]}
 
 [[ -e "$ROOT" ]] || die "I didn't find a disk for directory/file: '${BASEDIR[0]}'"

@@ -180,10 +180,10 @@ exec 2>"$errfile"
 finish() {
 	cat "$errfile" >&3
 	[[ -s $errfile ]] || rm "$errfile"
+  echo "Finish at $(date) with code $CODE"
 }
 
 atexit finish
-
 
 aclparents(){
   local dest=$(readlink -e "$dest")

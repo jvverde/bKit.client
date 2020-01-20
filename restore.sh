@@ -168,16 +168,18 @@ declare -a RESOURCES=( "${@:-.}" )
 mktempdir RESULT || die "Can't create a temporary working directory"
 
 NOW="$(date +"%Y-%m-%dT%H-%M-%S-%Z-%a-%W")"
-LOGFILE="$VARDIR/restore-logs-$NOW"
-ERRFILE="$VARDIR/restore-errors-$NOW"
-STATSFILE="$VARDIR/restore-stats-NOW"
+logfile="$VARDIR/log/restore/$NOW.log"
+errfile="$VARDIR/log/restore/$NOW.err"
+statsfile="$VARDIR/log/restore/$NOW.stat"
+
+mkdir -pv "${logfile%/*}" "${errfile%/*}" "${statsfile%/*}" #Just ensure that the log directory exists
 
 exec 3>&2
-exec 2>"$ERRFILE"
+exec 2>"$errfile"
 
 finish() {
-	cat "$ERRFILE" >&3
-	[[ -s $ERRFILE ]] || rm "$ERRFILE"
+	cat "$errfile" >&3
+	[[ -s $errfile ]] || rm "$errfile"
 }
 
 atexit finish
@@ -236,16 +238,16 @@ NTFS_acls(){
 makestats(){
   local DELTATIME=$1
   local ROOT=$2
-  [[ ${STATS+isset} == isset && -e $LOGFILE && -e "$sdir/tools/recv-stats.pl" ]] && exists perl && {
+  [[ ${STATS+isset} == isset && -e $logfile && -e "$sdir/lib/tools/stats/recv-stats.pl" ]] && exists perl && {
     echo "------------Stats------------"
     echo "Total time spent: $DELTATIME"
     exists cygpath && {
       ROOT=$(cygpath -w "$ROOT")
       ROOT="${ROOT//\\/\\\\}\\\\"
     }
-    cat -v "$LOGFILE" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$sdir/tools/recv-stats.pl"
+    cat -v "$logfile" | grep -Pio '^".+"$' | awk -vA="$ROOT" 'BEGIN {FS = OFS = "|"} {print $1,$2,A $3,$4,$5,$6,$7}' | perl "$sdir/lib/tools/stats/recv-stats.pl"
     echo "------------End of Stats------------"
-  } | tee "$STATSFILE"
+  } | tee "$statsfile"
 }
 
 for RESOURCE in "${RESOURCES[@]}"
@@ -299,7 +301,7 @@ do
       [[ ${ACLS+isset} == isset && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
         NTFS_acls "$METASRC" "$sdir/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${dest:-$DIR}"
       )
-    } | tee "$LOGFILE"
+    } | tee "$logfile"
     STOP=$(date -R)
     deltatime "$STOP" "$INIT"
     makestats "$DELTATIME" "${dest:-$DIR}"
@@ -309,7 +311,7 @@ done
 [[ ${dest+isset} == isset && ${#SRCS[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
   set -o pipefail
   INIT=$(date -R)
-  dorsync ${LINKS[@]+"${LINKS[@]}"} "${SRCS[@]}" "$dest" | tee "$LOGFILE" || die "Problems restoring to $dest"
+  dorsync ${LINKS[@]+"${LINKS[@]}"} "${SRCS[@]}" "$dest" | tee "$logfile" || die "Problems restoring to $dest"
   exists cygpath && dest=$(cygpath -w "$dest")
   echo "Files restored to $dest"
   STOP=$(date -R)
@@ -317,7 +319,7 @@ done
   makestats "$DELTATIME" "$dest"
 }
 
-[[ ${NOTIFY+isset} == isset && -s $STATSFILE ]] && (
+[[ ${NOTIFY+isset} == isset && -s $statsfile ]] && (
   ME=$(uname -n)
   FULLDIRS=( $(readlink -e "${RESOURCES[@]}") )     #get full paths
   exists cygpath &&  FULLDIRS=( $(cygpath -w "${FULLDIRS[@]}") )
@@ -329,25 +331,25 @@ done
   let EXTRADIRS=NUMBEROFDIRS-LIMIT
   ((NUMBEROFDIRS > LIMIT)) && WHAT="${FULLDIRS[0]} and $EXTRADIRS more directories/files"
   [[ -n $dest ]] && exists cygpath && dest=$(cygpath -w "$dest")
-  [[ -s $ERRFILE ]] && SUBJECT="Some errors occurred while restoring $WHAT on $ME ${dest:+to $dest} at $(date +%Hh%Mm)" ||
+  [[ -s $errfile ]] && SUBJECT="Some errors occurred while restoring $WHAT on $ME ${dest:+to $dest} at $(date +%Hh%Mm)" ||
   SUBJECT="Restore of $WHAT ${dest:+to $dest} on $ME successfully finished at $(date +%Hh%Mm)"
   {
     echo "Restore of $DIRS"
-    cat "$STATSFILE"
+    cat "$statsfile"
 
-    [[ -s $ERRFILE ]] && {
+    [[ -s $errfile ]] && {
       echo -e "\n------------Errors found------------"
-      cat "$ERRFILE"
+      cat "$errfile"
       echo "------------End of Errors------------"
     }
 
     [[ -n $FULLREPORT ]] && {
       echo -e "\n------------Full Logs------------"
-      cat "$LOGFILE"
+      cat "$logfile"
       echo "------------End of Logs------------"
     }
   } | sendnotify "$SUBJECT" "$ME" "$DEST"
 )
 
-
+echo "Restore done in $DELTATIME"
 exit ${ERROR:-0}

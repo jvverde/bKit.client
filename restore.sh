@@ -114,7 +114,7 @@ do
     --local-copy)
       LOCALACTION="--copy-dest"
     ;;
-    --local-copy)
+    --local-link)
       LOCALACTION="--link-dest"
     ;;
     --link-dest=*)

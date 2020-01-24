@@ -24,8 +24,8 @@ declare -a options=(
   --compress
   --human-readable
   --relative
-  #--partial
-  #--partial-dir=".bkit.rsync-partial"
+  --partial
+  --partial-dir=".bkit.rsync-partial"
   #--delay-updates 
   --super
 )

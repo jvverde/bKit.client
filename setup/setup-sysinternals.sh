@@ -7,7 +7,7 @@ if [[ ${OSTYPE,,} == cygwin ]]
 then
 	mkdir -pv "$third"
 	pushd "$third" >/dev/null
-	[[ -e SysinternalsSuite.zip ]] || wget -nv https://download.sysinternals.com/files/SysinternalsSuite.zip 
+	[[ -e SysinternalsSuite.zip ]] || wget -nv https://download.sysinternals.com/files/SysinternalsSuite.zip || echo "Can't find ysinternalsSuite.zip" 
 	unzip -u SysinternalsSuite.zip
 	chmod ugo+rx *.exe
 	popd >/dev/null

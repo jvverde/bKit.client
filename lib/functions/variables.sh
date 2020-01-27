@@ -4,4 +4,9 @@ declare -r _0f2cb7c5baf31e857ec0d6ff74d11dbd=1
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 OS="$(uname -o |tr '[:upper:]' '[:lower:]')"
-USER="$(id -nu)"
+if $(id -G|grep -qE '\b544\b')
+then
+	BKITUSER="Administrator"
+else
+	BKITUSER="$(id -nu)"
+fi

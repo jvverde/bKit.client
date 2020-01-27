@@ -14,7 +14,7 @@ _bd543783f4067de2309b8f02b63d3417(){
 		source "$file"
 	done < <( find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" )
 
-  true ${USER:="$(id -un)"}
+  true ${BKITUSER:="$(id -un)"}
 }
 
 _bd543783f4067de2309b8f02b63d3417

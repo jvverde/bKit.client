@@ -3,7 +3,7 @@ set oldhome=%HOME%
 set oldshell=%SHELL%
 set oldpath=%path%
 set path="%~dp03rd-party\cygwin\bin";%path%
-set HOME=/home/user
+set HOME=/home/%USERNAME%
 set SHELL=/bin/bash
 REM pushd "%~dp0"
 "%~dp03rd-party\cygwin\bin\bash.exe" -c 'SDIR=$(cygpath -u "$1");"$SDIR/system.sh" "${@:2}"' -- %~dp0 %*

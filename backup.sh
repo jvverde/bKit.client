@@ -8,7 +8,7 @@ source "$SDIR/lib/functions/all.sh"
 SNAP='@snap'
 
 declare -a options=()
-while [[ $1 =~ ^- ]]
+while [[ ${1:+$1} =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
@@ -94,13 +94,13 @@ done
 
 source "$SDIR/ccrsync.sh"
 
-declare -a ORIGINALDIR=( "$@" ) #dir names as seen by the user (linux vs windows path)
-declare -a ARGS=("$@")
+declare -a ORIGINALDIR=( "${@:-.}" ) #dir names as seen by the user (linux vs windows path)
+declare -a ARGS=("${@:-.}")
 
 exists cygpath && {
   ARGS=()
   ORIGINALDIR=()  
-  for arg in "$@"
+  for arg in "${@:-.}"
   do
     ARGS+=( "$(cygpath -u "$arg")" )
     ORIGINALDIR+=( "$(cygpath -w "$arg")" )

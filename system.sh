@@ -2,7 +2,7 @@
 declare -r sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
 declare -r cdir="${sdir%/client*}/client"
 declare -r wdir="$(cygpath -w "$cdir")"
-declare -r batch="$(cygpath -w "$cdir/bash.bat")"
+declare -r batch="$(cygpath -w "$cdir/psexecutable.bat")"
 
 [[ ${OSTYPE,,} != cygwin ]] && echo "Not cygwin here" && exit 1
 
@@ -15,5 +15,6 @@ declare psexec="$cdir/3rd-party/SysInternals/psexec.exe"
 unset i
 
 [[ -z $1 ]] && declare -r i='i' #run psexec iteratively if no args are provided
-
-"$psexec" -s${i:+$i} -w "$wdir" "$batch" ${@:+"${@}"}
+echo aqui vai ${@:+"${@}"}
+"$psexec" -s${i:+$i} -w "$wdir" cmd /c "$batch" ${@:+"${@}"}
+echo aqui foi ${@:+"${@}"}

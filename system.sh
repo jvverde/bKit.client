@@ -17,4 +17,3 @@ unset i
 [[ -z $1 ]] && declare -r i='i' #run psexec iteratively if no args are provided
 
 "$psexec" -s${i:+$i} -w "$wdir" "$batch" ${@:+"${@}"}
-

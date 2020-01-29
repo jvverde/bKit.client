@@ -16,5 +16,5 @@ unset i
 
 [[ -z $1 ]] && declare -r i='i' #run paexec iteratively if no args are provided
 
-0</dev/null "$paexec" -s${i:+$i} -w "$wdir" "$batch" ${@:+"${@}"}
+0</dev/null "$paexec" -s ${i:+-$i} -w "$wdir" "$batch" ${@:+"${@}"}
 

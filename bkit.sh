@@ -72,12 +72,12 @@ done
 
 [[ ${nofilters+isset} == isset ]] || filters+=( --filter=": .rsync-filter" )
 
-echo "bkit: Start backup"
+echo "bkit: Start backup for ${@:-.}"
 let cnt=16
 let sec=60
 while (( cnt-- > 0 ))
 do
-	bash -m "$sdir/backup.sh" ${options+"${options[@]}"} -- ${filters+"${filters[@]}"} ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}" && break
+	bash "$sdir/backup.sh" ${options+"${options[@]}"} -- ${filters+"${filters[@]}"} ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}" && break
 	let delay=(1 + RANDOM % $sec)
 	echo "bkit:Wait $delay seconds before try again"
 	sleep $delay 

@@ -16,7 +16,7 @@ source "$client/lib/functions/mktempdir.sh"
 	bash "$sdir"/setup-apt.sh
 	bash "$sdir"/apt-cyg.sh "$sdir"/cyg-packages.lst
 	bash "$sdir"/setup-shadowspwan.sh
-	bash "$sdir"/setup-sysinternals.sh
+	bash "$sdir"/setup-paexec.sh
 	
 
 	declare -r nsswitch="$(find "$client" -type f -path '*/cygwin/etc/nsswitch.conf' -print -quit)"  

@@ -1,0 +1,8 @@
+
+PsExec v2.2 - Execute processes remotely
+Copyright (C) 2001-2016 Mark Russinovich
+Sysinternals - www.sysinternals.com
+
+10.1.1.3
+Connecting to local system...Starting PSEXESVC service on local system...Connecting with PsExec service on WIN10...Starting C:\bkit\scripts\client\bash.bat on WIN10...
+C:\bkit\scripts\client\bash.bat exited on WIN10 with error code 0.

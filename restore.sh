@@ -67,7 +67,7 @@ usage() {
   exit 1
 }
 
-SRCS=()
+declare -a fullURL=()
 declare -A LINKTO
 LOCALACTION="--copy-dest" #rsync option
 while [[ ${1:-} =~ ^- ]]
@@ -98,6 +98,9 @@ do
     ;;
     -d=*|--dst=*)
       destination "${KEY#*=}"
+    ;;
+    --RVID=*)
+      declare argRVID="${KEY#*=}"
     ;;
     --permissions)
       ACLS=1
@@ -256,31 +259,41 @@ do
   then
     [[ -z $dest ]] && dest=${RESOURCES[${#RESOURCES[@]}-1]} && unset RESOURCES[${#RESOURCES[@]}-1] #Try to get last argument
     [[ -d $dest ]] || die "You should specify a (existing) destination directory in last argument or using --dst option"
-    SRCS+=( "$RESOURCE" )		#Add to a list of multiple SRCs and dorsync later/bellow
+    fullURL+=( "$RESOURCE" )		#Add to a list of multiple fullURL and dorsync later/bellow
     #dorsync "$RESOURCE" "$dest"
   else
-    exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
-    RESOURCE=$(readlink -m "${RESOURCE}")
-    DIR=$RESOURCE
-    until [[ -d $DIR ]]       #find a existing parent
-    do
-      DIR=$(dirname "$DIR")
-    done
+    if [[ ${argRVID+isset} == isset ]] 
+    then
+      RVID="${argRVID}"
+      RESOURCE="${RESOURCE#./}"       #remove any leading ./ sequence 
+      RESOURCE="/${RESOURCE#/}"       #and it should always start by a SINGLE slash
+      BASE="${RESOURCE%/*}"           #BASE is everything except last slash and following caracteres
+      ENTRY="${RESOURCE##*/}"         #ENTRY is anything after last slash
+    else
+      exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
+      RESOURCE=$(readlink -m "${RESOURCE}")
+      DIR=$RESOURCE
+      until [[ -d $DIR ]]       #find a existing parent
+      do
+        DIR=$(dirname "$DIR")
+      done
 
-    ROOT=$(stat -c%m "$DIR")
+      ROOT=$(stat -c%m "$DIR")
 
-    BASE="${DIR#${ROOT%%/}}"
+      BASE="${DIR#${ROOT%%/}}"
 
-    ENTRY=${RESOURCE#$DIR}    #Is empty when resource is a existing directory (DIR==RESOURCE)
+      ENTRY=${RESOURCE#$DIR}    #Is empty when resource is a existing directory (DIR==RESOURCE)
 
-    IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$sdir/lib/drive.sh" "$ROOT" 2>/dev/null)
+      IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$sdir/lib/drive.sh" "$ROOT" 2>/dev/null)
 
-    declare DRIVE=''
-    exists cygpath && DRIVE=$(cygpath -w "$ROOT")
-    DRIVE=${DRIVE%%:*}
-    RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-    BASE=${BASE%%/}   #remove trailing slash if present
-    ENTRY=${ENTRY#/}  #remove leading slash if present
+      declare DRIVE=''
+      exists cygpath && DRIVE=$(cygpath -w "$ROOT")
+      DRIVE=${DRIVE%%:*}
+      RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
+      BASE=${BASE%%/}   #remove trailing slash if present
+      #Yes, BASE could by a empty string
+      ENTRY=${ENTRY#/}  #remove leading slash if present
+    fi
 
     [[ ${SNAP+isset} == isset ]] && { # if we want an older version
       SRC="$BACKUPURL/$RVID/.snapshots/$SNAP/data$BASE/./$ENTRY"
@@ -308,10 +321,10 @@ do
   fi
 done
 
-[[ ${dest+isset} == isset && ${#SRCS[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
+[[ ${dest+isset} == isset && ${#fullURL[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
   set -o pipefail
   INIT=$(date -R)
-  dorsync ${LINKS[@]+"${LINKS[@]}"} "${SRCS[@]}" "$dest" | tee "$logfile" || die "Problems restoring to $dest"
+  dorsync ${LINKS[@]+"${LINKS[@]}"} "${fullURL[@]}" "$dest" | tee "$logfile" || die "Problems restoring to $dest"
   exists cygpath && dest=$(cygpath -w "$dest")
   echo "Files restored to $dest"
   STOP=$(date -R)

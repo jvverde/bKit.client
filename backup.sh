@@ -142,7 +142,8 @@ done
 
 #We need ROOT, BACKUPDIR and STARTDIR
 #[[ ${BKIT_RVID:-} =~ .+\..+\..+\..+\..+ ]] || source "$SDIR/lib/rvid.sh" || die "Can't source rvid"
-[[ ${BKIT_RVID+isset} == isset ]] || source "$SDIR/lib/rvid.sh" || die "Can't source rvid"
+
+[[ ${BKIT_RVID+isset} == isset ]] || source "$SDIR/lib/rvid.sh" "$ROOT" || die "Can't source rvid"
 
 
 exists rsync || die Cannot find rsync

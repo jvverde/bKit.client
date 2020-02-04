@@ -99,7 +99,7 @@ do
     -d=*|--dst=*)
       destination "${KEY#*=}"
     ;;
-    --RVID=*)
+    --rvid=*)
       declare argRVID="${KEY#*=}"
     ;;
     --permissions)
@@ -262,27 +262,26 @@ do
     fullURL+=( "$RESOURCE" )		#Add to a list of multiple fullURL and dorsync later/bellow
     #dorsync "$RESOURCE" "$dest"
   else
+    exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
+    RESOURCE=$(readlink -m "${RESOURCE}")
+    parentdir=$RESOURCE
+    until [[ -d $parentdir ]]       #find a existing parent
+    do
+      parentdir=$(dirname "$parentdir") || parentdir="/"
+    done
+
+    ROOT=$(stat -c%m "$parentdir")
+
+    BASE="${parentdir#${ROOT%%/}}"  #BASE is parentdir without the mounting point
+
+    ENTRY=${RESOURCE#$parentdir}    #Is empty when resource is a existing directory (parentdir==RESOURCE)
+
+    BASE=${BASE%%/}   #remove trailing slash if present. Yes, BASE could by a empty string
+    ENTRY=${ENTRY#/}  #remove leading slash if present
     if [[ ${argRVID+isset} == isset ]] 
     then
       RVID="${argRVID}"
-      RESOURCE="${RESOURCE#./}"       #remove any leading ./ sequence 
-      RESOURCE="/${RESOURCE#/}"       #and it should always start by a SINGLE slash
-      BASE="${RESOURCE%/*}"           #BASE is everything except last slash and following caracteres
-      ENTRY="${RESOURCE##*/}"         #ENTRY is anything after last slash
     else
-      exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
-      RESOURCE=$(readlink -m "${RESOURCE}")
-      DIR=$RESOURCE
-      until [[ -d $DIR ]]       #find a existing parent
-      do
-        DIR=$(dirname "$DIR")
-      done
-
-      ROOT=$(stat -c%m "$DIR")
-
-      BASE="${DIR#${ROOT%%/}}"
-
-      ENTRY=${RESOURCE#$DIR}    #Is empty when resource is a existing directory (DIR==RESOURCE)
 
       IFS='|' read -r VOLUMENAME VOLUMESERIALNUMBER FILESYSTEM DRIVETYPE <<<$("$sdir/lib/drive.sh" "$ROOT" 2>/dev/null)
 
@@ -290,9 +289,6 @@ do
       exists cygpath && DRIVE=$(cygpath -w "$ROOT")
       DRIVE=${DRIVE%%:*}
       RVID="${DRIVE:-_}.${VOLUMESERIALNUMBER:-_}.${VOLUMENAME:-_}.${DRIVETYPE:-_}.${FILESYSTEM:-_}"
-      BASE=${BASE%%/}   #remove trailing slash if present
-      #Yes, BASE could by a empty string
-      ENTRY=${ENTRY#/}  #remove leading slash if present
     fi
 
     [[ ${SNAP+isset} == isset ]] && { # if we want an older version
@@ -307,17 +303,17 @@ do
     {
       if [[ ${dest+isset} == isset ]]
       then
-        dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$LOCALACTION=$DIR/" "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
+        dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$LOCALACTION=$parentdir/" "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
       else
-        dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$DIR/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
+        dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$parentdir/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi
       [[ ${ACLS+isset} == isset && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-        NTFS_acls "$METASRC" "$sdir/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${dest:-$DIR}"
+        NTFS_acls "$METASRC" "$sdir/cache/metadata/by-volume/${VOLUMESERIALNUMBER:-_}$BASE/" "${dest:-$parentdir}"
       )
     } | tee "$logfile"
     STOP=$(date -R)
     deltatime "$STOP" "$INIT"
-    makestats "$DELTATIME" "${dest:-$DIR}"
+    makestats "$DELTATIME" "${dest:-$parentdir}"
   fi
 done
 

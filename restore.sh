@@ -263,7 +263,6 @@ do
     #dorsync "$RESOURCE" "$dest"
   else
     exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
-    echo RESOURCE=$RESOURCE
     RESOURCE=$(readlink -m "${RESOURCE}")
     parentdir=$RESOURCE
     until [[ -d $parentdir ]]       #find a existing parent
@@ -279,12 +278,6 @@ do
 
     BASE=${BASE%%/}   #remove trailing slash if present. Yes, BASE could by a empty string
     ENTRY=${ENTRY#/}  #remove leading slash if present
-    
-    echo root=$ROOT
-    echo BASE=$BASE
-    echo ENTRY=$ENTRY
-    echo parentdir=$parentdir
-    echo RESOURCE=$RESOURCE
 
     if [[ ${argRVID+isset} == isset ]] 
     then

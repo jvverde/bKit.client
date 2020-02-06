@@ -41,7 +41,6 @@ declare -a options=(
 dorsync() {
   local localdir="${@: -1}$localbackup"
   mkdir -p "$localdir"
-  echo rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
   rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
   RET=$?
   #delete empty before-localdir dirs
@@ -266,10 +265,10 @@ do
     #dorsync "$RESOURCE" "$dest"
   else
     exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
-    echo RESOURCE=$RESOURCE
+
     RESOURCE=$(readlink -m "${RESOURCE}")
     parentdir=$RESOURCE
-    echo parentdir=$parentdir
+
     until [[ -d $parentdir ]]       #find a existing parent
     do
       parentdir=$(dirname "$parentdir") || parentdir="/"
@@ -284,9 +283,6 @@ do
 
     BASE=${BASE%%/}   #remove trailing slash if present. Yes, BASE could by a empty string
     ENTRY=${ENTRY#/}  #remove leading slash if present
-    echo base=$BASE
-    echo ROOT=$ROOT
-    echo ENTRY=$ENTRY
 
     if [[ ${argRVID+isset} == isset ]] 
     then

@@ -41,6 +41,7 @@ declare -a options=(
 dorsync() {
   local localdir="${@: -1}$localbackup"
   mkdir -p "$localdir"
+  echo rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
   rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
   RET=$?
   #delete empty before-localdir dirs
@@ -59,6 +60,7 @@ destination() {
   dest=$(readlink -ne "$dest")
   [[ -d $dest ]] || die "'$1' should be a directory"
   [[ ${dest: -1} == / ]] || dest="$dest/"
+  echo "dest='$dest'"
 }
 
 usage() {
@@ -167,6 +169,7 @@ LINKS=( ${LINKS[@]+"${LINKS[@]:0:20}"} )  #a rsync limitation of 20 directories
 [[ ${1+isset} == isset ]] || usage
 
 declare -a RESOURCES=( "${@:-.}" )
+echo resources="${RESOURCES[@]}"
 
 mktempdir RESULT || die "Can't create a temporary working directory"
 
@@ -263,12 +266,15 @@ do
     #dorsync "$RESOURCE" "$dest"
   else
     exists cygpath && RESOURCE="$(cygpath -u "$RESOURCE")"
+    echo RESOURCE=$RESOURCE
     RESOURCE=$(readlink -m "${RESOURCE}")
     parentdir=$RESOURCE
+    echo parentdir=$parentdir
     until [[ -d $parentdir ]]       #find a existing parent
     do
       parentdir=$(dirname "$parentdir") || parentdir="/"
     done
+    echo parentdir final=$parentdir
 
     ROOT=$(stat -c%m "$parentdir")
 
@@ -278,6 +284,9 @@ do
 
     BASE=${BASE%%/}   #remove trailing slash if present. Yes, BASE could by a empty string
     ENTRY=${ENTRY#/}  #remove leading slash if present
+    echo base=$BASE
+    echo ROOT=$ROOT
+    echo ENTRY=$ENTRY
 
     if [[ ${argRVID+isset} == isset ]] 
     then

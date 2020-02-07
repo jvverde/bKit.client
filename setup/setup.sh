@@ -12,6 +12,12 @@ source "$client/lib/functions/mktempdir.sh"
 #USERID=$(id -u $U)
 #GRPID=$(id -g $U)
 
+[[ $1 =~ --proxy= ]] &&  {
+ declare -r proxy="${1#*=}" && shift
+ export http_proxy="http://$proxy"
+ export https_proxy="https://$proxy"
+}
+
 [[ $OS == cygwin ]] && {
 	bash "$sdir"/setup-apt.sh
 	bash "$sdir"/apt-cyg.sh "$sdir"/cyg-packages.lst

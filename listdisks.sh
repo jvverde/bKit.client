@@ -11,4 +11,4 @@ do
         options+=( "$key" )
 done
 
-rsync ${options+"${options[@]}"} --list-only "$BACKUPURL/./"	| grep -Po '.([.][^.]+){4}' #get a list of all snapshots in backup
+rsync ${options+"${options[@]}"} --list-only "$BACKUPURL/./"	| grep -P '^d.+' | grep -Po '.([.][^.]+){4}' #get a list of all snapshots in backup

@@ -6,7 +6,7 @@ if [[ ${OSTYPE,,} == cygwin ]]
 then
 	mkdir -pv "$third"
 	pushd "$third" >/dev/null
-	[[ -e paexec.exe ]] || wget -nv https://www.poweradmin.com/paexec/paexec.exe
+	[[ -e paexec.exe ]] || wget --no-check-certificate -nv https://www.poweradmin.com/paexec/paexec.exe
 	chmod ugo+rx paexec.exe
 	popd >/dev/null
 else

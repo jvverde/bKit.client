@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 declare -r sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
-declare -r parent="${sdir%/client*}/client"
+declare -r parent="${sdir%/setup*}" #assuming we are inside a setup directory under client area 
 
 die(){
 	echo -e "$@" && exit 1

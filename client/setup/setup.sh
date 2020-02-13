@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 declare -r sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
-declare -r client="${sdir%/client*}/client"
+declare -r client="${sdir%/setup*}"
 
 source "$client/lib/functions/variables.sh"
 source "$client/lib/functions/messages.sh"

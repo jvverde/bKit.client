@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 declare -r sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
-declare -r cdir="${sdir%/client*}/client"
-declare -r wdir="$(cygpath -w "$cdir")"
-declare -r batch="$(cygpath -w "$cdir/bash.bat")"
+declare -r wdir="$(cygpath -w "$sdir")"
+declare -r batch="$(cygpath -w "$sdir/bash.bat")"
 
 [[ ${OSTYPE,,} != cygwin ]] && echo "Not cygwin here" && exit 1
 
-declare paexec="$cdir/3rd-party/paexec.exe"
+declare paexec="$sdir/3rd-party/paexec.exe"
 
-[[ -x $paexec ]] || paexec="$(find "$cdir" -iname paexec.exe -print -quit 2>/dev/null)"
+[[ -x $paexec ]] || paexec="$(find "$sdir" -iname paexec.exe -print -quit 2>/dev/null)"
 
 [[ -x $paexec ]] || echo "'$paexec' is not executable"
 

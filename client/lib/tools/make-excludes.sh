@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -u
 declare -r sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
-declare -r base="${sdir%/client*}/client" 
+declare -r base="${sdir%/lib*}" #assuming we are inside a lib directory under client area
 
 source "$base/lib/functions/all.sh"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -p _04ba0ba2e1fe91ebacbe038b53e75545 >/dev/null 2>&1 && echo module messages apparentely already sourced && return
+declare -p _04ba0ba2e1fe91ebacbe038b53e75545 >/dev/null 2>&1 && return
 
 function  _04ba0ba2e1fe91ebacbe038b53e75545() {
 	declare -r mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"

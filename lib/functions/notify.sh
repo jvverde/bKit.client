@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -p _7233c82197bf04f6ef10f4914614182f >/dev/null 2>&1 && echo module notify apparentely already sourced && return
+declare -p _7233c82197bf04f6ef10f4914614182f >/dev/null 2>&1 && return
 declare -r _7233c82197bf04f6ef10f4914614182f=1
 
 sendnotify(){

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
-third="${sdir%/client*}/client/3rd-party"
+third="${sdir%/setup*}/3rd-party"
 
 if [[ ${OSTYPE,,} == cygwin ]] 
 then

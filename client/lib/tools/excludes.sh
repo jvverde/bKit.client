@@ -2,7 +2,7 @@
 #Make a filter from excludes files in excludir directory
 set -u
 declare -r sdir="$(dirname "$(readlink -f "$0")")"
-declare -r base="${sdir%/client*}/client"
+declare -r base="${sdir%/lib*}"               #assuming we are inside a lib directory under client area
 
 declare -r excludedir="${1:-"$base/excludes"}"
 

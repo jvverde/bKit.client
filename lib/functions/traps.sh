@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #trap 'warn ${LINENO} $?' ERR
-declare -p _665dff8f985f6292ab5d18cc36b2db1e > /dev/null 2>&1 && echo module traps already inserted && return
+declare -p _665dff8f985f6292ab5d18cc36b2db1e > /dev/null 2>&1 && return
 declare -r _665dff8f985f6292ab5d18cc36b2db1e=1
 
 fn_exists() {

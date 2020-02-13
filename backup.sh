@@ -180,6 +180,7 @@ dorsync(){
 }
 
 mktempdir RUNDIR || die "Can't create a temporary working directory"
+
 FLIST="$RUNDIR/file-list.$$"
 HLIST="$RUNDIR/hl-list.$$"
 DLIST="$RUNDIR/dir-list.$$"

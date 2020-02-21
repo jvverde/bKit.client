@@ -17,13 +17,13 @@ server_doit(){
 
   function usage(){
       local name=$(basename -s .sh "$0")
-      echo Set default server
-      echo -e "usage:\n\t $name address port"
+      echo "Set/Get default server"
+      echo -e "usage:\n\t $name [-s] [address [port]]\n\t\t-s set server as permanent"
       exit 1
   }
 
   [[ $1 =~ ^--?h ]] && usage
-  [[ $1 =~ ^-s ]] && shift && save=1 #we want to save it permanently
+  [[ $1 =~ ^-s ]] && shift && declare -r save=1 #we want to save it permanently
 
   declare -r default="$CONFDIR/default"
   declare current="$default"

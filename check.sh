@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#Checks who needs to be backup
+# Checks who needs to be backup
 set -u
 sdir="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
@@ -21,6 +21,7 @@ do
 		;;
 		--snap=*)
 			snap="${key#*=}"
+			[[ $snap =~ ^@GMT- ]] && snap=".snapshots/$snap"
 		;;
 		--BKIT_TARGET=*)
 			BKIT_TARGET="${key#*=}"

@@ -31,7 +31,9 @@ do
 	esac
 done
 
-[[ -e $1 ]] || die "'$1' doesn't exist"
+declare -r entry="${1:-.}"
+
+[[ -e $entry ]] || die "'$entry' doesn't exist"
  
 true ${BKIT_TARGET:='data'}		#by default we check data, but we can also check metadata or anything else. Export BKIT_TARGET before invoke me
 
@@ -39,14 +41,14 @@ dorsync(){
 	rsync "$@"
 }
 
-backupdir="$(readlink -ne "$1")"
+backupdir="$(readlink -ne "$entry")"
 
 mnt="${BKIT_MNTPOINT:-"$(stat -c %m "$backupdir")"}"
 startdir="${backupdir#$mnt}"		#remove mount point from path
 startdir="${startdir#/}" 		#remove leading slash if any
 mnt=${mnt%/} 				#remove trailing slash if any
 
-[[ ${BKIT_RVID+isset} == isset ]] || source "$sdir/lib/rvid.sh" || die "Can't source rvid"
+[[ ${BKIT_RVID+isset} == isset ]] || source "$sdir/lib/rvid.sh" "$mnt" || die "Can't source rvid"
 
 remotedir="$BKIT_RVID/$snap/$BKIT_TARGET"
 

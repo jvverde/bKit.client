@@ -62,8 +62,7 @@ usage() {
 }
 
 set_server () {
-  source "$SDIR"/server.sh "$1"
-  echo BKIT_CONFIG=$BKIT_CONFIG
+  source "$sdir"/server.sh "$1"
 }
 
 declare -a fullURL=()

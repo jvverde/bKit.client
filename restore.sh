@@ -4,7 +4,7 @@ sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
 set -uE
 set -o pipefail
 
-source "$sdir/ccrsync.sh"
+source "$sdir/lib/functions/all.sh"
 
 declare -r fmt='--out-format="%o|%i|%f|%M|%b|%l|%t"'
 declare -ra perm=(--perms --acls --super --numeric-ids)
@@ -29,13 +29,6 @@ declare -a options=(
   #--delay-updates 
   --super
 )
-
-#Don't try to chown or chgrp if not root or Administrator
-
-[[ $OS == cygwin ]] && {
-    $(id -G|grep -qE '\b544\b') || options+=( "--no-group" "--no-owner" )
-}
-[[ $OS != cygwin && $UID -ne 0 ]] && options+=( "--no-group" "--no-owner" )
 
 
 dorsync() {
@@ -64,8 +57,13 @@ destination() {
 
 usage() {
   local NAME=${1:-"$(basename -s .sh "$0")"}
-  echo -e "Usage:\n\t $NAME [--dry-run] [--permissions] [--delete] [--dst=directory] [--snap=snap] [--local-copy] dir1/file1 [[dir2/file2 [...]]"
+  echo -e "Usage:\n\t $NAME [--dry-run] [--permissions] [--delete] [--dst=directory] [--snap=snap] [--local-copy] [--rvid=RVID]] dir1/file1 [[dir2/file2 [...]]"
   exit 1
+}
+
+set_server () {
+  source "$SDIR"/server.sh "$1"
+  echo BKIT_CONFIG=$BKIT_CONFIG
 }
 
 declare -a fullURL=()
@@ -88,10 +86,10 @@ do
     --logdir=*)
         redirectlogs "${KEY#*=}" backup
     ;;
-    -s=*|--snap=*|--snapshot=*)
+    --snap=*|--snapshot=*)
         SNAP="${KEY#*=}"
     ;;
-    -s|--snap|--snapshot)
+    --snap|--snapshot)
         SNAP=$1 && shift
     ;;
     -d|--dst)
@@ -102,6 +100,12 @@ do
     ;;
     --rvid=*)
       declare argRVID="${KEY#*=}"
+    ;;
+    -s|--server)
+      set_server "$1" && shift
+    ;;
+    -s=*|--server=*)
+      set_server "${KEY#*=}"
     ;;
     --permissions)
       ACLS=1
@@ -168,7 +172,6 @@ LINKS=( ${LINKS[@]+"${LINKS[@]:0:20}"} )  #a rsync limitation of 20 directories
 [[ ${1+isset} == isset ]] || usage
 
 declare -a RESOURCES=( "${@:-.}" )
-echo resources="${RESOURCES[@]}"
 
 mktempdir RESULT || die "Can't create a temporary working directory"
 
@@ -255,6 +258,13 @@ makestats(){
   } | tee "$statsfile"
 }
 
+source "$sdir/ccrsync.sh"
+#Don't try to chown or chgrp if not root or Administrator
+[[ $OS == cygwin ]] && {
+    $(id -G|grep -qE '\b544\b') || options+=( "--no-group" "--no-owner" )
+}
+[[ $OS != cygwin && $UID -ne 0 ]] && options+=( "--no-group" "--no-owner" )
+
 for RESOURCE in "${RESOURCES[@]}"
 do
   if [[ $RESOURCE =~ ^[^@]+@.+::.+ ]] #ex: user@server::section
@@ -273,7 +283,6 @@ do
     do
       parentdir=$(dirname "$parentdir") || parentdir="/"
     done
-    echo parentdir final=$parentdir
 
     ROOT=$(stat -c%m "$parentdir")
 

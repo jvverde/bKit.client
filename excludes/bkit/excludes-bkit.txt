@@ -12,4 +12,5 @@ web2*
 old*
 **/lixo*
 lixo*
+tmp.*.bkit.*
 **/node_modules

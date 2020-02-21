@@ -31,8 +31,5 @@ do
 	esac
 done
 
-
-[[ $# -eq 0 ]] && usage
-
 echo "Please wait... this may take a while"
-bash "$sdir/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "$@"
+bash "$sdir/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "${@:-.}"

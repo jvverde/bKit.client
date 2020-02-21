@@ -13,8 +13,8 @@ declare -a rsyncoptions=()
 
 while [[ ${1:-} =~ ^- ]]
 do
-	KEY="$1" && shift
-	case "$KEY" in
+	key="$1" && shift
+	case "$key" in
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
@@ -26,7 +26,7 @@ do
 			usage
 		;;
 		*)
-			options+=( "$KEY" )
+			options+=( "$key" )
 		;;
 	esac
 done

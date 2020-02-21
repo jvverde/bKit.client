@@ -11,7 +11,29 @@ usage() {
 	exit 1
 }
 
-[[ $# -eq 0 ]] && usage
+set_server () {
+  source "$sdir"/server.sh "$1"
+}
+
+declare -a options=()
+while [[ ${1:-} =~ ^- ]]
+do
+  key="$1" && shift
+  case "$key" in
+    -s|--server)
+      set_server "$1" && shift
+    ;;
+    -s=*|--server=*)
+      set_server "${key#*=}"
+    ;;
+    --?h*)
+      usage
+    ;;
+    *)
+      options+=( "$key" )
+    ;;
+  esac
+done
 
 declare -a filters=( --filter=": .rsync-filter" )
 
@@ -23,4 +45,4 @@ while IFS='|' read i datetime size file
 do
 	exists cygpath && file=$(cygpath -w "$file")
 	echo "$i|$datetime|$size|$file"
-done < <(bash "$sdir/check.sh" --snap="@last" --out-format="%i|%M|%l|/%f"  "${filters[@]}" "$@")
+done < <(bash "$sdir/check.sh" --snap="@last" ${options+"${options[@]}"} --out-format="%i|%M|%l|/%f"  "${filters[@]}" "${@:-.}")

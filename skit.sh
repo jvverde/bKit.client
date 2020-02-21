@@ -5,7 +5,6 @@ source "$sdir/lib/functions/all.sh"
 
 declare -a filters=()
 
-
 excludes(){
 
 	declare -r exclist="$VARDIR/excludes/excludes.lst"
@@ -91,8 +90,9 @@ done
 
 #Don't move up in order to allow help/usage msg
 [[ -n $NOASK ]] || {
-	#run as sudo if user is not root and os is not cygwin
-	[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
+	##run as sudo if user is not root and os is not cygwin
+	#Until we realise we really need this, comment line bellow
+	#[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
 	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {	#if cygwin and not Administrator
 		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 		echo I am going to runas Administrator

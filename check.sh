@@ -52,7 +52,7 @@ remotedir="$BKIT_RVID/$snap/$BKIT_TARGET"
 
 src="$mnt/./$startdir"
 
-dorsync "${RSYNCOPTIONS[@]}" \
+dorsync ${RSYNCOPTIONS[@]+"${RSYNCOPTIONS[@]}"} \
 	${options+"${options[@]}"} \
 	--dry-run \
 	--recursive \

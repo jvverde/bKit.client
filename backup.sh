@@ -7,6 +7,10 @@ source "$SDIR/lib/functions/all.sh"
 
 SNAP='@snap'
 
+set_server () {
+  source "$SDIR"/server.sh "$1"
+}
+
 declare -a options=()
 while [[ ${1:+$1} =~ ^- ]]
 do
@@ -59,6 +63,12 @@ do
 		--config=*)
 			CONFIG="${KEY#*=}"
 		;;
+    -s|--server)
+      set_server "$1" && shift
+    ;;
+    -s=*|--server=*)
+      set_server "${KEY#*=}"
+    ;;
 		--stats)
 			stats=1
 		;;

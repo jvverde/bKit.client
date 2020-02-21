@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"       #Full DIR
+sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full dir
 
-source "$SDIR/ccrsync.sh"
+source "$sdir/ccrsync.sh"
 
 while [[ $1 =~ ^- ]]
 do
-	KEY="$1" && shift
-	case "$KEY" in
+	key="$1" && shift
+	case "$key" in
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
@@ -21,26 +21,26 @@ do
 			detail="detail"
 		;;
 		*)
-			die Unknown	option $KEY
+			die Unknown	option $key
 		;;
 	esac
 done
 
-RESTOREDIR=("$@")
+restordir=("$@")
 
-ORIGINALDIR=( "${RESTOREDIR[@]}" )
+originaldir=( "${restordir[@]}" )
 
 OLDIFS=$IFS
 IFS="
 "
-exists cygpath && RESTOREDIR=( $(cygpath -u "${ORIGINALDIR[@]}") ) && ORIGINALDIR=( $(cygpath -w "${RESTOREDIR[@]}") )
+exists cygpath && restordir=( $(cygpath -u "${originaldir[@]}") ) && originaldir=( $(cygpath -w "${restordir[@]}") )
 
-RESTOREDIR=( $(readlink -m "${RESTOREDIR[@]}") )
+restordir=( $(readlink -m "${restordir[@]}") )
 
 IFS=$OLDIFS
 
-PERM=(--acls --owner --group --super --numeric-ids)
-OPTIONS=(
+perm=(--acls --owner --group --super --numeric-ids)
+options=(
 	--archive
 	--no-recursive
 	--dirs
@@ -49,24 +49,24 @@ OPTIONS=(
 	--dry-run
 )
 
-mktempdir FAKEROOT
+mktempdir fakeroot
 
-for DIR in "${RESTOREDIR[@]}"
+for dir in "${restordir[@]}"
 do
 
-	source "$SDIR/lib/rvid.sh" "$DIR" || die "Can't source rvid"
+	source "$sdir/lib/rvid.sh" "$dir" || die "Can't source rvid"
 
-	ROOT="$(stat -c%m "$DIR")" || die "Can't find mounting point for '$DIR'"
+	root="$(stat -c%m "$dir")" || die "Can't find mounting point for '$dir'"
 
-	DIR="${DIR#$ROOT}"										#remove mounting point from path => relative path
+	dir="${dir#$root}"										#remove mounting point from path => relative path
 
-	VERSIONS=( $(rsync --list-only "$BACKUPURL/$BKIT_RVID/.snapshots/@GMT-*"|grep -Po '@GMT-.+$') ) 		#get a list of all snapshots in backup
+	versions=( $(rsync --list-only "$BACKUPURL/$BKIT_RVID/.snapshots/@GMT-*"|grep -Po '@GMT-.+$') ) 		#get a list of all snapshots in backup
 
-	for V in "${VERSIONS[@]}"
+	for V in "${versions[@]}"
 	do
-		FMT="--out-format=$V|%o|%i|%M|%l|%f"
-		SRC="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$DIR"
-		rsync "${RSYNCOPTIONS[@]}" "$FMT" "${OPTIONS[@]}" "$SRC" "$FAKEROOT/" 2>/dev/null
+		fmt="--out-format=$V|%o|%i|%M|%l|%f"
+		src="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$dir"
+		rsync "${RSYNCOPTIONS[@]}" "$fmt" "${options[@]}" "$src" "$fakeroot/" 2>/dev/null
 	done | sort | {
 		[[ ${detail+isset} == isset ]] && cat || 
 		[[ ${all+isset} == isset ]] && cut -d'|' -f1  || 

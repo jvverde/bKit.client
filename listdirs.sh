@@ -2,7 +2,9 @@
 set -u
 sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full dir
 
-source "$sdir/ccrsync.sh"
+set_server () {
+  source "$sdir"/server.sh "$1"
+}
 
 declare -a options=()
 while [[ ${1:-} =~ ^- ]]
@@ -15,6 +17,12 @@ do
     --snap=*)
       snap="${key#*=}"
     ;;
+    -s|--server)
+      set_server "$1" && shift
+    ;;
+    -s=*|--server=*)
+      set_server "${key#*=}"
+    ;;
     *)
       options+=( "$key" )
     ;;
@@ -23,6 +31,8 @@ done
 
 declare dir="${1:-.}"
 declare -r snapshot="${snap+.snapshots/${snap}}"
+
+source "$sdir/ccrsync.sh"
 
 [[ ${BKIT_RVID+isset} == isset ]] || {
   dir="$(readlink -ne -- "$dir")"

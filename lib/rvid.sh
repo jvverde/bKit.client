@@ -3,12 +3,12 @@
 issourced(){
 	[[ "${BASH_SOURCE[0]}" != "${0}" ]]
 }
-sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
-source "$sdir/functions/all.sh"
+declare rviddir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
+source "$rviddir/functions/all.sh"
 
 export_rvid(){
 	src="$(readlink -ne -- "$1")"
-	IFS='|' read -r volumename volumeserialnumber filesystem drivetype <<<$("$sdir/drive.sh" "$src")
+	IFS='|' read -r volumename volumeserialnumber filesystem drivetype <<<$("$rviddir/drive.sh" "$src")
 	exists cygpath && declare drive="$(cygpath -w "$src")" && drive="${drive%%:*}"                      #remove anything after : (if any)
 	export BKIT_DRIVE="${drive:-_}"
 	export BKIT_VOLUMESERIALNUMBER="${volumeserialnumber:-_}"

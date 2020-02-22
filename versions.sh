@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full dir
+declare -r sdir="$(dirname -- "$(readlink -ne -- "$0")")"       #Full dir
 
-source "$sdir/ccrsync.sh"
+
+set_server () {
+  source "$sdir"/server.sh "$1"
+}
 
 while [[ $1 =~ ^- ]]
 do
@@ -20,27 +23,35 @@ do
 		-d|--detail ) 
 			detail="detail"
 		;;
+		-s|--server)
+      set_server "$1" && shift
+    ;;
+    -s=*|--server=*)
+      set_server "${KEY#*=}"
+    ;;
 		*)
 			die Unknown	option $key
 		;;
 	esac
 done
 
-restordir=("$@")
+source "$sdir/ccrsync.sh"
 
-originaldir=( "${restordir[@]}" )
+declare -a restordir=( "${@:-.}" )
 
-OLDIFS=$IFS
-IFS="
-"
+declare -a originaldir=( "${restordir[@]}" )
+
+oldifs=$IFS
+IFS=$'\n'
+
 exists cygpath && restordir=( $(cygpath -u "${originaldir[@]}") ) && originaldir=( $(cygpath -w "${restordir[@]}") )
 
 restordir=( $(readlink -m "${restordir[@]}") )
 
-IFS=$OLDIFS
+IFS=$oldifs
 
-perm=(--acls --owner --group --super --numeric-ids)
-options=(
+declare -r perm=(--acls --owner --group --super --numeric-ids)
+declare -a options=(
 	--archive
 	--no-recursive
 	--dirs

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-SDIR=$(dirname -- "$(readlink -en -- "$0")")	#Full SDIR
-source "$SDIR/lib/functions/all.sh"
+sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
+source "$sdir/../functions/all.sh"
 
-
+exists wmic && {
+  wmic logicalDisk Where DriveType!='6' Get name|tail -n +2|sed '/^[[:space:]]*$/d'
+  exit 0
+}
 exists fsutil && {
   for DRV in $(fsutil fsinfo drives| tr -d '\r' | sed /^$/d | cut -d' ' -f2-)
   do

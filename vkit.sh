@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
-sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
+declare -r sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
 source "$sdir/lib/functions/all.sh"
 
 usage() {
-	NAME=$(basename -s .sh "$0")
+	declare -r name=$(basename -s .sh "$0")
 	echo "List backup versions of a given file"
-	echo -e "Usage:\n\t $NAME dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $name dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
-OPTIONS=()
-RSYNCOPTIONS=()
+declare -a options=()
+declare -a rsyncoptions=()
 while [[ $1 =~ ^- ]]
 do
-	KEY="$1" && shift
-	case "$KEY" in
+	key="$1" && shift
+	case "$key" in
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
-				RSYNCOPTIONS+=( "$1" )
+				rsyncoptions+=( "$1" )
 				shift
 			done
 		;;
@@ -26,10 +26,10 @@ do
 			usage
 		;;
 		*)
-			OPTIONS+=( "$KEY" )
+			options+=( "$key" )
 		;;
 	esac
 done
 
-echo "Please wait... this may take a while"
-bash "$sdir/versions.sh" "${OPTIONS[@]}" -- --dry-run --filter=": .rsync-filter" "${RSYNCOPTIONS[@]}" "${@:-.}"
+echo "Please wait... this may take a while" >&2
+bash "$sdir/versions.sh" ${options+"${options[@]}"} -- --dry-run --filter=": .rsync-filter" ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}"

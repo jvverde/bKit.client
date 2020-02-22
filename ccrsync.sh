@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #RSYNC Common Code
-sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
-source "$sdir/lib/functions/all.sh"
+declare rccdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+source "$rccdir/lib/functions/all.sh"
 
 declare -a RSYNCOPTIONS=()
 

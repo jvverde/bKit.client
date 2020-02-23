@@ -3,7 +3,11 @@
 set -u
 sdir="$(dirname "$(readlink -f "$0")")"				#Full DIR
 
-source "$sdir/ccrsync.sh"
+
+set_server () {
+  source "$sdir"/server.sh "$1"
+}
+
 
 declare -a options=()
 declare snap='@current'
@@ -26,11 +30,19 @@ do
 		--BKIT_TARGET=*)
 			BKIT_TARGET="${key#*=}"
 		;;
+		-s|--server)
+      set_server "$1" && shift
+    ;;
+    -s=*|--server=*)
+      set_server "${key#*=}"
+    ;;
 		*)
 			options+=( "$key" )
 		;;
 	esac
 done
+
+source "$sdir/ccrsync.sh"
 
 declare -r entry="${1:-.}"
 
@@ -51,19 +63,20 @@ mnt=${mnt%/} 				#remove trailing slash if any
 
 [[ ${BKIT_RVID+isset} == isset ]] || source "$sdir/lib/rvid.sh" "$mnt" || die "Can't source rvid"
 
-remotedir="$BKIT_RVID/$snap/$BKIT_TARGET"
+remotedir="$BKIT_RVID/$snap/$BKIT_TARGET/"
 
 src="$mnt/./$startdir"
 
+[[ -d $backupdir ]] && src="$src/"
+
 dorsync ${RSYNCOPTIONS[@]+"${RSYNCOPTIONS[@]}"} \
-	${options+"${options[@]}"} \
-	--dry-run \
 	--recursive \
 	--links \
-	--delete-before \
 	--times \
 	--hard-links \
 	--relative \
+	${options+"${options[@]}"} \
+	--dry-run \
 	--itemize-changes \
 	$fmt \
 	"$src" \

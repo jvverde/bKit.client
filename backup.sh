@@ -89,6 +89,10 @@ do
 			NOTIFY=1
 			stats=1
 		;;
+    --dry-run)
+      declare dryrun="dryrun"
+      options+=("--dry-run")
+    ;;
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
@@ -490,9 +494,11 @@ ITIME=$(date -R)
     #backupACLS "$MOUNTPOINT" "${STARTDIR[@]}" |sed -e 's/^/\t/'
   )
 
-  echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"
+  [[ ${dryrun+isset} == isset ]] || {
+    echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"
 
-  snapshot
+    snapshot
+  }
 
   echo "Backup done on $(date -R) for:"
   for I in ${!ORIGINALDIR[@]}

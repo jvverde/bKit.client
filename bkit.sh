@@ -57,11 +57,8 @@ do
 		--stats|--sendlogs|--notify)
 			options+=( "$key")
 		;;
-		*=*)
-			options+=( "$key")
-		;;
 		*)
-			options+=( "$key" "$1" ) && shift
+			options+=( "$key")
 		;;
 	esac
 done

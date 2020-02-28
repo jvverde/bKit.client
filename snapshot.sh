@@ -3,14 +3,14 @@
 #In case of shodow copies it also rewrite path locatiosn for possible filter rsync options
 #In all other situation just call backup.sh
 
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
+declare sdir="$(dirname -- "$(readlink -ne -- "$0")")"				#Full DIR
 
-source "$SDIR/lib/functions/all.sh"
+source "$sdir/lib/functions/all.sh"
 
 
 MOUNTED=()
 getdev(){
-    DEV=$("$SDIR/lib/getdev.sh" "$1"|head -n1|perl -lape 's/(?:\r|\n)+$//g') || die "Device $1 not found"
+    DEV=$("$sdir/lib/getdev.sh" "$1"|head -n1|perl -lape 's/(?:\r|\n)+$//g') || die "Device $1 not found"
 	exists cygpath && DEV="$(cygpath -u "$DEV")"
     DEV=$(readlink -e "$DEV") || die "Device '$DEV' doesn't exists"
     MOUNT=$(df --output=target,fstype "$DEV"|tail -n 1|fgrep -v devtmpfs|cut -f1 -d' ')
@@ -24,6 +24,7 @@ getdev(){
 }
 
 #echo args="${@}"
+declare -a rsyncoptions=()
 OPTIONS=()
 while [[ $1 =~ ^- ]]
 do
@@ -51,7 +52,7 @@ do
         -- )
             while [[ $1 =~ ^- ]]
             do
-                RSYNCOPTIONS+=( "$1" )
+                rsyncoptions+=( "$1" )
                 shift
             done
         ;;
@@ -84,27 +85,27 @@ done
 
 backup() {
     echo Backup directly -- without shadow copy
-    bash "$SDIR/backup.sh" "${OPTIONS[@]}" -- "${RSYNCOPTIONS[@]}" "$@"
+    bash "$sdir/backup.sh" "${OPTIONS[@]}" ${rsyncoptions[@]+ -- "${rsyncoptions[@]}"} "$@"
 }
 
 ntfssnap(){
     echo Backup a ntfs shadow copy
-    local SHADOWSPAN=$(find "$SDIR/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
-    for I in "${!RSYNCOPTIONS[@]}"
+    local SHADOWSPAN=$(find "$sdir/3rd-party" -type f -iname 'ShadowSpawn.exe' -print -quit)
+    for I in "${!rsyncoptions[@]}"
     do
-        [[ ${RSYNCOPTIONS[$I]} =~ --filter=\.[[:space:]]+ ]] && { # map rules from original root to mapped root
-            local FILE="$(echo ${RSYNCOPTIONS[$I]} | cut -d' ' -f2-)"
+        [[ ${rsyncoptions[$I]} =~ --filter=\.[[:space:]]+ ]] && { # map rules from original root to mapped root
+            local FILE="$(echo ${rsyncoptions[$I]} | cut -d' ' -f2-)"
             local NEWFILE="$RUNDIR/rule-$$.$I"
             local OLDROOT=$(cygpath -u "$1")
             local NEWROOT=$(cygpath -u "$2")
             OLDROOT=${OLDROOT%/}
             NEWROOT=${NEWROOT%/}
             cat "$FILE" |sed -E "s#([+-]/?\s+)$OLDROOT#\\1$NEWROOT#" > "$NEWFILE"
-            RSYNCOPTIONS[$I]=${RSYNCOPTIONS[$I]/$FILE/$NEWFILE} #replace original rule file by a temporary rule file
+            rsyncoptions[$I]=${rsyncoptions[$I]/$FILE/$NEWFILE} #replace original rule file by a temporary rule file
             RMFILES+=( "$NEWFILE" ) #include temporary rule in a list of files to remove at the end.
         }
     done
-    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$SDIR/backup.sh" "${OPTIONS[@]}" --map "$2" -- "${RSYNCOPTIONS[@]}" "${@:3}"
+    "$SHADOWSPAN" /verbosity=2 "$1" "$2" "$DOSBASH" "$sdir/backup.sh" "${OPTIONS[@]}" --map "$2" ${rsyncoptions[@]+ -- "${rsyncoptions[@]}"}" "${@:3}"
  }
 
 mktempdir RUNDIR

@@ -6,6 +6,7 @@ set_server () {
   source "$sdir"/server.sh "$1"
 }
 
+declare -a rsyncoptions=()
 while [[ $1 =~ ^- ]]
 do
 	key="$1" && shift
@@ -13,7 +14,7 @@ do
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
-				RSYNCOPTIONS+=("$1")
+				rsyncoptions+=("$1")
 				shift
 			done
 		;;
@@ -77,7 +78,7 @@ do
 	do
 		fmt="--out-format=$V|%o|%i|%M|%l|%f"
 		src="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$dir"
-		rsync "${RSYNCOPTIONS[@]}" "$fmt" "${options[@]}" "$src" "$fakeroot/" 2>/dev/null
+		rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}" "$fmt" ${rsyncoptions+"${rsyncoptions[@]}"} "${options[@]}" "$src" "$fakeroot/" 2>/dev/null
 	done | sort | {
 		[[ ${detail+isset} == isset ]] && cat || 
 		[[ ${all+isset} == isset ]] && cut -d'|' -f1  || 

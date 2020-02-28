@@ -168,8 +168,7 @@ dorsync2(){
 	local RETRIES=300
 	while true
 	do
-    		#echo rsync "${RSYNCOPTIONS[@]}" --one-file-system --compress "$@"
-    		rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
+    rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success

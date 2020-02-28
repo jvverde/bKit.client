@@ -3,8 +3,6 @@
 declare rccdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 source "$rccdir/lib/functions/all.sh"
 
-declare -a RSYNCOPTIONS=()
-
 [[ ${BKIT_CONFIG+isset} == isset && -e $BKIT_CONFIG ]] || {
 	BKIT_CONFIG="$ETCDIR/server/default/conf.init"
 }

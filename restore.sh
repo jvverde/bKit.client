@@ -34,7 +34,7 @@ declare -a options=(
 dorsync() {
   local localdir="${@: -1}$localbackup"
   mkdir -p "$localdir"
-  rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
+  echo rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@" >&2
   RET=$?
   #delete empty before-localdir dirs
   find "$localdir" -maxdepth 0 -empty -delete 2>/dev/null
@@ -68,6 +68,7 @@ set_server () {
 declare -a fullURL=()
 declare -A LINKTO
 LOCALACTION="--copy-dest" #rsync option
+
 while [[ ${1:-} =~ ^- ]]
 do
   KEY="$1" && shift
@@ -110,7 +111,7 @@ do
       ACLS=1
     ;;
     --dry-run)
-      RSYNCOPTIONS+=('--dry-run')
+      options+=('--dry-run')
     ;;
     --no-owner)
       options+=( "--no-group" "--no-owner" )  
@@ -129,6 +130,9 @@ do
     ;;
     --copy-dest=*)
       LINKTO["--copy-dest=${KEY#*=}"]=1
+    ;;
+    --no-local)
+      unset LOCALACTION
     ;;
     --stats)
       STATS=1
@@ -156,7 +160,7 @@ do
     -- )
       while [[ $1 =~ ^- ]]
       do
-        RSYNCOPTIONS+=("$1") && shift
+        options+=("$1") && shift
       done
     ;;
     *)
@@ -317,7 +321,7 @@ do
     {
       if [[ ${dest+isset} == isset ]]
       then
-        dorsync ${LINKS[@]+"${LINKS[@]}"} --no-relative "$SRC" "$LOCALACTION=$parentdir/" "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
+        dorsync ${LINKS[@]+"${LINKS[@]}"} --no-relative "$SRC" ${LOCALACTION+"$LOCALACTION=$parentdir/"} "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
       else
         dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$parentdir/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi

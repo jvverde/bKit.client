@@ -379,7 +379,6 @@ backupACLS(){
   {
     coproc upload_manifest "$metadatadir" 'metadata'
     {
-      #bash "$SDIR/hash.sh" --remotedir="$BKIT_RVID/@current/metadata" --root="$metadatadir" -- "${RSYNCOPTIONS[@]}" "${MDIRS[@]}"
       export BKIT_TARGET='metadata'
       export BKIT_MNTPOINT="$metadatadir"
       bash "$SDIR/hashit.sh"  ${options+"${options[@]}"} "${MDIRS[@]}"

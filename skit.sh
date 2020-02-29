@@ -49,7 +49,7 @@ do
 		-- )
 			while [[ $1 =~ ^- ]]
 			do
-				RSYNCOPTIONS+=( "$1" )
+				rsyncoptions+=( "$1" )
 				shift
 			done
 		;;
@@ -112,8 +112,8 @@ done
 
 echo Start snapshot backup for "${@:-.}" @"$(date -Imin)" 
 #echo options="${options[@]}"
-#echo RSYNCOPTIONS="${RSYNCOPTIONS[@]}"
-#echo "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}"
-bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${RSYNCOPTIONS[@]}" "${@:-.}" 2>&1
+#echo rsyncoptions="${rsyncoptions[@]}"
+#echo "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${rsyncoptions[@]}" "${@:-.}"
+bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${rsyncoptions[@]}" "${@:-.}" 2>&1
 echo Done snapshot backup for "${@:-.}" @"$(date -Imin)" 
 

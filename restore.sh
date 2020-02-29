@@ -33,7 +33,7 @@ declare -a options=(
 
 dorsync() {
   local localdir="${@: -1}$localbackup"
-  mkdir -p "$localdir"
+  mkdir -p "$localdir" 2>/dev/null
   rsync ${perm+"${perm[@]}"} "$fmt" ${options+"${options[@]}"} ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$@"
   RET=$?
   #delete empty before-localdir dirs

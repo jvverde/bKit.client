@@ -3,7 +3,7 @@ sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
 source "$sdir/../functions/all.sh"
 
 exists wmic && {
-  wmic logicalDisk Where DriveType!='6' Get name|tail -n +2|sed '/^[[:space:]]*$/d'
+  wmic logicalDisk Where DriveType!='6' Get name|tail -n +2| sed 's/\r//g'| sed '/^[[:space:]]*$/d'| sed 's/[[:space:]]*$//'
   exit 0
 }
 exists fsutil && {

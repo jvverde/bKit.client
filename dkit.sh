@@ -35,6 +35,17 @@ do
   esac
 done
 
+if exists cygpath
+then
+  declare -a args=()
+  for arg in "${@:-.}"
+  do
+    args+=( "$(cygpath -u "$arg")" )
+  done
+else
+  declare -ra args=("${@:-.}")
+fi
+
 declare -a filters=( --filter=": .rsync-filter" )
 
 exclist="$VARDIR/excludes/excludes.lst"
@@ -45,4 +56,4 @@ while IFS='|' read i datetime size file
 do
 	exists cygpath && file=$(cygpath -w "$file")
 	echo "$i|$datetime|$size|$file"
-done < <(bash "$sdir/check.sh" --snap="@last" ${options+"${options[@]}"} --out-format="%i|%M|%l|/%f"  "${filters[@]}" "${@:-.}")
+done < <(bash "$sdir/check.sh" --snap="@last" ${options+"${options[@]}"} --out-format="%i|%M|%l|/%f"  "${filters[@]}" "${args[@]}")

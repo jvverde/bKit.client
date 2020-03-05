@@ -35,4 +35,15 @@ done
 
 echo "Start Restore"
 
-bash "$sdir/restore.sh" ${options+"${options[@]}"} -- --filter=": .rsync-filter" ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}"
+if exists cygpath
+then
+	declare -a args=()
+	for arg in "${@:-.}"
+	do
+	  args+=( "$(cygpath -u "$arg")" )
+	done
+else
+	declare -ra args=("${@:-.}")
+fi
+
+echo bash "$sdir/restore.sh" ${options+"${options[@]}"} -- --filter=": .rsync-filter" ${rsyncoptions+"${rsyncoptions[@]}"} "${args[@]}"

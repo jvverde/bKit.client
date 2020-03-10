@@ -72,17 +72,17 @@ do
 
 	dir="${dir#$root}"										#remove mounting point from path => relative path
 
-	versions=( $(rsync --list-only "$BACKUPURL/$BKIT_RVID/.snapshots/@GMT-*"|grep -Po '@GMT-.+$') ) 		#get a list of all snapshots in backup
+	versions=( $(rsync --list-only "$BACKUPURL/$BKIT_RVID/.snapshots/@GMT-*"|grep -Po '@GMT-.+$' |sort) ) 		#get a list of all snapshots in backup
 
 	for V in "${versions[@]}"
 	do
 		fmt="--out-format=$V|%o|%i|%M|%l|%f"
 		src="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$dir"
 		rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$fmt" ${rsyncoptions+"${rsyncoptions[@]}"} "${options[@]}" "$src" "$fakeroot/" 2>/dev/null
-	done | sort | {
+	done | {
 		[[ ${detail+isset} == isset ]] && cat || 
 		[[ ${all+isset} == isset ]] && cut -d'|' -f1  || 
-		awk -F'|' ' 
+		sort | awk -F'|' ' 
 			{
 				LINES[$2 $3 $4 $5 $6] = $1 " have a last modifed version at " $4 " of " $6 #supress the first field(=snapshot) id all the other are the same. Just show one
 			}

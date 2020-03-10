@@ -78,7 +78,7 @@ do
 	do
 		fmt="--out-format=$V|%o|%i|%M|%l|%f"
 		src="$BACKUPURL/$BKIT_RVID/.snapshots/$V/data/$dir"
-		rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}" "$fmt" ${rsyncoptions+"${rsyncoptions[@]}"} "${options[@]}" "$src" "$fakeroot/" 2>/dev/null
+		rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} "$fmt" ${rsyncoptions+"${rsyncoptions[@]}"} "${options[@]}" "$src" "$fakeroot/" 2>/dev/null
 	done | sort | {
 		[[ ${detail+isset} == isset ]] && cat || 
 		[[ ${all+isset} == isset ]] && cut -d'|' -f1  || 

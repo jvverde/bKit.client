@@ -33,16 +33,24 @@ done
 
 exists cygpath && declare dir="$(cygpath -u "${1:-.}")" || declare dir="${1:-.}"
 
+echo dir=$dir
+
 declare -r snapshot="${snap+.snapshots/${snap}}"
 
 source "$sdir/ccrsync.sh"
 
 
 [[ ${BKIT_RVID+isset} == isset ]] || {
-  dir="$(readlink -ne -- "$dir")"
-  source "$sdir/lib/rvid.sh" "$dir" || die "Can't source rvid"
-  declare -r root="$(stat -c%m "$dir")"
-  [[ -d $dir ]] && dir="$dir/" #This is important for rsync
+  dir="$(readlink -nm -- "$dir")"
+  declare parent="$dir"
+  while [[ ! -e $parent && -n $parent ]]
+  do
+    parent="$(dirname -- $parent)"
+  done
+  source "$sdir/lib/rvid.sh" "$parent" || die "Can't source rvid"
+  declare -r root="$(stat -c%m "$parent")"
+  # If is a directory or if filename not exist => assume it is a directory <= This is a listdir not a listfile
+  [[ -d $dir || ! -e $dir ]] && dir="$dir/" #This is important for rsync
   dir=${dir#$root}    #remove mount point
   dir=${dir#/}        #remove heading slash if any
 }

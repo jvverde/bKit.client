@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
+sdir=$(dirname -- "$(readlink -en -- "$0")")  #Full sdir
 source "$sdir/../functions/all.sh"
 
 exists wmic && {

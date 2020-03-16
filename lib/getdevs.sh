@@ -3,15 +3,15 @@ sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
 source "$sdir/functions/all.sh"
 
 exists wmic && {
-  WMIC logicaldisk WHERE "DriveType!=64" GET Name,VolumeName,VolumeSerialNumber|
-    tail -n +2|                   #ignore header line
+  WMIC logicaldisk WHERE "DriveType!=64" GET FileSystem,Name,VolumeName,VolumeSerialNumber /format:csv|
     tr -d '\r' |                  #remove all carriage returns
     sed '/^[[:space:]]*$/d'|      #remove empty lines
-    awk '{print $1"/|"$2"|"$3}'   #formmt output
+    tail -n +2|                   #ignore header line
+    awk -F, '{print $3"/|"$4"|"$5"|"$2}'   #format output letter:/|label|uuid|fstype
   exit 0
 }
 
-
+#This is for linux
 getLabel() {
   declare dev="$1"
   declare -g label=''
@@ -32,7 +32,7 @@ exists df && {
   do
     getLabel "$src"
     getUUID "$src"
-    echo "$src|$mnt|${label:-_}|${uuid:-_}|${type:-_}"
+    echo "$src|$mnt|$label|$uuid|$type"
   done
   exit 0
 }

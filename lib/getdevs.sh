@@ -32,7 +32,7 @@ exists df && {
   do
     getLabel "$src"
     getUUID "$src"
-    echo "$src|$mnt|$label|$uuid|$type"
+    echo "$mnt|$label|$uuid|$type"
   done
   exit 0
 }

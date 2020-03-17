@@ -7,7 +7,7 @@ exists wmic && {
     tr -d '\r' |                  #remove all carriage returns
     sed '/^[[:space:]]*$/d'|      #remove empty lines
     tail -n +2|                   #ignore header line
-    awk -F, '{print $3"/|"$4"|"$5"|"$2}'   #format output letter:/|label|uuid|fstype
+    awk -F, '{print $3"\\|"$4"|"$5"|"$2}'   #format output letter:/|label|uuid|fstype
   exit 0
 }
 

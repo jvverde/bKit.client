@@ -33,8 +33,6 @@ done
 
 exists cygpath && declare dir="$(cygpath -u "${1:-.}")" || declare dir="${1:-.}"
 
-echo dir=$dir
-
 declare -r snapshot="${snap+.snapshots/${snap}}"
 
 source "$sdir/ccrsync.sh"

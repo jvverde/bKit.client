@@ -46,4 +46,4 @@ else
 	declare -ra args=("${@:-.}")
 fi
 
-echo bash "$sdir/restore.sh" ${options+"${options[@]}"} -- --filter=": .rsync-filter" ${rsyncoptions+"${rsyncoptions[@]}"} "${args[@]}"
+bash "$sdir/restore.sh" ${options+"${options[@]}"} -- --filter=": .rsync-filter" ${rsyncoptions+"${rsyncoptions[@]}"} "${args[@]}"

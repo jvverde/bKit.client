@@ -321,7 +321,7 @@ do
     {
       if [[ ${dest+isset} == isset ]]
       then
-        dorsync ${LINKS[@]+"${LINKS[@]}"} --no-relative "$SRC" ${LOCALACTION+"$LOCALACTION=$parentdir/"} "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
+        dorsync ${LINKS[@]+"${LINKS[@]}"} --no-relative ${LOCALACTION+"$LOCALACTION=$parentdir/"} "$SRC" "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
       else
         dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$parentdir/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi

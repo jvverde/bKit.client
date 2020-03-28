@@ -335,7 +335,8 @@ do
   fi
 done
 
-[[ ${dest+isset} == isset && ${#fullURL[@]} -gt 0 ]] && {	#if SRC(s) in format user@server::section (this is for migration)
+[[ ${dest+isset} == isset && ${#fullURL[@]} -gt 0 ]] && {	
+  #if SRC(s) in format user@server::section (this is for migration)
   set -o pipefail
   INIT=$(date -R)
   dorsync ${LINKS[@]+"${LINKS[@]}"} "${fullURL[@]}" "$dest" | tee "$logfile" || die "Problems restoring to $dest"

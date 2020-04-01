@@ -36,7 +36,7 @@ do
 	key="$1" && shift
 	case "$key" in
 		-- )
-			while [[ $1 =~ ^- ]]
+			while [[ ${1:-} =~ ^- ]]
 			do
 				rsyncoptions+=( "$1" )
 				shift

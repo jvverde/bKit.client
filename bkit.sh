@@ -70,14 +70,14 @@ done
 [[ ${nofilters+isset} == isset ]] || filters+=( --filter=": .rsync-filter" )
 
 declare -r pgid="$(cat /proc/self/pgid 2>/dev/null)"
-echo "bkit[$$:$pgid]: Start backup for ${@:-.}"
+echo "bKit[$$:$pgid]: Start backup for ${@:-.}"
 let cnt=16
 let sec=60
 while (( cnt-- > 0 ))
 do
 	bash "$sdir/backup.sh" ${options+"${options[@]}"} -- ${filters+"${filters[@]}"} ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}" && break
 	let delay=(1 + RANDOM % $sec)
-	echo "bkit:Wait $delay seconds before try again"
+	echo "bKit:Wait $delay seconds before try again"
 	sleep $delay 
 	let sec=2*sec
 done

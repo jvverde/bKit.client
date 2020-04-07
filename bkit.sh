@@ -69,7 +69,8 @@ done
 
 [[ ${nofilters+isset} == isset ]] || filters+=( --filter=": .rsync-filter" )
 
-echo "bkit: Start backup for ${@:-.}"
+declare -r pgid="$(cat /proc/self/pgid 2>/dev/null)"
+echo "bkit[$$:$pgid]: Start backup for ${@:-.}"
 let cnt=16
 let sec=60
 while (( cnt-- > 0 ))
@@ -80,4 +81,4 @@ do
 	sleep $delay 
 	let sec=2*sec
 done
-echo "bKit: Done"
+echo "bKit[$$:$pgid]: Done"

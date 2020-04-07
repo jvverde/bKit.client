@@ -1,4 +1,4 @@
-@echo OFF
+ @echo OFF
 REM set oldhome=%HOME%
 set oldshell=%SHELL%
 set oldpath=%path%

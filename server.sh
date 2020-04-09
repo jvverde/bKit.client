@@ -23,7 +23,7 @@ server_doit(){
   }
 
   [[ $1 =~ ^--?h ]] && usage
-  [[ $1 =~ ^-s ]] && shift && declare -r save=1 #we want to save it permanently
+  [[ $1 =~ ^--?s ]] && shift && declare -r save=1 #we want to save it permanently
 
   declare -r default="$CONFDIR/default"
   declare current="$default"

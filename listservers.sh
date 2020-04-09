@@ -4,7 +4,7 @@ declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
 function usage(){
     local name=$(basename -s .sh "$0")
     echo "List bkit servers"
-    echo -e "usage:\n\t $name"
+    echo -e "Usage:\n\t $name"
     exit 1
 }
 

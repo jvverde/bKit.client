@@ -323,6 +323,7 @@ do
       then
         dorsync ${LINKS[@]+"${LINKS[@]}"} --no-relative ${LOCALACTION+"$LOCALACTION=$parentdir/"} "$SRC" "$dest" | tee "$RESULT/index" || warn "Problems restoring to $dest"
       else
+        mkdir -pv "$(dirname "$RESOURCE")" #Just in case for windows
         dorsync ${LINKS[@]+"${LINKS[@]}"} "$SRC" "$parentdir/" | tee "$RESULT/index" || warn "Problems restoring the $BASE/$ENTRY"
       fi
       [[ ${ACLS+isset} == isset && $OS == 'cygwin' && $FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (

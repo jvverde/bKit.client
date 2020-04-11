@@ -33,6 +33,7 @@ CONFDIR="${2:-"$ETCDIR/$1"}"
 PRIV="$CONFDIR/.priv"
 PUB="$CONFDIR/pub"
 mkdir -p "$PRIV"
+chmod 600 "$PRIV"
 mkdir -p "$PUB"
 KEYSSH="$PRIV/ssh.key"
 PUBSSH="$PUB/ssh-client.pub"
@@ -40,6 +41,7 @@ PUBSSH="$PUB/ssh-client.pub"
 [[ -e $KEYSSH && -n $NEW ]] && rm "$KEYSSH"
 
 [[ -e $KEYSSH ]] || ssh-keygen -b 256 -t ecdsa -f "$KEYSSH" -q -N "" -C "key from $(id -un)@$(hostname -f) to $1"
+chmod 600 "$PRIV"/*
 
 ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
 

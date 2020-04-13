@@ -34,7 +34,7 @@ done
 (( $# == 0 )) && usage
 
 declare -r pgid="$(cat /proc/self/pgid 2>/dev/null)"
-echo "rKit[$$:$pgid]: Start Restore for ${@:-.}"
+echo "rKit[$$:$pgid]: Start Restore for ${@:-.}" #Don't chand this format. It is used by GUI
 
 if exists cygpath
 then
@@ -48,4 +48,4 @@ else
 fi
 
 bash "$sdir/restore.sh" ${options+"${options[@]}"} -- --filter=": .rsync-filter" ${rsyncoptions+"${rsyncoptions[@]}"} "${args[@]}"
-echo "rKit[$$:$pgid]: Done"
+echo "rKit[$$:$pgid]: Done" #Don't chand this format. It is used by GUI

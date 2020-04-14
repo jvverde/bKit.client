@@ -255,6 +255,11 @@ do
 			tasklog="$(cygpath -w "$LOGBASE/task.log")"
 			cat <<EOF
 >> "$tasklog" 2>&1 (
+  REM tasklog="$tasklog"
+  REM logdir="$WLOGDIR"
+  REM uuid="$UUID"
+  REM drive="$(cygpath -w "$ROOT")"
+  REM path="${BACKUPDIR[@]}"
 	echo Snapshot of ${BACKUPDIR[@]} on DRIVE $(cygpath -w "$ROOT")
 	echo See Logs on folder $WLOGDIR
 	pushd "%~dp0"
@@ -280,6 +285,7 @@ done
 [[ -n $INSTALL ]] && {
 	if [[ $OS == cygwin ]]
 	then
+    (id -G|grep -qE '\b544\b') && declare -r isadmin="yes"
 		echo "Create a batch file in $JOBFILE"
 		TASCMD='"'$(cygpath -w "$JOBFILE")'"'
 		ST=$(date -d "$START" +"%H:%M:%S")
@@ -289,7 +295,8 @@ done
 		(($FORMAT == 0)) && SD=$(date -d "$START" +"%m/%d/%Y")
 		(($FORMAT == 1)) && SD=$(date -d "$START" +"%d/%m/%Y")
 		(($FORMAT == 2)) && SD=$(date -d "$START" +"%Y/%m/%d")
-		schtasks /CREATE /RU "SYSTEM" /SC $SCHTYPE /MO ${EVERY:-1} /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
+    echo schtasks /CREATE ${isadmin+/RU "SYSTEM"} /SC $SCHTYPE /MO ${EVERY:-1} /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD"
+    schtasks /CREATE ${isadmin+/RU "SYSTEM"} /SC $SCHTYPE /MO ${EVERY:-1} /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
 		echo "These are your bKit schedule tasks now"
 		schtasks /QUERY|fgrep BKIT
 	else

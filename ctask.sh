@@ -255,11 +255,11 @@ do
 			tasklog="$(cygpath -w "$LOGBASE/task.log")"
 			cat <<EOF
 >> "$tasklog" 2>&1 (
-  REM tasklog="$tasklog"
-  REM logdir="$WLOGDIR"
-  REM uuid="$UUID"
-  REM drive="$(cygpath -w "$ROOT")"
-  REM path="${BACKUPDIR[@]}"
+  REM tasklog='$tasklog'
+  REM logdir='$WLOGDIR'
+  REM uuid='$UUID'
+  REM drive='$(cygpath -w "$ROOT")'
+  REM path=${BACKUPDIR[@]}
 	echo Snapshot of ${BACKUPDIR[@]} on DRIVE $(cygpath -w "$ROOT")
 	echo See Logs on folder $WLOGDIR
 	pushd "%~dp0"

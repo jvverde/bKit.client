@@ -15,14 +15,14 @@ exists wmic && {
 getLabel() {
   declare dev="$1"
   declare -g label=''
-  exists findmnt && label="$(findmnt -nro LABEL "$dev")"
+  exists findmnt && label="$(findmnt -nro LABEL "$dev"|head -n1)"
   [[ -z $label && -b $dev ]] && exists lsblk && label="$(lsblk -nro LABEL "$dev")"
   [[ -z $label && -e /dev/disk/by-label ]] && label="$(find /dev/disk/by-label -lname "*/${dev##*/}" -printf "%f" -quit)" 
 }
 getUUID() {
   declare dev="$1"
   declare -g uuid=''
-  exists findmnt && uuid="$(findmnt -nro UUID "$dev")"
+  exists findmnt && uuid="$(findmnt -nro UUID "$dev" | head -n1)"
   [[ -z $uuid && -b $dev ]] && exists lsblk && uuid="$(lsblk -nro UUID "$dev")"
   [[ -z $uuid && -e /dev/disk/by-uuid ]] && uuid="$(find /dev/disk/by-uuid -lname "*/${dev##*/}" -printf "%f" -quit)" 
 }

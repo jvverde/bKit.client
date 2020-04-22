@@ -196,7 +196,7 @@ do
   do
   	#echo F:$F
   	#DIR=${F:2}
-  	DIR=${F#* } #STAR AFTER FIRST SPACE
+  	DIR=${F#* } #START AFTER FIRST SPACE
   	P=${F%% *}	#P is the rule
   	set -f
   	exists cygpath && [[ $DIR =~ ^[a-zA-Z]: || $DIR =~ \\ ]] && DIR=$(cygpath -u "$DIR")
@@ -257,6 +257,7 @@ do
 >> "$tasklog" 2>&1 (
   REM tasklog='$tasklog'
   REM logdir='$WLOGDIR'
+  REM filters='${FILTERLOCATION}'
   REM uuid='$UUID'
   REM drive='$(cygpath -w "$ROOT")'
   REM path=${BACKUPDIR[@]}

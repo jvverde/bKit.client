@@ -30,7 +30,7 @@ msg () {
 
 	say "${BASH_SOURCE[$cnt]}: Line ${BASH_LINENO[$cnt-1]}: $@">&2;		#show error with line number and file name
 
-	for i in $(seq $cnt $(( ${#BASH_SOURCE[@]} - 2 )) )			#show call stach
+	for i in $(seq $cnt $(( ${#BASH_SOURCE[@]} - 2 )) )			#Show caller stack
 	do
 		say "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
 	done
@@ -38,6 +38,7 @@ msg () {
 
 die() {
 	CODE=$?
+	(( CODE == 0 )) && CODE=1 #Unless there is a previous error code the exit code should be 1
 	msg "$@"
 	exit $CODE;
 }

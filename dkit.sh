@@ -43,6 +43,7 @@ then
     args+=( "$(cygpath -u "$arg")" )
   done
 else
+  arg="$(echo $arg|perl -lape 's/^"(.+)"$/$1/')" #This is a workaround to remove extra quotes introduced my cmd.exe
   declare -ra args=("${@:-.}")
 fi
 

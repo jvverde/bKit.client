@@ -2,7 +2,8 @@
 declare -p _fa5db1cec69d83e1bb3898143fd1002c >/dev/null 2>&1 && return
 
 _fa5db1cec69d83e1bb3898143fd1002c(){
-	local user="$(id -nu)"
+  [[ ${BKITUSER+isset} == isset ]] || source "$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")/variables.sh"
+	local user="${BKITUSER:-$(id -nu)}"
 	local homedir="$( getent passwd "$user" | cut -d: -f6 )"
 	true ${homedir:="$HOME"}
 	true ${homedir:="/home/$user"}

@@ -42,10 +42,10 @@ echo -n $CHALLENGE > "$SYNCD/challenge"
 
 #Send public keys and challenge to the server
 #echo RSYNC_PASSWORD=$RSYNC_PASSWORD
-rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/" || die "Exit value of rsync is non null: $?"
+rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}/" || die "Exit value of rsync is non null: $?"
 
 #Read (back) public keys from server including (meanwhile) generated server public keys as well the encripted challenge
-rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${USER}/./" "$SYNCD/" || die "Exit value of rsync is non null: $?"
+rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}/./" "$SYNCD/" || die "Exit value of rsync is non null: $?"
 
 #Now generate a password/secret by using a Diffie-Hellman algorithm
 "$SDIR/lib/genpass.sh" "$CONFDIR"		|| die "Can't generate the pass"

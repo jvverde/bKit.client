@@ -40,7 +40,7 @@ PUBSSH="$PUB/ssh-client.pub"
 
 [[ -e $KEYSSH && -n $NEW ]] && rm "$KEYSSH"
 
-[[ -e $KEYSSH ]] || ssh-keygen -b 256 -t ecdsa -f "$KEYSSH" -q -N "" -C "key from $(id -un)@$(hostname -f) to $1"
+[[ -e $KEYSSH ]] || ssh-keygen -b 256 -t ecdsa -f "$KEYSSH" -q -N "" -C "key from $BKITUSER@$(hostname -f) to $1"
 chmod 600 "$PRIV"/*
 
 ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"

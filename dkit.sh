@@ -26,7 +26,7 @@ do
     -s=*|--server=*)
       set_server "${key#*=}"
     ;;
-    --?h*)
+    -h|--help)
       usage
     ;;
     *)

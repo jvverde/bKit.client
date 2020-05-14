@@ -15,6 +15,7 @@ set_server () {
   source "$sdir"/server.sh "$1"
 }
 
+echo "Called with $@"
 declare -a options=()
 while [[ ${1:-} =~ ^- ]]
 do
@@ -40,6 +41,7 @@ then
   declare -a args=()
   for arg in "${@:-.}"
   do
+    echo arg="'$arg'"
     #arg="$(echo $arg|perl -lape 's/^"(.+)"$/$1/')" #This is a workaround to remove extra quotes introduced my cmd.exe
     args+=( "$(cygpath -u "$arg")" )
   done

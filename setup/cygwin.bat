@@ -1,4 +1,10 @@
 @echo OFF
+
+SET cdir=%~dp0
+SET getCygwin64=%cdir%cygwin.ps1
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%getCygwin64%'";
+
+exit /b
 :: http://stackoverflow.com/questions/5034076/what-does-dp0-mean-and-how-does-it-work
 :: http://stackoverflow.com/questions/12322308/batch-file-to-check-64bit-or-32bit-os
 Setlocal EnableDelayedExpansion

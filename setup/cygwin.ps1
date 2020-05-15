@@ -49,7 +49,7 @@ foreach ($mirror in $mirrors) {
     $args = @(
       "--download",
       "--no-admin",
-      "--root","$parent\3rd-party\cygwin.XXX",
+      "--root","$parent\3rd-party\cygwin",
       "--local-package-dir",$repo,
       "--no-desktop",
       "--no-startmenu",

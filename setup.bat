@@ -13,8 +13,13 @@ if not exist "%OP%3rd-party\shadowspawn\" mkdir "%OP%3rd-party\shadowspawn"
 if not exist "%OP%run\" mkdir "%OP%run"
 if not exist "%OP%cache\" mkdir "%OP%cache"
 
-call "%OP%setup\mirror-cygwin.bat"
-call "%OP%setup\cygwin.bat"
+::call "%OP%setup\mirror-cygwin.bat"
+::call "%OP%setup\cygwin.bat"
+
+set cdir=%~dp0
+set getCygwin64=%cdir%setup\cygwin.ps1
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%getCygwin64%'";
+
 :: call "%OP%setup\shadowspawn.bat"
 :: call "%OP%setup\subinacl.bat"
 call "%OP%bash.bat" "%OP%\setup\setup.sh"

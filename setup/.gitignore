@@ -2,3 +2,5 @@
 *.log
 *.full
 *.exe
+!*/urls
+*/

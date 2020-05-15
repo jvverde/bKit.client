@@ -6,3 +6,4 @@ cygwi*/*.full
 !cyg*/repo
 paexec.exe
 */*
+*/*.exe

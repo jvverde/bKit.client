@@ -3,6 +3,8 @@ $cygdir = "$PSScriptRoot\cygwin"
 $urls = "$PSScriptRoot\urls"
 $mirrorlist = "$urls\cygwin.mirrors"
 
+$proxy = [System.Net.WebProxy]::GetDefaultProxy() | select address #LATER
+
 if ((gwmi win32_operatingsystem | select osarchitecture).osarchitecture -like "64*") {
   
   $cygwin = "$cygdir\setup-x86_64.exe"
@@ -47,16 +49,24 @@ foreach ($mirror in $mirrors) {
     $args = @(
       "--download",
       "--no-admin",
-      "--root","$parent\cygwin.XXX",
+      "--root","$parent\3rd-party\cygwin.XXX",
       "--local-package-dir",$repo,
       "--no-desktop",
       "--no-startmenu",
       "--no-shortcuts",
       "--no-verify",
-      "--site", $mirror
-      "--quiet-mode","--packages",$modules
+      "--site", $mirror,
+      "--quiet-mode",
+      "--local-install",
+      "--packages",$modules,
+      "--verbose"
     ) 
-    & $cygwin $args
+    #&$cygwin $args | Out-Null # Pipe output to null to force wait for program finish
+    Start-Process -FilePath $cygwin -Wait -ArgumentList $args
+    if ($lastexitcode -ne 0) {
+      Write-Host $errorMessage
+      #throw $errorMessage
+    }
     break
   } else {
       Write-Host "The mirror '$mirror' may be down. Go try next one..."

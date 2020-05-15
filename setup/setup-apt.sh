@@ -7,12 +7,12 @@ if [[ ${OSTYPE,,} == cygwin ]]
 then
 	#cygcheck apt-cyg 1>/dev/null 2>&1 && echo yes
 	declare -r tmp="$(mktemp -d)"
-	pushd $tmp
-	wget -nv https://raw.githubusercontent.com/transcode-open/apt-cyg/master/apt-cyg \
-		|| echo "Can't download apt-cyg"
-	install apt-cyg /bin && rm apt-cyg
-	popd
-	rmdir -v "$tmp"
+  trap "rm -rf $tmp" EXIT SIGINT SIGTERM
+	pushd "$tmp" >/dev/null
+  IFS= read -t 1 -r url < <(cat "$sdir/urls/apt-cyg.url" | sed -E '/^(\s|\r)*$/d')
+	wget -nv -O apt-cyg "$url" || echo "Can't download apt-cyg"
+	install apt-cyg /bin
+	popd >/dev/null
 else
 	echo Not Cygwin OSTYPE
 fi

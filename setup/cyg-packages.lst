@@ -5,7 +5,8 @@ nc
 util-linux
 perl
 openssh
-email	
+email
 zip
 unzip
 git
+awk

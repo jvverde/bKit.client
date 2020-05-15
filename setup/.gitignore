@@ -5,3 +5,4 @@ cygwi*/*.log
 cygwi*/*.full
 !cyg*/repo
 paexec.exe
+*/*

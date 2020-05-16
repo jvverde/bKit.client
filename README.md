@@ -39,21 +39,21 @@ On cases where you we would like to see what version are in the backup we can us
 
 This will return a list of modified versions existing on backup servers, ex:
 
->$ ../vkit.sh c:/bkit
-
->Please wait... this may take a while
-
->@GMT-2019.11.28-22.33.14 have a last modifed version at 2019/11/19-21:13:55 of bkit
->@GMT-2020.01.18-18.25.50 have a last modifed version at 2020/01/18-14:12:49 of bkit
->@GMT-2020.02.13-14.01.47 have a last modifed version at 2020/02/13-14:01:44 of bkit
->@GMT-2020.03.03-21.46.38 have a last modifed version at 2020/03/03-21:46:31 of bkit
->@GMT-2020.03.23-11.49.05 have a last modifed version at 2020/03/13-15:00:02 of bkit
->@GMT-2020.03.29-20.15.09 have a last modifed version at 2020/03/29-21:14:28 of bkit
->@GMT-2020.04.02-09.35.40 have a last modifed version at 2020/03/30-13:31:50 of bkit
->@GMT-2020.04.05-23.57.56 have a last modifed version at 2020/03/31-00:29:49 of bkit
->@GMT-2020.04.07-13.43.21 have a last modifed version at 2020/04/06-15:17:19 of bkit
->@GMT-2020.04.08-06.23.52 have a last modifed version at 2020/04/06-15:17:19 of bkit
->@GMT-2020.05.13-11.52.21 have a last modifed version at 2020/04/13-12:30:52 of bkit
+  ```
+  $ ../vkit.sh c:/bkit
+  Please wait... this may take a while
+  @GMT-2019.11.28-22.33.14 have a last modifed version at 2019/11/19-21:13:55 of bkit
+  @GMT-2020.01.18-18.25.50 have a last modifed version at 2020/01/18-14:12:49 of bkit
+  @GMT-2020.02.13-14.01.47 have a last modifed version at 2020/02/13-14:01:44 of bkit
+  @GMT-2020.03.03-21.46.38 have a last modifed version at 2020/03/03-21:46:31 of bkit
+  @GMT-2020.03.23-11.49.05 have a last modifed version at 2020/03/13-15:00:02 of bkit
+  @GMT-2020.03.29-20.15.09 have a last modifed version at 2020/03/29-21:14:28 of bkit
+  @GMT-2020.04.02-09.35.40 have a last modifed version at 2020/03/30-13:31:50 of bkit
+  @GMT-2020.04.05-23.57.56 have a last modifed version at 2020/03/31-00:29:49 of bkit
+  @GMT-2020.04.07-13.43.21 have a last modifed version at 2020/04/06-15:17:19 of bkit
+  @GMT-2020.04.08-06.23.52 have a last modifed version at 2020/04/06-15:17:19 of bkit
+  @GMT-2020.05.13-11.52.21 have a last modifed version at 2020/04/13-12:30:52 of bkit
+```
 
 Then if you want recovery/restore the version of February, just use the option snap on rkit.sh
 - ./rkit.sh --snap="@GMT-2020.02.13-14.01.47" c:/bkit

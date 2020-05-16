@@ -18,17 +18,21 @@ I run under windows open a CMD shell, go to bkIt directory and then run bash.bat
 This will open a bash shell and we are now using cygwin
 
 The first thing to do is to point to a bKit server
+
 `` ./init.sh *serveraddress*``
 
 This operations can be repeat as many times as needed/desired. Every time it runs a new key-pair is changed with server using Diffie-Hellman algorithm, and a new password is computed. So it will be a good pratice to run it frequently.
 
 To backup a file or a directory use bkit.sh script
+
 `` ./bkit.sh *directory*``
 
 In order to check whats file or directory are changed sinde last backup
+
 `` ./dkit.sh *directory*``
 
 The restore from last backup use rkit.sh
+
 `` ./rkit.sh *directory*``
 
 If we don't want to restore to de original location, but instead recovery to a another location user --dst option 
@@ -36,6 +40,7 @@ If we don't want to restore to de original location, but instead recovery to a a
 `` ./rkit.sh --dst=*newlocationdirectory* *directory*``
 
 On cases where you we would like to see what version are in the backup we can use vkit.sh
+
 `` ./vkit.sh *directory*``
 
 This will return a list of modified versions existing on backup servers, ex:

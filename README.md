@@ -14,7 +14,7 @@ On windows it runs over cygwin, so the first thing to do is to install it
   Don't require any action
 
 ## Usage
-I run under windows open a CMD shell, go to bkIt directory and then run bash.bat.
+If run on windows open a CMD shell, go to bkIt directory and then run bash.bat.
 This will open a bash shell and we are now using cygwin
 
 The first thing to do is to point to a bKit server

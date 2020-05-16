@@ -31,7 +31,7 @@ To backup a file or a directory use bkit.sh script
   ./bkit.sh directory
 ```
 
-In order to check whats file or directory are changed sinde last backup
+In order to check whats file or directory are changed since our last backup
 
 ```
   ./dkit.sh directory
@@ -43,7 +43,7 @@ The restore from last backup use rkit.sh
   ./rkit.sh directory
 ```
 
-If we don't want to restore to de original location, but instead recovery to a another location user --dst option 
+If we don't want to restore to de original location, but instead recovery to a different location user *--dst* option 
 
 ```
   ./rkit.sh --dst=newlocationdirectory directory
@@ -73,7 +73,7 @@ $ ../vkit.sh c:/bkit
   @GMT-2020.05.13-11.52.21 have a last modifed version at 2020/04/13-12:30:52 of bkit
 ```
 
-Then if you want recovery/restore the version of February, just use the option snap on rkit.sh
+Then if you want recovery/restore the version of February, just use the option *--snap* on rkit.sh
 
 ```
   ./rkit.sh --snap="@GMT-2020.02.13-14.01.47" c:/bkit
@@ -85,7 +85,7 @@ After each restore a directory with name .before-restore-on-2020-05-16T14-56-49.
   ./rkit.sh --dry-run --snap="@GMT-2020.02.13-14.01.47" c:/bkit
 ```
 
-If we want to see first what will be restored just use the option --dry-run
+If we want to see first what will be restored just use the option *--dry-run*
 
 All the above examples use the default server, which can be checked with
 
@@ -93,7 +93,7 @@ All the above examples use the default server, which can be checked with
   ./server.sh
 ```
 
-To change to a new server use the same command with option -s
+To change to a new server use the same command with *-s option*
 
 ```
   ./server.sh -s newserver

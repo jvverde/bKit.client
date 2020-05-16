@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo Install apy-cyg
 declare -r sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
 #https://github.com/transcode-open/apt-cyg
 # or https://github.com/kou1okada/apt-cyg

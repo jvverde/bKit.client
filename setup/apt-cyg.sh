@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+echo Install cygwin modules with apy-cyg
 die(){
 	echo -e "$@" && exit 1
 }

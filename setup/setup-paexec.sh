@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo Install paexec
 sdir="$(dirname -- "$(readlink -en -- "$0")")"               #Full DIR
 third="${sdir%/setup*}/3rd-party"
 

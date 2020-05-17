@@ -30,14 +30,4 @@ source "$client/lib/functions/mktempdir.sh"
 	sed -i '/^db_home/d' "$nsswitch"
 	echo 'db_home: windows' >> "$nsswitch"
 	
-	exists CMD && {
-		mktempdir RUNDIR
-		BATCH="$RUNDIR/set$$.bat"
-		DIR=$(cygpath -w "$client")
-		{
-			echo Assoc .bkit=bkit
-			echo Ftype bkit='"'$DIR\\bash.bat'" "'$client/recovery.sh'" "%%1"'
-		}> "$BATCH"
-		CMD /C "$(cygpath -w "$BATCH")"
-	}
 }

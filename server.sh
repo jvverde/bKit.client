@@ -42,12 +42,13 @@ server_doit(){
 
     #if permanently set the default
     [[ ${save+isset} == isset ]] && ln -srfT "$current" "$default"
-  } >&2
+  }
   # export BKIT_CONFIG (if sourced)
   declare -xg BKIT_CONFIG="$config"
 
-  issourced || basename -- "$(readlink -e -- "$current")"
-}
+  issourced || basename -- "$(readlink -e -- "$current")" >&$OUT #The obly result to send to stdout
+}  >&2 #Send everything to stderr except what is explicit sent to OUT=stdout
 
+exec {OUT}>&1   #OUT=stdout
 server_doit "$@"
 

@@ -3,6 +3,12 @@ $cygdir = "$PSScriptRoot\cygwin"
 $urls = "$PSScriptRoot\urls"
 $mirrorlist = "$urls\cygwin.mirrors"
 
+if (!(Test-Path $cygdir)) {
+  $parentdir = Split-Path -parent $cygdir
+  $name = Split-Path -leaf $cygdir
+  New-Item -Path "$parentdir" -Name "$name" -ItemType "directory"
+}
+
 $proxy = [System.Net.WebProxy]::GetDefaultProxy() | select address #LATER
 
 if ((gwmi win32_operatingsystem | select osarchitecture).osarchitecture -like "64*") {
@@ -10,9 +16,10 @@ if ((gwmi win32_operatingsystem | select osarchitecture).osarchitecture -like "6
   $cygwin = "$cygdir\setup-x86_64.exe"
 
   if(![System.IO.File]::Exists($cygwin)){
-    "Download cygwin 64-bit"
     $url = Get-Content "$urls\cygwin64.url"
     $wc = New-Object System.Net.WebClient
+
+    Write-Host "Download cygwin 64-bit from $url to $cygwin"
     
     $wc.DownloadFile($url, $cygwin)
   }

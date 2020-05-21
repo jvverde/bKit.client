@@ -32,9 +32,11 @@ done
 CONFDIR="${2:-"$ETCDIR/$1"}"
 PRIV="$CONFDIR/.priv"
 PUB="$CONFDIR/pub"
-mkdir -p "$PRIV"
-chmod 600 "$PRIV"
-mkdir -p "$PUB"
+echo $PRIV
+mkdir -pv "$PRIV"
+chmod 700 "$PRIV"
+mkdir -pv "$PUB"
+
 KEYSSH="$PRIV/ssh.key"
 PUBSSH="$PUB/ssh-client.pub"
 

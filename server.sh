@@ -42,7 +42,7 @@ server_doit(){
 
     #if permanently set the default
     [[ ${save+isset} == isset ]] && ln -srfT "$current" "$default"
-  }
+  } >&2
   # export BKIT_CONFIG (if sourced)
   declare -xg BKIT_CONFIG="$config"
 

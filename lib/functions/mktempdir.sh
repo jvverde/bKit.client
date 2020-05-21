@@ -23,5 +23,5 @@ rmtempdir(){
 
   # delete also any bkit temporary file older than 30 days
   declare -r parent="$(dirname -- "$(mktemp -u)")"
-  find "$parent" -path '*/tmp.*.bkit.*' -mtime +30 -delete
+  find "$parent" -path '*/tmp.*.bkit.*' -mtime +30 -delete 2>/dev/null
 }

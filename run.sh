@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#exec sudo "$0" "$@"
-#echo "call '$@'"
+declare -r sdir="$(dirname -- "$(readlink -ne -- "$0")")"
+export PATH=".:$sdir:$PATH"
 declare -a args=()
 for arg in "$@"
 do

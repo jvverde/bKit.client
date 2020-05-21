@@ -11,7 +11,7 @@ then
   trap "rm -rf $tmp" EXIT SIGINT SIGTERM
 	pushd "$tmp" >/dev/null
   IFS= read -t 1 -r url < <(cat "$sdir/urls/apt-cyg.url" | sed -E '/^(\s|\r)*$/d')
-	wget -nv -O apt-cyg "$url" || echo "Can't download apt-cyg"
+	wget -nv -O apt-cyg "$url" 2>&1|| echo "Can't download apt-cyg"
 	install apt-cyg /bin
 	popd >/dev/null
 else

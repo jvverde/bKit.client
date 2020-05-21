@@ -18,7 +18,7 @@ declare -r shadow="$sdir/ShadowSpawn/$name"
 
 [[ -e $shadow ]] || {
   mkdir -pv "$sdir/ShadowSpawn/"
-  wget -nv -O "$shadow" "$url" || echo "Can't download ShadowSpawn"
+  wget -nv -O "$shadow" "$url" 2>&1 || echo "Can't download ShadowSpawn"
 }
 
 [[ -e $shadow ]] || die "Can't find ShadowSpawn*${OSARCH}${XP}"

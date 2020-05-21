@@ -2,7 +2,7 @@
 REM set oldhome=%HOME%
 set oldshell=%SHELL%
 set oldpath=%path%
-set path="%~dp03rd-party\cygwin\bin";%path%
+set path=.;"%~dp03rd-party\cygwin\bin";%path%
 REM set HOME=/home/user
 set HOME=/home/%USERNAME%
 set SHELL=/bin/bash

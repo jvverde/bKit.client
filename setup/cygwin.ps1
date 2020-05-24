@@ -39,7 +39,7 @@ $list="$PSScriptRoot\cyg-packages.lst"
 $content = (Get-Content $list) -replace '(\s|\r)+$', ''
 $modules = [string]::join(",", $content)
 $parent = Split-Path -parent $PSScriptRoot
-$repo = "$cygdir\repo"
+$repo = """$cygdir""\repo"
 
 $mirrors = @(Get-Content $mirrorlist)
 
@@ -56,7 +56,7 @@ foreach ($mirror in $mirrors) {
     $args = @(
       "--download",
       "--no-admin",
-      "--root","$parent\3rd-party\cygwin",
+      "--root","""$parent""\3rd-party\cygwin",
       "--local-package-dir",$repo,
       "--no-desktop",
       "--no-startmenu",

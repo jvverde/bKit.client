@@ -21,7 +21,7 @@ if ((gwmi win32_operatingsystem | select osarchitecture).osarchitecture -like "6
 
     Write-Host "Download cygwin 64-bit from $url to $cygwin"
     
-    $wc.DownloadFile($url, $cygwin)
+    $wc.DownloadFile("$url", "$cygwin")
   }
 } else {
 

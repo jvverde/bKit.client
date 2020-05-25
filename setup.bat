@@ -23,4 +23,6 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%getCygwin%'";
 :: call "%OP%setup\shadowspawn.bat"
 :: call "%OP%setup\subinacl.bat"
 echo Run Setup
-call "%OP%bash.bat" "%OP%setup\setup.sh"
+pushd "%~dp0"
+call bash.bat "setup/setup.sh"
+popd

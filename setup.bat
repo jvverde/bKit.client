@@ -16,8 +16,8 @@ if not exist "%OP%cache\" mkdir "%OP%cache"
 ::call "%OP%setup\mirror-cygwin.bat"
 ::call "%OP%setup\cygwin.bat"
 echo Install Cygwin
-set cdir=%~dp0
-set getCygwin=%cdir%setup\cygwin.ps1
+set cdir="%~dp0"
+set getCygwin="%cdir%setup\cygwin.ps1"
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%getCygwin%'";
 
 :: call "%OP%setup\shadowspawn.bat"

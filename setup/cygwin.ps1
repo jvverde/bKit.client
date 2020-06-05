@@ -17,6 +17,7 @@ if ((gwmi win32_operatingsystem | select osarchitecture).osarchitecture -like "6
 
   if(![System.IO.File]::Exists($cygwin)){
     $url = Get-Content "$urls\cygwin64.url"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $wc = New-Object System.Net.WebClient
 
     Write-Host "Download cygwin 64-bit from $url to $cygwin"
@@ -30,7 +31,10 @@ if ((gwmi win32_operatingsystem | select osarchitecture).osarchitecture -like "6
   if(![System.IO.File]::Exists($cygwin)){
     "Download cygwin 32-bit"
     $url = Get-Content "$urls\cygwin32.url"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $wc = New-Object System.Net.WebClient
+
+    Write-Host "Download cygwin 32-bit from $url to $cygwin"
     
     $wc.DownloadFile($url, $cygwin)
   }

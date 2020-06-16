@@ -78,7 +78,7 @@ do
 	bash "$sdir/backup.sh" ${options+"${options[@]}"} -- ${filters+"${filters[@]}"} ${rsyncoptions+"${rsyncoptions[@]}"} "${@:-.}" && break
 	let delay=(1 + RANDOM % $sec)
 	echo "bKit:Wait $delay seconds before try again"
-	sleep $delay 
+	sleep $delay
 	let sec=2*sec
 done
 echo "bKit[$$:$pgid]: Done"

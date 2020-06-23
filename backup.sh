@@ -552,7 +552,7 @@ ITIME=$(date -R)
   } | sendnotify "$SUBJECT" "$ME" "${EMAIL:-}" 
 )
 
-[[ -s $errfile ]] && die "Backup done with some errors. Check $errfile" || rm "$errfile"
+[[ -s $errfile ]] && echo "Backup done with some errors. Please check '$errfile'" || rm "$errfile"
 
 deltatime "$(date -R)" "$ITIME"
 echo "Backup done in $DELTATIME"

@@ -27,7 +27,7 @@ source "$client/lib/functions/mktempdir.sh"
 
 	declare -r nsswitch="$(find "$client" -type f -path '*/cygwin/etc/nsswitch.conf' -print -quit)"  
 	[[ -e $nsswitch ]] || warn 'cygwin/etc/nsswitch does not exits'
-	sed -i '/^db_home/d' "$nsswitch"
+	sed -i '/^db_home/d' "$nsswitch" #delete current db_home line
 	echo 'db_home: windows' >> "$nsswitch"
-	
+	mkdir -pv /home/SYSTEM
 }

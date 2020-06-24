@@ -300,6 +300,11 @@ done
     schtasks /CREATE ${isadmin+/RU "SYSTEM"} /SC $SCHTYPE /MO ${EVERY:-1} /ST "$ST" /SD "$SD" /TN "$TASKNAME" /TR "$TASCMD" || die "Error calling windows schtasks"
 		echo "These are your bKit schedule tasks now"
 		schtasks /QUERY|fgrep BKIT
+    #https://web.archive.org/web/20111202234528/http://support.microsoft.com/kb/220167
+    [[ ${isadmin+isset} == isset ]] && {
+      icacls "$VARDIR" /grant SYSTEM:\(OI\)\(CI\)\(F\) /T
+      mkdir -pv /home/SYSTEM
+    }
 	else
 		echo "Create a job file in $JOBFILE"
 		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /usr/bin/flock -n '$TASKDIR/.lock.$TASKNAME' -c '$JOBFILE' || echo '$TASKDIR/.lock.$TASKNAME' is locked"

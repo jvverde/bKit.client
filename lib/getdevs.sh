@@ -3,7 +3,7 @@ sdir=$(dirname -- "$(readlink -en -- "$0")")	#Full sdir
 source "$sdir/functions/all.sh"
 
 exists wmic && {
-  WMIC logicaldisk WHERE "DriveType!=64" GET FileSystem,Name,VolumeName,VolumeSerialNumber /format:csv|
+  WMIC logicaldisk WHERE "DriveType!=6" GET FileSystem,Name,VolumeName,VolumeSerialNumber /format:csv|
     tr -d '\r' |                  #remove all carriage returns
     sed '/^[[:space:]]*$/d'|      #remove empty lines
     tail -n +2|                   #ignore header line

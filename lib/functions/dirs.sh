@@ -9,10 +9,10 @@ _fa5db1cec69d83e1bb3898143fd1002c(){
     declare -r SID="$(wmic PATH win32_UserAccount where "Name = '$BKITUSER'" get SID|tr -d '\r'|tail -n+2|head -n1|sed -E 's/\s+$//')"
     declare homedir="$(WMIC PATH win32_UserProfile where "SID = '$SID'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')"
     [[ ${BKITISADMIN+isset} == isset && -z $homedir ]] && {
-      homedir:="$(WMIC PATH win32_UserProfile where "SID like 'S-1-5-21%%-500'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')" #This is a fallback
+      homedir="$(WMIC PATH win32_UserProfile where "SID like 'S-1-5-21%%-500'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')" #This is a fallback
       #true ${homedir:="$(WMIC PATH win32_UserProfile where "SID = 'S-1-5-18'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')"} #This is a fallback
-      true ${homedir:="$ALLUSERSPROFILE"}
-      true ${homedir:="$ProgramData"}
+      true ${homedir:="$ALLUSERSPROFILE/bkit-admin"}
+      true ${homedir:="$ProgramData/bkit-admin"}
     }
     true ${homedir:="$( getent passwd "$user" | cut -d: -f6 )"} #This is another fallback
     homedir="$(cygpath -u "$homedir")"
@@ -24,6 +24,7 @@ _fa5db1cec69d83e1bb3898143fd1002c(){
   [[ -e $homedir ]] || mkdir -pv "$homedir"
 	VARDIR="$homedir/.bkit/var"
 	ETCDIR="$homedir/.bkit/etc"
+  [[ $homedir == /home/$user ]] || mv "/home/$user" "/home/$user.old"
 	[[ -e /home/$user ]] || ln -svT "$homedir" "/home/$user"
 }
 

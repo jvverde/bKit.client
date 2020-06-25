@@ -302,7 +302,7 @@ done
 		schtasks /QUERY|fgrep BKIT
     #https://web.archive.org/web/20111202234528/http://support.microsoft.com/kb/220167
     [[ ${isadmin+isset} == isset ]] && {
-      icacls "$VARDIR" /grant SYSTEM:\(OI\)\(CI\)\(F\) /T
+      icacls "$(cygpath -w "$VARDIR")" /grant SYSTEM:\(OI\)\(CI\)\(F\) /T
       mkdir -pv /home/SYSTEM
     }
 	else

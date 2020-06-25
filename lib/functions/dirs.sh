@@ -8,7 +8,11 @@ _fa5db1cec69d83e1bb3898143fd1002c(){
   then
     declare -r SID="$(wmic PATH win32_UserAccount where "Name = '$BKITUSER'" get SID|tr -d '\r'|tail -n+2|head -n1|sed -E 's/\s+$//')"
     declare homedir="$(WMIC PATH win32_UserProfile where "SID = '$SID'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')"
-    true ${homedir:="$( getent passwd "$user" | cut -d: -f6 )"} #This is a fallback
+    [[ ${BKITISADMIN+issset} == isset && -z $homedir ]] && {
+      homedir:="$(WMIC PATH win32_UserProfile where "SID like 'S-1-5-21%%-500'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')" #This is a fallback
+      true ${homedir:="$(WMIC PATH win32_UserProfile where "SID = 'S-1-5-18'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')"} #This is a fallback
+    }
+    true ${homedir:="$( getent passwd "$user" | cut -d: -f6 )"} #This is another fallback
     homedir="$(cygpath -u "$homedir")"
   else
     declare homedir="$( getent passwd "$user" | cut -d: -f6 )"

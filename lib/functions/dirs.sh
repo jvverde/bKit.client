@@ -24,8 +24,12 @@ _fa5db1cec69d83e1bb3898143fd1002c(){
   [[ -e $homedir ]] || mkdir -pv "$homedir"
 	VARDIR="$homedir/.bkit/var"
 	ETCDIR="$homedir/.bkit/etc"
-  [[ $homedir == /home/$user ]] || mv "/home/$user" "/home/$user.old"
-	[[ -e /home/$user ]] || ln -svT "$homedir" "/home/$user"
+  #[[ $homedir == /home/$user ]] || mv "/home/$user" "/home/$user.old"
+	#[[ -e /home/$user ]] || ln -svT "$homedir" "/home/$user"
+  [[ "$(readlink -nm "$homedir")" != "$(readlink -nm "/home/$user")" ]] && {
+    [[ -e /home/$user ]] && mv --backup=numbered "/home/$user" "/home/${user}.old"
+    ln -svTf "$homedir" "/home/$user"
+  }
 }
 
 _fa5db1cec69d83e1bb3898143fd1002c

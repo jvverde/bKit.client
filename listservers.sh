@@ -10,7 +10,7 @@ function usage(){
 
 [[ $1 =~ ^--?h ]] && usage
 
-source "$sdir/lib/functions/all.sh"
+source "$sdir/lib/functions/all.sh" >&2
 
 [[ ${ETCDIR+isset} == isset ]] || die "ETCDIR is not defined"
 

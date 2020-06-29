@@ -175,7 +175,9 @@ for DIR in "$@"
 do
     FULL=$(readlink -ne "$DIR") || { warn $DIR "doesn't exists" && continue ;}
     exists cygpath && FULL=$(cygpath -u "$FULL")
+    [[ -e $FULL ]] || continue
     ROOT=$(stat -c%m "$FULL")
+    [[ -e $ROOT ]] || continue
     ROOTS["$ROOT"]=1
     REL=${FULL#$ROOT}	#path relative to root
     ROOTOF["$FULL"]="$ROOT"

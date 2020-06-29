@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p _7233c82197bf04f6ef10f4914614182f >/dev/null 2>&1 && return
-declare -r _7233c82197bf04f6ef10f4914614182f=1
+declare -p _3dcc753aa5d6ffb1b182f347a0727075 >/dev/null 2>&1 && return
+declare -r _3dcc753aa5d6ffb1b182f347a0727075=1
 
 sendnotify(){
 	local SUBJECT=$1

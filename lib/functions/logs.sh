@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p _5954d899fd82de856a720d070ab7e05f >/dev/null 2>&1 && return
-declare -r _5954d899fd82de856a720d070ab7e05f=1
+declare -p _4065e060ea10be2e0166c00358f374c0 >/dev/null 2>&1 && return
+declare -r _4065e060ea10be2e0166c00358f374c0=1
 
 redirectlogs() {
 	local LOGDIR=$(readlink -nm "$1")
@@ -14,5 +14,5 @@ redirectlogs() {
 	echo "Logs go to $LOGFILE"
 	echo "Errors go to $ERRFILE"
 	exec 1>"$LOGFILE"					#fork stdout to logfile
-	exec 2>"$ERRFILE"					#fork stdin to errfile
+	exec 2>"$ERRFILE"					#fork stderr to errfile
 }

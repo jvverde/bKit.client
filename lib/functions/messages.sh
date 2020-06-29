@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-declare -p _04ba0ba2e1fe91ebacbe038b53e75545 >/dev/null 2>&1 && return
+declare -p _a1e5a483a2e7308885db65e8cfa4f9e1 >/dev/null 2>&1 && return
 
-function  _04ba0ba2e1fe91ebacbe038b53e75545() {
+function  _a1e5a483a2e7308885db65e8cfa4f9e1() {
 	declare -r mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 
 	source "$mylocation/exists.sh"
 }
-_04ba0ba2e1fe91ebacbe038b53e75545
+_a1e5a483a2e7308885db65e8cfa4f9e1
 
 if exists tput && [[ -n $TERM && $TERM != dumb ]]
 then

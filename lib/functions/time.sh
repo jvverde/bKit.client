@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p _8cce80a574417cbe3dbdf785b1b40a5c >/dev/null 2>&1 && return
-declare -r _8cce80a574417cbe3dbdf785b1b40a5c=1
+declare -p _d48fd70a57882a0c40c14af34ac57a8b >/dev/null 2>&1 && return
+declare -r _d48fd70a57882a0c40c14af34ac57a8b=1
 
 declare DELTATIME=''
 deltatime(){

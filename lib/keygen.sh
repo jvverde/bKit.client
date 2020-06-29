@@ -1,58 +1,59 @@
 #!/usr/bin/env bash
 #Generate ssh keys and openssl keys
-SDIR=$(dirname -- "$(readlink -fn -- "$0")")	#Full SDIR
-source "$SDIR/functions/all.sh"
+declare -r sdir=$(dirname -- "$(readlink -fn -- "$0")")	#Full sdir
+[[ ${ETCDIR+isset} == isset ]] || source "$sdir/functions/all.sh"
 
-pushd "$SDIR" >/dev/null
+pushd "$sdir" >/dev/null
 
 usage() {
         echo -e "$@"
-        NAME=$(basename -s .sh "$0")
-        echo -e "Usage:\n\t $NAME [-n|--new] servername"
+        local name=$(basename -s .sh "$0")
+        echo -e "Usage:\n\t $name [-n|--new] servername"
         exit 1
 }
 while [[ $1 =~ ^- ]]
 do
-        KEY="$1" && shift
-        case "$KEY" in
+        key="$1" && shift
+        case "$key" in
                 -h|--help)
                         usage
                 ;;
                 -n|--new)
-                	NEW=new
+                	declare -r new=new
                 ;;
                 *)
-			usage wrong options $KEY
+			usage wrong options $key
                 ;;
         esac
 done
 
 [[ -n $1 ]] || usage "Servername missing"
 
-CONFDIR="${2:-"$ETCDIR/$1"}"
-PRIV="$CONFDIR/.priv"
-PUB="$CONFDIR/pub"
-echo $PRIV
-mkdir -pv "$PRIV"
-chmod 700 "$PRIV"
-mkdir -pv "$PUB"
+declare -r confdir="${2:-"$ETCDIR/$1"}"
+declare -r priv="$confdir/.priv"
+declare -r pub="$confdir/pub"
+echo $priv
+[[ -e $priv ]] || mkdir -pv "$priv"
+chmod 700 "$priv"
+[[ -e $pub ]] || mkdir -pv "$pub"
 
-KEYSSH="$PRIV/ssh.key"
-PUBSSH="$PUB/ssh-client.pub"
+declare -r keyssh="$priv/ssh.key"
+declare -r pubssh="$pub/ssh-client.pub"
 
-[[ -e $KEYSSH && -n $NEW ]] && rm "$KEYSSH"
+[[ -e $keyssh && -n $new ]] && rm "$keyssh" #rm if exists and new is requested
 
-[[ -e $KEYSSH ]] || ssh-keygen -b 256 -t ecdsa -f "$KEYSSH" -q -N "" -C "key from $BKITUSER@$(hostname -f) to $1"
-chmod 600 "$PRIV"/*
+[[ -e $keyssh ]] || ssh-keygen -b 256 -t ecdsa -f "$keyssh" -q -N "" -C "key from $BKITUSER@$(hostname -f) to $1"
+chmod 600 "$priv"/*
 
-ssh-keygen -f "$KEYSSH" -y > "$PUBSSH"
-
-#rsync -aiv "$KEYSSH.pub" "$PUBSSH" >&2
+echo Extract public ssh key from private key
+ssh-keygen -f "$keyssh" -y > "$pubssh"
 
 {
-	openssl ecparam -name secp256k1 -genkey -noout -out "$PRIV/key.pem" || { echo "Fail to generate key" && exit 1; }
-	openssl ec -in "$PRIV/key.pem" -pubout -out "$PUB/client.pub" || { echo "Fail to get public key" && exit 1; }
+        echo Generate a private key for openssl
+	openssl ecparam -name secp256k1 -genkey -noout -out "$priv/key.pem" || { echo "Fail to generate key" && exit 1; }
+        echo Extract the public key to "$pub/client.pub"
+	openssl ec -in "$priv/key.pem" -pubout -out "$pub/client.pub" || { echo "Fail to get public key" && exit 1; }
 #} > /dev/null  2>&1
 }
-chmod 700 "$ETCDIR" "$CONFDIR" "$PRIV"
-chmod 600 "$PRIV"/*
+chmod 700 "$ETCDIR" "$confdir" "$priv"
+chmod 600 "$priv"/*

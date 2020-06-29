@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #trap 'warn ${LINENO} $?' ERR
-declare -p _665dff8f985f6292ab5d18cc36b2db1e > /dev/null 2>&1 && return
-declare -r _665dff8f985f6292ab5d18cc36b2db1e=1
+declare -p _8b4c9249d1bf474b4ac7f84329135abd > /dev/null 2>&1 && return
+declare -r _8b4c9249d1bf474b4ac7f84329135abd=1
 
 fn_exists() {
     declare -f -F "$1" > /dev/null

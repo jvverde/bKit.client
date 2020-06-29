@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -p _0f2cb7c5baf31e857ec0d6ff74d11dbd > /dev/null 2>&1 && return
-declare -r _0f2cb7c5baf31e857ec0d6ff74d11dbd=1
+declare -p _a6e92deb2e49b934ccb12e47410058e5 > /dev/null 2>&1 && return
+declare -r _a6e92deb2e49b934ccb12e47410058e5=1
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:$PATH
 declare -gx OS="$(uname -o |tr '[:upper:]' '[:lower:]')"

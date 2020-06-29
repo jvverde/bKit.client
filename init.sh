@@ -1,88 +1,88 @@
 #!/usr/bin/env bash
-SDIR=$(dirname -- "$(readlink -ne -- "$0")")	#Full SDIR
-source "$SDIR/lib/functions/all.sh"
+declare -r sdir=$(dirname -- "$(readlink -ne -- "$0")")	#Full sdir
+source "$sdir/lib/functions/all.sh"
 
-SECTION=bkit
-PORT=8760
-BPORT=8761
-RPORT=8762
-UPORT=8763
+declare -r SECTION=bkit
+declare -r PORT=8760
+declare -r BPORT=8761
+declare -r RPORT=8762
+declare -r UPORT=8763
 
-SERVER="${1:-"$($SDIR/server.sh)"}"
-CERT="${2:-default}"
+declare -r server="${1:-"$($sdir/server.sh)"}"
 
 usage() {
-    NAME=$(basename -s .sh "$0")
+    declare -r name=$(basename -s .sh "$0")
     echo Restore from backup one or more directories of files
-    echo -e "Usage:\n\t $NAME Server-address"
+    echo -e "Usage:\n\t $name Server-address"
     exit 1
 }
 
-[[ -n $SERVER ]] || usage
+[[ -n $server ]] || usage
 echo Contacting the server ... please wait!
-exists nc && { nc -z $SERVER $PORT 2>&1 		|| die Server $SERVER not found;}
+exists nc && { nc -z $server $PORT 2>&1 || die Server $server not found;}
 
-CONFDIR="$ETCDIR/server/$SERVER"
+declare -r confdir="$ETCDIR/server/$server"
 
-bash "$SDIR"/lib/keygen.sh -n "$SERVER" "$CONFDIR"		|| die "Can't generate a key"
+bash "$sdir"/lib/keygen.sh -n "$server" "$confdir"		|| die "Can't generate a key"
 
-INITFILE="$CONFDIR/conf.init"
+declare -r conffile="$confdir/conf.init"
 
 export RSYNC_PASSWORD="4dm1n"
 
-FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
+declare -r FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
-IFS='|' read -r DOMAIN NAME UUID <<<$("$SDIR/lib/computer.sh")
+IFS='|' read -r DOMAIN NAME UUID <<<$("$sdir/lib/computer.sh")
 
-SYNCD="$CONFDIR/pub"					#public keys location
-exists cygpath && SYNCD="$(cygpath -u "$SYNCD")"
+declare -r syncd="$confdir/pub"					#public keys location
+exists cygpath && syncd="$(cygpath -u "$syncd")"
 
-CHALLENGE="$(head -c 1000 </dev/urandom | tr -cd "[:alnum:]" | head -c 32)"
-echo -n $CHALLENGE > "$SYNCD/challenge"
+#generate a random string to challenge the server
+declare -r challenge="$(head -c 1000 </dev/urandom | tr -cd "[:alnum:]" | head -c 32)"
+echo -n $challenge > "$syncd/challenge"
 
+declare -r url="rsync://admin@${server}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}"
 #Send public keys and challenge to the server
-#echo RSYNC_PASSWORD=$RSYNC_PASSWORD
-rsync -rltvhR $FMT "$SYNCD/./" "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}/" || die "Exit value of rsync is non null: $?"
+rsync -rltvhR $FMT "$syncd/./" "$url/" || die "Exit value of rsync is non null: $?"
 
 #Read (back) public keys from server including (meanwhile) generated server public keys as well the encripted challenge
-rsync -rlthgpR --no-owner $FMT "rsync://admin@${SERVER}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}/./" "$SYNCD/" || die "Exit value of rsync is non null: $?"
+rsync -rlthgpR --no-owner $FMT "$url/./" "$syncd/" || die "Exit value of rsync is non null: $?"
 
 #Now generate a password/secret by using a Diffie-Hellman algorithm
-"$SDIR/lib/genpass.sh" "$CONFDIR"		|| die "Can't generate the pass"
+"$sdir/lib/genpass.sh" "$confdir"		|| die "Can't generate the pass"
 
 #And check if challenged was well encripted
-VERIF="$(openssl enc -aes256 -md SHA256 -base64 -k "$(<"$CONFDIR/.priv/secret")" -d -in "$CONFDIR/pub/verification")"
-[[ $VERIF == $CHALLENGE ]] || die "Something was wrong with the produced key"
+declare -r verify="$(openssl enc -aes256 -md SHA256 -base64 -pass file:"$confdir/.priv/secret" -d -in "$confdir/pub/verification")"
+[[ $verify == $challenge ]] || die "Something was wrong with the produced key"
 #rsync --dry-run -ai -e "ssh -i conf/id_rsa bkit@10.1.1.3 localhost 8730" admin@10.1.1.3::bkit tmp/
 
-KH="$CONFDIR/.priv/known_hosts"
+KH="$confdir/.priv/known_hosts"
 touch "$KH"
-ssh-keygen -R "$SERVER" -f "$KH" && ssh-keyscan -H -t ecdsa "$SERVER" >> "$KH"
+ssh-keygen -R "$server" -f "$KH" && ssh-keyscan -H -t ecdsa "$server" >> "$KH"
 
-echo Writing configuration to $INITFILE
+echo Writing configuration to $conffile
 (
-	read SECTION <"$CONFDIR/pub/section"
-	read COMMAND <"$CONFDIR/pub/command"
-	#echo "BACKUPURL=rsync://user@$SERVER:$BPORT/$SECTION"
-	echo "SSH='ssh -i \"$CONFDIR/.priv/ssh.key\" -o UserKnownHostsFile=\"$KH\" rsyncd@$SERVER $COMMAND'"
-	echo "RSYNCURL='rsync://user@$SERVER:$BPORT/$SECTION'"
-	echo "SSHURL='user@$SERVER::$SECTION'"
-	echo "BACKUPURL='user@$SERVER::$SECTION'"
-	echo "PASSFILE='$CONFDIR/.priv/secret'"
+	read SECTION <"$confdir/pub/section"
+	read COMMAND <"$confdir/pub/command"
+	#echo "BACKUPURL=rsync://user@$server:$BPORT/$SECTION"
+	echo "SSH='ssh -i \"$confdir/.priv/ssh.key\" -o UserKnownHostsFile=\"$KH\" rsyncd@$server $COMMAND'"
+	echo "RSYNCURL='rsync://user@$server:$BPORT/$SECTION'"
+	echo "SSHURL='user@$server::$SECTION'"
+	echo "BACKUPURL='user@$server::$SECTION'"
+	echo "PASSFILE='$confdir/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')
 	[[ $ARCH == x86_64 ]] && ARCH=x64 || ARCH=ia32
 	[[ $OS == cygwin ]] && OS=win32 || OS=linux
-	echo "UPDATERSRC=rsync://admin@$SERVER:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
-	[[ -d $SDIR/conf ]] && find "$SDIR/conf" -maxdepth 1 -type f -iname 'rsync*.conf' -exec cat "{}" ';'
-)> "$INITFILE"
+	echo "UPDATERSRC=rsync://admin@$server:$UPORT/bkit-update/bKit-$OS-$ARCH/./"
+	[[ -d $sdir/conf ]] && find "$sdir/conf" -maxdepth 1 -type f -iname 'rsync*.conf' -exec cat "{}" ';'
+)> "$conffile"
 
-default="$(dirname -- "$CONFDIR")/default"
+declare -r default="$(dirname -- "$confdir")/default"
 
-[[ -d $default ]] || ln -svrfT "$CONFDIR" "$default"
+[[ -d $default ]] || ln -svrfT "$confdir" "$default"
 
-echo This is the content of init file in $INITFILE
+echo This is the content of init file in $conffile
 echo '##########################'
-cat "$INITFILE"
+cat "$conffile" | sed 's/^/\t/'
 echo '##########################'
-echo "Backup server $SERVER setup successfully!"
+echo "Backup server $server setup successfully!"

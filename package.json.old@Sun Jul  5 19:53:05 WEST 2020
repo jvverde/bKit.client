@@ -1,0 +1,8 @@
+
+{
+  "name": "bKit",
+  "version": "1.0.1",
+  "description": "bKit Client",
+  "scripts": ["skit.sh","system.sh","listservers.sh","pkit.sh","restore.sh","dkit.sh","bkit.sh","sdisk.sh","init-smtp.sh","sudo.sh","server.sh","listsnaps.sh","listdirs.sh","rkit.sh","update.sh","check.sh","init.sh","ccrsync.sh","listdisks.sh","ctask.sh","help.sh","run.sh","applyacls.sh","backup.sh","storeACLs.sh","hashit.sh","killtree.sh","diracls.sh","versions.sh","snapshot.sh","bash.sh","vkit.sh"]
+  "install": "make install"
+}

@@ -9,10 +9,10 @@ _8df9b4408cdf9837e37cd988b7d0a6f2(){
 	declare -r dir="$(dirname -- "$myself")"
 
 	#source <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" -exec cat "{}" ';')
-	while IFS=$'\n' read -r file
+	while IFS= read -r -d $'\0' file
 	do
 		source "$file"
-	done < <( find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" -print0)
+	done < <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" -print0)
   true ${BKITUSER:="$(id -un)"}
 }
 

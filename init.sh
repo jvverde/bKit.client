@@ -2,7 +2,7 @@
 declare -r sdir=$(dirname -- "$(readlink -ne -- "$0")")	#Full sdir
 source "$sdir/lib/functions/all.sh"
 
-declare -r SECTION=bkit
+declare SECTION=bkit
 declare -r PORT=8760
 declare -r BPORT=8761
 declare -r RPORT=8762
@@ -33,7 +33,7 @@ declare -r FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 
 IFS='|' read -r DOMAIN NAME UUID <<<$("$sdir/lib/computer.sh")
 
-declare -r syncd="$confdir/pub"					#public keys location
+declare syncd="$confdir/pub"					#public keys location
 exists cygpath && syncd="$(cygpath -u "$syncd")"
 
 #generate a random string to challenge the server

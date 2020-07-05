@@ -1,0 +1,8 @@
+
+{
+  "name": "bKit",
+  "version": "1.0.1",
+  "description": "bKit Client",
+  "scripts": [],
+  "install": "make install"
+}

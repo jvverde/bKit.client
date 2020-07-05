@@ -2,7 +2,7 @@
 bKit Client
 
 ## Installation
-- git clone https://github.com/jvverde/bKit.git bKit
+- git clone https://github.com/jvverde/bKit.client bKit
 
 ### Windows
 On windows it runs over cygwin, so the first thing to do is to install it

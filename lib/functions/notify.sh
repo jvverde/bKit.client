@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-declare -p _3dcc753aa5d6ffb1b182f347a0727075 >/dev/null 2>&1 && return
-declare -r _3dcc753aa5d6ffb1b182f347a0727075=1
+declare -r mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+source "$mylocation/messages.sh"
+source "$mylocation/dirs.sh"
+source "$mylocation/exists.sh"
 
 sendnotify(){
 	local SUBJECT=$1
@@ -22,7 +24,7 @@ sendnotify(){
 	  return 1
 	}
 	
-	exists email && email -smtp-server $SMTP -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
+	exists email && email -smtp-server "$SMTP" -subject "$SUBJECT" -from-name "$ME" -from-addr "backup-${ME}@bkit.pt" "$DEST"
 	exists mail && mail -s "$SUBJECT" "$DEST"
 	echo "Notification sent to $DEST"
 }

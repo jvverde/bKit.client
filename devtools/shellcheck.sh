@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#https://github.com/koalaman/shellcheck
 declare EXCLUDE=12
 [[ $1 == --all ]] && unset EXCLUDE 
 

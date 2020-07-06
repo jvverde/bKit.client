@@ -5,6 +5,7 @@ declare -F _bkit_export_variables > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && 
 
 _bkit_export_variables(){
   declare -gx OS="$(uname -o |tr '[:upper:]' '[:lower:]')"
+  
   [[ $OS == cygwin ]] && declare -gx BKITCYGWIN="$(uname -a)"
 
   if [[ ${BKITCYGWIN+isset} == isset ]] && (id -G|grep -qE '\b544\b')
@@ -18,7 +19,7 @@ _bkit_export_variables(){
         head -n1|           #get only first line
         sed -E 's/\s+$//'   #clean traling spaces 
       )"
-      true ${admin:=Administrator} #this is a fallback
+      true "${admin:=Administrator}" #this is a fallback
       declare -gx BKITISADMIN=YES
       declare -gx BKITUSER="$admin"
   else
@@ -28,10 +29,10 @@ _bkit_export_variables(){
 
 _bkit_export_variables
 
-if [[ ${BASH_SOURCE[0]} == $0 ]]
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
 then
-  echo BKITUSER=$BKITUSER
-  echo OS=$OS
-  [[ ${BKITCYGWIN+isset} == isset ]] && echo BKITCYGWIN=$BKITCYGWIN
-  [[ ${BKITISADMIN+isset} == isset ]] && echo BKITISADMIN=$BKITISADMIN 
+  echo BKITUSER="$BKITUSER"
+  echo OS="$OS"
+  [[ ${BKITCYGWIN+isset} == isset ]] && echo BKITCYGWIN="$BKITCYGWIN"
+  [[ ${BKITISADMIN+isset} == isset ]] && echo BKITISADMIN="$BKITISADMIN" 
 fi

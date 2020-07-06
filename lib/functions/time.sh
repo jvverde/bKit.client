@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
-declare -p _d48fd70a57882a0c40c14af34ac57a8b >/dev/null 2>&1 && return
-declare -r _d48fd70a57882a0c40c14af34ac57a8b=1
 
 declare DELTATIME=''
 deltatime(){
-	let DTIME=$(date +%s -d "$1")-$(date +%s -d "$2")
-	declare SEC=${DTIME}s
-	(($DTIME>59)) && {
-		let SEC=DTIME%60
-		let DTIME=DTIME/60
-		SEC=${SEC}s
-		MIN=${DTIME}m
-		(($DTIME>59)) && {
-			let MIN=DTIME%60
-			let DTIME=DTIME/60
-			MIN=${MIN}m
-			HOUR=${DTIME}h
-			(($DTIME>23)) && {
-				let HOUR=DTIME%24
-				let DTIME=DTIME/24
-				DAYS=${DTIME}d
+	declare -i dtime=$(date +%s -d "$1")-$(date +%s -d "$2")
+	declare -i seconds=dtime
+	(( seconds > 59 )) && {
+		declare -i minutes=seconds/60
+		seconds=seconds%60
+		(( minutes > 59 )) && {
+			declare -i hours=minutes/60
+			minutes=minutes%60
+			(( hours > 23 )) && {
+				declare -i days=hours/24
+				hours=hours%24
+				(( days > 7 )) && {
+					declare -i weeks=days/7
+					days=days%7
+				}
 			}
 		}
 	}
-	DELTATIME="${DAYS:-}${HOUR:-}${MIN:-}${SEC:-}"
+	DELTATIME="${weeks+${weeks}w}${days+${days}d}${hours+${hours}h}${minutes+${minutes}m}${seconds}s"
 }

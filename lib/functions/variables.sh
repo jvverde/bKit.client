@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 #export variables
-
 declare -F _bkit_export_variables > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
 
 _bkit_export_variables(){

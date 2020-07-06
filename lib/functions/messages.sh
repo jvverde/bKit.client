@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-declare -p _a1e5a483a2e7308885db65e8cfa4f9e1 >/dev/null 2>&1 && return
+declare -p _bkit_messages > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
 
-function  _a1e5a483a2e7308885db65e8cfa4f9e1() {
-	declare -r mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+declare _bkit_messages="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 
-	source "$mylocation/exists.sh"
-}
-_a1e5a483a2e7308885db65e8cfa4f9e1
+source "$_bkit_messages/exists.sh"
 
 if exists tput && [[ -n $TERM && $TERM != dumb ]]
 then
@@ -28,23 +25,29 @@ msg () {
 		[[ "${BASH_SOURCE[$cnt]}" == "${BASH_SOURCE[0]}" ]] || break;	#find first bash_source which is not this file
 	done
 
-	say "${BASH_SOURCE[$cnt]}: Line ${BASH_LINENO[$cnt-1]}: $@">&2;		#show error with line number and file name
+	say "${BASH_SOURCE[$cnt]}: Line ${BASH_LINENO[$cnt-1]}: $*">&2;		#show error with line number and file name
 
-	for i in $(seq $cnt $(( ${#BASH_SOURCE[@]} - 2 )) )			#Show caller stack
+	for i in $(seq "$cnt" $(( ${#BASH_SOURCE[@]} - 2 )) )			#Show caller stack
 	do
 		say "\tCalled from ${BASH_SOURCE[$i+1]}" "${BASH_LINENO[$i]}">&2
 	done
 }
 
 die() {
-	CODE=$?
-	(( CODE == 0 )) && CODE=1 #Unless there is a previous error code the exit code should be 1
+	declare errorcode=$?
+	(( errorcode == 0 )) && errorcode=1 #Unless there is a previous error code the exit code should be 1
 	msg "$@"
-	exit $CODE;
+	exit $errorcode;
 }
 
 declare ERROR=0
 warn() {
-	ERROR=1
+	declare -g ERROR=1
 	msg "$@"
 }
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
+then
+  echo "The script '$0' is meant to be sourced"
+  echo "Usage: source '$0'"
+fi

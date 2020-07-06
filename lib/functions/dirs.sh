@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-declare -p _8d84093ab1869faabb7124aab6d78829 >/dev/null 2>&1 && return
+[[ ${VARDIR+x} == x && ${ETCDIR+y} == y && -e $VARDIR && -e $ETCDIR ]] && [[ ! ${1+$1} =~ ^-f ]] && return
 
-_8d84093ab1869faabb7124aab6d78829(){
-  [[ ${BKITUSER+isset} == isset ]] || source "$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")/variables.sh"
-	declare -r user="${BKITUSER:-$(id -nu)}"
+
+_bkit_find_dirs(){
+  declare mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+  source "$mylocation/variables.sh" ${1:+"$@"}
+
+  declare -r user="${BKITUSER:-$(id -nu)}"
+
   if [[ ${BKITCYGWIN+isset} == isset ]]
   then
     {
@@ -12,17 +16,17 @@ _8d84093ab1869faabb7124aab6d78829(){
       [[ ${BKITISADMIN+isset} == isset && -z $homedir ]] && {
         #This is a fallback
         homedir="$(WMIC PATH win32_UserProfile where "SID like 'S-1-5-21%%-500'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')" 
-        true ${homedir:="${ALLUSERSPROFILE+"$ALLUSERSPROFILE"/bkit-admin}"} #a hard-wired fallback
-        true ${homedir:="$ProgramData/bkit-admin"} #In worst case homedir will be /bkit-admin
+        true "${homedir:="${ALLUSERSPROFILE+"$ALLUSERSPROFILE"/bkit-admin}"}" #a hard-wired fallback
+        true "${homedir:="$ProgramData/bkit-admin"}" #In worst case homedir will be /bkit-admin
       }
-      true ${homedir:="$( getent passwd "$user" | cut -d: -f6 )"} #This is another fallback
+      true "${homedir:="$( getent passwd "$user" | cut -d: -f6 )"}" #This is another fallback
       homedir="$(cygpath -u "$homedir")"
     } 2>/dev/null
   else
     declare homedir="$( getent passwd "$user" | cut -d: -f6 )"
   fi
-  true ${homedir:="$HOME"}        #another fallback
-  true ${homedir:="/home/$user"}  #yet another
+  true "${homedir:="$HOME"}"        #another fallback
+  true "${homedir:="/home/$user"}"  #yet another
   [[ -e $homedir ]] || mkdir -pv "$homedir"
 	declare -gx VARDIR="$homedir/.bkit/var"
 	declare -gx ETCDIR="$homedir/.bkit/etc"
@@ -34,9 +38,13 @@ _8d84093ab1869faabb7124aab6d78829(){
   }
 } 
 
-[[ ${VARDIR+x} == x && ${ETCDIR+y} == y && -e $VARDIR && -e $ETCDIR ]] && return
-
-_8d84093ab1869faabb7124aab6d78829
+_bkit_find_dirs ${1:+"$@"}
 
 mkdir -pv "$VARDIR"
 mkdir -pv "$ETCDIR" 
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
+then
+  echo VARDIR="$VARDIR"
+  echo ETCDIR="$ETCDIR"
+fi

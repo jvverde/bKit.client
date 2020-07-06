@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-declare -r mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
-source "$mylocation/messages.sh"
-source "$mylocation/dirs.sh"
-source "$mylocation/exists.sh"
+declare -p _bkit_notify > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
+
+declare _bkit_notify="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+source "$_bkit_notify/messages.sh"
+source "$_bkit_notify/dirs.sh"
+source "$_bkit_notify/exists.sh"
 
 sendnotify(){
 	local SUBJECT=$1
@@ -28,3 +30,9 @@ sendnotify(){
 	exists mail && mail -s "$SUBJECT" "$DEST"
 	echo "Notification sent to $DEST"
 }
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
+then
+  echo "The script '$0' is meant to be sourced"
+  echo "Usage: source '$0'"
+fi

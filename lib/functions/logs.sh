@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
-declare -p _4065e060ea10be2e0166c00358f374c0 >/dev/null 2>&1 && return
-declare -r _4065e060ea10be2e0166c00358f374c0=1
+#Defines a functio to redirect stdout and stderr to given dir
 
 redirectlogs() {
-	local LOGDIR=$(readlink -nm "$1")
-	local PREFIX="${2:+$2-}"				#if second argument is set use it immediately follwed by a hyphen as a prefix. Otherwise prefix will be empty
-	[[ -d $LOGDIR ]] || mkdir -pv "$LOGDIR" || die "Can't mkdir $LOGDIR" 
-	local STARTDATE=$(date +%Y-%m-%dT%H-%M-%S)
-	local LOGFILE="$LOGDIR/${PREFIX}log-$STARTDATE"
-	local ERRFILE="$LOGDIR/${PREFIX}err-$STARTDATE"
-	:> $LOGFILE						#create/truncate log file
-	:> $ERRFILE						#creae/truncate err file
-	echo "Logs go to $LOGFILE"
-	echo "Errors go to $ERRFILE"
-	exec 1>"$LOGFILE"					#fork stdout to logfile
-	exec 2>"$ERRFILE"					#fork stderr to errfile
+	local logdir=$(readlink -nm "$1")
+	local prefix="${2:+$2-}"				#if second argument is set use it immediately follwed by a hyphen as a prefix. Otherwise prefix will be empty
+	[[ -d $logdir ]] || mkdir -pv "$logdir" || die "Can't mkdir $logdir" 
+	local now=$(date +%Y-%m-%dT%H-%M-%S)
+	local logfile="$logdir/${prefix}log-$now"
+	local errfile="$logdir/${prefix}err-$now"
+	:> "$logfile"						#create/truncate log file
+	:> "$errfile"						#create/truncate err file
+	echo "Logs go to $logfile"
+	echo "Errors go to $errfile"
+	exec 1>"$logfile"					#fork stdout to logfile
+	exec 2>"$errfile"					#fork stderr to errfile
 }
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
+then
+  echo "The script '$0' is meant to be sourced"
+  echo "Usage: source '$0'"
+fi

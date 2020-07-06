@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-declare -p _d9a6afe59c48aaccbbc36e5e346cec49 > /dev/null 2>&1 && return
-declare -r _d9a6afe59c48aaccbbc36e5e346cec49=1
+declare -F _bkit_source_all > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
 
-_d9a6afe59c48aaccbbc36e5e346cec49(){
+_bkit_source_all(){
 
 	declare -r myself="$(readlink -ne -- "${BASH_SOURCE[0]}")"
 
@@ -13,7 +12,7 @@ _d9a6afe59c48aaccbbc36e5e346cec49(){
 	do
 		source "$file"
 	done < <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" -print0)
-  true ${BKITUSER:="$(id -un)"}
+  true "${BKITUSER:="$(id -un)"}"
 }
 
-_d9a6afe59c48aaccbbc36e5e346cec49
+_bkit_source_all

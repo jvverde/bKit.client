@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-declare DELTATIME=''
 deltatime(){
 	declare -i dtime=$(date +%s -d "$1")-$(date +%s -d "$2")
 	declare -i seconds=dtime
@@ -20,5 +19,11 @@ deltatime(){
 			}
 		}
 	}
-	DELTATIME="${weeks+${weeks}w}${days+${days}d}${hours+${hours}h}${minutes+${minutes}m}${seconds}s"
+	declare -g DELTATIME="${weeks+${weeks}w}${days+${days}d}${hours+${hours}h}${minutes+${minutes}m}${seconds}s"
 }
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
+then
+  echo "The script '$0' is meant to be sourced"
+  echo "Usage: source '$0'"
+fi

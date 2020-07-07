@@ -1,7 +1,8 @@
 language: bash
 
 before_script:
-    - curl -fsSL https://git.io/shellspec | sh
+    - curl -fsSL https://git.io/shellspec|sh -s -- --yes
+    - export PATH=$PATH:$HOME/.local/bin/
 
 script:
     - ./devtools/test_spec.sh

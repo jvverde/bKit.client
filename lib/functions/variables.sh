@@ -26,6 +26,8 @@ _bkit_export_variables(){
   fi
 }
 
+${__SOURCED__:+return} #Intended for shellspec tests
+
 _bkit_export_variables
 
 if [[ ${BASH_SOURCE[0]} == "$0" ]]

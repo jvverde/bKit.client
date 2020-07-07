@@ -31,6 +31,8 @@ atexit() {
 	done
 }
 
+${__SOURCED__:+return} #Intended for shellspec tests
+
 _bkit_set_traps
 
 if [[ ${BASH_SOURCE[0]} == "$0" ]]

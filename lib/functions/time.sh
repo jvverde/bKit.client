@@ -12,7 +12,7 @@ deltatime(){
 			(( hours > 23 )) && {
 				declare -i days=hours/24
 				hours=hours%24
-				(( days > 7 )) && {
+				(( days > 6 )) && {
 					declare -i weeks=days/7
 					days=days%7
 				}
@@ -21,6 +21,8 @@ deltatime(){
 	}
 	declare -g DELTATIME="${weeks+${weeks}w}${days+${days}d}${hours+${hours}h}${minutes+${minutes}m}${seconds}s"
 }
+
+${__SOURCED__:+return} #Intended for shellspec tests
 
 if [[ ${BASH_SOURCE[0]} == "$0" ]]
 then

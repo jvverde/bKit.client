@@ -1,0 +1,32 @@
+var data = {lines:[
+{"lineNum":"    1","line":"#!/usr/bin/env bash"},
+{"lineNum":"    2","line":"#Generate password using Diffie-Helman algorithm"},
+{"lineNum":"    3","line":"set -u","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"    4","line":"sdir=$(dirname -- \"$(readlink -fn -- \"$0\")\")\t#Full sdir","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"    5","line":"[[ ${ETCDIR+isset} == isset ]] || source \"$sdir/functions/all.sh\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"    6","line":""},
+{"lineNum":"    7","line":"usage() {"},
+{"lineNum":"    8","line":"        echo -e \"$@\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"    9","line":"        local name=\"$(basename -- \"$0\")\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   10","line":"        echo -e \"Usage:\\n\\t $name confdir\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   11","line":"        exit 1","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   12","line":"}"},
+{"lineNum":"   13","line":""},
+{"lineNum":"   14","line":"[[ ${1:-} =~ ^--?h ]] && usage \"Directory missing\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   15","line":""},
+{"lineNum":"   16","line":"confdir=\"${1:-$ETCDIR/default}\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   17","line":"priv=\"$confdir/.priv/key.pem\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   18","line":"pub=\"$confdir/pub/server.pub\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   19","line":"pass=\"$confdir/.priv/pass.bin\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   20","line":"secret=\"$confdir/.priv/secret\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   21","line":""},
+{"lineNum":"   22","line":""},
+{"lineNum":"   23","line":"[[ -e $priv && -e $pub ]] || die \"Keys are missing\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   24","line":""},
+{"lineNum":"   25","line":"openssl pkeyutl -derive -inkey \"$priv\" -peerkey \"$pub\" -out \"$pass\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   26","line":"base64 \"$pass\" > \"$secret\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+{"lineNum":"   27","line":"chmod 600 \"$secret\" \"$pass\"","class":"lineNoCov","hits":"0","possible_hits":"0",},
+]};
+var percent_low = 25;var percent_high = 75;
+var header = { "command" : "shellspec spec", "date" : "2020-07-07 12:21:07", "instrumented" : 17, "covered" : 0,};
+var merged_data = [];

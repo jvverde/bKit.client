@@ -38,6 +38,9 @@ _bkit_find_dirs(){
   }
 } 
 
+
+${__SOURCED__:+return} #Intended for shellspec tests
+
 _bkit_find_dirs ${1:+"$@"}
 
 mkdir -pv "$VARDIR"

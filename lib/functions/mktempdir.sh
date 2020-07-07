@@ -30,6 +30,8 @@ rmtempdir(){
   find "$parent" -path '*/tmp.*.bkit.*' -mtime +30 -delete 2>/dev/null
 }
 
+${__SOURCED__:+return} #Intended for shellspec tests
+
 if [[ ${BASH_SOURCE[0]} == "$0" ]]
 then
   echo "The script '$0' is meant to be sourced"

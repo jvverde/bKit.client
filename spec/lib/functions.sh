@@ -49,16 +49,16 @@ Describe 'messages.sh'
     The value say should be defined
     The value define_say should be defined
   End
-  It 'runs define_say'     
+  It 'call define_say'     
     When call define_say
     The status should be success
   End
   say(){ :; }
-  It 'runs msg (with stub)'
+  It 'call msg (with stub)'
     When call msg
     The status should be success
   End
-  It 'runs warn (with stub)'
+  It 'call warn (with stub)'
     When call warn 
     The status should be success
     The variable ERROR should equal 1
@@ -71,12 +71,12 @@ End
 Describe 'messages(2).sh'
   Include lib/functions/messages.sh
   BeforeAll define_say
-  It 'runs say'
+  It 'call say'
     When call say aqui
     The error should equal "aqui"  
     The output should not match pattern "*aqui*" #Trick because tput sedn control characters to output  
   End
-  It 'runs msg'
+  It 'call msg'
     When call msg aqui
     The line 1 of error should match pattern "*aqui*"  
     The line 2 of error should match pattern "*Called from*"  

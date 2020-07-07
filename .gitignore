@@ -25,3 +25,4 @@ webapp/
 web2/
 web2.*/
 *.old*
+package.json.old*

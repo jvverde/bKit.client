@@ -16,6 +16,8 @@ redirectlogs() {
 	exec 2>"$errfile"					#fork stderr to errfile
 }
 
+${__SOURCED__:+return} #Intended for shellspec tests
+
 if [[ ${BASH_SOURCE[0]} == "$0" ]]
 then
   echo "The script '$0' is meant to be sourced"

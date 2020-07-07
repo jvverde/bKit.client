@@ -15,4 +15,12 @@ _bkit_source_all(){
   true "${BKITUSER:="$(id -un)"}"
 }
 
+${__SOURCED__:+return} #Intended for shellspec tests
+
 _bkit_source_all
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]
+then
+  echo "The script '$0' is meant to be sourced"
+  echo "Usage: source '$0'"
+fi

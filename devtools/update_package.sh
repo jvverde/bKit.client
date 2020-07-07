@@ -6,7 +6,7 @@ die() {
 }
 
 declare -r sdir=$(dirname -- "$(readlink -ne -- "$0")")	#Full SDIR
-declare -r src="${1:-"$sdir/.."}"  #If not specified, assuming we are inside a tools directory under client area
+declare -r src="${1:-"$(dirname -- "$sdir""}"  #If not specified, assuming we are inside a tools directory under client area
 declare -r package="$src/package.json"
 
 [[ -e $package ]] || die "'$package' not found"

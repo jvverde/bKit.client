@@ -3,21 +3,22 @@ declare -p _bkit_messages > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
 
 declare _bkit_messages="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 
-source "$_bkit_messages/exists.sh"
-
-if exists tput && [[ -n $TERM && $TERM != dumb ]]
-then
-	say() {
-		tput setaf 1
-		tput setab 3
-		echo -e "$@">&2 
-		tput sgr0
-	}
-else
-	say() {
-		echo -e "$@">&2
-	}
-fi
+define_say() {
+	source "$_bkit_messages/exists.sh"
+	if exists tput && [[ -n $TERM && $TERM != dumb ]]
+	then
+		say() {
+			tput setaf 1
+			tput setab 3
+			echo -e "$@">&2 
+			tput sgr0
+		}
+	else
+		say() {
+			echo -e "$@">&2
+		}
+	fi
+}
 
 msg () {
 	for cnt in "${!BASH_SOURCE[@]}"
@@ -40,11 +41,14 @@ die() {
 	exit $errorcode;
 }
 
-declare ERROR=0
 warn() {
 	declare -g ERROR=1
 	msg "$@"
 }
+
+${__SOURCED__:+return} #Intended for shellspec tests
+
+define_say
 
 if [[ ${BASH_SOURCE[0]} == "$0" ]]
 then

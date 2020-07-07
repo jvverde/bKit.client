@@ -12,7 +12,7 @@ Describe 'traps.sh'
   It 'defines atexit'
     The value atexit should be a valid funcname
   End
-  It 'Runs'
+  It 'Runs set traps'
     When call _bkit_set_traps
     The status should be success
   End
@@ -27,7 +27,7 @@ Describe 'time.sh'
     "#5" "@$((3600 * 24 * 7))" "@0" "1w0d0h0m0s"
     "#5" "@$((3600 * 24 * 8 + 3659))" "@0" "1w1d1h0m59s"
   End
-  It "defines DELTATIME $1"
+  It "compute DELTATIME $1"
     When call deltatime "$2" "$3"
     The status should be success
     The variable DELTATIME should equal "$4"

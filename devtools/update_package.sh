@@ -19,5 +19,3 @@ jq \
   --argjson scripts "$(echo $scripts| jq '.')" \
   --argjson files "$(echo $files| jq '.')" \
   '. | .scripts |= $scripts | .files |= $files' "$old" > "$package" 
-#sed -i."old@$(date)" -E "s/(.+scripts.+:)(.+?)/\1 $scripts,/" "$package"
-#sed -E "s/(.+scripts.+:)(.+?)/\1 $scripts,/" "$package"

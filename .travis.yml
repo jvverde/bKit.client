@@ -1,4 +1,7 @@
 language: bash
 
+before_script:
+    - curl -fsSL https://git.io/shellspec | sh
+
 script:
     - ./devtools/test_spec.sh

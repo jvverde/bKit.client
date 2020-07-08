@@ -3,8 +3,8 @@ language: bash
 before_script:
     - curl -fsSL https://git.io/shellspec|sh -s -- --yes
     - export PATH=$PATH:$HOME/.local/bin/
-    - mkdir -pv /home/travis/.bkit/etc
-    - mkdir -pv /home/travis/.bkit/var
+    - mkdir -pv $PATH:$HOME/.bkit/etc
+    - mkdir -pv $PATH:$HOME/.bkit/var
 
 script:
     - ./devtools/test_spec.sh

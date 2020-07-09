@@ -3,7 +3,7 @@
 issourced(){
 	[[ "${BASH_SOURCE[0]}" != "${0}" ]]
 }
-declare rviddir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
+declare -r rviddir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
 source "$rviddir/functions/all.sh"
 
 export_rvid(){

@@ -26,9 +26,9 @@ else
 	[[ ${BKITCYGWIN+x} == x ]] && exists cygpath && dir=$(cygpath "$dir")
 	
 	dev=$(df --output=source "$mountpoint"|tail -1)
-	[[ -b $dev ]] || {
+	[[ ${BKITCYGWIN+x} != x && ! -b $dev ]] && exists lsblk && {
 		#echo try another way >&2
-		exists lsblk && dev="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$mountpoint" '$2 == m {printf("/dev/%s",$1)}')"
+		dev="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$mountpoint" '$2 == m {printf("/dev/%s",$1)}')"
 	}
 fi
 
@@ -44,7 +44,6 @@ use_wmic(){
 	SN=$(awk -F '=' 'tolower($1) ~  /volumeserialnumber/ {print $2}' <<<"$LD")
 	DT=$(awk -F '=' 'tolower($1) ~  /drivetype/ {print $2}' <<<"$LD")
 	echo "${VN:-_}|${SN:-_}|${FS:-_}|${DT:-_}"
-	exit
 }
 
 use_fsutil(){
@@ -63,7 +62,6 @@ use_fsutil(){
 		sed -e "s/^$DRIVE:.*- *//" | sed -E 's/[^a-z0-9]/-/gi;s/^$/_/;s/\s/_/g'
 	)
 	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
-	exit
 } 2>/dev/null
 
 readNameBy() {
@@ -125,12 +123,22 @@ volume() {
 	VOLUMENAME=$(echo $VOLUMENAME| sed -E 's/\s+/_/g')
 }
 
+use_linux() {
+	volume		
+	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE" | perl -lape 's/[^a-z0-9._|:+=-]/_/ig'	
+}
+
+#Check $dev
+[[ -z $dev ]] && die "I couldn't find a dev for $dir" 
+
+[[ ${BKITCYGWIN+x} == x && ! $dev =~ ^.: ]] && die "'$dev' isn't valid disc"
+[[ ${BKITCYGWIN+x} != x && ! -b $dev ]] && die "'$dev' isn't valid block device"
+
+#Find a method, run it and exit
 [[ ${BKITCYGWIN+x} == x ]] && exists wmic && use_wmic && exit
 [[ ${BKITCYGWIN+x} == x ]] && exists fsutil && use_fsutil && exit
 
-[[ ${BKITCYGWIN+x} != x ]] && {
-	volume		
-	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE" | perl -lape 's/[^a-z0-9._|:+=-]/_/ig'
-	exit
-} 2>/dev/null
+[[ ${BKITCYGWIN+x} != x ]] && use_linux 2>/dev/null && exit
+
+die 'Not find a method to use'
 

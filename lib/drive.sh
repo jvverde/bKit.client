@@ -1,26 +1,39 @@
 #!/usr/bin/env bash
-SDIR="$(dirname -- "$(readlink -ne -- "$0")")"                          #Full DIR
+declare -r sdir="$(dirname -- "$(readlink -ne -- "$0")")"                          #Full dir
 
-source "$SDIR/functions/all.sh"
+source "$sdir/functions/all.sh"
 
-DIR="$(readlink -ne -- "$1")"
+declare dir="$(readlink -ne -- "${1:-.}")"
 
-MOUNT=$(stat -c%m "$DIR")
-#Find the top most mount point. We need this for example for BTRFS subvolumes which are mounting points
-MOUNT="$(echo "$MOUNT" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
+#mountpoint=$(stat -c%m "$dir")
+#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are mountpointing points
+#mountpoint="$(echo "$mountpoint" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
 
-[[ -b $DIR ]] && DEV="$DIR" || {
-	exists cygpath && DIR=$(cygpath "$DIR")
-	DEV=$(df --output=source "$MOUNT"|tail -1)
-}
+#[[ -b $dir ]] && dev="$dir" || {
+#	exists cygpath && dir=$(cygpath "$dir")
+#	dev=$(df --output=source "$mountpoint"|tail -1)
+#}
+declare dev=""
 
-[[ -b $DEV ]] || {
-	#echo try another way >&2
-	exists lsblk && DEV="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$MOUNT" '$2 == m {printf("/dev/%s",$1)}')"
-}
+if [[ -b $dir ]]
+then
+	dev="$dir"
+else
+	declare mountpoint=""
+	mountpoint="$(stat -c%m "$dir")" || die "Cannot find mountpoint point of '$dir'"
+	#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are mountpointing points
+	mountpoint="$(echo "$mountpoint" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
+	[[ ${BKITCYGWIN+x} == x ]] && exists cygpath && dir=$(cygpath "$dir")
+	
+	dev=$(df --output=source "$mountpoint"|tail -1)
+	[[ -b $dev ]] || {
+		#echo try another way >&2
+		exists lsblk && dev="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$mountpoint" '$2 == m {printf("/dev/%s",$1)}')"
+	}
+fi
 
-[[ $OS == cygwin ]] && exists wmic && {
-	DRIVE=${DEV%%:*} #just left drive letter, nothing else
+use_wmic(){
+	DRIVE=${dev%%:*} #just left drive letter, nothing else
 	LD="$(WMIC logicaldisk WHERE "name like '$DRIVE:'" GET VolumeName,FileSystem,VolumeSerialNumber,drivetype /format:textvaluelist|
 		tr -d '\r'|
 		sed -r '/^$/d;s/^\s+|\s+$//;s/\s+/_/g'
@@ -34,8 +47,8 @@ MOUNT="$(echo "$MOUNT" |fgrep -of <(df --sync --output=target |tail -n +2|sort -
 	exit
 }
 
-[[ $OS == cygwin ]] && exists fsutil && {
-	DRIVE=${DEV%%:*} #just left drive letter, nothing else
+use_fsutil(){
+	DRIVE=${dev%%:*} #just left drive letter, nothing else
 	VOLUMEINFO="$(fsutil fsinfo volumeinfo $DRIVE:\\ | tr -d '\r')"
 	VOLUMENAME=$(echo -e "$VOLUMEINFO"| awk -F ":" 'toupper($1) ~ /VOLUME NAME/ {print $2}' |
 		sed -E 's/^\s*//;s/\s*$//;s/[^a-z0-9]/-/gi;s/^$/_/;s/\s/_/g'
@@ -54,15 +67,15 @@ MOUNT="$(echo "$MOUNT" |fgrep -of <(df --sync --output=target |tail -n +2|sort -
 } 2>/dev/null
 
 readNameBy() {
-		local device="$(readlink -ne -- "$DEV")"
-		RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
-		RESULT=${RESULT##*/}
-		RESULT=${RESULT%-*}
-		VOLUMENAME=${RESULT#*-}
+		local device="$(readlink -ne -- "$dev")"
+		RESULT="$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )"
+		RESULT="${RESULT##*/}"
+		RESULT="${RESULT%-*}"
+		VOLUMENAME="${RESULT#*-}"
 }
 
 readTypeBy() {
-		local device="$(readlink -ne -- "$DEV")"
+		local device="$(readlink -ne -- "$dev")"
 		RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
 		RESULT=${RESULT##*/}
 		DRIVETYPE=${RESULT%%-*}
@@ -71,30 +84,30 @@ readTypeBy() {
 readUUIDby() {
 	for U in $(ls /dev/disk/by-uuid)
 	do
-		[[ "$(readlink -ne -- "$DEV")" == "$(readlink -ne -- "/dev/disk/by-uuid/$U")" ]] && VOLUMESERIALNUMBER="$U" && return 
+		[[ "$(readlink -ne -- "$dev")" == "$(readlink -ne -- "/dev/disk/by-uuid/$U")" ]] && VOLUMESERIALNUMBER="$U" && return 
 	done
 }
 
 readIDby() {
 	for U in $(ls /dev/disk/by-id)
 	do
-		[[ "$(readlink -ne -- "$DEV")" == "$(readlink -ne "/dev/disk/by-id/$U")" ]] && VOLUMESERIALNUMBER="${U//[^0-9A-Za-z_-]/_}" && return 
+		[[ "$(readlink -ne -- "$dev")" == "$(readlink -ne "/dev/disk/by-id/$U")" ]] && VOLUMESERIALNUMBER="${U//[^0-9A-Za-z_-]/_}" && return 
 	done
 }
 
 volume() {
 	exists lsblk && {
-		VOLUMENAME="$(lsblk -ln -o LABEL "$DEV")"
-		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $DEV)}
-		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${DEV%%[0-9]*})}
-		true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${DEV%%[0-9]*})}
-		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$DEV")"}
-		DRIVETYPE=$(lsblk -ln -o TRAN ${DEV%%[0-9]*})
-		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $DEV)
+		VOLUMENAME="$(lsblk -ln -o LABEL "$dev")"
+		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $dev)}
+		true ${VOLUMENAME:=$(lsblk -ln -o VENDOR,MODEL ${dev%%[0-9]*})}
+		true ${VOLUMENAME:=$(lsblk -ln -o MODEL ${dev%%[0-9]*})}
+		true ${FILESYSTEM:="$(lsblk -ln -o FSTYPE "$dev")"}
+		DRIVETYPE=$(lsblk -ln -o TRAN ${dev%%[0-9]*})
+		VOLUMESERIALNUMBER=$(lsblk -ln -o UUID $dev)
 	}
 	exists blkid  && {
-		true ${FILESYSTEM:=$(blkid "$DEV" |sed -E 's#.*TYPE="([^"]+)".*#\1#')}
-		true ${VOLUMESERIALNUMBER:=$(blkid "$DEV" |fgrep 'UUID=' | sed -E 's#.*UUID="([^"]+)".*#\1#')}
+		true ${FILESYSTEM:=$(blkid "$dev" |sed -E 's#.*TYPE="([^"]+)".*#\1#')}
+		true ${VOLUMESERIALNUMBER:=$(blkid "$dev" |fgrep 'UUID=' | sed -E 's#.*UUID="([^"]+)".*#\1#')}
 	}	
 
 	[[ -n $DRIVETYPE ]] || readTypeBy
@@ -102,7 +115,7 @@ volume() {
 	[[ -n $VOLUMESERIALNUMBER ]] || readIDby
 	[[ -n $VOLUMENAME ]] || readNameBy
 
-	true ${FILESYSTEM:="$(df --output=fstype "$DEV"|tail -n1)"}
+	true ${FILESYSTEM:="$(df --output=fstype "$dev"|tail -n1)"}
 
 	true ${DRIVETYPE:=_}
 	true ${VOLUMESERIALNUMBER:=_}
@@ -112,8 +125,10 @@ volume() {
 	VOLUMENAME=$(echo $VOLUMENAME| sed -E 's/\s+/_/g')
 }
 
+[[ ${BKITCYGWIN+x} == x ]] && exists wmic && use_wmic && exit
+[[ ${BKITCYGWIN+x} == x ]] && exists fsutil && use_fsutil && exit
 
-[[ $OS != cygwin ]] && {
+[[ ${BKITCYGWIN+x} != x ]] && {
 	volume		
 	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE" | perl -lape 's/[^a-z0-9._|:+=-]/_/ig'
 	exit

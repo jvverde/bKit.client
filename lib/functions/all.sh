@@ -6,8 +6,9 @@ _bkit_source_all(){
 
 	declare -r dir="$(dirname -- "$myself")"
 
-  if [[ ${@:+x} == x ]]
+  if [[ ${@:+x} == x && $1 == --args ]]
   then
+    shift
     for arg in "$@"
     do
       source "$dir/${arg%.sh}.sh"

@@ -128,7 +128,7 @@ use_linux() {
 	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE" | perl -lape 's/[^a-z0-9._|:+=-]/_/ig'	
 }
 
-#Check $dev
+#Check if $dev is ok for use
 [[ -z $dev ]] && die "I couldn't find a dev for $dir" 
 
 [[ ${BKITCYGWIN+x} == x && ! $dev =~ ^.: ]] && die "'$dev' isn't valid disc"

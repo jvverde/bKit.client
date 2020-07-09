@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#comput RVID -- Remote Volume ID
+#compute RVID -- Remote Volume ID
 issourced(){
 	[[ "${BASH_SOURCE[0]}" != "${0}" ]]
 }
@@ -16,6 +16,7 @@ export_rvid(){
 	export BKIT_DRIVETYPE="${drivetype:-_}"
 	export BKIT_FILESYSTEM="${filesystem:-_}"
 	export BKIT_RVID="$BKIT_DRIVE.$BKIT_VOLUMESERIALNUMBER.$BKIT_VOLUMENAME.$BKIT_DRIVETYPE.$BKIT_FILESYSTEM"
-	issourced || echo $BKIT_RVID
 }
+
 export_rvid "${1:-.}"
+issourced || echo $BKIT_RVID

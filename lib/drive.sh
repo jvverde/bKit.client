@@ -1,38 +1,7 @@
 #!/usr/bin/env bash
-declare -r sdir="$(dirname -- "$(readlink -ne -- "$0")")"                          #Full dir
 
-source "$sdir/functions/all.sh"
-
-declare dir="$(readlink -ne -- "${1:-.}")"
-
-#mountpoint=$(stat -c%m "$dir")
-#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are mountpointing points
-#mountpoint="$(echo "$mountpoint" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
-
-#[[ -b $dir ]] && dev="$dir" || {
-#	exists cygpath && dir=$(cygpath "$dir")
-#	dev=$(df --output=source "$mountpoint"|tail -1)
-#}
-declare dev=""
-
-if [[ -b $dir ]]
-then
-	dev="$dir"
-else
-	declare mountpoint=""
-	mountpoint="$(stat -c%m "$dir")" || die "Cannot find mountpoint point of '$dir'"
-	#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are mountpointing points
-	mountpoint="$(echo "$mountpoint" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
-	[[ ${BKITCYGWIN+x} == x ]] && exists cygpath && dir=$(cygpath "$dir")
-	
-	dev=$(df --output=source "$mountpoint"|tail -1)
-	[[ ${BKITCYGWIN+x} != x && ! -b $dev ]] && exists lsblk && {
-		#echo try another way >&2
-		dev="$(lsblk -ln -oNAME,MOUNTPOINT |awk -v m="$mountpoint" '$2 == m {printf("/dev/%s",$1)}')"
-	}
-fi
-
-use_wmic(){
+_use_wmic(){
+	declare -r dev="$1"
 	DRIVE=${dev%%:*} #just left drive letter, nothing else
 	LD="$(WMIC logicaldisk WHERE "name like '$DRIVE:'" GET VolumeName,FileSystem,VolumeSerialNumber,drivetype /format:textvaluelist|
 		tr -d '\r'|
@@ -46,7 +15,8 @@ use_wmic(){
 	echo "${VN:-_}|${SN:-_}|${FS:-_}|${DT:-_}"
 }
 
-use_fsutil(){
+_use_fsutil(){
+	declare -r dev="$1"
 	DRIVE=${dev%%:*} #just left drive letter, nothing else
 	VOLUMEINFO="$(fsutil fsinfo volumeinfo $DRIVE:\\ | tr -d '\r')"
 	VOLUMENAME=$(echo -e "$VOLUMEINFO"| awk -F ":" 'toupper($1) ~ /VOLUME NAME/ {print $2}' |
@@ -64,7 +34,8 @@ use_fsutil(){
 	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE"
 } 2>/dev/null
 
-readNameBy() {
+_readNameBy() {
+	declare -r dev="$1"
 		local device="$(readlink -ne -- "$dev")"
 		RESULT="$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )"
 		RESULT="${RESULT##*/}"
@@ -72,28 +43,32 @@ readNameBy() {
 		VOLUMENAME="${RESULT#*-}"
 }
 
-readTypeBy() {
+_readTypeBy() {
+	declare -r dev="$1"
 		local device="$(readlink -ne -- "$dev")"
 		RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
 		RESULT=${RESULT##*/}
 		DRIVETYPE=${RESULT%%-*}
 }
 
-readUUIDby() {
+_readUUIDby() {
+	declare -r dev="$1"
 	for U in $(ls /dev/disk/by-uuid)
 	do
 		[[ "$(readlink -ne -- "$dev")" == "$(readlink -ne -- "/dev/disk/by-uuid/$U")" ]] && VOLUMESERIALNUMBER="$U" && return 
 	done
 }
 
-readIDby() {
+_readIDby() {
+	declare -r dev="$1"
 	for U in $(ls /dev/disk/by-id)
 	do
 		[[ "$(readlink -ne -- "$dev")" == "$(readlink -ne "/dev/disk/by-id/$U")" ]] && VOLUMESERIALNUMBER="${U//[^0-9A-Za-z_-]/_}" && return 
 	done
 }
 
-volume() {
+_volume() {
+	declare -r dev="$1"
 	exists lsblk && {
 		VOLUMENAME="$(lsblk -ln -o LABEL "$dev")"
 		true ${VOLUMENAME:=$(lsblk -ln -o PARTLABEL $dev)}
@@ -108,10 +83,10 @@ volume() {
 		true ${VOLUMESERIALNUMBER:=$(blkid "$dev" |fgrep 'UUID=' | sed -E 's#.*UUID="([^"]+)".*#\1#')}
 	}	
 
-	[[ -n $DRIVETYPE ]] || readTypeBy
-	[[ -n $VOLUMESERIALNUMBER ]] || readUUIDby
-	[[ -n $VOLUMESERIALNUMBER ]] || readIDby
-	[[ -n $VOLUMENAME ]] || readNameBy
+	[[ -n $DRIVETYPE ]] || _readTypeBy "$dev"
+	[[ -n $VOLUMESERIALNUMBER ]] || _readUUIDby "$dev"
+	[[ -n $VOLUMESERIALNUMBER ]] || _readIDby "$dev"
+	[[ -n $VOLUMENAME ]] || _readNameBy "$dev"
 
 	true ${FILESYSTEM:="$(df --output=fstype "$dev"|tail -n1)"}
 
@@ -123,22 +98,35 @@ volume() {
 	VOLUMENAME=$(echo $VOLUMENAME| sed -E 's/\s+/_/g')
 }
 
-use_linux() {
-	volume		
+_use_linux() {
+	declare -r dev="$1"
+	_volume "$dev"		
 	echo "$VOLUMENAME|$VOLUMESERIALNUMBER|$FILESYSTEM|$DRIVETYPE" | perl -lape 's/[^a-z0-9._|:+=-]/_/ig'	
 }
 
-#Check if $dev is ok for use
-[[ -z $dev ]] && die "I couldn't find a dev for $dir" 
-
-[[ ${BKITCYGWIN+x} == x && ! $dev =~ ^.: ]] && die "'$dev' isn't valid disc"
-[[ ${BKITCYGWIN+x} != x && ! -b $dev ]] && die "'$dev' isn't valid block device"
-
 #Find a method, run it and exit
-[[ ${BKITCYGWIN+x} == x ]] && exists wmic && use_wmic && exit
-[[ ${BKITCYGWIN+x} == x ]] && exists fsutil && use_fsutil && exit
+_drive(){
+	declare -r sdir="$(dirname -- "$(readlink -ne -- "$0")")"
+	source "$sdir/functions/messages.sh"                          #Full dir
+	declare -r dir="$(readlink -nm -- "$1" || warn "Cannot readlink for '$1'")"
+	declare -r dev="$($sdir/dir2dev.sh "$dir" || warn "Cannot get a dev for '$dir'")"
 
-[[ ${BKITCYGWIN+x} != x ]] && use_linux 2>/dev/null && exit
+	[[ ${BKITCYGWIN+x} == x ]] && exists wmic && _use_wmic "$dev" && return
+	[[ ${BKITCYGWIN+x} == x ]] && exists fsutil && _use_fsutil "$dev" && return
 
-die 'Not find a method to use'
+	[[ ${BKITCYGWIN+x} != x ]] && _use_linux "$dev" 2>/dev/null && return
 
+	warn 'Not find a method to use'
+}
+
+${__SOURCED__:+return} #Intended for shellspec tests
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]] #if not sourced
+then
+	for src in "${@:-.}"
+	do 
+		_drive "$src"
+	done
+else
+	export BKITDRIVE="$(_drive "${1:-.}")"
+fi

@@ -116,17 +116,21 @@ _drive(){
 
 	[[ ${BKITCYGWIN+x} != x ]] && _use_linux "$dev" 2>/dev/null && return
 
-	warn 'Not find a method to use'
+	warn 'Not find a method to use'	
+}
+
+_drives(){
+	for src in "${@:-.}"
+	do	
+		_drive "$src"
+	done
 }
 
 ${__SOURCED__:+return} #Intended for shellspec tests
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]] #if not sourced
 then
-	for src in "${@:-.}"
-	do 
-		_drive "$src"
-	done
+	_drives "$@"
 else
 	export BKITDRIVE="$(_drive "${1:-.}")"
 fi

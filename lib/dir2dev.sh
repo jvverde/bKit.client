@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+_findxisting(){
+	declare dir="$1"
+	[[ -e $dir ]] && echo "$dir" && return
+	declare parent="$(dirname -- "$dir")"
+	[[ "$parent" == "$dir" ]] && echo $dir && return
+	echo "$(_findxisting "$parent")"
+}
+
 dir2dev(){
 	declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"                          #Full dir
 
@@ -13,6 +21,7 @@ dir2dev(){
 		dev="$dir"
 	else
 		declare mountpoint=""
+		[[ -e $dir ]] || dir="$(_findxisting "$dir")"
 		mountpoint="$(stat -c%m "$dir")" || die "Cannot find mountpoint point of '$dir'"
 		#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are mountpointing points
 		mountpoint="$(echo "$mountpoint" |fgrep -of <(df --sync --output=target |tail -n +2|sort -r)|head -n1)"
@@ -27,7 +36,7 @@ dir2dev(){
 
 	[[ -z $dev ]] && die "I couldn't find a dev for $dir" 
 
-	[[ ${BKITCYGWIN+x} == x && ! $dev =~ ^.: ]] && die "'$dev' isn't valid disc"
+	[[ ${BKITCYGWIN+x} == x && ! $dev =~ ^.: ]] && die "'$dev' isn't valid windows disk"
 	[[ ${BKITCYGWIN+x} != x && ! -b $dev ]] && die "'$dev' isn't valid block device"
 
 	echo "$dev"

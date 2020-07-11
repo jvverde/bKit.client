@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-declare -F  > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
+declare -F _bkit_use > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
 
-_bkit_source_all(){
+_bkit_use(){
 	declare -r myself="$(readlink -ne -- "${BASH_SOURCE[0]}")"
 
 	declare -r dir="$(dirname -- "$myself")"
 
-	while IFS= read -r -d $'\0' file
-	do
-    source "$file"
-	done < <(find "$dir" -maxdepth 1 -type f -name '*.sh' ! -path "$myself" -print0)
+  for arg in "$@"
+  do
+    source "$dir/${arg%.sh}.sh"
+  done    
 }
 
 ${__SOURCED__:+return} #Intended for shellspec tests
 
-_bkit_source_all
+_bkit_use "$@"
 
 if [[ ${BASH_SOURCE[0]} == "$0" ]]
 then

@@ -126,11 +126,15 @@ _drives(){
 	done
 }
 
+_exportdrive() {
+	declare -gx BKITDRIVE="$(_drive "${1:-.}")"
+}
+
 ${__SOURCED__:+return} #Intended for shellspec tests
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]] #if not sourced
 then
 	_drives "$@"
 else
-	export BKITDRIVE="$(_drive "${1:-.}")"
+	_exportdrive "${1:-.}"
 fi

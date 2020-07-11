@@ -7,7 +7,7 @@ _findxisting(){
 	echo "$(_findxisting "$parent")"
 }
 
-dir2dev(){
+_dir2dev(){
 	declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"                          #Full dir
 
 	declare dir="$(readlink -nm -- "${1:-.}")"
@@ -42,11 +42,15 @@ dir2dev(){
 	echo "$dev"
 }
 
+_exportdev(){
+	declare -gx BKITDEV="$(_dir2dev "${1:-.}")"
+}
+
 ${__SOURCED__:+return} #Intended for shellspec tests
 
 if [[ ${BASH_SOURCE[0]} == "$0" ]] #if not sourced
 then
-		dir2dev "${1:-.}"
+	_dir2dev "${1:-.}"
 else
-	export BKITDEV="$(dir2dev "${1:-.}")"
+	_exportdev "${1:-.}"
 fi

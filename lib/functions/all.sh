@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -F  > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
+declare -F _bkit_source_all > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
 
 _bkit_source_all(){
 	declare -r myself="$(readlink -ne -- "${BASH_SOURCE[0]}")"

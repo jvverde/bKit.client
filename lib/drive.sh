@@ -36,19 +36,19 @@ _use_fsutil(){
 
 _readNameBy() {
 	declare -r dev="$1"
-		local device="$(readlink -ne -- "$dev")"
-		RESULT="$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )"
-		RESULT="${RESULT##*/}"
-		RESULT="${RESULT%-*}"
-		VOLUMENAME="${RESULT#*-}"
+	local device="$(readlink -ne -- "$dev")"
+	RESULT="$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )"
+	RESULT="${RESULT##*/}"
+	RESULT="${RESULT%-*}"
+	VOLUMENAME="${RESULT#*-}"
 }
 
 _readTypeBy() {
 	declare -r dev="$1"
-		local device="$(readlink -ne -- "$dev")"
-		RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
-		RESULT=${RESULT##*/}
-		DRIVETYPE=${RESULT%%-*}
+	local device="$(readlink -ne -- "$dev")"
+	RESULT=$(find /dev/disk/by-id -lname "*/${device##*/}" -print|sort|head -n1 )
+	RESULT=${RESULT##*/}
+	DRIVETYPE=${RESULT%%-*}
 }
 
 _readUUIDby() {

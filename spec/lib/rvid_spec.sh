@@ -7,6 +7,6 @@ Describe 'rvid.sh'
   It 'call _export_rvid'
     When call _export_rvid
     The status should be success
-    The variable BKIT_R                                                                                                                                   VID should match pattern "[a-zA-Z_].*.*.*" 
+    The variable BKIT_RVID should match pattern "[a-zA-Z_].*.*.*" 
   End
 End

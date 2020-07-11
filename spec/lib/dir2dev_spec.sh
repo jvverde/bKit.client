@@ -19,10 +19,8 @@ Describe 'dir2dev.sh'
     The status should be success
     The output should match pattern "/**"
   End
-End
-Describe '_dir2dev.sh (2)'
-  It 'run source _dir2dev'
-    When run source lib/dir2dev.sh
+  It 'call _exportdev'
+    When call _exportdev
     The status should be success
     The value BKITDEV should be present
   End

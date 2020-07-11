@@ -1,4 +1,4 @@
-unset BKITDRIVE _drives
+unset BKITDRIVE _drives _exportdrive
 Describe 'drive.sh'
   Include lib/drive.sh
   It 'defined _drive'
@@ -12,11 +12,9 @@ Describe 'drive.sh'
     The line 3 of output should match pattern "*|*|*|*" 
     The line 4 of output should match pattern "*|*|*|*" 
   End
-End
-Describe 'drive.sh (2)'
-  It 'run sourced _drive'
-    When run source lib/drive.sh
+  It 'call _exportdrive'
+    When call _exportdrive
     The status should be success
-    The value BKITDRIVE should be present
+    The variable BKITDRIVE should be present
   End
 End

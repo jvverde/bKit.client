@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-declare -F _bkit_use > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && return
-
-_bkit_use(){
+_bkit_source(){
 	declare -r myself="$(readlink -ne -- "${BASH_SOURCE[0]}")"
 
 	declare -r dir="$(dirname -- "$myself")"
@@ -14,9 +12,9 @@ _bkit_use(){
 
 ${__SOURCED__:+return} #Intended for shellspec tests
 
-_bkit_use "$@"
+_bkit_source "$@"
 
-if [[ ${BASH_SOURCE[0]} == "$0" ]]
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]
 then
   echo "The script '$0' is meant to be sourced"
   echo "Usage: source '$0'"

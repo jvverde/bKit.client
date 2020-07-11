@@ -16,7 +16,7 @@ Describe 'dir2dev.sh'
     The status should be success
     The output should match pattern "/**"
   End
-  It 'call dir2dev not existing dir'
+  It 'call dir2dev over a not existing dir'
     When call dir2dev "./___xpto__"
     The status should be success
     The output should match pattern "/**"

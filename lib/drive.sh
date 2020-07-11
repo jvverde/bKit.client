@@ -106,7 +106,7 @@ _use_linux() {
 
 #Find a method, run it and exit
 _drive(){
-	declare -r sdir="$(dirname -- "$(readlink -ne -- "$0")")"
+	declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 	source "$sdir/functions/messages.sh"                          #Full dir
 	declare -r dir="$(readlink -nm -- "$1" || warn "Cannot readlink for '$1'")"
 	declare -r dev="$($sdir/dir2dev.sh "$dir" || warn "Cannot get a dev for '$dir'")"

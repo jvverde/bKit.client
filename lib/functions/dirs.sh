@@ -16,6 +16,7 @@ _bkit_find_dirs(){
       [[ ${BKITISADMIN+isset} == isset && -z $homedir ]] && {
         #This is a fallback
         homedir="$(WMIC PATH win32_UserProfile where "SID like 'S-1-5-21%%-500'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')" 
+        #true "${homedir:="$(WMIC PATH win32_UserProfile where "SID like 'S-1-5-18'" get LocalPath|tr -d '\r'|tail -n+2|head -1|sed -E 's/\s+$//')"}" #a hard-wired fallback
         true "${homedir:="${ALLUSERSPROFILE+"$ALLUSERSPROFILE"/bkit-admin}"}" #a hard-wired fallback
         true "${homedir:="$ProgramData/bkit-admin"}" #In worst case homedir will be /bkit-admin
       }

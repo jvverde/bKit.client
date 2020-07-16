@@ -25,8 +25,9 @@ while [[ ${RSYNC_USER:+x} != x ]]
 do
   read -p "Rsync username: " RSYNC_USER
   unset RSYNC_PASSWORD 
-  SECTION="$RSYNC_USER"
 done
+
+SECTION="$RSYNC_USER"
 
 while [[ ${RSYNC_PASSWORD:+x} != x ]]
 do
@@ -54,7 +55,8 @@ exists cygpath && syncd="$(cygpath -u "$syncd")"
 declare -r challenge="$(head -c 1000 </dev/urandom | tr -cd "[:alnum:]" | head -c 32)"
 echo -n $challenge > "$syncd/challenge"
 
-declare -r url="rsync://admin@${server}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}"
+declare -r url="rsync://${RSYNC_USER}@${server}:${PORT}/${SECTION}/${DOMAIN}/${NAME}/${UUID}/user/${BKITUSER}"
+echo url=$url
 #Send public keys and challenge to the server
 rsync -rltvhR $FMT "$syncd/./" "$url/" || die "Exit value of rsync is non null: $?"
 
@@ -75,13 +77,14 @@ ssh-keygen -R "$server" -f "$KH" && ssh-keyscan -H -t ecdsa "$server" >> "$KH"
 
 echo Writing configuration to $conffile
 (
-	read SECTION <"$confdir/pub/section"
+  read SECTION <"$confdir/pub/section"
+  read BKITUSER <"$confdir/pub/user"
 	read COMMAND <"$confdir/pub/command"
 	#echo "BACKUPURL=rsync://user@$server:$BPORT/$SECTION"
 	echo "SSH='ssh -i \"$confdir/.priv/ssh.key\" -o UserKnownHostsFile=\"$KH\" rsyncd@$server $COMMAND'"
-	echo "RSYNCURL='rsync://user@$server:$BPORT/$SECTION'"
-	echo "SSHURL='user@$server::$SECTION'"
-	echo "BACKUPURL='user@$server::$SECTION'"
+	echo "RSYNCURL='rsync://${BKITUSER}@$server:$BPORT/$SECTION'"
+	echo "SSHURL='${BKITUSER}@$server::$SECTION'"
+	echo "BACKUPURL='${BKITUSER}@$server::$SECTION'"
 	echo "PASSFILE='$confdir/.priv/secret'"
 	OS=$(uname -o|tr '[:upper:]' '[:lower:]')
 	ARCH=$(uname -m|tr '[:upper:]' '[:lower:]')

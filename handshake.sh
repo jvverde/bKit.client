@@ -38,11 +38,20 @@ done
 
 declare -r confdir="$ETCDIR/server/$server"
 
-declare publickey="$("$sdir"/lib/keys-ssh.sh -n "$server" "$confdir" | die "Can't generate a key")"
+"$sdir"/lib/keys-ssh.sh -n "$server" "$confdir" || die "Can't generate a key"
 
+#Sign the public key with user simetric key
+declare -r public="$confdir/pub"
+openssl dgst -sha512 -hmac <<<"$RSYNC_PASSWORD" -hex < "$public/ssh-client.pub" -r |awk '{print $1}' > "$public/key.hmac"
 
+#find section = hmac(user, pass)
+declare -r section="${RSYNC_USER}#$(echo -n "$RSYNC_USER" | openssl dgst -md5 -r -hmac <<<"$RSYNC_PASSWORD" -hex | awk '{print $1}')"
 
+declare -r url="rsync://${server}:${PORT}/${section}/"
 
+rsync -ri $FMT "$public/" "$url/" || die "Exit value of rsync is non null: $?"
+
+exit
 
 
 

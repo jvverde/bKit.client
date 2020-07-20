@@ -29,7 +29,7 @@ done
 
 [[ -n $1 ]] || usage "Servername missing"
 
-declare -r confdir="${2:-"$ETCDIR/$1"}"
+declare -r confdir="${2:-"$ETCDIR/server/$1"}"
 declare -r priv="$confdir/.priv"
 declare -r pub="$confdir/pub"
 
@@ -47,4 +47,3 @@ declare -r pubssh="$pub/ssh-client.pub"
 
 echo Extract public ssh key from private key
 ssh-keygen -f "$keyssh" -y > "$pubssh"
-echo "pubkey=$pubssh"

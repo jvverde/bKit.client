@@ -38,7 +38,14 @@ done
 
 declare -r confdir="$ETCDIR/server/$server"
 
-bash "$sdir"/lib/keygen.sh -n "$server" "$confdir"		|| die "Can't generate a key"
+declare publickey="$("$sdir"/lib/keys-ssh.sh -n "$server" "$confdir" | die "Can't generate a key")"
+
+
+
+
+
+
+
 
 declare -r conffile="$confdir/conf.init"
 
@@ -50,7 +57,8 @@ IFS='|' read -r DOMAIN NAME UUID <<<$("$sdir/lib/computer.sh")
 
 mktempdir htemp
 
-declare -r url="rsync://${server}:${PORT}/${RSYNC_USER}#read/"
+declare -r section="$(echo -n "$RSYNC_USER" | openssl dgst -md5 -r -hmac <<<"$RSYNC_PASSWORD" -hex | awk '{print $1}')"
+declare -r url="rsync://${server}:${PORT}/${section}/"
 rsync -ri $FMT "$url/key.hmac" "$htemp/" || die "Exit value of rsync is non null: $?"
 
 declare -r serverpubkey="$htemp/$server.pub"
@@ -60,11 +68,12 @@ ssh-keyscan -t ecdsa "$server" | tee "$serverpubkey" | awk '{print $NF}' > "$key
 openssl dgst -sha512 -hmac <<<"$RSYNC_PASSWORD" -hex < <(cat "$keyvalue") -r|awk '{print $1}' > "$macvalue"
 cmp -s "$macvalue" "$htemp/key.hmac" || die "BE CAREFUL public key isn't valid"
 
-decalre -r KH="$confdir/.priv/known_hosts" #KnowHosts file
+declare -r KH="$confdir/.priv/known_hosts" #KnowHosts file
 touch "$KH"
 ssh-keygen -R "$server" -f "$KH" #Remove a possible old publickey for the server
-cat "$serverpubkey" >> "$KH"      "Now add the public key"
+cat "$serverpubkey" >> "$KH"     #"Now add the public key"
 
+echo done
 exit
 
 declare syncd="$confdir/pub"          #public keys location

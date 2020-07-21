@@ -43,7 +43,7 @@ declare -r pubssh="$pub/ssh-client.pub"
 
 [[ -e $keyssh && -n $new ]] && rm "$keyssh" #rm if exists and new is requested
 
-[[ -e $keyssh ]] || ssh-keygen -b 256 -t ecdsa -f "$keyssh" -q -N "" -C "key from $BKITUSER@$(hostname -f) to $1"
+[[ -e $keyssh ]] || ssh-keygen -b 256 -t ecdsa -f "$keyssh" -q -N "" -C ""
 
 echo Extract public ssh key from private key
 ssh-keygen -f "$keyssh" -y > "$pubssh"

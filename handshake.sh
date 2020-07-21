@@ -71,4 +71,17 @@ declare -r url="rsync://${server}:${PORT}/${section}/$clientid/$sign"
 rsync -ai --exclude="ssh-server.*" $FMT "$public/" "$url/" || die "Exit value of rsync is non null: $?"
 rsync -ai --exclude="ssh-client.*" $FMT "$url/" "$public/" || die "Exit value of rsync is non null: $?"
 
+declare -r verify="$(
+  openssl dgst -sha512 -hmac "${RSYNC_PASSWORD}" -hex -r < "$public/secret.enc"|  #sign with password
+  awk '{print $1}'                                                #just remove the sencond column(= *stdin)
+)"
+
+declare -r secsign="$(cat "$public/secret.hmac")"
+
+[[ "$verify" == "$secsign" ]] || die Secret signature not valid
+
+declare -r secret="$confdir/.priv/secret"
+
+openssl enc -d -md sha256 -aes-256-cbc -k "${RSYNC_PASSWORD}" -in "$public/secret.enc" -out "$secret"
+
 exit 0

@@ -45,14 +45,15 @@ declare -t publickey="$public/ssh-client.pub"
 
 [[ -e "$publickey" ]] || die "public key on '$public' is missing"
 
+umask 077
 #Sign the public key with user simetric key
 declare -t keyhmac="$public/ssh-client.hmac"
-openssl dgst -sha512 -hmac <<<"$RSYNC_PASSWORD" -hex < "$publickey" -r |awk '{print $1}' > "$keyhmac"
+openssl dgst -sha512 -hmac "$RSYNC_PASSWORD" -hex -r < "$publickey" |awk '{print $1}' > "$keyhmac"
 
 #find section = hmac(user, pass)
 declare -r section="${RSYNC_USER}#$(
   echo -n "$RSYNC_USER" |                                 #messsage(=user) to sign
-  openssl dgst -sha512 -hmac "$RSYNC_PASSWORD" -hex -r |     #sign with password
+  openssl dgst -sha512 -hmac "$RSYNC_PASSWORD" -hex -r |  #sign with password
   awk '{print $1}'                                        #just remove the sencond column(= *stdin)
 )"
 
@@ -62,14 +63,14 @@ declare -r clientid="${domain}/${name}/${uuid}/user/${BKITUSER}"
 
 declare -r sign="$(
   echo -n "$clientid" |                                   #message(=clientid) to sign
-  openssl dgst -sha512 -hmac "$RSYNC_PASSWORD" -hex -r |     #sign with password
+  openssl dgst -sha512 -hmac "$RSYNC_PASSWORD" -hex -r |  #sign with password
   awk '{print $1}'                                        #just remove the sencond column(= *stdin)
 )"
 
 declare -r url="rsync://${server}:${PORT}/${section}/$clientid/$sign"
 
-rsync -ai --exclude="ssh-server.*" $FMT "$public/" "$url/" || die "Exit value of rsync is non null: $?"
-rsync -ai --exclude="ssh-client.*" $FMT "$url/" "$public/" || die "Exit value of rsync is non null: $?"
+rsync -rti --exclude="ssh-server.*" $FMT "$public/" "$url/" || die "Exit value of rsync is non null: $?"
+rsync -rti --exclude="ssh-client.*" $FMT "$url/" "$public/" || die "Exit value of rsync is non null: $?"
 
 declare -r verify="$(
   openssl dgst -sha512 -hmac "${RSYNC_PASSWORD}" -hex -r < "$public/secret.enc"|  #sign with password

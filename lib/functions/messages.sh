@@ -8,10 +8,11 @@ define_say() {
 	if exists tput && [[ -n $TERM && $TERM != dumb ]]
 	then
 		say() {
+			tput setab 7
 			tput setaf 1
-			tput setab 3
 			echo -e "$@">&2 
 			tput sgr0
+			tput el
 		}
 	else
 		say() {

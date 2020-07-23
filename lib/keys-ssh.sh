@@ -43,7 +43,7 @@ declare -r pubssh="$pub/ssh-client.pub"
 
 [[ -e $keyssh && -n $new ]] && rm "$keyssh" #rm if exists and new is requested
 
-[[ -e $keyssh ]] || ssh-keygen -b 521 -t ecdsa -f "$keyssh" -q -N "" -C ""
+[[ -e $keyssh ]] || ssh-keygen -t ed25519 -f "$keyssh" -q -N "" -C ""
 
 echo Extract public ssh key from private key
 ssh-keygen -f "$keyssh" -y > "$pubssh"

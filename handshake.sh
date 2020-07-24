@@ -47,11 +47,7 @@ declare -t keyhmac="$public/ssh-client.hmac"
 openssl dgst -sha512 -hmac "$CLIENT_PASS" -hex -r < "$publickey" |awk '{print $1}' > "$keyhmac"
 
 #find section = hmac(user, pass)
-declare -r section="${CLIENT_USR}#$(
-  echo -n "$CLIENT_USR" |                                 #messsage(=user) to sign
-  openssl dgst -sha512 -hmac "$CLIENT_PASS" -hex -r |  #sign with password
-  awk '{print $1}'                                        #just remove the sencond column(= *stdin)
-)"
+declare -r section="${CLIENT_USR}"
 
 IFS='|' read -r domain name uuid <<<$("$sdir/lib/computer.sh")
 

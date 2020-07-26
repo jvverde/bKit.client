@@ -45,5 +45,7 @@ declare -r pubssh="$pub/ssh-client.pub"
 
 [[ -e $keyssh ]] || ssh-keygen -t ed25519 -f "$keyssh" -q -N "" -C ""
 
+chmod -R 600 "$priv"
+
 echo Extract public ssh key from private key
 ssh-keygen -f "$keyssh" -y > "$pubssh"

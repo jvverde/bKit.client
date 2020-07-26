@@ -22,13 +22,13 @@ exists nc && { nc -z $server $PORT 2>&1 || die Server $server not found;}
 
 while [[ ${CLIENT_USR:+x} != x ]]
 do
-  read -p "Rsync username: " CLIENT_USR
+  read -p "bKit username: " CLIENT_USR
   unset CLIENT_PASS 
 done
 
 while [[ ${CLIENT_PASS:+x} != x ]]
 do
-  read -sp "Rsync password: " CLIENT_PASS
+  read -sp "bKit password: " CLIENT_PASS
   CLIENT_PASS="$(echo -n "$CLIENT_PASS"|md5sum|awk '{print $1}')"
 done
 
@@ -85,12 +85,16 @@ declare -r ssign="$(cat "$serversign")"
 declare -r secretfile="$confdir/.priv/secret"
 declare -r encsec="$(grep -Po "(?<=^secret=').+(?='\$)" "$serverconf")"
 openssl enc -d -md sha256 -aes-256-cbc -k "${CLIENT_PASS}" -in <(echo -n "$encsec"|base64 -d) -out "$secretfile"
+chmod 600 "$secretfile"
 
 #add server public key to known_hosts file
 declare -r khfile="$confdir/.priv/known_hosts"
 touch "$khfile"
 ssh-keygen -R "$server" -f "$khfile" 2>/dev/null
-grep -Po "(?<=^pubkey=').+(?='\$)" "$serverconf" |xargs -rI{} echo "$server {}" >> "$khfile"
+grep -Po "(?<=^sshkey=').+(?='\$)" "$serverconf" |xargs -rI{} echo "$server {}" >> "$khfile"
+
+#
+grep -Po "(?<=^pubkey=').+(?='\$)" "$serverconf" | base64 -d > "$public/server.pubkey"
 
 #setup configuration file to be used by clients scipts
 declare -r conffile="$confdir/conf.init"

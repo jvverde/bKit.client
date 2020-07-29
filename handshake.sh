@@ -32,19 +32,29 @@ do
   CLIENT_PASS="$(echo -n "$CLIENT_PASS"|md5sum|awk '{print $1}')"
 done
 
-declare -r confdir="$ETCDIR/server/$server"
-
-"$sdir"/lib/keys-ssh.sh -n "$server" "$confdir" || die "Can't generate a key"
-
-declare -r public="$confdir/pub"
-declare -t publickey="$public/ssh-client.pub"
-
-[[ -e "$publickey" ]] || die "public key on '$public' is missing"
-
 umask 077
+
+declare -r confdir="$ETCDIR/server/$server"
+declare -r public="$confdir/pub"
+declare -r private="$confdir/.priv"
+mkdir -pv "$public"
+mkdir -pv "$private"
+declare -r sshpriv="$private/ssh.key"
+[[ -e $sshpriv ]] && rm "$sshpriv" #rm any old key if exists
+ssh-keygen -t ed25519 -f "$sshpriv" -q -N "" -C ""
+chmod 600 "$sshpriv"
+declare -t sshpub="$(ssh-keygen -f "$sshpriv" -y |base64 -w0)"
+
+openssl ecparam -name secp256k1 -genkey -noout -out "$private/key.pem"  #generate a private key
+declare -r pubkey="$(openssl ec -in "$private/key.pem" -pubout | base64 -w0)" #extract the public key and save it on client readable location
+
 #Sign the public key with user simetric key
-declare -t keyhmac="$public/ssh-client.hmac"
-openssl dgst -sha512 -hmac "$CLIENT_PASS" -hex -r < "$publickey" |awk '{print $1}' > "$keyhmac"
+{
+  echo "sshkey='$sshpub'"
+  echo "pubkey='$pubkey'"
+} > "$public/client.conf"
+
+openssl dgst -sha512 -hmac "$CLIENT_PASS" -hex -r < "$public/client.conf" |awk '{print $1}' > "$public/client.sign"
 
 #find section = hmac(user, pass)
 declare -r section="${CLIENT_USR}"
@@ -82,19 +92,19 @@ declare -r ssign="$(cat "$serversign")"
 [[ "$serify" == "$ssign" ]] || die Server signature not valid
 
 #extract secret and save it on private directory
-declare -r secretfile="$confdir/.priv/secret"
+declare -r secretfile="$private/secret"
 declare -r encsec="$(grep -Po "(?<=^secret=').+(?='\$)" "$serverconf")"
 openssl enc -d -md sha256 -aes-256-cbc -k "${CLIENT_PASS}" -in <(echo -n "$encsec"|base64 -d) -out "$secretfile"
 chmod 600 "$secretfile"
 
-#add server public key to known_hosts file
-declare -r khfile="$confdir/.priv/known_hosts"
+#add server ssh public key to known_hosts file
+declare -r khfile="$private/known_hosts"
 touch "$khfile"
 ssh-keygen -R "$server" -f "$khfile" 2>/dev/null
 grep -Po "(?<=^sshkey=').+(?='\$)" "$serverconf" |xargs -rI{} echo "$server {}" >> "$khfile"
 
-#
-grep -Po "(?<=^pubkey=').+(?='\$)" "$serverconf" | base64 -d > "$public/server.pubkey"
+#extract public key and store in on local private folder
+grep -Po "(?<=^pubkey=').+(?='\$)" "$serverconf" | base64 -d > "$private/server.pubkey"
 
 #setup configuration file to be used by clients scipts
 declare -r conffile="$confdir/conf.init"
@@ -105,7 +115,7 @@ echo "Writing configuration to $conffile"
   declare -r bkituser="$(grep -Po "(?<=^user=').+(?='\$)" "$serverconf")"
   declare -r command="$(grep -Po "(?<=^command=').+(?='\$)" "$serverconf")"
   declare -r bport="$(grep -Po "(?<=^bport=').+(?='\$)" "$serverconf")"
-  echo "SSH='ssh -i \"$confdir/.priv/ssh.key\" -o UserKnownHostsFile=\"$khfile\" rsyncd@${server} $command'"
+  echo "SSH='ssh -i \"$private/ssh.key\" -o UserKnownHostsFile=\"$khfile\" rsyncd@${server} $command'"
   echo "RSYNCURL='rsync://${bkituser}@$server:$bport/$bkitsection'"
   echo "SSHURL='${bkituser}@$server::$bkitsection'"
   echo "BACKUPURL='${bkituser}@$server::$bkitsection'"

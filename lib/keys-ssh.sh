@@ -29,17 +29,13 @@ done
 
 [[ -n $1 ]] || usage "Servername missing"
 
-declare -r confdir="${2:-"$ETCDIR/server/$1"}"
-declare -r priv="$confdir/.priv"
-declare -r pub="$confdir/pub"
+declare -r priv="${2:-"$ETCDIR/server/$1/.priv/"}"
 
 umask 077
 
 [[ -e $priv ]] || mkdir -pv "$priv"
-[[ -e $pub ]] || mkdir -pv "$pub"
 
 declare -r keyssh="$priv/ssh.key"
-declare -r pubssh="$pub/ssh-client.pub"
 
 [[ -e $keyssh && -n $new ]] && rm "$keyssh" #rm if exists and new is requested
 
@@ -48,4 +44,4 @@ declare -r pubssh="$pub/ssh-client.pub"
 chmod -R 600 "$priv"
 
 echo Extract public ssh key from private key
-ssh-keygen -f "$keyssh" -y > "$pubssh"
+ssh-keygen -f "$keyssh" -y

@@ -41,6 +41,9 @@ openssl ec -in "$private/newkey.pem" -pubout -out "$tmp/client.pubkey"
 #Sign the new public key with older private key
 openssl dgst -sign "$private/key.pem" -out "$tmp/pubkey.sign" "$tmp/client.pubkey"
 
+#Prepare a challenge to send server and later get back encrypted
+openssl rand -out "$tmp/challenge" 128
+
 #prepare to rsync with server
 source "$sdir/ccrsync.sh"
 

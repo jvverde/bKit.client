@@ -31,6 +31,9 @@ declare -r conffile="$confdir/conf.init"
 mkdir -pv "$tmp"
 mkdir -pv "$private"
 
+#clean $tmp
+find "$tmp" -maxdepth 1 -type f -delete
+
 #generate a new private key
 openssl ecparam -name secp256k1 -genkey -noout -out "$private/newkey.pem"
 chmod 600 "$private/newkey.pem"
@@ -56,6 +59,11 @@ rsync -rti "$url/" "$tmp/" || die "Exit value of rsync is non null: $?"
 openssl pkeyutl -derive -inkey "$private/newkey.pem" -peerkey "$private/server.pubkey" | base64 -w0 > "$private/secret"
 chmod 600 "$private/secret"
 
+#decrypt challenge
+[[ -e "$tmp/challenge.enc" ]] && openssl enc -d -aes-256-cbc -md sha512 -in "$tmp/challenge.enc" -kfile "$private/secret" -out "$tmp/challenge.dec"
+
+#verify if secret ik the same
+cmp -s "$tmp/challenge.dec" "$tmp/challenge" || die "Cannot decrypt challenge"
 #Drop old key and store new one 
 mv -fTv "$private/newkey.pem" "$private/key.pem"
 

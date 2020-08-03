@@ -29,7 +29,8 @@ done
 while [[ ${CLIENT_PASS:+x} != x ]]
 do
   read -sp "bKit password: " CLIENT_PASS
-  CLIENT_PASS="$(echo -n "$CLIENT_PASS"|md5sum|awk '{print $1}')"
+  #${username}|bKit|${password}
+  CLIENT_PASS="$(echo -n "${CLIENT_USR}|bKit|${CLIENT_PASS}"|md5sum|awk '{print $1}')"
 done
 
 umask 077
@@ -48,7 +49,7 @@ declare -t sshpub="$(ssh-keygen -f "$sshpriv" -y |base64 -w0)"
 openssl ecparam -name secp256k1 -genkey -noout -out "$private/key.pem"  #generate a private key
 declare -r pubkey="$(openssl ec -in "$private/key.pem" -pubout | base64 -w0)" #extract the public key and save it on client readable location
 
-#Sign the public key with user simetric key
+#Sign the public key with a user simetric key
 {
   echo "sshkey='$sshpub'"
   echo "pubkey='$pubkey'"

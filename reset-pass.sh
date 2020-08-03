@@ -7,15 +7,13 @@ set -eu
 usage() {
     declare -r name=$(basename -s .sh "$0")
     echo Reset password with server
-    echo -e "Usage:\n\t $name server" >&2
+    echo -e "Usage:\n\t $name [server]" >&2
     exit 1
 }
 
-[[ ${1:+x} == x ]] || usage
-
 [[ ${1+"$1"} =~ ^--?h(elp)? ]] && usage
 
-declare -r server="$1"
+declare -r server="${1:-"$($sdir/server.sh)"}"
 
 umask 077
 

@@ -12,7 +12,8 @@ server_doit(){
     [[ ! -e $confile ]] && echo "'$confile' doesn't exists" >&2 && exit 1
     declare -xg BKIT_CONFIG="$confile"
     issourced || {
-      source <(grep 'SERVER=' "$confile")
+      source <(grep -P 'SERVER=|BKIT_ACCOUNT=' "$confile")
+      [[ ${FULL+x} == x ]] && echo -n "${BKIT_ACCOUNT}@"
       echo "$SERVER"
     }
   }
@@ -41,11 +42,17 @@ server_doit(){
   declare current="$default"
   declare config="$current/conf.init"
 
-  [[ $1 =~ ^--?h(elp)?$ ]] && usage
-  [[ $1 =~ ^--?s(ave)?$ ]] && shift && declare -r save=1 #we want to save it permanently
-  [[ $1 =~ ^--?u(ser)?$ ]] && shift && declare -xr BKIT_ACCOUNT="$1" && shift
-  [[ $1 =~ ^--?r(ead)?$ ]] && shift && getserver "$config" >&$OUT && exit 0
+  while [[ $1 =~ ^- ]]
+  do
+    [[ $1 =~ ^--?h(elp)?$ ]] && usage
+    [[ $1 =~ ^--?s(ave)?$ ]] && declare -r save=1 #we want to save it permanently
+    [[ $1 =~ ^--?u(ser)?$ ]] && declare -xr BKIT_ACCOUNT="$1" && shift
+    [[ $1 =~ ^--?f(ull)?$ ]] && declare -r FULL=full
+    [[ $1 =~ ^--?r(ead)?$ ]] && declare -r READONLY=readonly
+    shift
+  done
 
+  [[ ${READONLY+x} == x ]] && getserver "$config" >&$OUT && exit 0
 
   [[ ${1+isset} == isset || ! -d $current || ! -e $config ]] && { 
   	declare -r server="${1:-localhost}"

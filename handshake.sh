@@ -16,7 +16,7 @@ else
   declare -r PORT=8760
 fi
 
-declare -r server="${1:-"$($sdir/server.sh)"}"
+declare -r server="${1:-"$($sdir/server.sh -r)"}"
 
 [[ -n $server ]] || usage
 echo Contacting the server ... please wait!

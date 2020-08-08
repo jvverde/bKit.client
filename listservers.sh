@@ -9,6 +9,7 @@ function usage(){
 }
 
 [[ $1 =~ ^--?h ]] && usage
+[[ $1 =~ ^--?f(ull)?$ ]] && declare -r READONLY=readonly && shift
 
 source "$sdir/lib/functions/all.sh" >&2
 
@@ -16,4 +17,11 @@ source "$sdir/lib/functions/all.sh" >&2
 
 declare -r CONFDIR="$ETCDIR/server"
 
-find "$CONFDIR" -mindepth 1 -maxdepth 1 -type d -exec test -e "{}/conf.init" ';' -printf "%f\n" 
+find "$CONFDIR" -type f -name "conf.init"|
+while read conffile
+do
+  unset SERVER
+  source "$conffile"
+  [[ ${READONLY+x} == x ]] && echo -n "${BKIT_ACCOUNT}@"
+  echo "$SERVER"
+done |sed /^$/d | sort -u 

@@ -47,7 +47,7 @@ server_doit(){
   do
     [[ $1 =~ ^--?h(elp)?$ ]] && usage
     [[ $1 =~ ^--?s(ave)?$ ]] && declare -r save=1 #we want to save it permanently
-    [[ $1 =~ ^--?u(ser)?$ ]] && declare -xr BKIT_ACCOUNT="$1" && shift
+    [[ $1 =~ ^--?u(ser)?$ ]] && declare -xr BKIT_ACCOUNT="$2" && shift
     [[ $1 =~ ^--?f(ull)?$ ]] && declare -r FULL=full
     [[ $1 =~ ^--?r(ead)?$ ]] && declare -r READONLY=readonly
     shift

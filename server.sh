@@ -10,6 +10,7 @@ server_doit(){
   getserver(){
     declare -r confile="$1"
     [[ ! -e $confile ]] && echo "'$confile' doesn't exists" >&2 && exit 1
+    # export BKIT_CONFIG (if sourced)
     declare -xg BKIT_CONFIG="$confile"
     issourced || {
       source <(grep -P 'SERVER=|BKIT_ACCOUNT=' "$confile")
@@ -79,7 +80,6 @@ server_doit(){
     #if permanently set the default
     [[ ${save+isset} == isset ]] && ln -srfT "$current" "$default"
   }
-  # export BKIT_CONFIG (if sourced)
   getserver "$config" >&$OUT #The only result to send to stdout
 
 }  >&2 #Send everything to stderr except what is explicit sent to OUT=stdout

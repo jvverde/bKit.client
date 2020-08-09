@@ -9,7 +9,8 @@ function usage(){
 }
 
 [[ $1 =~ ^--?h ]] && usage
-[[ $1 =~ ^--?f(ull)?$ ]] && declare -r READONLY=readonly && shift
+[[ $1 =~ ^--?f(ull)?$ ]] && declare -r FULL=readonly && shift
+[[ $1 =~ ^--?a(ccounts)?$ ]] && declare -r ACCOUNTS=acounts && shift
 
 source "$sdir/lib/functions/all.sh" >&2
 
@@ -22,6 +23,13 @@ while read conffile
 do
   unset SERVER
   source "$conffile"
-  [[ ${READONLY+x} == x ]] && echo -n "${BKIT_ACCOUNT}@"
-  echo "$SERVER"
+  if [[ ${FULL+x} == x ]]
+  then
+    echo "${BKIT_ACCOUNT}@${SERVER}::${BKITSRV_SECTION}:${BKITSRV_IPORT}:${BKITSRV_BPORT}:${BKITSRV_RPORT}:${BKITSRV_UPORT}:${BKITSRV_APORT}"
+  elif [[ ${ACCOUNTS+x} == x ]]
+  then
+    echo "${BKIT_ACCOUNT}@${SERVER}"
+  else
+    echo "$SERVER"
+  fi
 done |sed /^$/d | sort -u

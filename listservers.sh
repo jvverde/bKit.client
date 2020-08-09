@@ -24,4 +24,4 @@ do
   source "$conffile"
   [[ ${READONLY+x} == x ]] && echo -n "${BKIT_ACCOUNT}@"
   echo "$SERVER"
-done |sed /^$/d | sort -u 
+done |sed /^$/d | sort -u

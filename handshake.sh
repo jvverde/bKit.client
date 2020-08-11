@@ -22,22 +22,24 @@ declare -r server="${1:-"$($sdir/server.sh -r)"}"
 echo Contacting the server ... please wait!
 exists nc && { nc -z $server $PORT 2>&1 || die Server $server not found;}
 
-while [[ ${BKIT_ACCOUNT:+x} != x ]]
+while [[ ${BKIT_USERNAME:+x} != x ]]
 do
-  read -p "bKit username: " BKIT_ACCOUNT
-  unset ACCOUNT_PASS 
+  read -p "bKit username: " BKIT_USERNAME
+  unset BKIT_PASSWORD 
 done
 
-while [[ ${ACCOUNT_PASS:+x} != x ]]
+[[ ${BKIT_NOASK+x} == x && ${BKIT_PASSWORD:+x} != x ]] && die "With no ask a password needs to be exported in BKIT_PASSWORD"
+
+while [[ ${BKIT_PASSWORD:+x} != x ]]
 do
-  read -sp "${BKIT_ACCOUNT} password: " ACCOUNT_PASS
+  read -sp "${BKIT_USERNAME} password: " BKIT_PASSWORD
   #${username}|bKit|${password}
-  ACCOUNT_PASS="$(echo -n "${BKIT_ACCOUNT}|bKit|${ACCOUNT_PASS}"|md5sum|awk '{print $1}')"
+  BKIT_PASSWORD="$(echo -n "${BKIT_USERNAME}|bKit|${BKIT_PASSWORD}"|md5sum|awk '{print $1}')"
 done
 
 umask 077
 
-declare -r confdir="$ETCDIR/server/$server/$BKIT_ACCOUNT"
+declare -r confdir="$ETCDIR/server/$server/$BKIT_USERNAME"
 declare -r public="$confdir/pub"
 declare -r private="$confdir/.priv"
 mkdir -pv "$public"
@@ -57,10 +59,10 @@ declare -r pubkey="$(openssl ec -in "$private/key.pem" -pubout | base64 -w0)" #e
   echo "pubkey='$pubkey'"
 } > "$public/client.conf"
 
-openssl dgst -sha512 -hmac "$ACCOUNT_PASS" -hex -r < "$public/client.conf" |awk '{print $1}' > "$public/client.sign"
+openssl dgst -sha512 -hmac "$BKIT_PASSWORD" -hex -r < "$public/client.conf" |awk '{print $1}' > "$public/client.sign"
 
 #find section = hmac(user, pass)
-declare -r section="${BKIT_ACCOUNT}"
+declare -r section="${BKIT_USERNAME}"
 
 IFS='|' read -r domain name uuid <<<$("$sdir/lib/computer.sh")
 
@@ -68,7 +70,7 @@ declare -r clientid="${domain}/${name}/${uuid}/user/${BKITUSER}"
 
 declare -r sign="$(
   echo -n "$clientid" |                                   #message(=clientid) to sign
-  openssl dgst -sha512 -hmac "$ACCOUNT_PASS" -hex -r |  #sign with password
+  openssl dgst -sha512 -hmac "$BKIT_PASSWORD" -hex -r |  #sign with password
   awk '{print $1}'                                        #just remove the sencond column(= *stdin)
 )"
 
@@ -86,7 +88,7 @@ declare -r serversign="$public/server.sign"
 
 #openssl enc -d -md sha256 -aes-256-cbc -kfile <(echo -n "mypass") -in <(echo -n "$secret"|base64 -d)
 declare -r serify="$(
-   openssl dgst -sha512 -hmac "${ACCOUNT_PASS}" -hex -r < "$serverconf"|  #sign with password
+   openssl dgst -sha512 -hmac "${BKIT_PASSWORD}" -hex -r < "$serverconf"|  #sign with password
    awk '{print $1}'                                                #just remove the sencond column(= *stdin)
 )"
 
@@ -98,7 +100,7 @@ source "$serverconf"
 #extract secret and save it on private directory
 declare -r secretfile="$private/secret"
 
-openssl enc -d -md sha256 -aes-256-cbc -k "${ACCOUNT_PASS}" -in <(echo -n "$BKITSRV_ENCSECRET"|base64 -d) -out "$secretfile"
+openssl enc -d -md sha256 -aes-256-cbc -k "${BKIT_PASSWORD}" -in <(echo -n "$BKITSRV_ENCSECRET"|base64 -d) -out "$secretfile"
 chmod 600 "$secretfile"
 
 #add server ssh public key to known_hosts file
@@ -124,7 +126,7 @@ echo "Writing configuration to $conffile"
   echo "BACKUPURL='${BKITSRV_ACCOUNT}@$server::$BKITSRV_SECTION'"
   echo "PASSFILE='$secretfile'"
   echo "SERVER='$server'"
-  echo "BKIT_ACCOUNT='$BKIT_ACCOUNT'"
+  echo "BKIT_ACCOUNT='$BKIT_USERNAME'"
   echo "CONFDATE='$(date -Iseconds)'"
 )> "$conffile"
 

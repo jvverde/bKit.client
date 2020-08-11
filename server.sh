@@ -12,11 +12,19 @@ server_doit(){
     [[ ! -e $confile ]] && echo "'$confile' doesn't exists" >&2 && exit 1
     # export BKIT_CONFIG (if sourced)
     declare -xg BKIT_CONFIG="$confile"
-    issourced || {
-      source <(grep -P 'SERVER=|BKIT_ACCOUNT=' "$confile")
-      [[ ${FULL+x} == x ]] && echo -n "${BKIT_ACCOUNT}@"
-      echo "$SERVER"
-    }
+    issourced || (
+      source "$confile"
+
+      if [[ ${FULL+x} == x ]]
+      then
+        echo "${BKIT_ACCOUNT}@${SERVER}::${BKITSRV_SECTION}:${BKITSRV_IPORT}:${BKITSRV_BPORT}:${BKITSRV_RPORT}:${BKITSRV_UPORT}:${BKITSRV_APORT}"
+      elif [[ ${ACCOUNTS+x} == x ]]
+      then
+        echo "${BKIT_ACCOUNT}@${SERVER}"
+      else
+        echo "$SERVER"
+      fi
+    )
   }
   declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]:-$0}")")"
 
@@ -50,6 +58,7 @@ server_doit(){
     [[ $1 =~ ^--?u(ser)?$ ]] && declare -xr BKIT_ACCOUNT="$2" && shift
     [[ $1 =~ ^--?f(ull)?$ ]] && declare -r FULL=full
     [[ $1 =~ ^--?r(ead)?$ ]] && declare -r READONLY=readonly
+    [[ $1 =~ ^--?a(ccounts)?$ ]] && declare -r ACCOUNTS=acounts
     shift
   done
 

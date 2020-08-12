@@ -55,6 +55,7 @@ server_doit(){
   do
     [[ $1 =~ ^--?h(elp)?$ ]] && usage
     [[ $1 == --no-ask ]] && declare -rx BKIT_NOASK=noask
+    [[ $1 == --init ]] && declare -r FORCE=force
     [[ $1 =~ ^--?s(ave)?$ ]] && declare -r save=1 #we want to save it permanently
     [[ $1 =~ ^--?u(ser)?$ ]] && declare -xr BKIT_USERNAME="$2" && shift
     [[ $1 =~ ^--?f(ull)?$ ]] && declare -r FULL=full
@@ -82,14 +83,14 @@ server_doit(){
   	current="$CONFDIR/$server/${BKIT_USERNAME:-$(usage 'User account not specified')}"
     config="$current/conf.init"
 
-  	[[ -e $config ]] || {
+    [[ ${FORCE+x} == x || ! -e $config ]] && {
       [[ ${BKIT_PASSWORD+x} == x ]] && echo export BKIT_PASSWORD && export BKIT_PASSWORD
       bash "$sdir/handshake.sh" -p "$port" "$server" || die "Can't set conf.init to server $server"
       [[ -e $config ]] || die "Was unable to set a new server '$server' with account '$BKIT_USERNAME'"
     }
 
     #if permanently set the default
-    [[ ${save+isset} == isset ]] && ln -srfT "$current" "$default"
+    [[ ${save+isset} == isset ]] && ln -srfTv "$current" "$default"
   }
   getserver "$config" >&$OUT #The only result to send to stdout
 

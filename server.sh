@@ -61,10 +61,17 @@ server_doit(){
     [[ $1 =~ ^--?f(ull)?$ ]] && declare -r FULL=full
     [[ $1 =~ ^--?r(ead)?$ ]] && declare -r READONLY=readonly
     [[ $1 =~ ^--?a(ccounts)?$ ]] && declare -r ACCOUNTS=acounts
+    [[ $1 == --delete ]] && declare -r DELETE=delete
     shift
   done
 
   [[ ${READONLY+x} == x ]] && getserver "$config" >&$OUT && exit 0
+ 
+  [[ ${DELETE+x} == x && ${BKIT_USERNAME+x} == x && ${1+x} == x ]] && {
+    config="$CONFDIR/$1/$BKIT_USERNAME/conf.init"
+    [[ -e $config ]] && rm -v "$config"
+    exit 0
+  }
 
   [[ ${1+isset} == isset || ! -d $current || ! -e $config ]] && { 
   	declare -r server="${1:-localhost}"

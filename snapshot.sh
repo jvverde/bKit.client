@@ -62,8 +62,11 @@ do
         *=*)
             options+=( "$KEY")
         ;;
+        # *)
+        #     options+=( "$KEY" "$1" ) && shift
+        # ;;
         *)
-            options+=( "$KEY" "$1" ) && shift
+            options+=( "$KEY")
         ;;
     esac
 done

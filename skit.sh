@@ -80,8 +80,11 @@ do
 		*=*)
 			options+=( "$KEY")
 		;;
+		# *)
+		# 	options+=( "$KEY" "$1" ) && shift
+		# ;;
 		*)
-			options+=( "$KEY" "$1" ) && shift
+			options+=( "$KEY")
 		;;
 	esac
 done
@@ -114,6 +117,6 @@ echo Start snapshot backup for "${@:-.}" @"$(date -Imin)"
 #echo options="${options[@]}"
 #echo rsyncoptions="${rsyncoptions[@]}"
 #echo "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${rsyncoptions[@]}" "${@:-.}"
-bash "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${rsyncoptions[@]}" "${@:-.}" 2>&1
+bash "$sdir/snapshot.sh" ${options[@]+"${options[@]}"} -- ${filters+"${filters[@]}"} ${rsyncoptions[@]+"${rsyncoptions[@]}"} "${@:-.}" 2>&1
 echo Done snapshot backup for "${@:-.}" @"$(date -Imin)" 
 

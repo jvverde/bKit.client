@@ -468,7 +468,7 @@ ITIME=$(date -R)
   echo "Backup to $BACKUPURL"
   prepare
 
-  echo "Start to backup directories/files on '${ORIGINALDIR[@]}' on $ITIME"
+  echo "Start to backup directories/files for '${ORIGINALDIR[@]}' on $ITIME"
   echo -e "\nPhase $((++cnt)) - Backup new/modified files\n"
 
   backup 

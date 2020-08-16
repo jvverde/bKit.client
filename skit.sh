@@ -83,6 +83,9 @@ do
 		# *)
 		# 	options+=( "$KEY" "$1" ) && shift
 		# ;;
+		-u|--uuid)
+		 	options+=( "$KEY" "$1" ) && shift
+		 ;;
 		*)
 			options+=( "$KEY")
 		;;

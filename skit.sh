@@ -85,7 +85,10 @@ do
 		# ;;
 		-u|--uuid)
 		 	options+=( "$KEY" "$1" ) && shift
-		 ;;
+		;;
+		--logdir)
+			options+=( "$KEY" "$1" ) && shift
+		;;
 		*)
 			options+=( "$KEY")
 		;;

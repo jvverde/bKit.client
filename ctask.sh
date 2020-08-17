@@ -244,8 +244,8 @@ do
   
   ROPTIONS=(
     "${OPTIONS[@]}"
-		'--uuid "'$UUID'"'
-		'--logdir "'$LOGDIR'"'
+		'--uuid="'$UUID'"'
+		'--logdir="'$LOGDIR'"'
 	)
 
 	{

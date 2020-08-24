@@ -309,7 +309,7 @@ done
     }
 	else
 		echo "Create a job file in $JOBFILE"
-		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /usr/bin/flock -n '$TASKDIR/.lock.$TASKNAME' -c '$JOBFILE' || echo '$TASKDIR/.lock.$TASKNAME' is locked"
+		JOB="${!MINUTE} ${!HOUR} ${!DAYOFMONTH} ${!MONTH} ${!DAYOFWEEK} /usr/bin/flock -n '$TASKDIR/.lock.$TASKNAME' -c '$JOBFILE' >/dev/null || echo '$TASKDIR/.lock.$TASKNAME' is locked"
 		{ #add this nJOBE to existing ones
 			crontab -l 2>/dev/null
 			echo "$JOB"

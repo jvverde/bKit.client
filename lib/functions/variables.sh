@@ -4,6 +4,9 @@ declare -F _bkit_export_variables > /dev/null 2>&1 && [[ ! ${1+$1} =~ ^-f ]] && 
 
 _bkit_export_variables(){
   declare -gx OS="$(uname -o |tr '[:upper:]' '[:lower:]')"
+  declare -gxa RSYNCOPTIONS=(
+    --exclude="/proc/kcore"
+  )
   
   [[ $OS == cygwin ]] && declare -gx BKITCYGWIN="$(uname -a)"
 

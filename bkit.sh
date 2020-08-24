@@ -19,11 +19,11 @@ excludes(){
 	[[ -e "$exclist" ]] || {
 		echo Compile exclude list
 		mkdir -pv "${exclist%/*}"
-		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
+		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" |sed -E 's/ +$//' >  "$exclist"
 	}
 	[[ -n $(find "$exclist" -mtime +30) || ${compile+isset} == isset ]] && {
 		echo Recompile exclude list
-		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" >  "$exclist"
+		bash "$sdir/lib/tools/excludes.sh" "$sdir/excludes" |sed -E 's/ +$//' >  "$exclist"
 	}
 
 	filters+=( --filter=". $exclist" )

@@ -1,0 +1,9 @@
+devtmpfs
+tmpfs
+squashfs
+devfs
+debugfs
+procfs
+proc
+sysfs
+specfs

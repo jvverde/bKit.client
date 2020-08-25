@@ -1,16 +1,1 @@
-run/*
-cache/*
-cache/**
-logs/*
-tmp/*
-old/*
-schtasks/*
-conf/*
-3rd-party/*
-not-used-anymore/*
-web2*
-old*
-**/lixo*
-lixo*
-tmp.*.bkit.*
-**/node_modules
+.bkit/var/log/

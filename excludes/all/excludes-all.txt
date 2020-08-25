@@ -3,7 +3,6 @@
 *.BAK
 *.dmp
 *.tmp
-#*.log
 .git/
 .svn/
 CVS/
@@ -39,4 +38,3 @@ Temporary*/
 Temporary/
 Download/
 Downloads/
-#/home/*/.bkit/

@@ -434,7 +434,8 @@ update(){
     } && continue
 
     #if it is a hard link (to file or to symlink)
-    [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
+    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
+    [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
 
     #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
     [[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue

@@ -236,14 +236,14 @@ PERM=(--perms --acls --owner --group --super --numeric-ids --devices --specials)
 exists cygpath || PERM+=(-XX)
 CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
 
-# hardlinks_bg_proc(){
+# update_bg(){
 #   FILE="${HLIST}.sort"
 #   LC_ALL=C sort -o "$FILE" "$HLIST"
 #   dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
 #   rm -f "$FILE"
 # }
 
-hardlinks_bg_proc(){
+update_bg(){
   exec {TMP}>&1
   exec 1>&$OUT
   declare -ar ARGS=("$@")
@@ -269,7 +269,7 @@ hardlinks_bg_proc(){
     }
   done
   [[ -s $HLIST ]] && send_hl
-  rm -vf "$HLIST"
+  rm -f "$HLIST"
   exec {TMP}>&-
 }
 
@@ -450,7 +450,7 @@ update(){
   HLFIFO="$RUNDIR/hl-fifo.$$"
   mkfifo "$HLFIFI" "$HLFIFO"
 
-  ( hardlinks_bg_proc "$BASE" "$DST" <"$HLFIFI">"$HLFIFO" )&
+  ( update_bg "$BASE" "$DST" <"$HLFIFI">"$HLFIFO" )&
 
   exec {FIFI}>"$HLFIFI"
   exec {FIFO}<"$HLFIFO"
@@ -460,6 +460,14 @@ update(){
     #echo miss "$I|$FILE|$LINK|$LEN"
 
     FILE=${FILE%/}  #remove trailing backslash in order to avoid sync files in a directory directly
+
+    #if it is a hard link (to file or to symlink)
+    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
+    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
+    [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo -e "${LINK# => }\n${FILE}" >&"$FIFI" && continue
+
+    #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
+    [[ $I =~ ^h[fLS] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
     #if it is a directory, symlink, device or special
     #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
@@ -474,13 +482,6 @@ update(){
           echo "Prefix '$PREFIX' !~ ././././././"
     } && continue
 
-    #if it is a hard link (to file or to symlink)
-    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
-    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
-    [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo -e "${LINK# => }\n${FILE}" >&"$FIFI" && continue
-
-    #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
-    [[ $I =~ ^h[fLS] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
     [[ $I =~ ^\*deleting ]] && continue
 
@@ -495,7 +496,7 @@ update(){
   read <&$FIFO
 
   #update_dirs "$BASE" "$DST"
-  #hardlinks_bg_proc "$BASE" "$DST"
+  #update_bg "$BASE" "$DST"
   #remove_postpone_files
 }
 

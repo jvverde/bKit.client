@@ -195,7 +195,6 @@ dorsync(){
 mktempdir RUNDIR || die "Can't create a temporary working directory"
 
 FLIST="$RUNDIR/file-list.$$"
-HLIST="$RUNDIR/hl-list.$$"
 DLIST="$RUNDIR/dir-list.$$"
 NOW="$(date +"%Y-%m-%dT%Hh%Mm%S(%:::z).%a.%W")"
 logfile="$VARDIR/log/backup/$NOW.log"
@@ -204,19 +203,21 @@ statsfile="$VARDIR/log/backup/$NOW.stat"
 
 mkdir -pv "${logfile%/*}" "${errfile%/*}" "${statsfile%/*}" #Just ensure that the log directory exists
 
-exec {ERR}>&2
-exec 2> >(tee "$errfile" >&$ERR)
+exec {ERRFILE}>&2
+exec 2> >(tee "$errfile" >&$ERRFILE)
+exec {OUTFILE}>&1
+exec 1> >(tee "$logfile" >&$OUTFILE)
 exec {OUT}>&1
-exec 1> >(tee "$logfile" >&$OUT)
+
 
 set_postpone_files(){
-	exec {FDA}>"$HLIST"
+	#exec {FDA}>"$HLIST"
 	exec {FDB}>"$DLIST"
 	exec {FDC}>"$FLIST"
 }
-remove_postpone_files(){
-	rm -f "$HLIST" "$DLIST" "$FLIST"
-}
+#remove_postpone_files(){
+	#rm -f "$HLIST" "$DLIST" "$FLIST"
+#}
 postpone_file(){
 	#(IFS=$'\n' && echo "$*" ) >&97
 	(IFS=$'\n' && echo "$*" ) >&$FDC
@@ -235,12 +236,42 @@ PERM=(--perms --acls --owner --group --super --numeric-ids --devices --specials)
 exists cygpath || PERM+=(-XX)
 CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
 
-update_hardlinks(){
-	FILE="${HLIST}.sort"
-	LC_ALL=C sort -o "$FILE" "$HLIST"
-	dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
-	rm -f "$FILE"
+# hardlinks_bg_proc(){
+#   FILE="${HLIST}.sort"
+#   LC_ALL=C sort -o "$FILE" "$HLIST"
+#   dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
+#   rm -f "$FILE"
+# }
+
+hardlinks_bg_proc(){
+  exec {TMP}>&1
+  exec 1>&$OUT
+  declare -ar ARGS=("$@")
+  declare -r HLIST="${RUNDIR:-/tmp}/hl-list.$$"
+  
+  :> "$HLIST"
+
+  send_hl(){
+    declare -r FILE="${HLIST}.sort"
+    LC_ALL=C sort -o "$FILE" "$HLIST"
+    :> "$HLIST"
+    dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "${ARGS[@]}"
+  }
+  
+  declare -i cnt=0
+  while IFS='|' read -r link file
+  do
+    echo -e "${link}\n${file}" >> "$HLIST"
+    (( ++cnt >= 50 )) && {
+      send_hl
+      (( cnt = 0 ))
+    }
+  done
+  [[ -s $HLIST ]] && send_hl
+  rm -vf "$HLIST"
+  exec {TMP}>&-
 }
+
 update_dirs(){
 	FILE="${DLIST}.sort"
 	LC_ALL=C sort -o "$FILE" "$DLIST"
@@ -280,10 +311,8 @@ prepare(){
 	dorsync --dry-run --ignore-non-existing --ignore-existing "$MOUNTPOINT/./" "$BACKUPURL/$BKIT_RVID/@current/data"
 }
 
-exec {UPLOAD}>&1
-
 upload_manifest(){
-  exec 1>&$UPLOAD
+  exec 1>&$OUT
   local BASE="$1"
   local PREFIX="$2"
   
@@ -412,7 +441,18 @@ update(){
   unset hlinks
   set_postpone_files
 
-  coproc upload_manifest "$BASE" 'data'
+  coproc upload_proc (
+    upload_manifest "$BASE" 'data'
+  )
+
+  HLFIFI="$RUNDIR/hl-fifi.$$"
+  HLFIFO="$RUNDIR/hl-fifo.$$"
+  mkfifo "$HLFIFI" "$HLFIFO"
+
+  ( hardlinks_bg_proc "$BASE" "$DST" <"$HLFIFI">"$HLFIFO" )&
+
+  exec {FIFI}>"$HLFIFI"
+  exec {FIFO}<"$HLFIFO"
 
   while IFS='|' read -r I FILE LINK FULLPATH LEN
   do
@@ -429,16 +469,17 @@ update(){
       HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
       PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
       [[ $PREFIX =~ ././././././ ]] && 
-        echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${COPROC[1]}" || 
+        echo "$PREFIX|$(stat -c '%s|%Y' "$FULLPATH")|$FILE" >&"${upload_proc[1]}" || 
           echo "Prefix '$PREFIX' !~ ././././././"
     } && continue
 
     #if it is a hard link (to file or to symlink)
     #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
-    [[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
+    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
+    [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo "${LINK# => }|${FILE}" >&"$FIFI" && continue
 
     #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
-    [[ $I =~ ^h[fL] && ! $LINK =~ =\> ]] && hlinks=missing && continue
+    [[ $I =~ ^h[fLS] && ! $LINK =~ =\> ]] && hlinks=missing && continue
 
     [[ $I =~ ^\*deleting ]] && continue
 
@@ -446,12 +487,15 @@ update(){
 
   done < <(dorsync --dry-run --no-verbose --archive --hard-links --relative --itemize-changes "${PERM[@]}" $FMT_QUERY "${SRCS[@]}" "$DST")
 
-  exec {COPROC[1]}>&-
-  wait $COPROC_PID
+  exec {upload_proc[1]}>&-
+  wait $upload_proc_PID
+  exec {FIFI}>&-
+  #read -t 600 <&$FIFO
+  read <&$FIFO
 
   update_dirs "$BASE" "$DST"
-  update_hardlinks "$BASE" "$DST"
-  remove_postpone_files
+  #hardlinks_bg_proc "$BASE" "$DST"
+  #remove_postpone_files
 }
 
 backup(){

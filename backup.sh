@@ -226,10 +226,10 @@ postpone_hl(){
 	#(IFS=$'\n' && echo "$*" ) >&99
 	(IFS=$'\n' && echo "$*" ) >&$FDA
 }
-postpone_update(){
-	#(IFS=$'\n' && echo "$*" ) >&98
-	(IFS=$'\n' && echo "$*" ) >&$FDB
-}
+#postpone_update(){
+	##(IFS=$'\n' && echo "$*" ) >&98
+	#(IFS=$'\n' && echo "$*" ) >&$FDB
+#}
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids --devices --specials)
@@ -253,15 +253,16 @@ hardlinks_bg_proc(){
 
   send_hl(){
     declare -r FILE="${HLIST}.sort"
-    LC_ALL=C sort -o "$FILE" "$HLIST"
+    LC_ALL=C sort -u -o "$FILE" "$HLIST"
     :> "$HLIST"
-    dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "${ARGS[@]}"
+    #dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "${ARGS[@]}"
+    dorsync --archive --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "${ARGS[@]}"
   }
   
   declare -i cnt=0
-  while IFS='|' read -r link file
+  while IFS='|' read -r file
   do
-    echo -e "${link}\n${file}" >> "$HLIST"
+    echo "${file}" >> "$HLIST"
     (( ++cnt >= 50 )) && {
       send_hl
       (( cnt = 0 ))
@@ -272,12 +273,12 @@ hardlinks_bg_proc(){
   exec {TMP}>&-
 }
 
-update_dirs(){
-	FILE="${DLIST}.sort"
-	LC_ALL=C sort -o "$FILE" "$DLIST"
-	dorsync --delete --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
-	rm -f "$FILE"
-}
+# update_dirs(){
+# 	FILE="${DLIST}.sort"
+# 	LC_ALL=C sort -o "$FILE" "$DLIST"
+# 	dorsync --delete --archive --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
+# 	rm -f "$FILE"
+# }
 update_file(){
 	dorsync -tiz --inplace "${PERM[@]}" $FMT "$@"
 }
@@ -462,7 +463,7 @@ update(){
 
     #if it is a directory, symlink, device or special
     #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
-    [[ $I =~ ^[c.][dLDS] ]] && postpone_update "$FILE" && continue
+    [[ $I =~ ^[c.][dLDS] ]] && echo "$FILE" >&"$FIFI" && continue
 
     #this is the main (and most costly) case. A file, or part of it, need to be transfer
     [[ $I =~ ^[.\<]f ]] && {
@@ -476,7 +477,7 @@ update(){
     #if it is a hard link (to file or to symlink)
     #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
     #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
-    [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo "${LINK# => }|${FILE}" >&"$FIFI" && continue
+    [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo -e "${LINK# => }\n${FILE}" >&"$FIFI" && continue
 
     #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
     [[ $I =~ ^h[fLS] && ! $LINK =~ =\> ]] && hlinks=missing && continue
@@ -493,7 +494,7 @@ update(){
   #read -t 600 <&$FIFO
   read <&$FIFO
 
-  update_dirs "$BASE" "$DST"
+  #update_dirs "$BASE" "$DST"
   #hardlinks_bg_proc "$BASE" "$DST"
   #remove_postpone_files
 }

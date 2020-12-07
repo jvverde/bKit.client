@@ -4,6 +4,7 @@ use MIME::Base64;
 use Crypt::ScryptKDF qw(scrypt_hash scrypt_raw scrypt_hex scrypt_b64);
 use Crypt::CBC;
 use Crypt::Cipher::AES;
+use Digest::SHA qw(hmac_sha256_base64);
 use utf8;
 #use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
 #use open      qw(:std :utf8);    # Undeclared streams in UTF-8.
@@ -26,25 +27,9 @@ my $key = scrypt_raw($password, $salt,  16384, 8, 1, 32);
 
 my $cbc = Crypt::CBC->new( -cipher=>'Cipher::AES', -key=>$key, -iv=>$iv, -literal_key => 1, -header=>'none');
 my $msg = $cbc->decrypt($encrypted);
+my $digest = hmac_sha256_base64($msg, $password);
 
-print "$msg";
+print $msg;
+print encode_base64($digest);
+
 exit;
-
-
-sub hex2octet{
-  my $hex = shift;
-  my @hex = ($hex =~ /(..)/g);
-  my @bytes = map { pack('C', hex($_)) } @hex;
-  return join '', @bytes
-}
-
-sub string2hex{
-  my $string = shift;
-  $string =~ s/(.)/sprintf '%02x', ord $1/seg;
-}
-
-sub hex2UTF8{
-  my $hex = shift;
-  my $bytes = pack 'H*', $hex;
-  my $chars = decode 'UTF-8', $bytes;
-}

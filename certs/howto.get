@@ -1,0 +1,1 @@
+scp myuser@home:/root/.rootCA/public/bkitCA.crt .

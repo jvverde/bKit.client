@@ -12,3 +12,5 @@ git
 wget
 curl
 jq
+make
+gcc-core

@@ -2,7 +2,7 @@
 #Get or set (permanently or not) the server
 #And also export BKIT_CONFIG when sourced
 
-server_doit(){  
+server_doit(){
   issourced(){
     [[ "${BASH_SOURCE[0]}" != "${0}" ]]
   }
@@ -41,9 +41,13 @@ server_doit(){
       echo -e "\n\n"
       ${1:+echo -e "$@" "\n\n"}
       echo "Set/Get default server"
-      echo -e "Usage:\n\t $name [-s|-r] [-u user] [address [port]]\n"
-      echo -e "\t\t-s set server as permanent"
-      echo -e "\t\t-r get current server"
+      echo -e "Usage:\n\t $name [-s|-r] [-f] [-u USER] [address [port]]\n"
+      echo -e "Or\n\t $name --delete -u USER address\n"
+      echo -e "\t\t-s, --save\t\tset server as permanent"
+      echo -e "\t\t-r, --read\t\t get current server"
+      echo -e "\t\t-a, --accounts\t\t show account in form user@server"
+      echo -e "\t\t-u, --user USER\t\t use USER account. Default to server account user if only one"
+      echo -e "\t\t-f, --full\t\t show full account description"
       exit 1
   }
 
@@ -66,14 +70,14 @@ server_doit(){
   done
 
   [[ ${READONLY+x} == x ]] && getserver "$config" >&$OUT && exit 0
- 
+
   [[ ${DELETE+x} == x && ${BKIT_USERNAME+x} == x && ${1+x} == x ]] && {
     config="$CONFDIR/$1/$BKIT_USERNAME/conf.init"
     [[ -e $config ]] && rm -v "$config"
     exit 0
   }
 
-  [[ ${1+isset} == isset || ! -d $current || ! -e $config ]] && { 
+  [[ ${1+isset} == isset || ! -d $current || ! -e $config ]] && {
   	declare -r server="${1:-localhost}"
   	declare -r port="${2:-8760}"
 
@@ -97,7 +101,13 @@ server_doit(){
     }
 
     #if permanently set the default
-    [[ ${save+isset} == isset ]] && ln -srfTv "$current" "$default"
+    [[ ${save+isset} == isset && $OS == cygwin ]] && {
+      declare -r target="$(cygpath -w "$current")"
+      declare -r link="$(cygpath -w "$default")"
+      [[ -e $link ]] && unlink "$link"
+      cmd.exe /c mklink /J "$link" "$target"
+    }
+    [[ ${save+isset} == isset && $OS != cygwin ]] && ln -srfTv "$current" "$default"
   }
   getserver "$config" >&$OUT #The only result to send to stdout
 
@@ -105,5 +115,3 @@ server_doit(){
 
 exec {OUT}>&1   #OUT=stdout
 server_doit "$@"
-
- 

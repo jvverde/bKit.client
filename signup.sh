@@ -37,7 +37,7 @@ done
 
 declare answer=$(
   jq -n --arg email "$EMAIL" --arg user "$USER" --arg pass "$hashpass" '{email: $email, username: $user, hashpass: $pass }' |
-  curl -s -H "Content-Type: application/json" -X POST -d @- http://10.1.1.4:8765/v1/auth/signup |jq .
+  curl -H "Content-Type: application/json" -X POST -d @- http://10.1.1.4:8765/v1/auth/signup |jq .
 )
 
 echo $answer
@@ -79,5 +79,15 @@ echo "challenge=$challenge"
 
 declare proof="$(echo -n "$challenge" | openssl dgst -sha256 -hmac "$hashpass" -binary -r| openssl base64)"
 echo "proof=$proof"
+
+# const confirm = { email, username, proof }
+# const res = await post('/v1/auth/confirm', confirm)
+
+declare response=$(
+  jq -n --arg email "$EMAIL" --arg user "$USER" --arg proof "$proof" '{email: $email, username: $user, proof: $proof }' |
+  curl -s -H "Content-Type: application/json" -X POST -d @- http://10.1.1.4:8765/v1/auth/confirm |jq .
+)
+
+echo $response
 
 exit 0

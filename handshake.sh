@@ -34,7 +34,8 @@ while [[ ${BKIT_PASSWORD:+x} != x ]]
 do
   read -sp "${BKIT_USERNAME} password: " BKIT_PASSWORD
   #${username}|bKit|${password}
-  BKIT_PASSWORD="$(echo -n "${BKIT_USERNAME}|bKit|${BKIT_PASSWORD}"|md5sum|awk '{print $1}')"
+  #BKIT_PASSWORD="$(echo -n "${BKIT_USERNAME}|bKit|${BKIT_PASSWORD}"|md5sum|awk '{print $1}')"
+  BKIT_PASSWORD="$(echo -n "$BKIT_PASSWORD" | openssl dgst -sha512 -hex -r|awk '{print $1}')"
 done
 
 umask 077

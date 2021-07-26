@@ -53,18 +53,18 @@ declare -t sshpub="$(ssh-keygen -f "$sshpriv" -y |base64 -w0)"
 openssl ecparam -name secp256k1 -genkey -noout -out "$private/key.pem"  #generate a private key
 declare -r pubkey="$(openssl ec -in "$private/key.pem" -pubout | base64 -w0)" #extract the public key and save it on client readable location
 
-#Sign the public key with a user simetric key
 {
   echo "sshkey='$sshpub'"
   echo "pubkey='$pubkey'"
 } > "$public/client.conf"
 
+#Sign the public keys (ssh and openssl) with the user simetric key
+
 openssl dgst -sha512 -hmac "$BKIT_PASSWORD" -hex -r < "$public/client.conf" |awk '{print $1}' > "$public/client.sign"
 
-#find section = hmac(user, pass)
 declare -r section="${BKIT_USERNAME}"
 
-IFS='|' read -r domain name uuid <<<$("$sdir/lib/computer.sh")
+IFS='|' read -r domain name uuid <<< $("$sdir/lib/computer.sh")
 
 declare -r clientid="${domain}/${name}/${uuid}/user/${BKITUSER}"
 
@@ -74,7 +74,7 @@ declare -r sign="$(
   awk '{print $1}'                                        #just remove the sencond column(= *stdin)
 )"
 
-declare -r url="rsync://${server}:${PORT}/${section}/$clientid/$sign"
+declare -r url="rsync://${server}:${PORT}/${section}/${clientid}/${sign}"
 
 rsync -rti --exclude="server.*" $FMT "$public/" "$url/" || die "Exit value of rsync is non null: $?"
 rsync -rti --exclude="ssh-client.*" $FMT "$url/" "$public/" || die "Exit value of rsync is non null: $?"

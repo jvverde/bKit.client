@@ -101,7 +101,7 @@ source "$serverconf"
 #extract secret and save it on private directory
 declare -r secretfile="$private/secret"
 
-openssl enc -d -md sha256 -aes-256-cbc -k "${BKIT_PASSWORD}" -in <(echo -n "$BKITSRV_ENCSECRET"|base64 -d) -out "$secretfile"
+openssl enc -d -md sha256 -aes-256-cbc -kfile <(echo ${BKIT_PASSWORD}) -in <(echo -n "$BKITSRV_ENCSECRET"|base64 -d) -out "$secretfile"
 chmod 600 "$secretfile"
 
 #add server ssh public key to known_hosts file

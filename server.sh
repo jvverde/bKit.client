@@ -103,9 +103,9 @@ server_doit(){
     #if permanently set the default
     [[ ${save+isset} == isset && $OS == cygwin ]] && {
       declare -r target="$(cygpath -w "$current")"
-      declare -r link="$(cygpath -w "$default")"
-      [[ -e $link ]] && unlink "$link"
-      cmd.exe /c mklink /J "$link" "$target"
+      declare -r linkparent="$(cygpath -w "${default%/default}")"
+      [[ -e $default ]] && unlink "$default"
+      cmd.exe /c mklink /J "$linkparent\\default" "$target"
     }
     [[ ${save+isset} == isset && $OS != cygwin ]] && ln -srfTv "$current" "$default"
   }

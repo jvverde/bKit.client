@@ -2,9 +2,9 @@
 declare -r sdir=$(dirname -- "$(readlink -ne -- "$0")")	#Full sdir
 
 usage() {
-    declare -r name=$(basename -s .sh "$0")
-    echo YYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    echo -e "Usage:\n\t ................"
+    declare -r name=$(basename "$0")
+    echo Sign-up account
+    echo -e "Usage:\n\t $name [USER[@SERVER[:PORT]]]"
     exit 1
 }
 
@@ -12,11 +12,21 @@ die() {
   echo "$@" && exit 1
 }
 
+#declare -r pattern='^([[:alnum:]]+)?(@([[:alnum:]]+)?(:([[:digit:]]+))?)?$'
+declare -r pattern='^([[:alnum:]]+)(@([^:]+)(:([0-9]+))?)?$'
+
+if [[ "${1:+$1}" =~ $pattern ]]
+then
+  declare USER=${BASH_REMATCH[1]}
+  declare SERVER=${BASH_REMATCH[3]}
+  declare PORT=${BASH_REMATCH[5]}
+fi
+
+PORT=${PORT:-8765}
 while [[ ${USER:+x} != x ]]
 do
   read -p "User: " USER
 done
-
 
 declare hashpass="$(
   openssl dgst -sha512 -hex -r < <(
@@ -30,14 +40,19 @@ declare hashpass="$(
 
 echo
 
-while [[ ${EMAIL:+x} != x ]]
+while [[ ${SERVER:+x} != x ]]
+do
+  read -p "SERVER: " SERVER
+done
+
+while [[ ! ${EMAIL} =~ ^.+@.+$ ]]
 do
   read -p "Email: " EMAIL
 done
 
 declare answer=$(
   jq -n --arg email "$EMAIL" --arg user "$USER" --arg pass "$hashpass" '{email: $email, username: $user, hashpass: $pass }' |
-  curl -H "Content-Type: application/json" -X POST -d @- http://10.1.1.4:8765/v1/auth/signup |jq .
+  curl -H "Content-Type: application/json" -X POST -d @- http://${SERVER}:${PORT}/v1/auth/signup |jq .
 )
 
 echo $answer

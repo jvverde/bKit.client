@@ -13,7 +13,7 @@ die() {
 }
 
 #declare -r pattern='^([[:alnum:]]+)?(@([[:alnum:]]+)?(:([[:digit:]]+))?)?$'
-declare -r pattern='^([[:alnum:]]+)(@([^:]+)(:([0-9]+))?)?$'
+declare -r pattern='^([[:alnum:]]*)(@([^:]+)(:([0-9]+))?)?$'
 
 if [[ "${1:+$1}" =~ $pattern ]]
 then

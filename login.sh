@@ -38,7 +38,7 @@ declare -r hashpass="$(
   ) | awk '{print $1}'
 )"
 
-echo -n
+echo
 
 while [[ ${server:+x} != x ]]
 do

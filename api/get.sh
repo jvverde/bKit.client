@@ -14,7 +14,7 @@ die() {
 }
 
 #declare -r pattern='^([[:alnum:]]+)?(@([[:alnum:]]+)?(:([[:digit:]]+))?)?$'
-declare -r pattern='^((https?)://)?([^:]+)(:([0-9]+))?(/.+)$'
+declare -r pattern='^((https?)://)?([^:/]+)(:([0-9]+))?(/.+)$'
 
 if [[ "${1:+$1}" =~ $pattern ]]
 then

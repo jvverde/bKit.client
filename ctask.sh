@@ -190,7 +190,12 @@ do
 	BACKUPDIR=()
   for DIR in "${!ROOTOF[@]}"
   do
+    if [[ $OS == cygwin ]]
+    then
+      [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( '"'"${RPATHS["$DIR"]}"'"' )
+    else
       [[ $ROOT == ${ROOTOF[$DIR]} ]] && BACKUPDIR+=( "'${RPATHS["$DIR"]}'" )
+    fi
   done
   [[ ${#BACKUPDIR[@]} -gt 0 ]] || continue
   #echo ROOT:$ROOT

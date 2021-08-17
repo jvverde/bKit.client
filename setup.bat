@@ -20,6 +20,10 @@ set cdir=%~dp0
 set getCygwin="%cdir%setup\cygwin.ps1"
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%getCygwin%'";
 
+echo Install Visual C++ 2010 Redistributable
+set redist="%cdir%setup\vcredist.ps1"
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%redist%'";
+
 :: call "%OP%setup\shadowspawn.bat"
 :: call "%OP%setup\subinacl.bat"
 echo Run Setup

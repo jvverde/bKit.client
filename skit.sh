@@ -77,6 +77,12 @@ do
 		--stats|--sendlogs|--notify)
 			options+=( "$KEY")
 		;;
+		--vardir=*)
+			export VARDIR="${KEY#*=}"
+		;;
+		--etcdir=*)
+			export ETCDIR="${KEY#*=}"
+		;;
 		*=*)
 			options+=( "$KEY")
 		;;
@@ -89,6 +95,7 @@ do
 		--logdir)
 			options+=( "$KEY" "$1" ) && shift
 		;;
+
 		*)
 			options+=( "$KEY")
 		;;
@@ -106,7 +113,8 @@ done
 		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
 		echo I am going to runas Administrator
 		WDIR=$(cygpath -w "$sdir")
-		cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" "${ARGS[@]}"
+		#echo cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" --etcdir="$ETCDIR" --vardir="$VARDIR" "${ARGS[@]}"
+		cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" --etcdir="$ETCDIR" --vardir="$VARDIR" "${ARGS[@]}"
 		exit
 	}
 }
@@ -123,6 +131,7 @@ echo Start snapshot backup for "${@:-.}" @"$(date -Imin)"
 #echo options="${options[@]}"
 #echo rsyncoptions="${rsyncoptions[@]}"
 #echo "$sdir/snapshot.sh" "${options[@]}" -- "${filters[@]}" "${rsyncoptions[@]}" "${@:-.}"
+echo snapshot with ETCDIR=$ETCDIR
 bash "$sdir/snapshot.sh" ${options[@]+"${options[@]}"} -- ${filters[@]+"${filters[@]}"} ${rsyncoptions[@]+"${rsyncoptions[@]}"} "${@:-.}" 2>&1
 echo Done snapshot backup for "${@:-.}" @"$(date -Imin)" 
-
+#read -t 60 -p "Hit ENTER or wait one minute"

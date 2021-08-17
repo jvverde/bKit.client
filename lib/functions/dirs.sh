@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 [[ ${VARDIR+x} == x && ${ETCDIR+y} == y && -e $VARDIR && -e $ETCDIR ]] && [[ ! ${1+$1} =~ ^-f ]] && return
 
-
 _bkit_find_dirs(){
   declare mylocation="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
   source "$mylocation/variables.sh" ${1:+"$@"}

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#Get computer info with format DOMAIN|NAME|UUID
 SDIR=$(dirname -- "$(readlink -ne -- "$0")")	#Full SDIR
 source "$SDIR/functions/all.sh"
 

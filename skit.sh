@@ -111,7 +111,7 @@ done
 	#[[ $OS == cygwin || $UID -eq 0 ]] || exec sudo "$0" "${ARGS[@]}"
 	[[ $OS == cygwin ]] && !(id -G|grep -qE '\b544\b') && {	#if cygwin and not Administrator
 		#https://cygwin.com/ml/cygwin/2015-02/msg00057.html
-		echo I am going to runas Administrator
+		echo I am going to run as Administrator
 		WDIR=$(cygpath -w "$sdir")
 		#echo cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" --etcdir="$ETCDIR" --vardir="$VARDIR" "${ARGS[@]}"
 		cygstart --wait --action=runas "$WDIR/skit.bat" --start-in="$(pwd)" --etcdir="$ETCDIR" --vardir="$VARDIR" "${ARGS[@]}"

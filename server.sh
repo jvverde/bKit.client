@@ -84,7 +84,7 @@ server_doit(){
   	exists nc && { nc -z $server $port 2>&1 || die bKit server not found at $server:$port;}
     [[ ${BKIT_USERNAME:+x} == x ]] || {
       declare -ri cnt=$(find "$CONFDIR" -maxdepth 2 -path "$CONFDIR/$server/*" -type d|wc -l)
-      if (( cnt == 1 ))
+      if (( cnt >= 1 ))
       then
         declare -xr BKIT_USERNAME="$(find "$CONFDIR" -maxdepth 2 -path "$CONFDIR/$server/*" -type d -printf "%f\n"|head -n1)"
       else

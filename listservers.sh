@@ -25,7 +25,7 @@ do
   source "$conffile"
   if [[ ${FULL+x} == x ]]
   then
-    echo "${BKIT_ACCOUNT}@${SERVER}::${BKITSRV_SECTION}:${BKITSRV_IPORT}:${BKITSRV_BPORT}:${BKITSRV_RPORT}:${BKITSRV_UPORT}:${BKITSRV_APORT}"
+    echo "${BKIT_ACCOUNT}@${SERVER}::${BKITSRV_SECTION}:${BKITSRV_IPORT}:${BKITSRV_BPORT}:${BKITSRV_RPORT}:${BKITSRV_UPORT}:${BKITSRV_APORT}:${BKITSRV_SPORT}"
   elif [[ ${ACCOUNTS+x} == x ]]
   then
     echo "${BKIT_ACCOUNT}@${SERVER}"

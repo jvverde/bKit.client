@@ -448,7 +448,8 @@ update(){
 
   HLFIFI="$RUNDIR/hl-fifi.$$"
   HLFIFO="$RUNDIR/hl-fifo.$$"
-  mkfifo "$HLFIFI" "$HLFIFO"
+  [[ -e "$HLFIFI" ]] || mkfifo "$HLFIFI"
+  [[ -e "$HLFIFO" ]] || mkfifo "$HLFIFO"
 
   ( update_bg "$BASE" "$DST" <"$HLFIFI">"$HLFIFO" )&
 
@@ -466,15 +467,19 @@ update(){
     #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
     [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo -e "${LINK# => }\n${FILE}" >&"$FIFI" && continue
 
-    #(if) There are situations where the rsync don't know yet the target of a hardlink, so we need to flag this situation and later we take care of it
+     #(if) There are situations where the rsync don't know (yet) the target of a hardlink, so we need to flag this situation and later we take care of it
     [[ $I =~ ^h[fLS] && ! $LINK =~ =\> ]] && hlinks=missing && continue
+
+    #If it is a file and it is not being updated
+    [[ $I =~ ^[.]f ]] && echo -e "${FILE}" >&"$FIFI" && continue
+
 
     #if it is a directory, symlink, device or special
     #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
     [[ $I =~ ^[c.][dLDS] ]] && echo "$FILE" >&"$FIFI" && continue
 
     #this is the main (and most costly) case. A file, or part of it, need to be transfer
-    [[ $I =~ ^[.\<]f ]] && {
+    [[ $I =~ ^[\<]f ]] && {
       HASH=$(sha256sum -b "$FULLPATH" | cut -d' ' -f1)
       PREFIX=$(echo $HASH|sed -E 's#^(.)(.)(.)(.)(.)(.)#\1/\2/\3/\4/\5/\6/#')
       [[ $PREFIX =~ ././././././ ]] && 

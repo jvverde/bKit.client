@@ -6,7 +6,7 @@ source "$sdir/lib/functions/all.sh"
 usage() {
 	local name=$(basename -s .sh "$0")
 	echo Backup one or more directories or files
-	echo -e "Usage:\n\t $name [-a|--all] [-c|--compile] [--ignore-filters] [--stats] dir1/file1 [[dir2/file2 [...]]"
+	echo -e "Usage:\n\t $name [-a|--all] [-c|--compile] [--ignore-filters] [--no-inherit-filters] [--filter file] [--stats] [-- [rsyncoption, ..., rsyncoption]] dir1/file1 [[dir2/file2 [...]]"
 	exit 1
 }
 
@@ -51,11 +51,18 @@ do
 		--ignore-filters)
 			nofilters=1
 		;;
+		--no-inherit-filters)
+			noinheritfilters=1
+		;;
 		-h|--help)
 			usage
 		;;
 		--stats|--sendlogs|--notify)
 			options+=( "$key")
+		;;
+		--filter)
+			options+=( "--filter '$1'")
+			shift
 		;;
 		*)
 			options+=( "$key")
@@ -67,7 +74,17 @@ done
 
 [[ ${all+isset} == isset ]] || excludes
 
-[[ ${nofilters+isset} == isset ]] || filters+=( --filter=": .rsync-filter" )
+[[ ${nofilters+isset} == isset ]] || { # Unlees nofilters is set, include filters bellow
+	if [[ ${noinheritfilters+isset} == isset ]]
+	then 
+		filters+=( --filter=":n- .rsync-filter")
+		filters+=( --filter=":n- .bkit-filter")
+	else
+		filters+=( --filter=": .rsync-filter" )
+		filters+=( --filter=": .bkit-filter" )
+	fi
+}
+
 
 declare -r pgid="$(cat /proc/self/pgid 2>/dev/null)"
 echo "bKit[$$:$pgid]: Start backup for ${@:-.}"

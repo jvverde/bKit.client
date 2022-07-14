@@ -234,7 +234,8 @@ postpone_hl(){
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids --devices --specials)
 exists cygpath || PERM+=(-XX)
-CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
+#CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
+CLEAN=(--delete-after --force --ignore-non-existing --ignore-existing)
 
 # update_bg(){
 #   FILE="${HLIST}.sort"

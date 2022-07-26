@@ -10,13 +10,18 @@ die() {
 
 [[ ${1+isset} == isset ]] || die "Usage:\n\t$0 pid"
 
-if [[ ${1:-} =~ ^- ]]
+if ps -p "$1" > /dev/null
 then
-  pgid="$1"
-else  
-  pgfile="/proc/$1/pgid"
-  [[ -e $pgfile ]] || die "Can't find '$pgfile' file"
-  pgid="-$(cat "$pgfile")"
+  OS="$(uname -o |tr '[:upper:]' '[:lower:]')"
+  if [[ $OS == cygwin ]]
+  then
+    pgfile="/proc/$1/pgid"
+    [[ -e $pgfile ]] || die "Can't find '$pgfile' file"
+    pgid="-$(cat "$pgfile")"
+  else
+    pgid="-$(ps -h -o pgid -p "$1")"
+  fi 
+  kill -- "$pgid" 
+else
+  echo "No process '$1' to kill"
 fi
-
-kill -- "$pgid" 

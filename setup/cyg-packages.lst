@@ -14,3 +14,4 @@ curl
 jq
 make
 gcc-core
+psmisc

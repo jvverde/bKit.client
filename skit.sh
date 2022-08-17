@@ -23,12 +23,12 @@ excludes(){
 }
 
 importrules(){
-	[[ -e $sdir/rules/global ]] || mkdir -pv "$sdir/rules/global"
+	[[ -e "$sdir/rules/global" ]] || mkdir -pv "$sdir/rules/global"
 	#bash "$sdir/update.sh" "rules/global" "$sdir" >/dev/null
 	bash "$sdir/update.sh" "rules/global" "$sdir"
 	for F in $(ls "$sdir/rules/global")
 	do
-		filters+=( --filter=". $sdir/rules/global/$F" )
+		filters+=( --filter=". '$sdir/rules/global/$F'" )
 	done
 }
 

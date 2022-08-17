@@ -13,7 +13,7 @@ usage() {
 
 [[ ${1+"$1"} =~ ^--?h(elp)? ]] && usage
 
-declare -r server="${1:-"$($sdir/server.sh)"}"
+declare -r server="${1:-"$("$sdir"/server.sh)"}"
 
 umask 077
 

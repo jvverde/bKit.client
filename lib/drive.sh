@@ -113,7 +113,7 @@ _drive(){
 	# declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 	source "$sdir/functions/messages.sh"                          #Full dir
 	declare -r dir="$(readlink -nm -- "$1" || warn "Cannot readlink for '$1'")"
-	declare -r dev="$($sdir/dir2dev.sh "$dir" || warn "Cannot get a dev for '$dir'")"
+	declare -r dev="$("$sdir"/dir2dev.sh "$dir" || warn "Cannot get a dev for '$dir'")"
 
 	[[ ${BKITCYGWIN+x} == x ]] && exists wmic && _use_wmic "$dev" && return
 	[[ ${BKITCYGWIN+x} == x ]] && exists fsutil && _use_fsutil "$dev" && return

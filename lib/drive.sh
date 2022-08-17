@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"                          #Full dir
+
+source "$sdir/functions/all.sh"
+
 _use_wmic(){
 	declare -r dev="$1"
 	DRIVE=${dev%%:*} #just left drive letter, nothing else
@@ -106,7 +110,7 @@ _use_linux() {
 
 #Find a method, run it and exit
 _drive(){
-	declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
+	# declare -r sdir="$(dirname -- "$(readlink -ne -- "${BASH_SOURCE[0]}")")"
 	source "$sdir/functions/messages.sh"                          #Full dir
 	declare -r dir="$(readlink -nm -- "$1" || warn "Cannot readlink for '$1'")"
 	declare -r dev="$($sdir/dir2dev.sh "$dir" || warn "Cannot get a dev for '$dir'")"

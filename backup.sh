@@ -331,90 +331,6 @@ upload_manifest(){
   [[ -s $manifest ]] && send_manifest
 }
 
-backupACLS(){
-  local FMT='--out-format=ACL:"%o|%i|%f|%c|%b|%l|%t"'
-  local FMT_QUERY='--out-format=%i|/%f'
-  local ACLFILE='.bkit-dir-acl'
-  local BASE=$1 && shift
-  declare -a SRCS=()
-  declare -a MDIRS=()
-
-  declare -r metadatadir="${VARDIR:-$SDIR}/cache-bkit/metadata/by-volume/${BKIT_VOLUMESERIALNUMBER:-_}/"
-  
-  [[ -d $metadatadir ]] || mkdir -pv "$metadatadir"
-
-  for DIR in "$@"
-  do
-    SRCS+=( "$BASE/./$DIR" )
-    [[ -d "${metadatadir}${DIR}" ]] || mkdir -pv "${metadatadir}${DIR}"
-    MDIRS+=( "${metadatadir}${DIR}" )
-  done
-
-  local Loptions=(
-    --no-verbose
-    --recursive
-    --relative
-    --super
-    --times
-    --itemize-changes
-    --exclude="$ACLFILE"
-    --exclude=".rsync-filter"
-    $FMT_QUERY
-  )
-
-  local ACLSoptions=(
-    --acls
-    --owner
-    --group
-    --perms
-  )
-
-  echo "a) Generate missing metafiles in local cache"
-  {
-
-    exec 11>&1
-    while IFS='|' read -r I FILE
-    do
-      [[ $I =~ skipping ]] && continue
-      #J=${I#?????}           #remove first 5 characteres ex: >f.st
-      J=${I#????}             #remove first 4 characteres ex: >f.s #That means don't consider size (of course) only time, permisions, owners are important
-      [[ $J =~ [^.] ]] && {
-        echo "ACL miss:$I|$FILE" >&11
-        echo "$FILE"
-      }
-    done < <(dorsync --dry-run "${Loptions[@]}" "${ACLSoptions[@]}" "${SRCS[@]}" "$metadatadir") |
-      bash "$SDIR/storeACLs.sh" --diracl="$ACLFILE" "$metadatadir"
-  } | sed -e 's/^/\t/'
-
-  echo "b) Update attributes and Clean metafiles on local cache"
-  {
-    dorsync --ignore-non-existing --ignore-existing --delete --delete-excluded --force "${Loptions[@]}" "${SRCS[@]}" "$metadatadir"
-  } | sed -e 's/^/\t/'
-
-  echo "c) Backup metafiles from local cache to backup server"
-  {
-    coproc upload_manifest "$metadatadir" 'metadata'
-    {
-      export BKIT_TARGET='metadata'
-      export BKIT_MNTPOINT="$metadatadir"
-      bash "$SDIR/hashit.sh"  ${options+"${options[@]}"} "${MDIRS[@]}"
-    } >&"${COPROC[1]}"
-    exec {COPROC[1]}>&-
-    wait $COPROC_PID
-  } | sed -e 's/^/\t/'
-	
-  echo "d) Update metafiles attributes"
-  {
-    update "$metadatadir" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
-  } | sed -e 's/^/\t/'
-
-  echo "e) Clean metafiles on server"
-  {
-    clean "$metadatadir" "$@" "$BACKUPURL/$BKIT_RVID/@current/metadata"
-  } | sed -e 's/^/\t/'
-}
-
-
 update(){
   local FMT_QUERY='--out-format=%i|%n|%L|/%f|%l'
   local BASE=$(readlink -e "$1") && shift
@@ -520,11 +436,11 @@ ITIME=$(date -R)
 
   clean "$MOUNTPOINT" "${STARTDIR[@]}" "$BACKUPURL/$BKIT_RVID/@current/data"
 
-  [[ $OS == 'cygwin' && $BKIT_FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
-    echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
+  #[[ $OS == 'cygwin' && $BKIT_FILESYSTEM == 'NTFS' ]] && (id -G|grep -qE '\b544\b') && (
+  #  echo -e "\nPhase $((++cnt)) - Backup ACLS\n"
 	#Need a better revision
     #backupACLS "$MOUNTPOINT" "${STARTDIR[@]}" |sed -e 's/^/\t/'
-  )
+  #)
 
   [[ ${dryrun+isset} == isset ]] || {
     echo -e "\nPhase $((++cnt)) - Create a readonly snapshot on server\n"

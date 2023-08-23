@@ -77,6 +77,7 @@ server_doit(){
     exit 0
   }
 
+  #If at least 1 argument or CURRENT doesn't exist or CONFIG file doesn't exist
   [[ ${1+isset} == isset || ! -d $current || ! -e $config ]] && {
   	declare -r server="${1:-localhost}"
   	declare -r port="${2:-8760}"

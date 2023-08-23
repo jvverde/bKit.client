@@ -165,10 +165,13 @@ exists rsync || die Cannot find rsync
 trap '' SIGPIPE
 
 dorsync2(){
-	local RETRIES=300
+	local RETRIES=900
+  local TIMEOUT=300
+  local CTIMEOUT=120
+  local NOCOMP='nef/3g2/3gp/7z/aac/ace/apk/avi/bz2/deb/dmg/ear/f4v/flac/flv/gpg/gz/iso/jar/jpeg/jpg/lrz/lz/lz4/lzma/lzo/m1a/m1v/m2a/m2ts/m2v/m4a/m4b/m4p/m4r/m4v/mka/mkv/mov/mp1/mp2/mp3/mp4/mpa/mpeg/mpg/mpv/mts/odb/odf/odg/odi/odm/odp/ods/odt/oga/ogg/ogm/ogv/ogx/opus/otg/oth/otp/ots/ott/oxt/png/qt/rar/rpm/rz/rzip/spx/squashfs/sxc/sxd/sxg/sxm/sxw/sz/tbz/tbz2/tgz/tlz/ts/txz/tzo/vob/war/webm/webp/xz/z/zip/zst'
 	while true
 	do
-    rsync ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
+    rsync --contimeout=$CTIMEOUT --timeout=$TIMEOUT --skip-compress=$NOCOMP ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success
@@ -203,46 +206,29 @@ statsfile="$VARDIR/log/backup/$NOW.stat"
 
 mkdir -pv "${logfile%/*}" "${errfile%/*}" "${statsfile%/*}" #Just ensure that the log directory exists
 
+#redirect to STDERR first free File Descriptor and asssign it to ERRFILE
 exec {ERRFILE}>&2
+#Redirect STDERR to $errfile and also to ERRFILE descriptor
 exec 2> >(tee "$errfile" >&$ERRFILE)
+#do the same for STDOUT
 exec {OUTFILE}>&1
 exec 1> >(tee "$logfile" >&$OUTFILE)
+#Get first free descripot and assing in to OUT and redirect it to STDOUT
 exec {OUT}>&1
 
 
 set_postpone_files(){
-	#exec {FDA}>"$HLIST"
+  #Get first free descritor, assign it to FDB and redirect it to $DLIST 
 	exec {FDB}>"$DLIST"
+  #Get first free descritor, assign it to FDC and redirect it to $FLIST 
 	exec {FDC}>"$FLIST"
 }
-#remove_postpone_files(){
-	#rm -f "$HLIST" "$DLIST" "$FLIST"
-#}
-postpone_file(){
-	#(IFS=$'\n' && echo "$*" ) >&97
-	(IFS=$'\n' && echo "$*" ) >&$FDC
-}
-postpone_hl(){
-	#(IFS=$'\n' && echo "$*" ) >&99
-	(IFS=$'\n' && echo "$*" ) >&$FDA
-}
-#postpone_update(){
-	##(IFS=$'\n' && echo "$*" ) >&98
-	#(IFS=$'\n' && echo "$*" ) >&$FDB
-#}
 
 FMT='--out-format="%o|%i|%f|%c|%b|%l|%t"'
 PERM=(--perms --acls --owner --group --super --numeric-ids --devices --specials)
 exists cygpath || PERM+=(-XX)
 #CLEAN=(--delete-delay --force --delete-excluded --ignore-non-existing --ignore-existing)
 CLEAN=(--delete-after --force --ignore-non-existing --ignore-existing)
-
-# update_bg(){
-#   FILE="${HLIST}.sort"
-#   LC_ALL=C sort -o "$FILE" "$HLIST"
-#   dorsync --delete --archive --hard-links --relative --files-from="$FILE" --recursive --itemize-changes "${PERM[@]}" $FMT "$@"
-#   rm -f "$FILE"
-# }
 
 update_bg(){
   exec {TMP}>&1
@@ -454,6 +440,7 @@ update(){
 
   ( update_bg "$BASE" "$DST" <"$HLFIFI">"$HLFIFO" )&
 
+  #Redirect FIFI/FIFO descriptor to fifo
   exec {FIFI}>"$HLFIFI"
   exec {FIFO}<"$HLFIFO"
 
@@ -464,8 +451,6 @@ update(){
     FILE=${FILE%/}  #remove trailing backslash in order to avoid sync files in a directory directly
 
     #if it is a hard link (to file or to symlink)
-    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && LINK="$(echo $LINK|sed -E 's/\s*=>\s*//')" &&  postpone_hl "$LINK" "$FILE" && continue
-    #[[ $I =~ ^h[fL] && $LINK =~ =\> ]] && postpone_hl "${LINK# => }" "$FILE" && continue
     [[ $I =~ ^h[fLS] && $LINK =~ =\> ]] && echo -e "${LINK# => }\n${FILE}" >&"$FIFI" && continue
 
      #(if) There are situations where the rsync don't know (yet) the target of a hardlink, so we need to flag this situation and later we take care of it
@@ -476,7 +461,6 @@ update(){
 
 
     #if it is a directory, symlink, device or special
-    #[[ $I =~ ^[c.][dLDS] && "$FILE" != '.' ]] && postpone_update "$FILE" && continue
     [[ $I =~ ^[c.][dLDS] ]] && echo "$FILE" >&"$FIFI" && continue
 
     #this is the main (and most costly) case. A file, or part of it, need to be transfer
@@ -497,13 +481,10 @@ update(){
 
   exec {upload_proc[1]}>&-
   wait $upload_proc_PID
-  exec {FIFI}>&-
+  exec {FIFI}>&- #close FIFI descriptor
   #read -t 600 <&$FIFO
-  read <&$FIFO
+  read <&$FIFO #Wait untile FIFO is closed
 
-  #update_dirs "$BASE" "$DST"
-  #update_bg "$BASE" "$DST"
-  #remove_postpone_files
 }
 
 backup(){

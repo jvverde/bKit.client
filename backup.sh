@@ -289,7 +289,7 @@ clean(){
 	done
 	local DST="${@: -1}" #last argument
 
-	dorsync -riHDR "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
+	dorsync -riHDR --timeout=0 "${CLEAN[@]}" "${PERM[@]}" $FMT "${SRCS[@]}" "$DST" #clean deleted files
 }
 
 snapshot(){
@@ -405,7 +405,7 @@ update(){
 
 backup(){
   coproc upload_manifest "$MOUNTPOINT" 'data'
-  bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
+  stdbuf -i0 -o0 -e0 perl "$SDIR/hashit.pl" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
   exec {COPROC[1]}>&-
   wait $COPROC_PID
 } 

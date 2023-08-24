@@ -51,7 +51,7 @@ declare -r entry="${1:-.}"
 true ${BKIT_TARGET:='data'}		#by default we check data, but we can also check metadata or anything else. Export BKIT_TARGET before invoke me
 
 dorsync(){
-	rsync "$@"
+	stdbuf -i0 -o0 -e0 rsync "$@"
 }
 
 backupdir="$(readlink -ne "$entry")"

@@ -23,7 +23,7 @@ _dir2dev(){
 		declare mountpoint=""
 		[[ -e $dir ]] || dir="$(_findxisting "$dir")"
 		mountpoint="$(stat -c%m "$dir")" || die "Cannot find mountpoint point of '$dir'"
-		#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are mountpointing points
+		#Find the top most mountpoint point. We need this for example for BTRFS subvolumes which are multiple mounting points
 		mountpoint="$(echo "$mountpoint" |fgrep -of <(df --sync --output=target 2>/dev/null|tail -n +2|sort -r)|head -n1)"
 		[[ ${BKITCYGWIN+x} == x ]] && exists cygpath && dir=$(cygpath "$dir")
 		

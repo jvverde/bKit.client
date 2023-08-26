@@ -39,7 +39,7 @@ sub main {
             my ($status, $file) = split(/\|/, $line);
             my $fullname = "$root/$file";
             my $hash = compute_hash($fullname);
-            $hash =~ s/^(.)(.)(.)(.)(.)(.)/$1\/$2\/$3\/$4\/$5\/$6/;
+            $hash =~ s{^(.)(.)(.)(.)(.)(.)}{$1/$2/$3/$4/$5/$6/};
             my $stats = stat($fullname);
             my $size = $stats->size;
             my $mtime = $stats->mtime;

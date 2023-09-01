@@ -17,7 +17,7 @@ sub get_mount_point {
 
 sub compute_hash {
     my ($file) = @_;
-    open(my $fh, '<:raw', $file) or die "Unable to open file $file: $!";
+    open(my $fh, '<:raw', $file) or warn "Unable to open file '$file': $!" and return undef;
     my $hash = sha256_hex(<$fh>);
     close($fh);
     return $hash;

@@ -405,7 +405,7 @@ update(){
 
 backup(){
   coproc upload_manifest "$MOUNTPOINT" 'data'
-  stdbuf -i0 -oL -eL perl "$SDIR/hashit.pl" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
+  stdbuf -i0 -oL -eL bash "$SDIR/hashit.sh" ${options+"${options[@]}"}  "${BACKUPDIR[@]}" >&"${COPROC[1]}"
   exec {COPROC[1]}>&-
   wait $COPROC_PID
 } 

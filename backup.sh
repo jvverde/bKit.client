@@ -11,11 +11,46 @@ set_server () {
   source "$SDIR"/server.sh "$1"
 }
 
+usage() {
+    cat <<EOM
+Usage: $0 [OPTIONS] [dirname/filename [ dirname or filename [...]]]
+
+Options:
+  -l, --log FILE     Redirect output to FILE
+  --logdir DIRECTORY Redirect logs to DIRECTORY/backup
+  -f, --force        Enable force mode
+  -m, --map PATH     Use MOUNTPOINT
+  --snap NAME        Set SNAP to @snap/NAME
+  --burn             At end create a permanent snapshot. Act like burn to a DVD.
+  --backupurl URL    Backup to backup URL
+  --rvid ID          Set BKIT_RVID to ID
+  --config FILE      Set CONFIG to FILE
+  -s, --server HOST  Set server to HOST
+  --stats            Enable stats
+  --sendlogs         Enable FULLREPORT, NOTIFY, and stats
+  --no-ssh           Disable SSH. Use raw rsync protocol (use it only in a trusted network)
+  --notify           Enable NOTIFY and stats
+  --email ADDRESS    At end send a report to EMAIL to ADDRESS
+  --timeout SECONDS  Set TIMEOUT to SECONDS
+  --contimeout SECONDS Set CTIMEOUT to SECONDS
+  --dry-run          Enable dry-run mode
+  -h, --help         Display this help message
+
+Example:
+  $0 --log mylog.txt dir
+
+EOM
+  exit 1;
+}
+
 declare -a options=()
 while [[ ${1:+$1} =~ ^- ]]
 do
 	KEY="$1" && shift
 	case "$KEY" in
+    -h|--help)
+      usage
+    ;;
 		-l|-log|--log)
 			exec 1>"$1"
 			shift
@@ -89,6 +124,12 @@ do
 			NOTIFY=1
 			stats=1
 		;;
+    --timeout=*)
+      TIMEOUT="${KEY#*=}"
+    ;;
+    --contimeout=*)
+      CTIMEOUT="${KEY#*=}"
+    ;;
     --dry-run)
       declare dryrun="dryrun"
       options+=("--dry-run")
@@ -166,12 +207,12 @@ trap '' SIGPIPE
 
 dorsync2(){
 	local RETRIES=900
-  local TIMEOUT=300
-  local CTIMEOUT=120
+  local timeout=${TIMEOUT:-900}
+  local ctimeout=${CTIMEOUT:-180}
   local NOCOMP='nef/3g2/3gp/7z/aac/ace/apk/avi/bz2/deb/dmg/ear/f4v/flac/flv/gpg/gz/iso/jar/jpeg/jpg/lrz/lz/lz4/lzma/lzo/m1a/m1v/m2a/m2ts/m2v/m4a/m4b/m4p/m4r/m4v/mka/mkv/mov/mp1/mp2/mp3/mp4/mpa/mpeg/mpg/mpv/mts/odb/odf/odg/odi/odm/odp/ods/odt/oga/ogg/ogm/ogv/ogx/opus/otg/oth/otp/ots/ott/oxt/png/qt/rar/rpm/rz/rzip/spx/squashfs/sxc/sxd/sxg/sxm/sxw/sz/tbz/tbz2/tgz/tlz/ts/txz/tzo/vob/war/webm/webp/xz/z/zip/zst'
 	while true
 	do
-    stdbuf -i0 -oL -eL rsync --contimeout=$CTIMEOUT --timeout=$TIMEOUT --skip-compress=$NOCOMP ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
+    stdbuf -i0 -oL -eL rsync --contimeout=$ctimeout --timeout=$timeout --skip-compress=$NOCOMP ${RSYNCOPTIONS+"${RSYNCOPTIONS[@]}"} ${options+"${options[@]}"} --one-file-system --compress "$@"
 		local ret=$?
 		case $ret in
 			0) break 									#this is a success

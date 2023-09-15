@@ -43,6 +43,9 @@ EOM
   exit 1;
 }
 
+declare hl_burst="${BKIT_HL_BURST:-500}"
+declare f_burst="${BKIT_F_BURST:-100}"
+
 declare -a options=()
 while [[ ${1:+$1} =~ ^- ]]
 do
@@ -291,7 +294,7 @@ update_bg(){
   while IFS='|' read -r file
   do
     echo "${file}" >> "$HLIST"
-    (( ++cnt >= 50 )) && {
+    (( ++cnt >= $hl_burst )) && {
       send_hl
       (( cnt = 0 ))
     }
@@ -315,8 +318,6 @@ update_files(){
 	FILE="${SRC}.sort"
 	LC_ALL=C sort -o "$FILE" "$SRC"
 	dorsync --delete --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
-	#echo dorsync --delete --archive --inplace --hard-links --relative --files-from="$FILE" --itemize-changes "${PERM[@]}" $FMT "$@"
-	#cat "$FILE"
 	rm -f "$FILE"
 }
 
@@ -364,7 +365,7 @@ upload_manifest(){
   while IFS= read -r line
   do
     echo "$line" >> "$manifest"
-    (( ++cnt > 50 )) && {
+    (( ++cnt > $f_burst )) && {
       send_manifest
       (( cnt = 0 ))
     }

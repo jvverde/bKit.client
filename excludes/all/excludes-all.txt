@@ -35,6 +35,12 @@ Cached*/
 *Cache/
 *Temporary/
 Temporary*/
+tmp/*
+tmp/
+temp/*
+temp/*
+Temp/*
+Temp/
 Temporary/
 Download/
 Downloads/
